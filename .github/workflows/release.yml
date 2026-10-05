@@ -15,6 +15,15 @@ name: Release
 on:
   push:
     branches: [main]
+    paths:
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "theme.css"
+      - "DESIGN_RULES.md"
+      - "COMPONENTS.md"
+      - "NOTICE"
+      - "tsconfig.json"
   workflow_dispatch:
 
 permissions:
