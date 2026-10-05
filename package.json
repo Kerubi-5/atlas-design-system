@@ -1,6 +1,6 @@
 {
   "name": "atlas-react-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared React components and Tailwind theme for Atlas",
   "type": "module",
   "license": "MIT",
@@ -39,6 +39,14 @@
       "types": "./dist/checkbox.d.ts",
       "default": "./dist/checkbox.js"
     },
+    "./combobox": {
+      "types": "./dist/combobox.d.ts",
+      "default": "./dist/combobox.js"
+    },
+    "./date-picker": {
+      "types": "./dist/date-picker.d.ts",
+      "default": "./dist/date-picker.js"
+    },
     "./dialog": {
       "types": "./dist/dialog.d.ts",
       "default": "./dist/dialog.js"
@@ -46,6 +54,10 @@
     "./empty-panel": {
       "types": "./dist/empty-panel.d.ts",
       "default": "./dist/empty-panel.js"
+    },
+    "./error-boundary": {
+      "types": "./dist/error-boundary.d.ts",
+      "default": "./dist/error-boundary.js"
     },
     "./field": {
       "types": "./dist/field.d.ts",
@@ -75,6 +87,10 @@
       "types": "./dist/skeleton.d.ts",
       "default": "./dist/skeleton.js"
     },
+    "./sortable-table-head": {
+      "types": "./dist/sortable-table-head.d.ts",
+      "default": "./dist/sortable-table-head.js"
+    },
     "./sonner": {
       "types": "./dist/sonner.d.ts",
       "default": "./dist/sonner.js"
@@ -95,6 +111,10 @@
       "types": "./dist/textarea.d.ts",
       "default": "./dist/textarea.js"
     },
+    "./theme-provider": {
+      "types": "./dist/theme-provider.d.ts",
+      "default": "./dist/theme-provider.js"
+    },
     "./toggle": {
       "types": "./dist/toggle.d.ts",
       "default": "./dist/toggle.js"
@@ -102,6 +122,10 @@
     "./toggle-group": {
       "types": "./dist/toggle-group.d.ts",
       "default": "./dist/toggle-group.js"
+    },
+    "./form/date-picker-field": {
+      "types": "./dist/form/date-picker-field.d.ts",
+      "default": "./dist/form/date-picker-field.js"
     },
     "./form/field-error": {
       "types": "./dist/form/field-error.d.ts",
@@ -158,6 +182,7 @@
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "date-fns": "^4.4.0",
     "lucide-react": "^1.16.0",
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",

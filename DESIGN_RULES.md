@@ -35,6 +35,9 @@ Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labell
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
 Next adapter provides `TabsNavLink` with this behavior.
 
-Use `FormTextField`, `FormSelectField`, and `FormFeedbackField` for portable form
-controls, and `FieldError` for field messages. More specialized controls belong
-to the application.
+Use `FormTextField`, `FormSelectField`, `FormDatePickerField`, and
+`FormFeedbackField` for portable form controls, and `FieldError` for field
+messages. `Combobox`, `DatePickerButton`, `ThemeProvider`, `ErrorBoundary`, and
+`SortableTableHead` are first-class kit pieces. Domain data and application
+shells stay with the application: currency or timezone option lists, query-library
+error views, markdown editors, kanban boards, and dashboard widgets.
