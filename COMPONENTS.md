@@ -1,6 +1,6 @@
 # Component guide
 
-Import each module from `@kerubi/atlas-ui/<subpath>`. Primitives preserve the
+Import each module from `atlas-react-kit/<subpath>`. Primitives preserve the
 underlying element or Radix props, including `className`, alongside their options.
 Form helpers and `TableBodySkeleton` accept only their documented props. There is
 no root component barrel.
@@ -57,8 +57,8 @@ shape. `FieldError` accepts either `message` or pre-resolved `text`.
 ## URL navigation in Next.js
 
 ```tsx
-import { TabsNav } from "@kerubi/atlas-ui/tabs"
-import { TabsNavLink } from "@kerubi/atlas-ui/next/tabs-nav-link"
+import { TabsNav } from "atlas-react-kit/tabs"
+import { TabsNavLink } from "atlas-react-kit/next/tabs-nav-link"
 
 export function ViewSwitcher({ view }: { view: string }) {
   return (
