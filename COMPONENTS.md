@@ -12,21 +12,27 @@ no root component barrel.
 | `calendar`                   | `Calendar`, `CalendarDayButton`; React Day Picker props and `buttonVariant`                                                        |
 | `card`                       | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`           |
 | `checkbox`                   | `Checkbox`                                                                                                                         |
+| `combobox`                   | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text                  |
+| `date-picker`                | `DatePickerButton`, `toDate`, `formatLocalDate`; `value` is `Date` or `yyyy-MM-dd`                                                 |
 | `dialog`                     | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton` |
 | `empty-panel`                | `EmptyPanel`; required `children`; optional `size`, `muted`, `className`                                                           |
+| `error-boundary`             | `ErrorBoundary`, `ErrorFallback`; optional `message`; retry resets, reload refreshes the page                                      |
 | `field`                      | Field, label, legend, description, group, set, title, content, separator, error; `Field` supports `orientation`                    |
 | `input`, `textarea`, `label` | `Input`, `Textarea`, `Label`                                                                                                       |
 | `popover`                    | `Popover`, trigger, anchor, content, header, title, description                                                                    |
 | `select`                     | Select, trigger, value, content, group, label, item, separator, scroll buttons; trigger `size`                                     |
 | `separator`, `skeleton`      | `Separator`, `Skeleton`                                                                                                            |
+| `sortable-table-head`        | `SortableTableHead`; `sorted`, `direction` (`asc` \| `desc`), `onClick`; sets `aria-sort`                                          |
 | `sonner`                     | `Toaster`; Sonner props, with `next-themes` theme defaults                                                                         |
 | `table`                      | Table, header, body, footer, row, head, cell, caption                                                                              |
 | `table-body-skeleton`        | `TableBodySkeleton`; `columns`, optional `rows` (default 5)                                                                        |
 | `tabs`                       | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsNav`, `tabsListVariants`; list `variant` is `default` or `line`             |
 | `toggle`                     | `Toggle`, `toggleVariants`; `variant`, `size`                                                                                      |
 | `toggle-group`               | `ToggleGroup`, `ToggleGroupItem`; `variant`, `size`                                                                                |
+| `theme-provider`             | `ThemeProvider`, `useTheme`; optional `storageKey` (default `atlas-theme`), `enableShortcut` for the `d` toggle                    |
 | `form/text-field`            | `FormTextField`, type `TextFieldApi`; controlled field, label, multiline, description, input constraints                           |
 | `form/select-field`          | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder; select item children                        |
+| `form/date-picker-field`     | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder                                          |
 | `form/field-error`           | `FieldError`, `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                  |
 | `form/feedback-field`        | `FormFeedbackField`; nullable `message`                                                                                            |
 | `next/tabs-nav-link`         | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                  |
@@ -51,8 +57,28 @@ type TextFieldApi = {
 
 `FormTextField` accepts `field` and `label`; use `multiline` and `rows` for a
 textarea, `inputType` for a specific input, and `showError={false}` to suppress
-error text and invalid styling. `FormSelectField` accepts the same error meta
-shape. `FieldError` accepts either `message` or pre-resolved `text`.
+error text and invalid styling. `FormSelectField` and `FormDatePickerField`
+accept the same error meta shape. `FormDatePickerField` takes a `Date` or
+`yyyy-MM-dd` string and calls `onValueChange` with `Date | undefined`.
+`FieldError` accepts either `message` or pre-resolved `text`.
+
+## Theme
+
+```tsx
+import { ThemeProvider } from "atlas-react-kit/theme-provider"
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider storageKey="app-theme" enableShortcut>
+      {children}
+    </ThemeProvider>
+  )
+}
+```
+
+`ThemeProvider` is a client component and does not import Next.js. It stores the
+choice under `atlas-theme` unless `storageKey` is set. Pass `enableShortcut={false}`
+to disable the `d` dark/light toggle.
 
 ## URL navigation in Next.js
 

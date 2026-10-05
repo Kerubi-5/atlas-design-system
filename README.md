@@ -4,7 +4,7 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.1.0
+npm install --save-exact atlas-react-kit@0.2.0
 ```
 
 Import components by subpath:
@@ -34,7 +34,8 @@ this example assumes it is one directory below the project root.
 @source "../node_modules/atlas-react-kit/dist";
 ```
 
-The theme includes animations and shared light/dark tokens. Set the `dark` class
+The theme includes animations and shared light/dark tokens. Wrap the tree with
+`ThemeProvider` from `atlas-react-kit/theme-provider`, or set the `dark` class
 on an ancestor to activate dark colors. Supply your own font configuration;
 `font-heading` uses the configured sans font. Application-specific tokens stay
 with the application.
@@ -58,25 +59,18 @@ without compilation and processed by the consuming application's Tailwind build.
 The optional Next.js 16 adapter requires Next only when imported. The package
 does not bundle React.
 
-For the first release, create and validate a packed artifact:
+0.1.0 is already on npm. Later releases use explicit `v<version>` tags matching
+`package.json`; CI runs checks before publishing through npm OIDC. Pushing to
+`main` runs validation only.
+
+If trusted publishing is not yet configured, pack and publish a validated
+artifact with the package owner's npm login:
 
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
+npm publish ./release-artifacts/atlas-react-kit-0.2.0.tgz --access public
 ```
-
-Install that tarball in consumer fixtures and complete their checks. The package
-owner then publishes that exact validated artifact, without rebuilding it:
-
-```sh
-npm publish ./release-artifacts/atlas-react-kit-0.1.0.tgz --access public
-```
-
-The owner then configures npm trusted publishing for this repository's
-`release.yml` workflow on a GitHub-hosted runner.
-Later releases use explicit `v<version>` tags matching `package.json`; CI runs
-checks before publishing through npm OIDC. Pushing to `main` runs validation only.
-Do not push a release tag for the initial manual publication.
 
 Pin an exact package version in consuming applications. Roll back an upgrade by
 restoring the previous version and lockfile. License: MIT; upstream notices are
