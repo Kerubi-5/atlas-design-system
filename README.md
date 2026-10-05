@@ -1,17 +1,17 @@
-# Atlas UI
+# Atlas React Kit
 
 Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact @kerubi/atlas-ui@0.1.0
+npm install --save-exact atlas-react-kit@0.1.0
 ```
 
 Import components by subpath:
 
 ```tsx
-import { Button } from "@kerubi/atlas-ui/button"
-import { Card, CardContent } from "@kerubi/atlas-ui/card"
+import { Button } from "atlas-react-kit/button"
+import { Card, CardContent } from "atlas-react-kit/card"
 
 export function Example() {
   return (
@@ -30,8 +30,8 @@ this example assumes it is one directory below the project root.
 
 ```css
 @import "tailwindcss";
-@import "@kerubi/atlas-ui/theme.css";
-@source "../node_modules/@kerubi/atlas-ui/dist";
+@import "atlas-react-kit/theme.css";
+@source "../node_modules/atlas-react-kit/dist";
 ```
 
 The theme includes animations and shared light/dark tokens. Set the `dark` class
@@ -69,7 +69,7 @@ Install that tarball in consumer fixtures and complete their checks. The package
 owner then publishes that exact validated artifact, without rebuilding it:
 
 ```sh
-npm publish ./release-artifacts/kerubi-atlas-ui-0.1.0.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.1.0.tgz --access public
 ```
 
 The owner then configures npm trusted publishing for this repository's
