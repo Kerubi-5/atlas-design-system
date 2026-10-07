@@ -97,6 +97,15 @@ export function Combobox({
       const option = filtered[highlight]
       if (option) selectValue(option.value)
     }
+    // Home/End jump the highlight; preventDefault so the search caret stays put.
+    if (event.key === "Home") {
+      event.preventDefault()
+      setHighlight(0)
+    }
+    if (event.key === "End") {
+      event.preventDefault()
+      setHighlight(filtered.length === 0 ? 0 : filtered.length - 1)
+    }
   }
 
   return (
