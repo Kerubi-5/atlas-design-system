@@ -37,7 +37,8 @@ Next adapter provides `TabsNavLink` with this behavior.
 
 Use `FormTextField`, `FormSelectField`, `FormDatePickerField`, and
 `FormFeedbackField` for portable form controls, and `FieldError` for field
-messages. `Combobox`, `DatePickerButton`, `ThemeProvider`, `ErrorBoundary`, and
-`SortableTableHead` are first-class kit pieces. Domain data and application
-shells stay with the application: currency or timezone option lists, query-library
-error views, markdown editors, kanban boards, and dashboard widgets.
+messages. `Combobox`, `DatePickerButton` (including `mode="range"`),
+`ThemeProvider`, `ErrorBoundary`, and `SortableTableHead` are first-class kit
+pieces. Domain data and application shells stay with the application: currency
+or timezone option lists, query-library error views, markdown editors, kanban
+boards, and dashboard widgets.

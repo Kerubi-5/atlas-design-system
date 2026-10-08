@@ -5,39 +5,39 @@ underlying element or Radix props, including `className`, alongside their option
 Form helpers and `TableBodySkeleton` accept only their documented props. There is
 no root component barrel.
 
-| Subpath                      | Main exports and options                                                                                                           |
-| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `button`                     | `Button`, `buttonVariants`; `variant`, `size`, `asChild`                                                                           |
-| `badge`                      | `Badge`, `badgeVariants`; `variant`, `tone`, `asChild`                                                                             |
-| `calendar`                   | `Calendar`, `CalendarDayButton`; React Day Picker props and `buttonVariant`                                                        |
-| `card`                       | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`           |
-| `checkbox`                   | `Checkbox`                                                                                                                         |
-| `combobox`                   | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text                  |
-| `date-picker`                | `DatePickerButton`, `toDate`, `formatLocalDate`; `value` is `Date` or `yyyy-MM-dd`                                                 |
-| `dialog`                     | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton` |
-| `empty-panel`                | `EmptyPanel`; required `children`; optional `size`, `muted`, `className`                                                           |
-| `error-boundary`             | `ErrorBoundary`, `ErrorFallback`; optional `message`; retry resets, reload refreshes the page                                      |
-| `field`                      | Field, label, legend, description, group, set, title, content, separator, error; `Field` supports `orientation`                    |
-| `input`, `textarea`, `label` | `Input`, `Textarea`, `Label`                                                                                                       |
-| `popover`                    | `Popover`, trigger, anchor, content, header, title, description                                                                    |
-| `select`                     | Select, trigger, value, content, group, label, item, separator, scroll buttons; trigger `size`                                     |
-| `separator`, `skeleton`      | `Separator`, `Skeleton`                                                                                                            |
-| `sortable-table-head`        | `SortableTableHead`; `sorted`, `direction` (`asc` \| `desc`), `onClick`; sets `aria-sort`                                          |
-| `sonner`                     | `Toaster`; Sonner props, with `next-themes` theme defaults                                                                         |
-| `table`                      | Table, header, body, footer, row, head, cell, caption                                                                              |
-| `table-body-skeleton`        | `TableBodySkeleton`; `columns`, optional `rows` (default 5)                                                                        |
-| `tabs`                       | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsNav`, `tabsListVariants`; list `variant` is `default` or `line`             |
-| `toggle`                     | `Toggle`, `toggleVariants`; `variant`, `size`                                                                                      |
-| `toggle-group`               | `ToggleGroup`, `ToggleGroupItem`; `variant`, `size`                                                                                |
-| `theme-provider`             | `ThemeProvider`, `useTheme`; optional `storageKey` (default `atlas-theme`), `enableShortcut` for the `d` toggle                    |
-| `form/text-field`            | `FormTextField`, type `TextFieldApi`; controlled field, label, multiline, description, input constraints                           |
-| `form/select-field`          | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder; select item children                        |
-| `form/date-picker-field`     | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder                                          |
-| `form/field-error`           | `FieldError`, `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                  |
-| `form/feedback-field`        | `FormFeedbackField`; nullable `message`                                                                                            |
-| `next/tabs-nav-link`         | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                  |
-| `utils`                      | `cn`, `onInputChange`                                                                                                              |
-| `theme.css`                  | Tailwind 4 theme; installation in [README](./README.md)                                                                            |
+| Subpath                      | Main exports and options                                                                                                                                                                                                       |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `button`                     | `Button`, `buttonVariants`; `variant`, `size`, `asChild`                                                                                                                                                                       |
+| `badge`                      | `Badge`, `badgeVariants`; `variant`, `tone`, `asChild`                                                                                                                                                                         |
+| `calendar`                   | `Calendar`, `CalendarDayButton`; React Day Picker props and `buttonVariant`                                                                                                                                                    |
+| `card`                       | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`                                                                                                       |
+| `checkbox`                   | `Checkbox`                                                                                                                                                                                                                     |
+| `combobox`                   | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text; keyboard highlight scrolls into view                                                                        |
+| `date-picker`                | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; optional `numberOfMonths` (range default 2) |
+| `dialog`                     | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton`                                                                                             |
+| `empty-panel`                | `EmptyPanel`; required `children`; optional `size`, `muted`, `className`                                                                                                                                                       |
+| `error-boundary`             | `ErrorBoundary`, `ErrorFallback`; optional `message`; retry resets, reload refreshes the page                                                                                                                                  |
+| `field`                      | Field, label, legend, description, group, set, title, content, separator, error; `Field` supports `orientation`                                                                                                                |
+| `input`, `textarea`, `label` | `Input`, `Textarea`, `Label`                                                                                                                                                                                                   |
+| `popover`                    | `Popover`, trigger, anchor, content, header, title, description                                                                                                                                                                |
+| `select`                     | Select, trigger, value, content, group, label, item, separator, scroll buttons; trigger `size`                                                                                                                                 |
+| `separator`, `skeleton`      | `Separator`, `Skeleton`                                                                                                                                                                                                        |
+| `sortable-table-head`        | `SortableTableHead`; `sorted`, `direction` (`asc` \| `desc`), `onClick`; sets `aria-sort`                                                                                                                                      |
+| `sonner`                     | `Toaster`; Sonner props, with `next-themes` theme defaults                                                                                                                                                                     |
+| `table`                      | Table, header, body, footer, row, head, cell, caption                                                                                                                                                                          |
+| `table-body-skeleton`        | `TableBodySkeleton`; `columns`, optional `rows` (default 5)                                                                                                                                                                    |
+| `tabs`                       | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsNav`, `tabsListVariants`; list `variant` is `default` or `line`                                                                                                         |
+| `toggle`                     | `Toggle`, `toggleVariants`; `variant`, `size`                                                                                                                                                                                  |
+| `toggle-group`               | `ToggleGroup`, `ToggleGroupItem`; `variant`, `size`                                                                                                                                                                            |
+| `theme-provider`             | `ThemeProvider`, `useTheme`; optional `storageKey` (default `atlas-theme`), `enableShortcut` for the `d` toggle                                                                                                                |
+| `form/text-field`            | `FormTextField`, type `TextFieldApi`; controlled field, label, multiline, description, input constraints                                                                                                                       |
+| `form/select-field`          | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder; select item children                                                                                                                    |
+| `form/date-picker-field`     | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder                                                                                                                                      |
+| `form/field-error`           | `FieldError`, `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                              |
+| `form/feedback-field`        | `FormFeedbackField`; nullable `message`                                                                                                                                                                                        |
+| `next/tabs-nav-link`         | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                                                                                                              |
+| `utils`                      | `cn`, `onInputChange`                                                                                                                                                                                                          |
+| `theme.css`                  | Tailwind 4 theme; installation in [README](./README.md)                                                                                                                                                                        |
 
 ## Forms
 
@@ -61,6 +61,34 @@ error text and invalid styling. `FormSelectField` and `FormDatePickerField`
 accept the same error meta shape. `FormDatePickerField` takes a `Date` or
 `yyyy-MM-dd` string and calls `onValueChange` with `Date | undefined`.
 `FieldError` accepts either `message` or pre-resolved `text`.
+
+`DatePickerButton` is single-day by default. For a from/to range, set
+`mode="range"`; `value` is `{ from, to }` (each side `Date` or `yyyy-MM-dd`)
+and `onChange` receives `DateRange | undefined`. The popover shows two months
+unless `numberOfMonths` is set, stays `w-auto` so it does not collapse to the
+default popover width, and includes a Clear action.
+
+```tsx
+import { DatePickerButton, type DateRange } from "atlas-react-kit/date-picker"
+
+export function ExportRange({
+  value,
+  onChange,
+}: {
+  value: DateRange | undefined
+  onChange: (range: DateRange | undefined) => void
+}) {
+  return (
+    <DatePickerButton
+      mode="range"
+      value={value}
+      onChange={onChange}
+      numberOfMonths={2}
+      placeholder="Export range"
+    />
+  )
+}
+```
 
 ## Theme
 

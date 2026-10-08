@@ -27,8 +27,17 @@ type ComboboxProps = {
 }
 
 /**
+ * PageUp/PageDown jump size. The option list is `max-h-60`; ten rows is a
+ * bit more than one viewport so long lists (timezones, currencies) move
+ * without requiring an End key.
+ */
+const LISTBOX_PAGE_SIZE = 10
+
+/**
  * Searchable single-select built from Button, Popover, and Input.
  * Options are a plain `{ value, label }` list; domain data stays in the app.
+ * Keyboard highlight (arrows, Home/End, PageUp/PageDown) scrolls the active
+ * option into view inside the overflow list.
  */
 export function Combobox({
   options,
@@ -46,6 +55,7 @@ export function Combobox({
   const [query, setQuery] = React.useState("")
   const [highlight, setHighlight] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
+  const highlightRef = React.useRef<HTMLButtonElement>(null)
   const listId = React.useId()
   const selected = options.find((option) => option.value === value)
   const filtered = React.useMemo(() => {
@@ -68,6 +78,14 @@ export function Combobox({
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus())
     return () => window.cancelAnimationFrame(frame)
   }, [open])
+
+  // Keep the highlighted option inside the overflow list. Home/End/Page and
+  // arrows only update index state; without this, a 400-option list can
+  // highlight the last row while it remains off-screen.
+  React.useEffect(() => {
+    if (!open) return
+    highlightRef.current?.scrollIntoView({ block: "nearest" })
+  }, [open, highlight, filtered])
 
   const onQueryChange = onInputChange((next) => {
     setQuery(next)
@@ -97,7 +115,8 @@ export function Combobox({
       const option = filtered[highlight]
       if (option) selectValue(option.value)
     }
-    // Home/End jump the highlight; preventDefault so the search caret stays put.
+    // Home/End/Page jump the highlight; preventDefault so the search caret
+    // stays put and the page behind the list does not scroll.
     if (event.key === "Home") {
       event.preventDefault()
       setHighlight(0)
@@ -105,6 +124,18 @@ export function Combobox({
     if (event.key === "End") {
       event.preventDefault()
       setHighlight(filtered.length === 0 ? 0 : filtered.length - 1)
+    }
+    if (event.key === "PageDown") {
+      event.preventDefault()
+      setHighlight((index) =>
+        filtered.length === 0
+          ? 0
+          : Math.min(index + LISTBOX_PAGE_SIZE, filtered.length - 1)
+      )
+    }
+    if (event.key === "PageUp") {
+      event.preventDefault()
+      setHighlight((index) => Math.max(index - LISTBOX_PAGE_SIZE, 0))
     }
   }
 
@@ -162,6 +193,7 @@ export function Combobox({
               return (
                 <li key={option.value} role="none">
                   <button
+                    ref={isActive ? highlightRef : undefined}
                     id={`${listId}-option-${option.value}`}
                     type="button"
                     role="option"
