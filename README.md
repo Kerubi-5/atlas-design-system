@@ -4,7 +4,7 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.2.0
+npm install --save-exact atlas-react-kit@0.2.1
 ```
 
 Import components by subpath:
@@ -59,17 +59,18 @@ without compilation and processed by the consuming application's Tailwind build.
 The optional Next.js 16 adapter requires Next only when imported. The package
 does not bundle React.
 
-0.1.0 is already on npm. Later releases use explicit `v<version>` tags matching
-`package.json`; CI runs checks before publishing through npm OIDC. Pushing to
-`main` runs validation only.
+0.1.0 and 0.2.0 are already on npm. Bumping the version in `package.json` and
+merging to `main` (path-filtered to package files) or running
+`workflow_dispatch` publishes through npm OIDC trusted publishing after
+check, test, and pack gates. Versions already on npm are skipped.
 
-If trusted publishing is not yet configured, pack and publish a validated
+If trusted publishing is not configured, pack and publish a validated
 artifact with the package owner's npm login:
 
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.2.0.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.2.1.tgz --access public
 ```
 
 Pin an exact package version in consuming applications. Roll back an upgrade by
