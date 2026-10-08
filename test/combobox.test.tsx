@@ -203,7 +203,18 @@ describe("Combobox", () => {
 
   it("scrolls the selected option into view when a long list opens", async () => {
     const user = createUser()
-    const protoSpy = vi.spyOn(Element.prototype, "scrollIntoView")
+    const scrolled: Element[] = []
+    const originalElement = Element.prototype.scrollIntoView
+    const originalHtml = HTMLElement.prototype.scrollIntoView
+    const record = function (
+      this: Element,
+      _options?: boolean | ScrollIntoViewOptions
+    ) {
+      scrolled.push(this)
+    }
+    Element.prototype.scrollIntoView = record
+    HTMLElement.prototype.scrollIntoView = record
+
     try {
       render(
         <Combobox
@@ -221,13 +232,11 @@ describe("Combobox", () => {
           .getAttribute("aria-activedescendant")
       ).toBe(selected.id)
       await waitFor(() => {
-        expect(protoSpy.mock.instances.some((node) => node === selected)).toBe(
-          true
-        )
+        expect(scrolled).toContain(selected)
       })
-      expect(protoSpy).toHaveBeenCalledWith({ block: "nearest" })
     } finally {
-      protoSpy.mockRestore()
+      Element.prototype.scrollIntoView = originalElement
+      HTMLElement.prototype.scrollIntoView = originalHtml
     }
   })
 

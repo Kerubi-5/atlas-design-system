@@ -55,7 +55,6 @@ export function Combobox({
   const [query, setQuery] = React.useState("")
   const [highlight, setHighlight] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
-  const highlightRef = React.useRef<HTMLButtonElement>(null)
   const listId = React.useId()
   const selected = options.find((option) => option.value === value)
   const filtered = React.useMemo(() => {
@@ -66,26 +65,34 @@ export function Combobox({
     )
   }, [options, query])
 
-  // Highlight and search reset when the popover opens or closes; options/value
-  // are read for the initial highlight rather than subscribed as deps.
-  React.useEffect(() => {
-    if (!open) {
+  const onOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (!next) {
       setQuery("")
       return
     }
+    // Set the highlight in the same turn as open so the first painted list
+    // already points at the selected option (a timezone at the end of 400
+    // rows) instead of flashing index 0 and scrolling twice.
     const selectedIndex = options.findIndex((option) => option.value === value)
     setHighlight(selectedIndex >= 0 ? selectedIndex : 0)
+  }
+
+  React.useEffect(() => {
+    if (!open) return
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus())
     return () => window.cancelAnimationFrame(frame)
   }, [open])
 
-  // Keep the highlighted option inside the overflow list. Home/End/Page and
-  // arrows only update index state; without this, a 400-option list can
-  // highlight the last row while it remains off-screen.
-  React.useEffect(() => {
-    if (!open) return
-    highlightRef.current?.scrollIntoView({ block: "nearest" })
-  }, [open, highlight, filtered])
+  // Callback ref (not an effect) so scroll runs when Radix mounts the list
+  // and when the highlight moves. A layout effect on `open` is too early:
+  // the option node does not exist until the popover content is in the DOM.
+  const scrollHighlightedOption = React.useCallback(
+    (node: HTMLButtonElement | null) => {
+      node?.scrollIntoView({ block: "nearest" })
+    },
+    []
+  )
 
   const onQueryChange = onInputChange((next) => {
     setQuery(next)
@@ -140,7 +147,7 @@ export function Combobox({
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -193,7 +200,7 @@ export function Combobox({
               return (
                 <li key={option.value} role="none">
                   <button
-                    ref={isActive ? highlightRef : undefined}
+                    ref={isActive ? scrollHighlightedOption : undefined}
                     id={`${listId}-option-${option.value}`}
                     type="button"
                     role="option"
