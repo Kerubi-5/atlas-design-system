@@ -10,6 +10,10 @@ name: Release
 # Organization/user: Kerubi-5
 # Repository: atlas-design-system
 # Workflow filename: release.yml
+# Allowed actions: npm publish (this workflow publishes directly).
+# Configs created after 2026-09-03 default to "npm stage publish" only;
+# also enable npm publish or the job fails with OIDC permission denied.
+# Leave Environment name empty unless this job sets `environment:`.
 # After that, bumping the version in package.json and merging to main
 # publishes it automatically. workflow_dispatch re-runs without a new tag.
 on:
