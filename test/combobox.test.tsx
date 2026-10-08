@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { Combobox } from "../src/combobox.js"
 
@@ -11,6 +11,14 @@ const options = [
   { value: "gbp", label: "British Pound" },
   { value: "jpy", label: "Japanese Yen" },
 ]
+
+/** Long enough to overflow `max-h-60` the way a timezone list does. */
+function timezoneOptions(count = 48) {
+  return Array.from({ length: count }, (_, index) => ({
+    value: `tz-${index}`,
+    label: `Timezone ${String(index).padStart(2, "0")}`,
+  }))
+}
 
 function ComboboxHarness({
   initialValue,
@@ -112,6 +120,124 @@ describe("Combobox", () => {
       expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
     })
     expect(getCombobox()).toHaveTextContent("British Pound")
+  })
+
+  it("pages the highlight with PageDown and PageUp", async () => {
+    const user = createUser()
+    render(<Combobox options={timezoneOptions()} onValueChange={() => {}} />)
+    await openCombobox(user)
+
+    const search = screen.getByPlaceholderText("Search")
+    const option = (index: number) =>
+      screen.getByRole("option", {
+        name: `Timezone ${String(index).padStart(2, "0")}`,
+      })
+
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(0).id)
+
+    await user.keyboard("{PageDown}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(10).id)
+
+    await user.keyboard("{PageDown}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(20).id)
+
+    await user.keyboard("{PageUp}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(10).id)
+
+    await user.keyboard("{End}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(47).id)
+
+    await user.keyboard("{PageDown}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(option(47).id)
+  })
+
+  it("scrolls the highlighted option into view for Home, End, Page, and arrows", async () => {
+    const user = createUser()
+    render(<Combobox options={timezoneOptions()} onValueChange={() => {}} />)
+    await openCombobox(user)
+
+    const search = screen.getByPlaceholderText("Search")
+    const last = screen.getByRole("option", { name: "Timezone 47" })
+    const lastSpy = vi.spyOn(last, "scrollIntoView")
+
+    await user.keyboard("{End}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(last.id)
+    await waitFor(() => {
+      expect(lastSpy).toHaveBeenCalledWith({ block: "nearest" })
+    })
+
+    const first = screen.getByRole("option", { name: "Timezone 00" })
+    const firstSpy = vi.spyOn(first, "scrollIntoView")
+    await user.keyboard("{Home}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(first.id)
+    await waitFor(() => {
+      expect(firstSpy).toHaveBeenCalledWith({ block: "nearest" })
+    })
+
+    const paged = screen.getByRole("option", { name: "Timezone 10" })
+    const pageSpy = vi.spyOn(paged, "scrollIntoView")
+    await user.keyboard("{PageDown}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(paged.id)
+    await waitFor(() => {
+      expect(pageSpy).toHaveBeenCalledWith({ block: "nearest" })
+    })
+
+    await user.keyboard("{PageUp}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(first.id)
+
+    const next = screen.getByRole("option", { name: "Timezone 01" })
+    const nextSpy = vi.spyOn(next, "scrollIntoView")
+    await user.keyboard("{ArrowDown}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(next.id)
+    await waitFor(() => {
+      expect(nextSpy).toHaveBeenCalledWith({ block: "nearest" })
+    })
+
+    const prevSpy = vi.spyOn(first, "scrollIntoView")
+    await user.keyboard("{ArrowUp}")
+    expect(search.getAttribute("aria-activedescendant")).toBe(first.id)
+    await waitFor(() => {
+      expect(prevSpy).toHaveBeenCalledWith({ block: "nearest" })
+    })
+  })
+
+  it("scrolls the selected option into view when a long list opens", async () => {
+    const user = createUser()
+    const scrolled: Element[] = []
+    const originalElement = Element.prototype.scrollIntoView
+    const originalHtml = HTMLElement.prototype.scrollIntoView
+    const record = function (
+      this: Element,
+      _options?: boolean | ScrollIntoViewOptions
+    ) {
+      scrolled.push(this)
+    }
+    Element.prototype.scrollIntoView = record
+    HTMLElement.prototype.scrollIntoView = record
+
+    try {
+      render(
+        <Combobox
+          options={timezoneOptions()}
+          value="tz-47"
+          onValueChange={() => {}}
+        />
+      )
+      await openCombobox(user)
+
+      const selected = screen.getByRole("option", { name: "Timezone 47" })
+      expect(
+        screen
+          .getByPlaceholderText("Search")
+          .getAttribute("aria-activedescendant")
+      ).toBe(selected.id)
+      await waitFor(() => {
+        expect(scrolled).toContain(selected)
+      })
+    } finally {
+      Element.prototype.scrollIntoView = originalElement
+      HTMLElement.prototype.scrollIntoView = originalHtml
+    }
   })
 
   it("closes on Escape and returns focus to the trigger", async () => {

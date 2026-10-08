@@ -1,12 +1,9 @@
 import { useState } from "react"
-import type { DateRange } from "react-day-picker"
 import { describe, expect, it, vi } from "vitest"
 
-import { Button } from "../src/button.js"
 import { Calendar } from "../src/calendar.js"
-import { DatePickerButton } from "../src/date-picker.js"
+import { DatePickerButton, type DateRange } from "../src/date-picker.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
-import { Popover, PopoverContent, PopoverTrigger } from "../src/popover.js"
 
 import { createUser, render, screen, waitFor, within } from "./helpers.js"
 
@@ -26,26 +23,28 @@ function getDayButton(date: Date) {
   return button
 }
 
-function RangePopover() {
-  const [open, setOpen] = useState(false)
-  const [range, setRange] = useState<DateRange | undefined>()
-
+function RangePickerHarness({
+  initial,
+  placeholder = "Export range",
+  onChange,
+}: {
+  initial?: DateRange
+  placeholder?: string
+  onChange?: (range: DateRange | undefined) => void
+}) {
+  const [range, setRange] = useState<DateRange | undefined>(initial)
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button type="button">Export range</Button>
-      </PopoverTrigger>
-      <PopoverContent align="start" className="w-auto rounded-none p-0">
-        <Calendar
-          mode="range"
-          locale={locale}
-          numberOfMonths={2}
-          selected={range}
-          defaultMonth={october}
-          onSelect={setRange}
-        />
-      </PopoverContent>
-    </Popover>
+    <DatePickerButton
+      mode="range"
+      value={range}
+      onChange={(next) => {
+        setRange(next)
+        onChange?.(next)
+      }}
+      defaultMonth={october}
+      numberOfMonths={2}
+      placeholder={placeholder}
+    />
   )
 }
 
@@ -190,10 +189,92 @@ describe("FormDatePickerField", () => {
   })
 })
 
-describe("nested range picker popover", () => {
-  it("keeps a two-month, auto-sized popover after selecting a range", async () => {
+describe("DatePickerButton range mode", () => {
+  it("opens and closes from the trigger", async () => {
     const user = createUser()
-    render(<RangePopover />)
+    render(<RangePickerHarness />)
+
+    const trigger = screen.getByRole("button", { name: "Export range" })
+    expect(trigger).toHaveAttribute("data-empty", "true")
+
+    await user.click(trigger)
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    await user.click(trigger)
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+  })
+
+  it("closes on Escape and returns focus to the trigger", async () => {
+    const user = createUser()
+    render(<RangePickerHarness />)
+
+    const trigger = screen.getByRole("button", { name: "Export range" })
+    await user.click(trigger)
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    await user.keyboard("{Escape}")
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    expect(trigger).toHaveFocus()
+    expect(trigger).toHaveTextContent("Export range")
+  })
+
+  it("picks a range across two months and closes", async () => {
+    const user = createUser()
+    const onChange = vi.fn<(range: DateRange | undefined) => void>()
+    render(<RangePickerHarness onChange={onChange} />)
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    expect(onChange).toHaveBeenCalled()
+    expect(screen.getAllByRole("grid")).toHaveLength(2)
+
+    await user.click(getDayButton(new Date(2026, 10, 10)))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    const last = onChange.mock.calls.at(-1)?.[0]
+    expect(last?.from?.getDate()).toBe(5)
+    expect(last?.from?.getMonth()).toBe(9)
+    expect(last?.to?.getDate()).toBe(10)
+    expect(last?.to?.getMonth()).toBe(10)
+  })
+
+  it("clears a selected range and returns to the placeholder", async () => {
+    const user = createUser()
+    render(
+      <RangePickerHarness
+        initial={{
+          from: new Date(2026, 9, 5),
+          to: new Date(2026, 10, 10),
+        }}
+      />
+    )
+
+    const trigger = screen.getByRole("button", { name: /October 5/ })
+    expect(trigger).toHaveTextContent("November 10")
+    expect(trigger).toHaveAttribute("data-empty", "false")
+
+    await user.click(trigger)
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    await user.click(screen.getByRole("button", { name: "Clear" }))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    expect(trigger).toHaveTextContent("Export range")
+    expect(trigger).toHaveAttribute("data-empty", "true")
+    expect(trigger).toHaveFocus()
+  })
+
+  it("keeps a two-month, auto-sized popover while the calendar is open", async () => {
+    const user = createUser()
+    render(<RangePickerHarness />)
 
     await user.click(screen.getByRole("button", { name: "Export range" }))
     const popover = await waitFor(() => {
@@ -204,22 +285,22 @@ describe("nested range picker popover", () => {
 
     expect(popover).toHaveClass("w-auto")
     expect(popover.className).not.toMatch(/\bw-72\b/)
-
-    await user.click(getDayButton(new Date(2026, 9, 5)))
-    await user.click(getDayButton(new Date(2026, 10, 10)))
-
-    const after = document.querySelector("[data-slot=popover-content]")
-    expect(after).toHaveClass("w-auto")
-    expect(after?.className ?? "").not.toMatch(/\bw-72\b/)
+    expect(screen.getAllByRole("grid")).toHaveLength(2)
     expect(
-      within(after as HTMLElement)
+      within(popover)
         .getAllByText(/2026/)
         .some((node) => /October/.test(node.textContent ?? ""))
     ).toBe(true)
     expect(
-      within(after as HTMLElement)
+      within(popover)
         .getAllByText(/2026/)
         .some((node) => /November/.test(node.textContent ?? ""))
     ).toBe(true)
+
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    const afterStart = document.querySelector("[data-slot=popover-content]")
+    expect(afterStart).toHaveClass("w-auto")
+    expect(afterStart?.className ?? "").not.toMatch(/\bw-72\b/)
+    expect(screen.getAllByRole("grid")).toHaveLength(2)
   })
 })

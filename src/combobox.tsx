@@ -27,8 +27,17 @@ type ComboboxProps = {
 }
 
 /**
+ * PageUp/PageDown jump size. The option list is `max-h-60`; ten rows is a
+ * bit more than one viewport so long lists (timezones, currencies) move
+ * without requiring an End key.
+ */
+const LISTBOX_PAGE_SIZE = 10
+
+/**
  * Searchable single-select built from Button, Popover, and Input.
  * Options are a plain `{ value, label }` list; domain data stays in the app.
+ * Keyboard highlight (arrows, Home/End, PageUp/PageDown) scrolls the active
+ * option into view inside the overflow list.
  */
 export function Combobox({
   options,
@@ -56,18 +65,34 @@ export function Combobox({
     )
   }, [options, query])
 
-  // Highlight and search reset when the popover opens or closes; options/value
-  // are read for the initial highlight rather than subscribed as deps.
-  React.useEffect(() => {
-    if (!open) {
+  const onOpenChange = (next: boolean) => {
+    setOpen(next)
+    if (!next) {
       setQuery("")
       return
     }
+    // Set the highlight in the same turn as open so the first painted list
+    // already points at the selected option (a timezone at the end of 400
+    // rows) instead of flashing index 0 and scrolling twice.
     const selectedIndex = options.findIndex((option) => option.value === value)
     setHighlight(selectedIndex >= 0 ? selectedIndex : 0)
+  }
+
+  React.useEffect(() => {
+    if (!open) return
     const frame = window.requestAnimationFrame(() => inputRef.current?.focus())
     return () => window.cancelAnimationFrame(frame)
   }, [open])
+
+  // Callback ref (not an effect) so scroll runs when Radix mounts the list
+  // and when the highlight moves. A layout effect on `open` is too early:
+  // the option node does not exist until the popover content is in the DOM.
+  const scrollHighlightedOption = React.useCallback(
+    (node: HTMLButtonElement | null) => {
+      node?.scrollIntoView({ block: "nearest" })
+    },
+    []
+  )
 
   const onQueryChange = onInputChange((next) => {
     setQuery(next)
@@ -97,7 +122,8 @@ export function Combobox({
       const option = filtered[highlight]
       if (option) selectValue(option.value)
     }
-    // Home/End jump the highlight; preventDefault so the search caret stays put.
+    // Home/End/Page jump the highlight; preventDefault so the search caret
+    // stays put and the page behind the list does not scroll.
     if (event.key === "Home") {
       event.preventDefault()
       setHighlight(0)
@@ -106,10 +132,22 @@ export function Combobox({
       event.preventDefault()
       setHighlight(filtered.length === 0 ? 0 : filtered.length - 1)
     }
+    if (event.key === "PageDown") {
+      event.preventDefault()
+      setHighlight((index) =>
+        filtered.length === 0
+          ? 0
+          : Math.min(index + LISTBOX_PAGE_SIZE, filtered.length - 1)
+      )
+    }
+    if (event.key === "PageUp") {
+      event.preventDefault()
+      setHighlight((index) => Math.max(index - LISTBOX_PAGE_SIZE, 0))
+    }
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
           id={id}
@@ -162,6 +200,7 @@ export function Combobox({
               return (
                 <li key={option.value} role="none">
                   <button
+                    ref={isActive ? scrollHighlightedOption : undefined}
                     id={`${listId}-option-${option.value}`}
                     type="button"
                     role="option"

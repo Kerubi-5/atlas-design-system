@@ -54,6 +54,28 @@ describe("date picker field", () => {
     expect(html).toContain("Pick a date")
     expect(html).toContain('data-empty="true"')
   })
+
+  it("renders a range trigger with from and to labels", () => {
+    const html = renderToStaticMarkup(
+      <DatePickerButton
+        mode="range"
+        value={{ from: "2026-10-05", to: "2026-11-10" }}
+        onChange={() => {}}
+      />
+    )
+    expect(html).toContain("October 5")
+    expect(html).toContain("November 10")
+    expect(html).toContain("rounded-none")
+    expect(html).toContain('data-empty="false"')
+  })
+
+  it("shows the range placeholder when empty", () => {
+    const html = renderToStaticMarkup(
+      <DatePickerButton mode="range" value={undefined} onChange={() => {}} />
+    )
+    expect(html).toContain("Pick a date range")
+    expect(html).toContain('data-empty="true"')
+  })
 })
 
 describe("combobox", () => {
