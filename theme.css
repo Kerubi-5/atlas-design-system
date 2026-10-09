@@ -202,4 +202,43 @@
   [data-slot="card-footer"].border-t {
     padding-top: var(--card-p);
   }
+
+  /*
+   * Horizontal scroll shadows: edge fades stay pinned (`scroll`) while
+   * matching covers ride with the content (`local`), so a clipped column
+   * like LICENSE is visible as overflow instead of looking truncated.
+   */
+  [data-slot="table-container"] {
+    --table-scroll-fade: var(--background);
+    background:
+      linear-gradient(to right, var(--table-scroll-fade) 40%, transparent),
+      linear-gradient(to left, var(--table-scroll-fade) 40%, transparent),
+      linear-gradient(
+        to right,
+        color-mix(in oklch, var(--foreground) 16%, transparent),
+        transparent 80%
+      ),
+      linear-gradient(
+        to left,
+        color-mix(in oklch, var(--foreground) 16%, transparent),
+        transparent 80%
+      );
+    background-repeat: no-repeat;
+    background-size:
+      1.5rem 100%,
+      1.5rem 100%,
+      0.75rem 100%,
+      0.75rem 100%;
+    background-position:
+      left center,
+      right center,
+      left center,
+      right center;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Covers match the card face so the fade does not flash the page background. */
+  [data-slot="card"] [data-slot="table-container"] {
+    --table-scroll-fade: var(--card);
+  }
 }

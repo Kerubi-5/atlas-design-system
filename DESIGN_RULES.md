@@ -30,10 +30,13 @@ other circles. Card and dialog titles already use uppercase, tracked
 `font-heading` styling.
 
 Use `EmptyPanel` for empty states, `TableBodySkeleton` for loading table bodies,
-and `<Card flush>` for an edge-to-edge list or table. `CardContent className="px-0"`
+and `<Card flush>` for an edge-to-edge list or table. `Table` scrolls wide
+columns inside itself (`min-w-0 overflow-x-auto`) and tightens cell padding
+below `sm`. `CardContent className="px-0"`
 overrides body padding without `!px-0` when only the body should go flush. Cards
 keep `min-h-min shrink-0` so they do not collapse inside a bounded flex
-column. `Dialog` already scrolls inside the viewport on small screens; avoid
+column, and `min-w-0` so nested tables scroll instead of widening the card.
+`Dialog` already scrolls inside the viewport on small screens; avoid
 additional height limits.
 
 `Input`, `SelectTrigger`, `DatePickerButton`, and `Combobox` share form-control

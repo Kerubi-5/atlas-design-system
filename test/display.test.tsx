@@ -125,6 +125,7 @@ describe("Card", () => {
     expect(flush).toHaveAttribute("data-size", "sm")
     expect(flush?.className ?? "").toMatch(/\[--card-p:0px\]/)
     expect(flush?.className.split(/\s+/)).toContain("min-h-min")
+    expect(flush?.className.split(/\s+/)).toContain("min-w-0")
     expect(flush?.className.split(/\s+/)).toContain("shrink-0")
     expect(flush?.className.split(/\s+/)).toContain("overflow-hidden")
     expect(flush?.className ?? "").not.toMatch(/py-\(--card-p\)/)
@@ -136,6 +137,7 @@ describe("Card", () => {
     expect(cards).toHaveLength(2)
     for (const card of cards) {
       expect(card.className.split(/\s+/)).toContain("min-h-min")
+      expect(card.className.split(/\s+/)).toContain("min-w-0")
       expect(card.className.split(/\s+/)).toContain("shrink-0")
       expect(card.className.split(/\s+/)).toContain("overflow-hidden")
     }
