@@ -1,0 +1,27 @@
+{
+  "name": "atlas-react-kit-site",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Docs and playground for atlas-react-kit. Not published to npm.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.2.1",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.0.4",
+    "marked": "^16.4.1",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.1",
+    "typescript": "^6.0.3",
+    "vite": "^7.1.9"
+  }
+}

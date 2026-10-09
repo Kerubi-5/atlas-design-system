@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "../../theme.css";
+
+@source "../../src";
+@source "../../stories";
+@source ".";
+
+@theme inline {
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+.markdown {
+  display: grid;
+  gap: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.markdown > :first-child {
+  margin-top: 0;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.markdown h1 {
+  font-size: 1.5rem;
+}
+
+.markdown h2 {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+}
+
+.markdown h3 {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+}
+
+.markdown p,
+.markdown li {
+  color: var(--foreground);
+}
+
+.markdown a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.markdown a:hover {
+  color: var(--foreground);
+}
+
+.markdown code {
+  font-size: 0.8125rem;
+  background: var(--muted);
+  padding: 0.1rem 0.3rem;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  background: var(--muted);
+  padding: 1rem;
+  border: 1px solid var(--border);
+}
+
+.markdown pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.markdown th,
+.markdown td {
+  border: 1px solid var(--border);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.markdown th {
+  font-family: var(--font-heading);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--muted);
+}
+
+.markdown ul,
+.markdown ol {
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.markdown hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.markdown blockquote {
+  border-left: 2px solid var(--primary);
+  padding-left: 1rem;
+  color: var(--muted-foreground);
+}

@@ -45,6 +45,11 @@ See [design rules](./DESIGN_RULES.md) for shared styling decisions and the
 files ship in the npm package. Shared component changes belong in this repository;
 applications compose their feature UI around the package and upgrade deliberately.
 
+Public docs and a live playground are at
+[design.querobines.com](https://design.querobines.com). They render every file
+under `stories/`, the tokens in `theme.css`, and these markdown guides. Adding a
+story is enough to include it on the next site build.
+
 ## Development and releases
 
 ```sh
@@ -52,10 +57,14 @@ npm ci
 npm run check
 npm test
 npm pack
+npm ci --prefix site
+npm run build --prefix site
 ```
 
 `tsc` emits individual ESM files and TypeScript declarations. CSS is shipped
 without compilation and processed by the consuming application's Tailwind build.
+The playground is a Vite app in `site/`; `npm run build --prefix site` writes
+static files to `site/dist` for Vercel. The site is not part of the npm package.
 The optional Next.js 16 adapter requires Next only when imported. The package
 does not bundle React.
 
