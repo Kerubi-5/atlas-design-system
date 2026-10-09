@@ -6,13 +6,21 @@
   "description": "Docs and playground for atlas-react-kit. Not published to npm.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run typecheck && vite build && npm run build-storybook && npm run test:build",
+    "typecheck": "tsc --noEmit",
+    "storybook": "storybook dev -p 6006 --no-open --disable-telemetry",
+    "build-storybook": "storybook build -o dist/storybook --disable-telemetry",
+    "test:build": "node --test tests/build.test.mjs",
     "preview": "vite preview"
   },
   "engines": {
     "node": ">=20.19.0"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "10.6.1",
+    "@storybook/addon-docs": "10.6.1",
+    "@storybook/addon-themes": "10.6.1",
+    "@storybook/react-vite": "10.6.1",
     "@tailwindcss/vite": "^4.2.1",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -20,6 +28,7 @@
     "marked": "^16.4.1",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "storybook": "10.6.1",
     "tailwindcss": "^4.2.1",
     "typescript": "^6.0.3",
     "vite": "^7.1.9"

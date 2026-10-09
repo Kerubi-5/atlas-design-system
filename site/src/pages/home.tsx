@@ -14,10 +14,10 @@ import { GITHUB_URL, NPM_URL } from "../lib/links.js"
 
 const highlights = [
   {
-    href: "/playground",
+    href: "/storybook/",
     title: "Playground",
     description:
-      "Every file in stories/ is globbed into a live canvas. Add a story and it shows up on the next build.",
+      "Try components in Storybook. Change their props, switch themes, inspect accessibility, and preview screen sizes.",
   },
   {
     href: "/tokens",
@@ -52,7 +52,7 @@ export function HomePage() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Button asChild>
-            <InternalLink href="/playground">Open playground</InternalLink>
+            <InternalLink href="/storybook/">Open playground</InternalLink>
           </Button>
           <Button asChild variant="outline">
             <a href={NPM_URL} rel="noreferrer" target="_blank">

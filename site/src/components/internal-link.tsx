@@ -25,6 +25,12 @@ export function InternalLink({ href, onClick, ...props }: Props) {
           return
         }
         if (/^(https?:|mailto:)/.test(href)) return
+        if (
+          href === "/storybook" ||
+          href.startsWith("/storybook/") ||
+          href === "/playground"
+        )
+          return
         event.preventDefault()
         navigate(href)
       }}

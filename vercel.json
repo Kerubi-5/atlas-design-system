@@ -4,5 +4,17 @@
   "installCommand": "npm ci && npm ci --prefix site",
   "buildCommand": "npm run build --prefix site",
   "outputDirectory": "site/dist",
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "redirects": [
+    {
+      "source": "/playground",
+      "destination": "/storybook/",
+      "permanent": true
+    },
+    { "source": "/storybook", "destination": "/storybook/", "permanent": true }
+  ],
+  "rewrites": [
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/tokens", "destination": "/index.html" },
+    { "source": "/docs/:path*", "destination": "/index.html" }
+  ]
 }
