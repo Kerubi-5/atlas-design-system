@@ -29,21 +29,42 @@ export function Shell({
         Skip to content
       </a>
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur-sm">
-        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-4 px-4 py-3 sm:px-6">
-          <InternalLink href="/" className="flex items-center gap-3">
-            <span className="flex size-8 items-center justify-center bg-primary font-heading text-sm font-semibold tracking-widest text-primary-foreground">
-              A
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className="font-heading text-xs font-semibold tracking-widest uppercase">
-                Atlas
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6">
+          <div className="flex items-center gap-4">
+            <InternalLink href="/" className="flex items-center gap-3">
+              <span className="flex size-8 items-center justify-center bg-primary font-heading text-sm font-semibold tracking-widest text-primary-foreground">
+                A
               </span>
-              <span className="text-[0.65rem] tracking-wide text-muted-foreground uppercase">
-                React Kit
+              <span className="flex flex-col leading-none">
+                <span className="font-heading text-xs font-semibold tracking-widest uppercase">
+                  Atlas
+                </span>
+                <span className="text-[0.65rem] tracking-wide text-muted-foreground uppercase">
+                  React Kit
+                </span>
               </span>
-            </span>
-          </InternalLink>
-          <TabsNav aria-label="Site" className="min-w-0 flex-1 overflow-x-auto">
+            </InternalLink>
+            <div className="ml-auto flex items-center gap-3">
+              <a
+                href={NPM_URL}
+                className="text-xs font-semibold tracking-widest text-muted-foreground uppercase hover:text-foreground"
+                rel="noreferrer"
+                target="_blank"
+              >
+                npm
+              </a>
+              <a
+                href={GITHUB_URL}
+                className="text-xs font-semibold tracking-widest text-muted-foreground uppercase hover:text-foreground"
+                rel="noreferrer"
+                target="_blank"
+              >
+                GitHub
+              </a>
+              <ThemeToggle />
+            </div>
+          </div>
+          <TabsNav aria-label="Site" className="w-full overflow-x-auto">
             {primaryNav.map((item) => {
               const active = navItemIsActive(item.href, pathname)
               return (
@@ -52,32 +73,13 @@ export function Shell({
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   data-state={active ? "active" : "inactive"}
-                  className={cn(tabsTriggerVariants())}
+                  className={cn(tabsTriggerVariants(), "px-3 sm:px-4")}
                 >
                   {item.label}
                 </InternalLink>
               )
             })}
           </TabsNav>
-          <div className="ml-auto flex items-center gap-2">
-            <a
-              href={NPM_URL}
-              className="hidden text-xs font-semibold tracking-widest text-muted-foreground uppercase hover:text-foreground sm:inline"
-              rel="noreferrer"
-              target="_blank"
-            >
-              npm
-            </a>
-            <a
-              href={GITHUB_URL}
-              className="hidden text-xs font-semibold tracking-widest text-muted-foreground uppercase hover:text-foreground sm:inline"
-              rel="noreferrer"
-              target="_blank"
-            >
-              GitHub
-            </a>
-            <ThemeToggle />
-          </div>
         </div>
       </header>
       <main
