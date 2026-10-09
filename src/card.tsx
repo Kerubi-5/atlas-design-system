@@ -7,8 +7,8 @@ import { cn } from "./utils.js"
  * `@layer components`) so a utility `px-0` / `py-0` on Card or its sections
  * overrides it without `!`. `flush` sets the variable to 0 so lists and
  * tables can run edge to edge. `min-h-min shrink-0` keeps the card from
- * collapsing inside a bounded flex column while `overflow-hidden` still
- * clips media.
+ * collapsing inside a bounded flex column. `min-w-0` lets nested tables
+ * scroll instead of widening the card. `overflow-hidden` still clips media.
  */
 function Card({
   className,
@@ -24,7 +24,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex min-h-min shrink-0 flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
+        "group/card flex min-h-min min-w-0 shrink-0 flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
         size === "sm"
           ? "gap-5 [--card-p:--spacing(5)]"
           : "gap-8 [--card-p:--spacing(8)]",
@@ -41,7 +41,7 @@ function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card-header"
       className={cn(
-        "group/card-header @container/card-header grid auto-rows-min items-start gap-1.5 rounded-none has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]",
+        "group/card-header @container/card-header grid min-w-0 auto-rows-min items-start gap-1.5 rounded-none has-data-[slot=card-action]:grid-cols-[1fr_auto] has-data-[slot=card-description]:grid-rows-[auto_auto]",
         className
       )}
       {...props}
@@ -90,14 +90,20 @@ function CardAction({ className, ...props }: React.ComponentProps<"div">) {
 }
 
 function CardContent({ className, ...props }: React.ComponentProps<"div">) {
-  return <div data-slot="card-content" className={className} {...props} />
+  return (
+    <div
+      data-slot="card-content"
+      className={cn("min-w-0", className)}
+      {...props}
+    />
+  )
 }
 
 function CardFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-footer"
-      className={cn("flex items-center", className)}
+      className={cn("flex min-w-0 items-center", className)}
       {...props}
     />
   )

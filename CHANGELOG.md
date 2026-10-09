@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.4.1
+
+Patch so default-density tables scroll inside a ~390px panel instead of
+widening the page.
+
+- `Table` keeps its overflow wrapper and adds `min-w-0 max-w-full` plus
+  overscroll containment so nowrap columns never stretch a card or flex
+  parent. Edge fades in `theme.css` cue horizontal overflow (LICENSE no
+  longer looks merely truncated).
+- `TableHead` / `TableCell` use `px-2` below `sm` and the previous padding
+  from `sm` up.
+- `Card`, `CardHeader`, `CardContent`, and `CardFooter` get `min-w-0` so
+  nested tables can shrink and scroll. Height behavior
+  (`min-h-min shrink-0`) is unchanged.
+
+`InfoTip` is not in this kit; 44px "?" hit-area line-height issues stay
+with the app that owns that component.
+
 ## 0.4.0
 
 Minor release so apps can use kit form controls and cards without workarounds.

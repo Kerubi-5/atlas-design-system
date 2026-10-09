@@ -4,15 +4,20 @@ import * as React from "react"
 
 import { cn } from "./utils.js"
 
+/**
+ * Data table. The root is a `min-w-0 overflow-x-auto` scroller so nowrap
+ * columns scroll inside the table instead of widening a card or panel.
+ * Cell padding is `px-2` below `sm` and the original `p-3` from `sm` up.
+ */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto"
+      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain"
     >
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("w-full min-w-full caption-bottom text-sm", className)}
         {...props}
       />
     </div>
@@ -70,7 +75,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-12 px-3 text-left align-middle text-xs font-medium tracking-wider whitespace-nowrap text-muted-foreground uppercase [&:has([role=checkbox])]:pr-0",
+        "h-10 px-2 text-left align-middle text-xs font-medium tracking-wider whitespace-nowrap text-muted-foreground uppercase sm:h-12 sm:px-3 [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -83,7 +88,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "p-3 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0",
+        "px-2 py-2 align-middle whitespace-nowrap sm:p-3 [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}

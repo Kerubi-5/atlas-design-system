@@ -52,6 +52,12 @@ describe("published modules", () => {
     expect(theme).toContain("@layer components")
     expect(theme).toContain('[data-slot="card-content"]')
     expect(theme).toContain("padding-inline: var(--card-p)")
+    expect(theme).toContain('[data-slot="table-container"]')
+    expect(theme).toContain(
+      "background-attachment: local, local, scroll, scroll"
+    )
+    expect(theme).toContain('[data-slot="card"] [data-slot="table-container"]')
+    expect(theme).toContain("--table-scroll-fade: var(--card)")
   })
 
   it("resolves the compiled framework adapter in native ESM", async () => {
