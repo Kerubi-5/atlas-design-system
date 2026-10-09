@@ -18,6 +18,8 @@ type Props = {
   meta?: FieldMetaState
   placeholder?: string
   disabled?: boolean
+  /** Forwarded to the date picker trigger. */
+  className?: string
 }
 
 /** Date picker with built-in field error text and invalid styling. */
@@ -28,6 +30,7 @@ export function FormDatePickerField({
   meta,
   placeholder,
   disabled,
+  className,
 }: Props) {
   const errorText = meta ? getFieldErrorMessage(meta.errors[0]) : undefined
   const id = useId()
@@ -41,6 +44,7 @@ export function FormDatePickerField({
         onChange={onValueChange}
         placeholder={placeholder}
         disabled={disabled}
+        className={className}
         aria-invalid={errorText ? true : undefined}
       />
       <FieldError text={errorText} />

@@ -21,6 +21,11 @@ import {
   TableRow,
 } from "../src/table.js"
 
+import {
+  CardContentPx0Story,
+  FlexColumnCardsStory,
+} from "../stories/card-layout.js"
+
 import { render, screen } from "./helpers.js"
 
 describe("Badge", () => {
@@ -119,6 +124,29 @@ describe("Card", () => {
     const flush = screen.getByText("Flush").closest("[data-slot=card]")
     expect(flush).toHaveAttribute("data-size", "sm")
     expect(flush?.className ?? "").toMatch(/\[--card-p:0px\]/)
+    expect(flush?.className.split(/\s+/)).toContain("min-h-min")
+    expect(flush?.className.split(/\s+/)).toContain("overflow-hidden")
+    expect(flush?.className ?? "").not.toMatch(/py-\(--card-p\)/)
+  })
+
+  it("does not shrink below content in a bounded flex column", () => {
+    render(<FlexColumnCardsStory />)
+    const cards = document.querySelectorAll("[data-slot=card]")
+    expect(cards).toHaveLength(2)
+    for (const card of cards) {
+      expect(card.className.split(/\s+/)).toContain("min-h-min")
+      expect(card.className.split(/\s+/)).toContain("overflow-hidden")
+    }
+    expect(screen.getByText(/must not collapse/)).toBeInTheDocument()
+  })
+
+  it("lets CardContent px-0 override padding without an important class", () => {
+    render(<CardContentPx0Story />)
+    const content = screen.getByText("Full-bleed body")
+    expect(content).toHaveAttribute("data-slot", "card-content")
+    expect(content.className.split(/\s+/)).toContain("px-0")
+    expect(content.className).not.toMatch(/px-\(--card-p\)/)
+    expect(content.className.split(/\s+/)).not.toContain("!px-0")
   })
 })
 

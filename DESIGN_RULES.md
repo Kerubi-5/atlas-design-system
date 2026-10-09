@@ -28,8 +28,16 @@ other circles. Card and dialog titles already use uppercase, tracked
 `font-heading` styling.
 
 Use `EmptyPanel` for empty states, `TableBodySkeleton` for loading table bodies,
-and `<Card flush>` for an edge-to-edge list or table. `Dialog` already scrolls
-inside the viewport on small screens; avoid additional height limits.
+and `<Card flush>` for an edge-to-edge list or table. `CardContent className="px-0"`
+overrides body padding without `!px-0` when only the body should go flush. Cards
+keep `min-h-min` so they do not collapse inside a bounded flex column. `Dialog`
+already scrolls inside the viewport on small screens; avoid additional height
+limits.
+
+`Input`, `SelectTrigger`, `DatePickerButton`, and `Combobox` share form-control
+chrome: 40px height, `px-3`, `text-base md:text-sm`, `border-input`, and
+`shadow-xs`. Do not restyle those triggers as outline buttons in application
+code.
 
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
 `TabsNav` with links and `aria-current="page"` on the active link. The optional

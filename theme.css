@@ -182,3 +182,24 @@
     @apply font-sans;
   }
 }
+
+/*
+ * Card padding in this layer so utility `px-0` / `py-0` override `--card-p`
+ * without `!`. Size and flush still set the variable on `[data-slot=card]`.
+ */
+@layer components {
+  [data-slot="card"] {
+    padding-block: var(--card-p);
+  }
+  [data-slot="card-header"],
+  [data-slot="card-content"],
+  [data-slot="card-footer"] {
+    padding-inline: var(--card-p);
+  }
+  [data-slot="card-header"].border-b {
+    padding-bottom: var(--card-p);
+  }
+  [data-slot="card-footer"].border-t {
+    padding-top: var(--card-p);
+  }
+}

@@ -45,6 +45,21 @@ describe("date picker field", () => {
     expect(html).toContain('aria-invalid="true"')
     expect(html).toContain('role="alert"')
     expect(html).toContain("rounded-none")
+    expect(html).toContain("text-base")
+    expect(html).toContain("px-3")
+    expect(html).toContain("border-input")
+  })
+
+  it("forwards className onto the labelled trigger", () => {
+    const html = renderToStaticMarkup(
+      <FormDatePickerField
+        value="2026-10-05"
+        onValueChange={() => {}}
+        label="Due"
+        className="w-40"
+      />
+    )
+    expect(html).toContain("w-40")
   })
 
   it("shows the placeholder when empty", () => {
@@ -95,6 +110,9 @@ describe("combobox", () => {
     expect(html).not.toContain("US Dollar")
     expect(html).toContain("rounded-none")
     expect(html).toContain('aria-expanded="false"')
+    expect(html).toContain("text-base")
+    expect(html).toContain("px-3")
+    expect(html).toContain("border-input")
   })
 })
 

@@ -7,6 +7,8 @@ import type { DateRange } from "react-day-picker"
 
 import { Button } from "./button.js"
 import { Calendar } from "./calendar.js"
+import { formControlTriggerClassName } from "./internal/form-control.js"
+import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn } from "./utils.js"
 
@@ -68,10 +70,13 @@ type DatePickerSharedProps = {
   className?: string
   "aria-invalid"?: boolean
   /**
-   * Visible months in the popover calendar. Defaults to 1 in single mode
-   * and 2 in range mode.
+   * Visible months in the popover calendar. Defaults to 1 in single mode.
+   * In range mode, defaults to 1 below the `md` breakpoint and 2 at `md`
+   * and above so two stacked months do not open off-screen on mobile.
    */
   numberOfMonths?: number
+  /** Popover side. Defaults to `bottom`; Radix still flips on collision. */
+  side?: React.ComponentProps<typeof PopoverContent>["side"]
   /** Month shown when the popover opens; falls back to the selected date. */
   defaultMonth?: Date
 }
@@ -104,6 +109,9 @@ function formatRangeTriggerLabel(
   return `${format(from, "PPP")} – ${format(to, "PPP")}`
 }
 
+/** Gutter used when the calendar popover collides with the viewport. */
+const DATE_PICKER_COLLISION_PADDING = 16
+
 /** Shared trigger + auto-sized popover chrome for single and range modes. */
 function DatePickerShell({
   id,
@@ -114,6 +122,7 @@ function DatePickerShell({
   label,
   open,
   onOpenChange,
+  side,
   children,
 }: {
   id?: string
@@ -124,6 +133,7 @@ function DatePickerShell({
   label: string
   open: boolean
   onOpenChange: (open: boolean) => void
+  side?: React.ComponentProps<typeof PopoverContent>["side"]
   children: React.ReactNode
 }) {
   return (
@@ -137,7 +147,8 @@ function DatePickerShell({
           aria-invalid={ariaInvalid}
           data-empty={empty}
           className={cn(
-            "h-10 w-full justify-start font-normal tracking-normal normal-case data-[empty=true]:text-muted-foreground",
+            formControlTriggerClassName,
+            "justify-start data-[empty=true]:text-muted-foreground",
             className
           )}
         >
@@ -145,7 +156,12 @@ function DatePickerShell({
           {label}
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="w-auto rounded-none p-0">
+      <PopoverContent
+        align="start"
+        side={side}
+        collisionPadding={DATE_PICKER_COLLISION_PADDING}
+        className="w-auto max-h-(--radix-popover-content-available-height) overflow-y-auto rounded-none p-0"
+      >
         {children}
       </PopoverContent>
     </Popover>
@@ -161,6 +177,7 @@ function DatePickerSingleButton({
   className,
   "aria-invalid": ariaInvalid,
   numberOfMonths,
+  side,
   defaultMonth,
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
@@ -176,6 +193,7 @@ function DatePickerSingleButton({
       label={date ? format(date, "PPP") : placeholder}
       open={open}
       onOpenChange={setOpen}
+      side={side}
     >
       <Calendar
         mode="single"
@@ -199,10 +217,13 @@ function DatePickerRangeButton({
   disabled,
   className,
   "aria-invalid": ariaInvalid,
-  numberOfMonths = 2,
+  numberOfMonths,
+  side,
   defaultMonth,
 }: DatePickerRangeProps) {
   const [open, setOpen] = React.useState(false)
+  const mdUp = useMediaQuery(MD_MEDIA_QUERY)
+  const months = numberOfMonths ?? (mdUp ? 2 : 1)
   const from = toDate(value?.from)
   const to = toDate(value?.to)
   const selected: DateRange | undefined = from || to ? { from, to } : undefined
@@ -217,12 +238,13 @@ function DatePickerRangeButton({
       label={formatRangeTriggerLabel(from, to, placeholder)}
       open={open}
       onOpenChange={setOpen}
+      side={side}
     >
       <Calendar
         mode="range"
         selected={selected}
         defaultMonth={defaultMonth ?? from ?? to}
-        numberOfMonths={numberOfMonths}
+        numberOfMonths={months}
         onSelect={(next) => {
           onChange(next)
           // First click is a same-day range; keep the popover open so the
@@ -251,10 +273,13 @@ function DatePickerRangeButton({
 }
 
 /**
- * Calendar popover trigger. `mode="single"` (default) accepts `Date` or
+ * Calendar popover trigger styled as a form control (same chrome as Input
+ * and SelectTrigger). `mode="single"` (default) accepts `Date` or
  * `yyyy-MM-dd` and emits `Date | undefined`. `mode="range"` accepts
- * `{ from, to }` and emits `DateRange | undefined`. Square corners follow
- * the shared shape rules.
+ * `{ from, to }` and emits `DateRange | undefined`. Range mode shows one
+ * month below `md` and two at `md+` unless `numberOfMonths` is set. The
+ * popover clamps to the viewport (`side` is overridable). Square corners
+ * follow the shared shape rules.
  */
 export function DatePickerButton(props: DatePickerButtonProps) {
   if (props.mode === "range") {
