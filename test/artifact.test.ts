@@ -73,6 +73,16 @@ describe("published modules", () => {
     expect(stdout.trim()).toBe("function")
   })
 
+  it("publishes only kit artifacts, not the docs site or stories", () => {
+    expect(manifest.files).toEqual([
+      "dist",
+      "theme.css",
+      "DESIGN_RULES.md",
+      "COMPONENTS.md",
+      "NOTICE",
+    ])
+  })
+
   it("exports compiled JavaScript and declarations for every public module", async () => {
     for (const name of components) {
       const entry = manifest.exports[`./${name}`]

@@ -16,6 +16,8 @@ name: Release
 # Leave Environment name empty unless this job sets `environment:`.
 # After that, bumping the version in package.json and merging to main
 # publishes it automatically. workflow_dispatch re-runs without a new tag.
+# Docs site (`site/`, `vercel.json`, `stories/`, tests, README) is omitted
+# from this path filter so a docs-only merge does not run publish.
 on:
   push:
     branches: [main]
