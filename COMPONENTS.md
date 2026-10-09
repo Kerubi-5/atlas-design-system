@@ -7,10 +7,10 @@ no root component barrel.
 
 | Subpath                      | Main exports and options                                                                                                                                                                                                                                                                       |
 | ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `button`                     | `Button`, `buttonVariants`; `variant`, `size`, `asChild`                                                                                                                                                                                                                                       |
+| `button`                     | `Button`, `buttonVariants`; `variant`, `size`, `asChild`; outline/ghost hover is brand purple + selected wash, not muted grey                                                                                                                                                                  |
 | `badge`                      | `Badge`, `badgeVariants`; `variant`, `tone`, `asChild`                                                                                                                                                                                                                                         |
 | `calendar`                   | `Calendar`, `CalendarDayButton`; React Day Picker props and `buttonVariant`                                                                                                                                                                                                                    |
-| `card`                       | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`; root uses `min-h-min` so flex columns do not collapse it; `CardContent className="px-0"` overrides padding without `!`                                               |
+| `card`                       | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`; root uses `min-h-min shrink-0` so flex columns do not collapse it; `CardContent className="px-0"` overrides padding without `!`                                      |
 | `checkbox`                   | `Checkbox`                                                                                                                                                                                                                                                                                     |
 | `combobox`                   | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text; trigger matches Input/SelectTrigger chrome; keyboard highlight scrolls into view                                                                                            |
 | `date-picker`                | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`) and `side` |
@@ -71,6 +71,10 @@ clamps to the viewport with collision padding and scroll, stays `w-auto` so
 it does not collapse to the default popover width, and includes a Clear
 action. Pass `side` to prefer a placement; Radix still flips on collision.
 `FormDatePickerField` forwards `className` to that trigger.
+
+Outline and ghost `Button` hover and focus use `border-primary`,
+`text-primary`, and `bg-selected`. They do not use a muted grey fill, including
+when the control sits on a selected row (for example "Clear selection").
 
 ```tsx
 import { DatePickerButton, type DateRange } from "atlas-react-kit/date-picker"

@@ -6,8 +6,9 @@ import { cn } from "./utils.js"
  * Size and flush padding live in `--card-p` (set here, read from `theme.css`
  * `@layer components`) so a utility `px-0` / `py-0` on Card or its sections
  * overrides it without `!`. `flush` sets the variable to 0 so lists and
- * tables can run edge to edge. `min-h-min` keeps the card from collapsing
- * inside a bounded flex column while `overflow-hidden` still clips media.
+ * tables can run edge to edge. `min-h-min shrink-0` keeps the card from
+ * collapsing inside a bounded flex column while `overflow-hidden` still
+ * clips media.
  */
 function Card({
   className,
@@ -23,7 +24,7 @@ function Card({
       data-slot="card"
       data-size={size}
       className={cn(
-        "group/card flex min-h-min flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
+        "group/card flex min-h-min shrink-0 flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
         size === "sm"
           ? "gap-5 [--card-p:--spacing(5)]"
           : "gap-8 [--card-p:--spacing(8)]",

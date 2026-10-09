@@ -73,8 +73,13 @@ describe("form-control trigger chrome", () => {
     const combobox = screen.getByRole("combobox")
     expect(dateTrigger.className.split(/\s+/)).toContain("px-3")
     expect(dateTrigger.className.split(/\s+/)).toContain("text-sm")
+    expect(dateTrigger.className.split(/\s+/)).toContain("hover:bg-background")
+    expect(dateTrigger.className.split(/\s+/)).not.toContain(
+      "hover:bg-selected"
+    )
     expect(combobox.className.split(/\s+/)).toContain("px-3")
     expect(combobox.className.split(/\s+/)).toContain("text-sm")
+    expect(combobox.className.split(/\s+/)).toContain("hover:bg-background")
   })
 
   it("forwards FormDatePickerField className to the trigger", () => {

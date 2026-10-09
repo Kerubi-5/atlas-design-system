@@ -16,6 +16,10 @@ Minor release so apps can use kit form controls and cards without workarounds.
   clamps the popover to the viewport (`max-height` + scroll, collision
   padding), and accepts `side`. Explicit `numberOfMonths` still wins.
 - `SelectTrigger` uses `text-base md:text-sm` like `Input` to avoid iOS zoom.
+- Outline and ghost `Button` (and outline `Toggle`) hover/focus use brand
+  purple border and text with the selected wash. No muted grey fill, so
+  actions like "Clear selection" stay clean on selected rows. Form-control
+  triggers still hover like Input.
 
 ## 0.3.0
 

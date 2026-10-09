@@ -4,18 +4,24 @@ import { Slot } from "radix-ui"
 
 import { cn } from "./utils.js"
 
+/**
+ * Outline and ghost hover/focus: brand purple border and text, optional
+ * selected wash, no muted grey fill. Used by quiet actions such as
+ * "Clear selection" sitting on a selected row.
+ */
+const quietButtonInteraction =
+  "hover:border-primary hover:bg-selected hover:text-primary focus-visible:border-primary focus-visible:text-primary focus-visible:ring-primary/30 aria-expanded:border-primary aria-expanded:bg-selected aria-expanded:text-primary"
+
 const buttonVariants = cva(
   "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/30 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
   {
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline:
-          "border-border bg-transparent hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-input/30",
+        outline: `border-border bg-transparent ${quietButtonInteraction}`,
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
-        ghost:
-          "hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground dark:hover:bg-muted/50",
+        ghost: quietButtonInteraction,
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline underline-offset-4 hover:underline",
@@ -62,4 +68,4 @@ function Button({
   )
 }
 
-export { Button, buttonVariants }
+export { Button, buttonVariants, quietButtonInteraction }
