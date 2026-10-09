@@ -12,6 +12,9 @@ describe("Toggle", () => {
 
     const toggle = screen.getByRole("button", { name: "Bold" })
     expect(toggle).toHaveAttribute("aria-pressed", "false")
+    expect(toggle.className.split(/\s+/)).toContain("hover:bg-selected")
+    expect(toggle.className.split(/\s+/)).toContain("hover:text-primary")
+    expect(toggle.className.split(/\s+/)).not.toContain("hover:bg-muted")
 
     await user.click(toggle)
     expect(toggle).toHaveAttribute("aria-pressed", "true")

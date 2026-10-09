@@ -5,6 +5,7 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react"
 
 import { Button } from "./button.js"
 import { Input } from "./input.js"
+import { formControlTriggerClassName } from "./internal/form-control.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn, onInputChange } from "./utils.js"
 
@@ -35,6 +36,7 @@ const LISTBOX_PAGE_SIZE = 10
 
 /**
  * Searchable single-select built from Button, Popover, and Input.
+ * The trigger uses the same form-control chrome as Input and SelectTrigger.
  * Options are a plain `{ value, label }` list; domain data stays in the app.
  * Keyboard highlight (arrows, Home/End, PageUp/PageDown) scrolls the active
  * option into view inside the overflow list.
@@ -159,7 +161,8 @@ export function Combobox({
           aria-invalid={ariaInvalid}
           disabled={disabled}
           className={cn(
-            "h-10 w-full justify-between font-normal tracking-normal normal-case",
+            formControlTriggerClassName,
+            "justify-between",
             !selected && "text-muted-foreground",
             className
           )}

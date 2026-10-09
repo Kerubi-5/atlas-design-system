@@ -3,7 +3,13 @@ import { describe, expect, it, vi } from "vitest"
 
 import { Combobox } from "../src/combobox.js"
 
-import { createUser, render, screen, waitFor } from "./helpers.js"
+import {
+  createUser,
+  expectFormControlTrigger,
+  render,
+  screen,
+  waitFor,
+} from "./helpers.js"
 
 const options = [
   { value: "usd", label: "US Dollar" },
@@ -59,6 +65,7 @@ describe("Combobox", () => {
     render(<ComboboxHarness />)
 
     const trigger = getCombobox()
+    expectFormControlTrigger(trigger)
     expect(trigger).toHaveTextContent("Select")
     expect(trigger).toHaveAttribute("aria-expanded", "false")
 

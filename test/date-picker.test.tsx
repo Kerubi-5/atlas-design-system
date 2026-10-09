@@ -5,7 +5,15 @@ import { Calendar } from "../src/calendar.js"
 import { DatePickerButton, type DateRange } from "../src/date-picker.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
 
-import { createUser, render, screen, waitFor, within } from "./helpers.js"
+import {
+  createUser,
+  expectFormControlTrigger,
+  render,
+  screen,
+  stubMatchMedia,
+  waitFor,
+  within,
+} from "./helpers.js"
 
 const october = new Date(2026, 9, 1)
 const locale = { code: "en-US" }
@@ -131,6 +139,7 @@ describe("DatePickerButton", () => {
     render(<DatePickerButton value="2026-10-05" onChange={onChange} />)
 
     const trigger = screen.getByRole("button", { name: /^October 5/ })
+    expectFormControlTrigger(trigger)
     await user.click(trigger)
     expect(await screen.findByRole("grid")).toBeVisible()
 
@@ -172,6 +181,7 @@ describe("FormDatePickerField", () => {
     )
 
     const trigger = screen.getByLabelText("Due")
+    expectFormControlTrigger(trigger)
     expect(trigger).toHaveTextContent("October 5th, 2026")
     expect(screen.getByText("Due")).toHaveAttribute(
       "for",
@@ -302,5 +312,84 @@ describe("DatePickerButton range mode", () => {
     expect(afterStart).toHaveClass("w-auto")
     expect(afterStart?.className ?? "").not.toMatch(/\bw-72\b/)
     expect(screen.getAllByRole("grid")).toHaveLength(2)
+  })
+
+  it("clamps the popover to the viewport and defaults to one month below md", async () => {
+    const user = createUser()
+    render(
+      <DatePickerButton
+        mode="range"
+        onChange={() => {}}
+        defaultMonth={october}
+        placeholder="Export range"
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    const popover = await waitFor(() => {
+      const node = document.querySelector("[data-slot=popover-content]")
+      expect(node).toBeTruthy()
+      return node as HTMLElement
+    })
+
+    expect(screen.getAllByRole("grid")).toHaveLength(1)
+    expect(popover.className.split(/\s+/)).toContain("w-auto")
+    expect(popover.className.split(/\s+/)).toContain(
+      "max-h-(--radix-popover-content-available-height)"
+    )
+    expect(popover.className.split(/\s+/)).toContain("overflow-y-auto")
+  })
+
+  it("defaults to two months at md and above when numberOfMonths is omitted", async () => {
+    stubMatchMedia((query) => query.includes("768"))
+    const user = createUser()
+    render(
+      <DatePickerButton
+        mode="range"
+        onChange={() => {}}
+        defaultMonth={october}
+        placeholder="Export range"
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+  })
+
+  it("honors an explicit numberOfMonths below md", async () => {
+    const user = createUser()
+    render(
+      <DatePickerButton
+        mode="range"
+        onChange={() => {}}
+        defaultMonth={october}
+        numberOfMonths={2}
+        placeholder="Export range"
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+  })
+
+  it("forwards side to the range popover", async () => {
+    const user = createUser()
+    render(
+      <DatePickerButton
+        mode="range"
+        onChange={() => {}}
+        defaultMonth={october}
+        side="top"
+        placeholder="Export range"
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    const popover = await waitFor(() => {
+      const node = document.querySelector("[data-slot=popover-content]")
+      expect(node).toBeTruthy()
+      return node as HTMLElement
+    })
+    expect(popover).toHaveAttribute("data-side", "top")
   })
 })

@@ -47,6 +47,13 @@ const components = [
 ]
 
 describe("published modules", () => {
+  it("keeps card padding in the theme component layer so px-0 overrides it", async () => {
+    const theme = await readFile(resolve(root, "theme.css"), "utf8")
+    expect(theme).toContain("@layer components")
+    expect(theme).toContain('[data-slot="card-content"]')
+    expect(theme).toContain("padding-inline: var(--card-p)")
+  })
+
   it("resolves the compiled framework adapter in native ESM", async () => {
     const { stdout } = await runNode(
       process.execPath,

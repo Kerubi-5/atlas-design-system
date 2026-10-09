@@ -3,8 +3,31 @@ import { afterEach } from "vitest"
 
 import "@testing-library/jest-dom/vitest"
 
+/** jsdom has no layout; default to below the Tailwind `md` breakpoint. */
+function installMatchMediaStub(matches = false) {
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    configurable: true,
+    value: (query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addListener() {},
+      removeListener() {},
+      addEventListener() {},
+      removeEventListener() {},
+      dispatchEvent() {
+        return false
+      },
+    }),
+  })
+}
+
+installMatchMediaStub()
+
 afterEach(() => {
   cleanup()
+  installMatchMediaStub()
 })
 
 /**
@@ -31,20 +54,3 @@ if (!Element.prototype.releasePointerCapture) {
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
-
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  configurable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener() {},
-    removeListener() {},
-    addEventListener() {},
-    removeEventListener() {},
-    dispatchEvent() {
-      return false
-    },
-  }),
-})
