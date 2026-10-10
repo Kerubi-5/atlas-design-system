@@ -28,6 +28,5 @@
       "destination": "/?path=/docs/docs-readme--docs",
       "permanent": true
     }
-  ],
-  "rewrites": [{ "source": "/:path*", "destination": "/index.html" }]
+  ]
 }

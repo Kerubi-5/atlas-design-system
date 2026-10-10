@@ -1,4 +1,9 @@
+import type { PropsWithChildren } from "react"
 import type { Preview, ReactRenderer } from "@storybook/react-vite"
+import {
+  DocsContainer,
+  type DocsContainerProps,
+} from "@storybook/addon-docs/blocks"
 import { withThemeByClassName } from "@storybook/addon-themes"
 import { MINIMAL_VIEWPORTS } from "storybook/viewport"
 
@@ -25,6 +30,19 @@ const preview: Preview = {
       storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
     },
     a11y: { test: "todo" },
+    docs: {
+      // One Toaster per docs page. The story decorator skips its own in docs
+      // mode, or every story on the page would show the same toast.
+      container: ({
+        children,
+        ...props
+      }: PropsWithChildren<DocsContainerProps>) => (
+        <DocsContainer {...props}>
+          {children}
+          <Toaster />
+        </DocsContainer>
+      ),
+    },
   },
   decorators: [
     withThemeByClassName<ReactRenderer>({
@@ -41,7 +59,7 @@ const preview: Preview = {
         <div className="min-h-40 bg-background p-6 text-foreground">
           <Story />
         </div>
-        <Toaster />
+        {context.viewMode === "docs" ? null : <Toaster />}
       </ThemeProvider>
     ),
   ],

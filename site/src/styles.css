@@ -26,6 +26,7 @@
 .markdown h1,
 .markdown h2,
 .markdown h3 {
+  color: var(--foreground);
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: 0.08em;
@@ -126,4 +127,13 @@
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+}
+
+/*
+ * Storybook gives docs headings its light theme text color. On the dark
+ * background above they were near-invisible, so follow the kit tokens.
+ */
+.sbdocs.sbdocs-wrapper
+  :is(h1, h2, h3, h4, h5, h6, .sbdocs-title, .sbdocs-subtitle) {
+  color: var(--foreground);
 }
