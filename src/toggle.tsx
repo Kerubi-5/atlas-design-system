@@ -4,22 +4,30 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Toggle as TogglePrimitive } from "radix-ui"
 
+import {
+  disabledState,
+  focusRing,
+  invalidState,
+  selectedState,
+} from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
- * Selected chrome shared by standalone Toggle and ToggleGroupItem.
- *
- * Radix Toggle sets `data-state=on` and `aria-pressed`. ToggleGroup items
- * always set `data-state=on`; in multiple mode they also set `aria-pressed`,
- * but in single mode they are radios with `aria-checked` and no
- * `aria-pressed`. All three selectors apply the same wash, text, and
- * selected-foreground border so the state meets WCAG 1.4.11 in every mode.
+ * Selected chrome shared by Toggle and ToggleGroupItem (see
+ * `selectedState.toggle`): the wash, selected text, and a selected border
+ * for `data-state=on`, `aria-pressed`, and `aria-checked`.
  */
-const selectedToggleChrome =
-  "data-on:border-selected-foreground data-on:bg-selected data-on:text-selected-foreground aria-pressed:border-selected-foreground aria-pressed:bg-selected aria-pressed:text-selected-foreground aria-checked:border-selected-foreground aria-checked:bg-selected aria-checked:text-selected-foreground"
+const selectedToggleChrome = selectedState.toggle
 
 const toggleVariants = cva(
-  `group/toggle inline-flex items-center justify-center gap-1.5 rounded-none text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-colors outline-none hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground focus-visible:border-ring focus-visible:text-selected-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 ${selectedToggleChrome} [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5`,
+  [
+    focusRing,
+    selectedState.hover,
+    selectedToggleChrome,
+    invalidState,
+    disabledState,
+    "group/toggle inline-flex items-center justify-center gap-1.5 rounded-none text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-colors focus-visible:text-selected-foreground [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+  ],
   {
     variants: {
       variant: {

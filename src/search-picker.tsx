@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { Input } from "./input.js"
 import { Label } from "./label.js"
+import { optionState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 const LISTBOX_PAGE_SIZE = 10
@@ -187,8 +188,8 @@ function SearchPicker<T>({
                   disabled={disabled}
                   className={cn(
                     "relative flex w-full cursor-default items-center rounded-none py-2 pr-3 pl-3 text-left text-sm outline-hidden select-none",
-                    isSelected && "bg-selected text-selected-foreground",
-                    isActive && "shadow-[inset_2px_0_0_var(--color-ring)]",
+                    isSelected && optionState.selected,
+                    isActive && optionState.active,
                     isActive &&
                       !isSelected &&
                       "bg-accent text-accent-foreground"

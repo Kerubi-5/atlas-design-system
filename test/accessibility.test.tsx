@@ -143,8 +143,8 @@ describe("focus and state cues (WCAG 1.4.11)", () => {
     expect(item).not.toHaveAttribute("aria-pressed")
     expect(item.className).toContain("data-on:border-selected-foreground")
     expect(item.className).toContain("aria-checked:border-selected-foreground")
-    expect(tabsTriggerVariants()).toContain(
-      'data-[state="active"]:border-selected-foreground'
+    expect(tabsTriggerVariants()).toMatch(
+      /data-\[state="?active"?\]:border-selected-foreground/
     )
   })
 })

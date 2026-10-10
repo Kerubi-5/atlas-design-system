@@ -3,6 +3,7 @@
 import * as React from "react"
 import { RadioGroup as RadioGroupPrimitive } from "radix-ui"
 
+import { disabledState, focusRing, invalidState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -34,7 +35,10 @@ function RadioGroupItem({
     <RadioGroupPrimitive.Item
       data-slot="radio-group-item"
       className={cn(
-        "peer relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-full border border-input bg-transparent shadow-xs transition-shadow outline-none after:absolute after:-inset-x-3 after:-inset-y-2 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 data-checked:border-primary",
+        focusRing,
+        invalidState,
+        disabledState,
+        "peer relative flex aspect-square size-4.5 shrink-0 items-center justify-center rounded-full border border-input bg-transparent shadow-xs transition-shadow after:absolute after:-inset-x-3 after:-inset-y-2 data-checked:border-primary",
         className
       )}
       {...props}

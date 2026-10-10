@@ -11,6 +11,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "./popover.js"
+import { focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export type InfoTipLayout = "box" | "inline"
@@ -106,7 +107,8 @@ function InfoTip({
           data-slot="info-tip-trigger"
           data-layout={layout}
           className={cn(
-            "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground outline-none hover:text-selected-foreground focus-visible:border-ring focus-visible:text-selected-foreground focus-visible:ring-2 focus-visible:ring-ring",
+            focusRing,
+            "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground hover:text-selected-foreground focus-visible:text-selected-foreground",
             inline
               ? "size-5 align-middle after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
               : "size-11",

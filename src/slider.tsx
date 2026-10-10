@@ -2,6 +2,7 @@
 
 import { Slider as SliderPrimitive } from "radix-ui"
 
+import { dataDisabledState, focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export type SliderProps = {
@@ -55,7 +56,8 @@ function Slider({
         if (amount !== undefined) onValueCommit?.(amount)
       }}
       className={cn(
-        "relative flex w-full touch-none items-center select-none data-disabled:opacity-50",
+        dataDisabledState,
+        "relative flex w-full touch-none items-center select-none",
         className
       )}
     >
@@ -73,7 +75,10 @@ function Slider({
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         data-slot="slider-thumb"
-        className="relative block size-4 shrink-0 rounded-none border border-primary bg-background shadow-xs outline-none after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2 focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+        className={cn(
+          focusRing,
+          "relative block size-4 shrink-0 rounded-none border border-primary bg-background shadow-xs after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
+        )}
       />
     </SliderPrimitive.Root>
   )
