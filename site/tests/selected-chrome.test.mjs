@@ -20,16 +20,6 @@ const stories = [
   },
 ]
 
-function parseRgb(value) {
-  const match = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)/.exec(value)
-  assert.ok(match, `parse color: ${value}`)
-  return [Number(match[1]), Number(match[2]), Number(match[3])]
-}
-
-function distance(a, b) {
-  return Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])
-}
-
 test("selected Toggle and ToggleGroup use the wash and selected border", async () => {
   const browser = await chromium.launch()
   const server = await serve(distDir)
@@ -42,78 +32,99 @@ test("selected Toggle and ToggleGroup use the wash and selected border", async (
           `http://127.0.0.1:${port}/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme}`
         )
         await page.waitForSelector("body.sb-show-main")
-        await page.evaluate(() => document.fonts.ready)
-        const measured = await page.evaluate((selected) => {
-          const el = document.querySelector(
-            `[role="${selected.role}"][aria-label="${selected.name}"], [role="${selected.role}"]`
+        if (theme === "dark") {
+          await page.waitForFunction(() =>
+            Boolean(document.querySelector(".dark"))
           )
+        }
+        await page.addStyleTag({
+          content:
+            "*, *::before, *::after { transition: none !important; animation: none !important; }",
+        })
+        await page.evaluate(async () => {
+          await document.fonts.ready
+          await new Promise((resolve) =>
+            requestAnimationFrame(() => requestAnimationFrame(resolve))
+          )
+        })
+        const measured = await page.evaluate((selected) => {
           const named = [
-            ...document.querySelectorAll(`[role="${selected.role}"]`),
+            ...document.querySelectorAll(
+              `[role="${selected.role}"], ${selected.role}`
+            ),
           ].find(
             (node) =>
               node.getAttribute("aria-label") === selected.name ||
               node.textContent?.trim() === selected.name
           )
-          const target = named ?? el
-          if (!target) return { missing: true }
-          const styles = getComputedStyle(target)
+          if (!named) return { missing: true }
+
           const probe = document.createElement("div")
-          document.body.append(probe)
-          const token = (property, value) => {
-            probe.style[property] = value
-            return getComputedStyle(probe)[property]
+          const canvas = document.createElement("canvas")
+          canvas.width = 1
+          canvas.height = 1
+          named.append(probe, canvas)
+          const ctx = canvas.getContext("2d", { willReadFrequently: true })
+          const rgb = (cssColor) => {
+            probe.style.color = cssColor
+            ctx.clearRect(0, 0, 1, 1)
+            ctx.fillStyle = getComputedStyle(probe).color
+            ctx.fillRect(0, 0, 1, 1)
+            return [...ctx.getImageData(0, 0, 1, 1).data.slice(0, 3)]
           }
+          const styles = getComputedStyle(named)
           const result = {
             missing: false,
-            background: styles.backgroundColor,
-            color: styles.color,
-            border: styles.borderTopColor,
-            selected: token("backgroundColor", "var(--selected)"),
-            selectedForeground: token("color", "var(--selected-foreground)"),
-            primary: token("backgroundColor", "var(--primary)"),
-            transparent: "rgba(0, 0, 0, 0)",
+            background: rgb(styles.backgroundColor),
+            color: rgb(styles.color),
+            border: rgb(styles.borderTopColor),
+            selected: rgb("var(--selected)"),
+            selectedForeground: rgb("var(--selected-foreground)"),
+            primary: rgb("var(--primary)"),
+            transparent:
+              styles.backgroundColor === "rgba(0, 0, 0, 0)" ||
+              styles.backgroundColor === "transparent",
           }
           probe.remove()
+          canvas.remove()
           return result
         }, story.selected)
         await page.close()
 
+        const label = `${story.id} [${theme}]`
         assert.equal(
           measured.missing,
           false,
-          `${story.id} [${theme}]: selected control is in the story`
+          `${label}: selected control is in the story`
         )
-        const background = parseRgb(measured.background)
-        const selected = parseRgb(measured.selected)
-        const selectedForeground = parseRgb(measured.selectedForeground)
-        const primary = parseRgb(measured.primary)
-        const color = parseRgb(measured.color)
-        const border = parseRgb(measured.border)
-
-        assert.notEqual(
-          measured.background,
+        assert.equal(
           measured.transparent,
-          `${story.id} [${theme}]: selected fill is not transparent`
+          false,
+          `${label}: selected fill is not transparent`
+        )
+
+        const distance = (a, b) =>
+          Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+        assert.ok(
+          distance(measured.background, measured.selected) < 12,
+          `${label}: fill ${measured.background} should be the selected wash ${measured.selected}`
         )
         assert.ok(
-          distance(background, selected) < 12,
-          `${story.id} [${theme}]: fill ${measured.background} should be the selected wash ${measured.selected}`
+          distance(measured.background, measured.primary) > 40,
+          `${label}: fill is the wash, not solid primary ${measured.primary}`
         )
         assert.ok(
-          distance(background, primary) > 40,
-          `${story.id} [${theme}]: fill is the wash, not solid primary ${measured.primary}`
+          measured.background[0] - measured.background[2] < 20,
+          `${label}: fill is not pink (${measured.background})`
         )
         assert.ok(
-          background[0] - background[2] < 20,
-          `${story.id} [${theme}]: fill is not pink (${measured.background})`
+          distance(measured.color, measured.selectedForeground) < 12,
+          `${label}: text ${measured.color} should be selected-foreground ${measured.selectedForeground}`
         )
         assert.ok(
-          distance(color, selectedForeground) < 12,
-          `${story.id} [${theme}]: text ${measured.color} should be selected-foreground ${measured.selectedForeground}`
-        )
-        assert.ok(
-          distance(border, selectedForeground) < 12,
-          `${story.id} [${theme}]: border ${measured.border} should be selected-foreground ${measured.selectedForeground}`
+          distance(measured.border, measured.selectedForeground) < 12,
+          `${label}: border ${measured.border} should be selected-foreground ${measured.selectedForeground}`
         )
       }
     }
