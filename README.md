@@ -116,6 +116,9 @@ npm pack --pack-destination release-artifacts
 npm publish ./release-artifacts/atlas-react-kit-0.4.1.tgz --access public
 ```
 
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser
+checks, versioning, and deprecations.
+
 Pin an exact package version in consuming applications. Roll back an upgrade by
 restoring the previous version and lockfile. License: MIT; upstream notices are
 preserved in [NOTICE](./NOTICE).

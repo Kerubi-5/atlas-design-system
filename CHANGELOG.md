@@ -39,6 +39,21 @@ versioned; bump `package.json` to release.
   `switch`, and `tooltip`. They follow the shape rules (square, except round
   radio dots and avatars), use `bg-selected` for the current page and focus
   styles shared with existing controls, and keep status tones off body text.
+- Accessibility gate: CI runs axe-core's WCAG 2.2 A/AA rules on every
+  Storybook story in light and dark mode. Fixes for what it found:
+  - `--muted-foreground` (light) is `oklch(0.53 0 0)`, so muted text passes on
+    `bg-muted` as well as the page (it was 4.3:1).
+  - `--destructive` (light) is `oklch(0.505 0.213 27.518)`, so destructive
+    text passes on its own soft tint (it was 3.6:1). The soft destructive
+    `Badge` tone and the destructive `Button` are now AA in both themes.
+  - Outline/ghost button and toggle hovers, link buttons, and field
+    description links use `text-selected-foreground` instead of
+    `text-primary`, which was about 2:1 on the dark background.
+  - Calendar day buttons are named "Tuesday, October 27, 2026" (no ordinal)
+    so the name contains the visible number (WCAG 2.5.3).
+  - `Table`'s scroller joins the tab order while it overflows, so keyboard
+    users can scroll it.
+  - `Combobox` accepts `aria-label` and `aria-labelledby`.
 
 ## 0.4.1
 

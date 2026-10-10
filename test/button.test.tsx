@@ -14,9 +14,9 @@ describe("Button quiet hover", () => {
     for (const token of [
       "hover:border-primary",
       "hover:bg-selected",
-      "hover:text-primary",
+      "hover:text-selected-foreground",
       "focus-visible:border-primary",
-      "focus-visible:text-primary",
+      "focus-visible:text-selected-foreground",
       "focus-visible:ring-primary/30",
     ]) {
       expect(quietButtonInteraction.split(/\s+/)).toContain(token)
@@ -31,7 +31,9 @@ describe("Button quiet hover", () => {
 
     for (const button of [outline, ghost, clear]) {
       expect(button.className.split(/\s+/)).toContain("hover:bg-selected")
-      expect(button.className.split(/\s+/)).toContain("hover:text-primary")
+      expect(button.className.split(/\s+/)).toContain(
+        "hover:text-selected-foreground"
+      )
       expect(button.className.split(/\s+/)).toContain("hover:border-primary")
       expect(button.className.split(/\s+/)).not.toContain("hover:bg-muted")
     }
@@ -55,7 +57,7 @@ describe("Button quiet hover", () => {
     const hovered = screen.getByRole("button", { name: "Clear selection" })
     expect(hovered.className.split(/\s+/)).toContain("border-primary")
     expect(hovered.className.split(/\s+/)).toContain("bg-selected")
-    expect(hovered.className.split(/\s+/)).toContain("text-primary")
+    expect(hovered.className.split(/\s+/)).toContain("text-selected-foreground")
     expect(hovered.className.split(/\s+/)).toContain("ring-primary/30")
   })
 })

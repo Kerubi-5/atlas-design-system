@@ -1,8 +1,17 @@
 import type { PropsWithChildren } from "react"
 import type { Preview, ReactRenderer } from "@storybook/react-vite"
 import {
+  Controls,
+  Description,
   DocsContainer,
   type DocsContainerProps,
+  Heading,
+  Markdown,
+  Primary,
+  Stories,
+  Subtitle,
+  Title,
+  useOf,
 } from "@storybook/addon-docs/blocks"
 import { withThemeByClassName } from "@storybook/addon-themes"
 import { MINIMAL_VIEWPORTS } from "storybook/viewport"
@@ -18,7 +27,42 @@ const atlasViewports = {
 
 import { ThemeProvider } from "../../src/theme-provider.js"
 import { Toaster } from "../../src/sonner.js"
+import { beta, usage } from "../src/lib/usage.js"
 import "../src/styles.css"
+
+/** "Usage" guidance for the component this docs page documents. */
+function UsageBlock() {
+  const { preparedMeta } = useOf("meta", ["meta"])
+  const name = preparedMeta.title.replace(/^Components\//, "")
+  const guidance = usage[name]
+  if (!guidance) return null
+  const status = beta.has(name)
+    ? "**Status: beta.** The API may still change in a minor release.\n\n"
+    : ""
+  return (
+    <>
+      <Heading>Usage</Heading>
+      <div className="markdown">
+        <Markdown>{status + guidance}</Markdown>
+      </div>
+    </>
+  )
+}
+
+/** Storybook's default autodocs page with a Usage section after the description. */
+function DocsPage() {
+  return (
+    <>
+      <Title />
+      <Subtitle />
+      <Description />
+      <UsageBlock />
+      <Primary />
+      <Controls />
+      <Stories />
+    </>
+  )
+}
 
 const preview: Preview = {
   tags: ["autodocs"],
@@ -29,8 +73,10 @@ const preview: Preview = {
     options: {
       storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
     },
-    a11y: { test: "todo" },
+    // CI runs axe on every story (tests/a11y.test.mjs); show failures as errors.
+    a11y: { test: "error" },
     docs: {
+      page: DocsPage,
       // One Toaster per docs page. The story decorator skips its own in docs
       // mode, or every story on the page would show the same toast.
       container: ({

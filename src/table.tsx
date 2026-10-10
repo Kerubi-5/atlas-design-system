@@ -5,15 +5,44 @@ import * as React from "react"
 import { cn } from "./utils.js"
 
 /**
+ * True while the element's content is wider than its box. Re-checked when
+ * the container or its content resizes.
+ */
+function useHorizontalOverflow(ref: React.RefObject<HTMLElement | null>) {
+  const [overflowing, setOverflowing] = React.useState(false)
+
+  React.useEffect(() => {
+    const element = ref.current
+    if (!element || typeof ResizeObserver === "undefined") return
+    const check = () =>
+      setOverflowing(element.scrollWidth > element.clientWidth + 1)
+    check()
+    const observer = new ResizeObserver(check)
+    observer.observe(element)
+    if (element.firstElementChild) observer.observe(element.firstElementChild)
+    return () => observer.disconnect()
+  }, [ref])
+
+  return overflowing
+}
+
+/**
  * Data table. The root is a `min-w-0 overflow-x-auto` scroller so nowrap
  * columns scroll inside the table instead of widening a card or panel.
+ * While it overflows, the scroller joins the tab order so keyboard users can
+ * scroll it with the arrow keys (WCAG 2.1.1).
  * Cell padding is `px-2` below `sm` and the original `p-3` from `sm` up.
  */
 function Table({ className, ...props }: React.ComponentProps<"table">) {
+  const containerRef = React.useRef<HTMLDivElement>(null)
+  const scrollable = useHorizontalOverflow(containerRef)
+
   return (
     <div
+      ref={containerRef}
       data-slot="table-container"
-      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain"
+      tabIndex={scrollable ? 0 : undefined}
+      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
     >
       <table
         data-slot="table"

@@ -51,14 +51,14 @@ export function QuietButtonHoverStory() {
         type="button"
         variant="outline"
         size="sm"
-        className="border-primary bg-selected text-primary ring-2 ring-primary/30"
+        className="border-primary bg-selected text-selected-foreground ring-2 ring-primary/30"
       >
         Clear selection
       </Button>
       <Button
         type="button"
         variant="ghost"
-        className="border-primary bg-selected text-primary ring-2 ring-primary/30"
+        className="border-primary bg-selected text-selected-foreground ring-2 ring-primary/30"
       >
         Ghost
       </Button>

@@ -36,3 +36,19 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix site
       - run: npm run build --prefix site
+      - name: Install Chromium for the browser checks
+        working-directory: site
+        run: npx playwright install --with-deps chromium
+      - name: Accessibility check (axe, WCAG 2.2 AA, light and dark)
+        run: npm run test:a11y --prefix site
+      - name: Screenshot comparison
+        run: npm run test:visual --prefix site
+      - name: Upload screenshot diffs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-diffs
+          path: |
+            site/playwright-report
+            site/test-results
+          retention-days: 7

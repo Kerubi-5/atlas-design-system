@@ -4,3 +4,5 @@ dist/
 .next/
 coverage/
 release-artifacts/
+test-results/
+playwright-report/

@@ -12,16 +12,60 @@ light/dark color pairs; tokens already switch with the theme.
 
 Selected or active navigation, tabs, toggles, chips, rows, and labels use
 `bg-selected text-selected-foreground`. Outline and ghost buttons hover and
-focus with `border-primary text-primary` and the selected wash, not a muted
-grey fill. Table row hover can stay `hover:bg-muted`. The shipped controls
-apply this distinction.
+focus with `border-primary`, `text-selected-foreground`, and the selected wash,
+not a muted grey fill. Table row hover can stay `hover:bg-muted`. The shipped
+controls apply this distinction.
+
+For brand-colored text (links, hovered labels), use `text-selected-foreground`:
+it is the primary purple in light mode and a lighter purple in dark mode.
+`text-primary` as text fails contrast on the dark background (about 2:1).
 
 Use `success`, `warning`, and `destructive` for good, caution, and bad states.
-For tinted status chips, use `Badge variant="soft" tone="success"` or
-`tone="warning"`. The destructive tone has a known contrast limitation on its
-own light-mode tint; prefer plain `text-destructive` or a solid fill. Status
-tones have no paired foreground token; avoid placing text on solid status fills.
-Application-specific identity colors belong to the application.
+For tinted status chips, use `Badge variant="soft"` with `tone="success"`,
+`"warning"`, or `"destructive"`; each meets AA as text on the page, a card, and
+its own soft tint in both themes. Status tones have no paired foreground token;
+avoid placing text on solid status fills. Application-specific identity colors
+belong to the application.
+
+## Accessibility
+
+The target is WCAG 2.2 AA. CI runs axe-core's WCAG 2.2 A and AA rules against
+every Storybook story in light and dark mode (`npm run test:a11y --prefix
+site`), and a violation fails the build. Automated checks do not replace
+keyboard and screen-reader testing.
+
+- Text meets 4.5:1 against its background. The token pairs are tuned for it,
+  including `text-muted-foreground` on `bg-muted` and status text on its soft
+  tint; raw colors and opacity tricks are where contrast breaks.
+- Every control has an accessible name: a `Label` with `htmlFor`, or
+  `aria-label` on icon-only buttons and an unlabelled `Combobox`.
+- Visible text is part of the accessible name, so speech users can say what
+  they see (the calendar labels days "September 27", not "27th").
+- Keep the focus rings the kit ships. Content that scrolls must be reachable
+  by keyboard; `Table` adds itself to the tab order while it overflows.
+
+## Writing
+
+Write labels and messages in sentence case; components that display uppercase
+(buttons, card and dialog titles, badges) apply it with CSS, so screen readers
+still read normal words.
+
+- **Buttons** say what happens: a verb and, when needed, a noun ("Save",
+  "Export orders", "Delete order"). Avoid "OK", "Submit", and "Click here".
+  In a confirmation dialog, the confirm button repeats the action from the
+  title ("Delete order?" / "Delete order").
+- **Errors** say what happened and what to do next, in plain words: "Could
+  not save. Check your connection and try again." Don't blame the user or
+  show only a code. Field errors name the fix: "Enter an email address like
+  name@company.com."
+- **Empty states** say what will appear and how to add the first one: "No
+  orders yet. Orders you create show up here."
+- **Toasts** confirm in past tense and stay short ("Settings saved"). Anything
+  the user must act on belongs in an `Alert` or dialog, not a toast.
+- **Placeholders** show an example, never the label; every field keeps a
+  visible `Label`.
+- Skip "please", exclamation marks, and filler ("Successfully saved" is
+  "Saved"). Use numerals, and `tabular-nums` where numbers line up in columns.
 
 ## Shape and composition
 

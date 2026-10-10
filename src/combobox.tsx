@@ -25,6 +25,9 @@ type ComboboxProps = {
   id?: string
   className?: string
   "aria-invalid"?: boolean
+  /** Name the trigger when there is no `<Label htmlFor={id}>`. */
+  "aria-label"?: string
+  "aria-labelledby"?: string
 }
 
 /**
@@ -52,6 +55,8 @@ export function Combobox({
   id,
   className,
   "aria-invalid": ariaInvalid,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
@@ -167,6 +172,8 @@ export function Combobox({
           aria-expanded={open}
           aria-controls={listId}
           aria-invalid={ariaInvalid}
+          aria-label={ariaLabel}
+          aria-labelledby={ariaLabelledBy}
           disabled={disabled}
           className={cn(
             formControlTriggerClassName,

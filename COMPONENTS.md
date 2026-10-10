@@ -52,6 +52,18 @@ no root component barrel.
 | `utils`                       | `cn`, `onInputChange`                                                                                                                                                                                                                                                                            |
 | `theme.css`                   | Tailwind 4 theme; installation in [README](./README.md)                                                                                                                                                                                                                                          |
 
+## Status
+
+Components are **stable** unless listed here. Stable components change
+through the deprecation policy in
+[CONTRIBUTING.md](https://github.com/Kerubi-5/atlas-design-system/blob/main/CONTRIBUTING.md):
+a deprecation notice first, removal in a later minor release.
+
+**Beta** components may still change shape in a minor release; the
+changelog calls out every change: `accordion`, `alert`, `avatar`,
+`breadcrumb`, `date-time-picker`, `dropdown-menu`, `pagination`, `progress`,
+`radio-group`, `spinner`, `switch`, `tooltip`.
+
 ## Forms
 
 `TextFieldApi` is a structural interface, with no form library dependency:
@@ -98,7 +110,7 @@ capped at `min(100vw - 2rem, 24rem)` so it stays on-screen at 390px. Pass
 and `timeStep` to that control.
 
 Outline and ghost `Button` hover and focus use `border-primary`,
-`text-primary`, and `bg-selected`. They do not use a muted grey fill, including
+`text-selected-foreground`, and `bg-selected`. They do not use a muted grey fill, including
 when the control sits on a selected row (for example "Clear selection").
 
 ```tsx
