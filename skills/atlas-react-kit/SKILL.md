@@ -49,26 +49,31 @@ Import each component from its subpath, e.g.
 `import { Button } from "atlas-react-kit/button"`. There is no root barrel, and
 `dist/` or `internal/` paths are not public API.
 
-| Need                                            | Use                                                                                                 |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Short fixed list (a handful of options)         | `Select` family from `select`                                                                       |
-| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                        |
-| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                   |
-| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField` from `form/*`                             |
-| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                      |
-| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                        |
-| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()` |
-| Status chip (paid, pending, failed)             | `Badge variant="soft" tone="success" \| "warning" \| "destructive" \| "neutral"` from `badge`       |
-| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                 |
-| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                     |
-| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                         |
-| Modal                                           | `Dialog` family from `dialog`                                                                       |
-| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                               |
-| Conditional classes                             | `cn` from `utils`                                                                                   |
+| Need                                            | Use                                                                                                              |
+| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Short fixed list (a handful of options)         | `Select` family from `select`                                                                                    |
+| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                                     |
+| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                |
+| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField` from `form/*`                                          |
+| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                                   |
+| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                     |
+| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`              |
+| Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success" \| "warning" \| "neutral"`; `Badge variant="destructive"` for failed |
+| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                              |
+| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                                  |
+| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                                      |
+| Modal                                           | `Dialog` family from `dialog`                                                                                    |
+| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                                            |
+| Conditional classes                             | `cn` from `utils`                                                                                                |
 
 If nothing fits, build the piece in the app from kit primitives and semantic
 tokens. Do not copy kit source into the app; a missing shared component belongs
 in the atlas-design-system repository.
+
+Existing app code may predate the kit (raw colors, rounded boxes, hand-styled
+buttons). Don't copy that style into new UI. Move what the task touches onto kit
+components and tokens, and mention the rest to the user instead of rewriting
+files the task doesn't need.
 
 ## 4. Style with tokens, not values
 
@@ -83,8 +88,11 @@ list; the ones that come up most:
   current nav item, chip, row, or toggle. Grey fills read as hover, not
   selection.
 - **Status**: `success`, `warning`, and `destructive` for good, caution, and
-  bad. Use them as text or soft tints (the `Badge` tones). There is no
-  foreground token for text on a solid status fill, so avoid that combination.
+  bad. Use them as text or soft tints (the `Badge` tones). The destructive tint
+  is too low-contrast in light mode, so show bad states as plain destructive
+  text (`Badge variant="destructive"`) rather than overriding a soft badge's
+  colors. There is no foreground token for text on a solid status fill, so
+  avoid that combination too.
 - **Square corners**: primitives have none. Use `rounded-full` only for real
   circles (avatars, dots). Adding `rounded-md` to a card or button breaks the
   system.
