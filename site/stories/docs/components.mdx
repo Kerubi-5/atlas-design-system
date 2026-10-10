@@ -1,0 +1,10 @@
+import { Meta, Markdown } from "@storybook/addon-docs/blocks"
+
+import { rewriteDocLinks } from "../../src/lib/docs.js"
+import components from "../../../COMPONENTS.md?raw"
+
+<Meta title="Docs/Components" />
+
+<div className="markdown">
+  <Markdown>{rewriteDocLinks(components)}</Markdown>
+</div>

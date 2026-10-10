@@ -1,13 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
+
 import { Table } from "../../src/table.js"
-import { TableStory, TableBodySkeletonStory } from "../../stories/data.js"
+import { TableBodySkeletonStory, TableStory } from "../../stories/data.js"
 import {
   NarrowPanelTableStory,
   ProfileCardTableStory,
 } from "../../stories/table-overflow.js"
 
 const meta = {
-  title: "Examples/Tables",
+  title: "Components/Table",
   component: Table,
   parameters: { controls: { disable: true } },
 } satisfies Meta<typeof Table>

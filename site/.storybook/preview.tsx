@@ -12,7 +12,9 @@ const preview: Preview = {
     layout: "padded",
     controls: { expanded: true },
     viewport: { options: MINIMAL_VIEWPORTS },
-    options: { storySort: { order: ["Components", "Examples"] } },
+    options: {
+      storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
+    },
     a11y: { test: "todo" },
   },
   decorators: [

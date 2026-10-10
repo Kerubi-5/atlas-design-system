@@ -5,16 +5,29 @@
   "buildCommand": "npm run build --prefix site",
   "outputDirectory": "site/dist",
   "redirects": [
+    { "source": "/playground", "destination": "/", "permanent": true },
+    { "source": "/storybook", "destination": "/", "permanent": true },
+    { "source": "/storybook/", "destination": "/", "permanent": true },
     {
-      "source": "/playground",
-      "destination": "/storybook/",
+      "source": "/tokens",
+      "destination": "/?path=/story/tokens--theme",
       "permanent": true
     },
-    { "source": "/storybook", "destination": "/storybook/", "permanent": true }
+    {
+      "source": "/docs/components",
+      "destination": "/?path=/docs/docs-components--docs",
+      "permanent": true
+    },
+    {
+      "source": "/docs/design-rules",
+      "destination": "/?path=/docs/docs-design-rules--docs",
+      "permanent": true
+    },
+    {
+      "source": "/docs/:path*",
+      "destination": "/?path=/docs/docs-readme--docs",
+      "permanent": true
+    }
   ],
-  "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/tokens", "destination": "/index.html" },
-    { "source": "/docs/:path*", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/:path*", "destination": "/index.html" }]
 }
