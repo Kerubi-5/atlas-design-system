@@ -9,7 +9,7 @@ const siteRoot = path.resolve(
 )
 const repoRoot = path.resolve(siteRoot, "..")
 
-const config: StorybookConfig = {
+const config = {
   framework: "@storybook/react-vite",
   stories: ["../stories/**/*.mdx", "../stories/**/*.stories.tsx"],
   staticDirs: ["../public"],
@@ -19,6 +19,9 @@ const config: StorybookConfig = {
     "@storybook/addon-themes",
   ],
   core: { disableTelemetry: true },
+  // Manager HTML title is `${title} - Storybook`. manager.ts rewrites the live
+  // document.title so the tab reads Atlas React Kit.
+  title: "Atlas React Kit",
   // Storybook links public/favicon.svg itself; iOS home screens need a PNG.
   managerHead: (head) =>
     `${head}<link rel="apple-touch-icon" href="./apple-touch-icon.png" />`,
@@ -31,6 +34,6 @@ const config: StorybookConfig = {
     }
     return config
   },
-}
+} satisfies StorybookConfig & { title: string }
 
 export default config

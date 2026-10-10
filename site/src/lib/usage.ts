@@ -7,12 +7,19 @@ export const beta = new Set([
   "Alert",
   "Avatar",
   "Breadcrumb",
+  "Color legend",
   "Date time picker",
   "Dropdown menu",
+  "Info tip",
+  "Markdown",
+  "Meter",
   "Pagination",
   "Progress",
   "Radio group",
+  "Search picker",
+  "Slider",
   "Spinner",
+  "Stat tile",
   "Switch",
   "Tooltip",
 ])
@@ -80,9 +87,15 @@ export const usage: Record<string, string> = {
   Combobox: `
 **Use for** picking one value from a long or searchable list: timezones, currencies, countries.
 
-**Not for** short lists of a handful of options (use \`Select\`) or free text entry.
+**Not for** short lists of a handful of options (use \`Select\`), free text entry, or an always-visible filtered list (use \`SearchPicker\`).
 
 **Accessibility** Name it with \`Label htmlFor={id}\` or \`aria-label\`; a combobox does not take its name from the selected value.`,
+  "Color legend": `
+**Use for** a key next to a color scale: map bins, status ramps. Pass CSS colors the app owns.
+
+**Not for** attribution, licenses, or overlay positioning — those stay in the app (\`className\` for chrome).
+
+**Accessibility** Name the figure with \`title\` or \`aria-label\`. Don't rely on the swatch color alone; every item has a text label.`,
   "Date picker": `
 **Use for** a single date, or a from/to range with \`mode="range"\`, in a form.
 
@@ -125,6 +138,12 @@ export const usage: Record<string, string> = {
 **Not for** a whole form's layout on its own; combine \`FieldGroup\` and \`FieldSet\`.
 
 **Accessibility** Point \`FieldLabel htmlFor\` at the control and use \`FieldSet\` with \`FieldLegend\` for groups of checkboxes or radios.`,
+  "Info tip": `
+**Use for** longer help than a tooltip: a titled popover from a 20px glyph with a 44px hit area.
+
+**Not for** a short label (use \`Tooltip\`) or a glossary / "coming soon" chip.
+
+**Accessibility** \`label\` is required (\`aria-label\` on the icon button). Hover opens only on a fine pointer; click, tap, and keyboard always toggle it.`,
   Input: `
 **Use for** single-line text: names, emails, search terms, numbers.
 
@@ -137,6 +156,18 @@ export const usage: Record<string, string> = {
 **Not for** headings or general text.
 
 **Accessibility** Connect with \`htmlFor\` (or wrap the control) so clicking the label focuses the control.`,
+  Markdown: `
+**Use for** rendering GitHub-flavoured Markdown the app already stores as a string.
+
+**Not for** a WYSIWYG editor. Pair with \`FormMarkdownField\` for write / preview.
+
+**Accessibility** Links and images are sanitized (http, https, mailto, hash, and root paths only). Raw HTML is not rendered.`,
+  Meter: `
+**Use for** a current value against a scale, with optional ticks: spend vs a cap, pace vs typical.
+
+**Not for** a determinate job bar (use \`Progress\`) or an unknown wait (use \`Spinner\`).
+
+**Accessibility** It is \`role="meter"\` with \`aria-valuemin\`, \`aria-valuemax\`, and \`aria-valuenow\`. \`aria-label\` is required.`,
   Pagination: `
 **Use for** moving through pages of a long list or table where the page belongs in the URL.
 
@@ -152,7 +183,7 @@ export const usage: Record<string, string> = {
   Progress: `
 **Use for** a job with a known percentage: uploads, imports, multi-step processing.
 
-**Not for** unknown durations (use \`Spinner\`) or scores and meters.
+**Not for** unknown durations (use \`Spinner\`) or a value against a scale with ticks (use \`Meter\`).
 
 **Accessibility** Name it with \`aria-label\` or \`aria-labelledby\` and show the percentage as text.`,
   "Radio group": `
@@ -161,6 +192,12 @@ export const usage: Record<string, string> = {
 **Not for** long lists (use \`Select\` or \`Combobox\`) or independent on/off choices (use \`Checkbox\`).
 
 **Accessibility** Name the group (\`aria-label\` or a \`FieldLegend\`); arrow keys move the selection.`,
+  "Search picker": `
+**Use for** picking one item from a list that stays on the page: places, directories, long filters.
+
+**Not for** a compact popover picker (use \`Combobox\`) or a short fixed list (use \`Select\`).
+
+**Accessibility** The input is \`role="combobox"\` with an always-visible listbox. Arrows, Home, End, PageUp, PageDown, Enter, and Escape move and select.`,
   Select: `
 **Use for** one value from a short, fixed list.
 
@@ -173,6 +210,12 @@ export const usage: Record<string, string> = {
 **Not for** spacing alone (use gap or margin).
 
 **Accessibility** Decorative by default; pass \`decorative={false}\` when it separates meaningful sections for screen readers.`,
+  Slider: `
+**Use for** choosing a number on a continuous scale: probability, volume, a threshold.
+
+**Not for** a read-only fill (use \`Meter\` or \`Progress\`).
+
+**Accessibility** Pair with a visible \`Label\` and \`aria-labelledby\` (the thumb is not a labelable element). The thumb has a 44px hit area; arrows, Home, and End move it.`,
   Skeleton: `
 **Use for** placeholders shaped like the content that is loading.
 
@@ -185,6 +228,12 @@ export const usage: Record<string, string> = {
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
 **Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\` from \`sonner\`.`,
+  "Stat tile": `
+**Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
+
+**Not for** a whole dashboard card (use \`Card\`) or a heading alone (\`sectionLabel\` is the shared uppercase class).
+
+**Accessibility** The value is visible text. Name any nested meter yourself.`,
   Spinner: `
 **Use for** short waits with an unknown duration, inside a button or a small region.
 
@@ -226,13 +275,13 @@ export const usage: Record<string, string> = {
 
 **Not for** form values submitted later (use \`RadioGroup\` or \`Checkbox\`) or navigation (use \`Tabs\` or \`TabsNav\`).
 
-**Accessibility** Give icon-only items \`aria-label\`; arrow keys move between items.`,
+**Accessibility** Give icon-only items \`aria-label\`; arrow keys move between items. The selected item uses the same wash, \`text-selected-foreground\`, and \`border-selected-foreground\` as a pressed \`Toggle\`, including in single (radio) mode.`,
   Toggle: `
 **Use for** a single pressed/unpressed control, such as Bold in a toolbar.
 
 **Not for** settings (use \`Switch\`).
 
-**Accessibility** Exposes \`aria-pressed\`; icon-only toggles need \`aria-label\`.`,
+**Accessibility** Exposes \`aria-pressed\` and \`data-state=on\`; icon-only toggles need \`aria-label\`. The pressed look is the selected wash plus a \`selected-foreground\` border.`,
   Tooltip: `
 **Use for** short labels on icon-only buttons and hints for truncated text.
 

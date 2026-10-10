@@ -1,6 +1,6 @@
 {
   "name": "atlas-react-kit",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Shared React components and Tailwind theme for Atlas",
   "type": "module",
   "license": "MIT",
@@ -56,6 +56,10 @@
       "types": "./dist/checkbox.d.ts",
       "default": "./dist/checkbox.js"
     },
+    "./color-legend": {
+      "types": "./dist/color-legend.d.ts",
+      "default": "./dist/color-legend.js"
+    },
     "./combobox": {
       "types": "./dist/combobox.d.ts",
       "default": "./dist/combobox.js"
@@ -88,6 +92,10 @@
       "types": "./dist/field.d.ts",
       "default": "./dist/field.js"
     },
+    "./info-tip": {
+      "types": "./dist/info-tip.d.ts",
+      "default": "./dist/info-tip.js"
+    },
     "./input": {
       "types": "./dist/input.d.ts",
       "default": "./dist/input.js"
@@ -95,6 +103,14 @@
     "./label": {
       "types": "./dist/label.d.ts",
       "default": "./dist/label.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown.d.ts",
+      "default": "./dist/markdown.js"
+    },
+    "./meter": {
+      "types": "./dist/meter.d.ts",
+      "default": "./dist/meter.js"
     },
     "./pagination": {
       "types": "./dist/pagination.d.ts",
@@ -112,6 +128,10 @@
       "types": "./dist/radio-group.d.ts",
       "default": "./dist/radio-group.js"
     },
+    "./search-picker": {
+      "types": "./dist/search-picker.d.ts",
+      "default": "./dist/search-picker.js"
+    },
     "./select": {
       "types": "./dist/select.d.ts",
       "default": "./dist/select.js"
@@ -124,6 +144,10 @@
       "types": "./dist/skeleton.d.ts",
       "default": "./dist/skeleton.js"
     },
+    "./slider": {
+      "types": "./dist/slider.d.ts",
+      "default": "./dist/slider.js"
+    },
     "./sonner": {
       "types": "./dist/sonner.d.ts",
       "default": "./dist/sonner.js"
@@ -135,6 +159,10 @@
     "./spinner": {
       "types": "./dist/spinner.d.ts",
       "default": "./dist/spinner.js"
+    },
+    "./stat-tile": {
+      "types": "./dist/stat-tile.d.ts",
+      "default": "./dist/stat-tile.js"
     },
     "./switch": {
       "types": "./dist/switch.d.ts",
@@ -188,6 +216,10 @@
       "types": "./dist/form/feedback-field.d.ts",
       "default": "./dist/form/feedback-field.js"
     },
+    "./form/markdown-field": {
+      "types": "./dist/form/markdown-field.d.ts",
+      "default": "./dist/form/markdown-field.js"
+    },
     "./form/select-field": {
       "types": "./dist/form/select-field.d.ts",
       "default": "./dist/form/select-field.js"
@@ -240,6 +272,8 @@
     "next-themes": "^0.4.6",
     "radix-ui": "^1.4.3",
     "react-day-picker": "^10.0.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "tw-animate-css": "^1.4.0"

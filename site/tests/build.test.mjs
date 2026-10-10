@@ -43,6 +43,16 @@ test("Storybook is the static site at the output root", async () => {
   }
 })
 
+test("the manager document title is Atlas React Kit", async () => {
+  const html = await fs.readFile(path.join(output, "index.html"), "utf8")
+  assert.match(html, /<title>[^<]*Atlas React Kit[^<]*<\/title>/)
+  const manager = await fs.readFile(
+    path.join(siteRoot, ".storybook/manager.ts"),
+    "utf8"
+  )
+  assert.match(manager, /document\.title = KIT_TITLE/)
+})
+
 test("the site ships its own icon set", async () => {
   const html = await fs.readFile(path.join(output, "index.html"), "utf8")
   assert.match(

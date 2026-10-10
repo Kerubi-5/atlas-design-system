@@ -104,9 +104,13 @@ Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labell
 Next adapter provides `TabsNavLink` with this behavior.
 
 Use `FormTextField`, `FormSelectField`, `FormDatePickerField`,
-`FormDateTimePickerField`, and `FormFeedbackField` for portable form controls,
-and `FieldError` for field messages. `Combobox`, `DatePickerButton` (including
-`mode="range"`), `DateTimePickerButton`, `ThemeProvider`, `ErrorBoundary`, and
-`SortableTableHead` are first-class kit pieces. Domain data and application shells stay with the application: currency
-or timezone option lists, query-library error views, markdown editors, kanban
-boards, and dashboard widgets.
+`FormDateTimePickerField`, `FormMarkdownField`, and `FormFeedbackField` for
+portable form controls, and `FieldError` for field messages. `Combobox` (popover)
+and `SearchPicker` (always-visible list), `DatePickerButton` (including
+`mode="range"`), `DateTimePickerButton`, `Slider`, `Meter` (scale with ticks;
+`Progress` is a plain 0–100 job bar), `InfoTip` (longer than `Tooltip`),
+`Markdown`, `ColorLegend`, `StatTile`, `ThemeProvider`, `ErrorBoundary`, and
+`SortableTableHead` are first-class kit pieces. Domain data and application
+shells stay with the application: currency or timezone option lists,
+query-library error views, WYSIWYG editors, kanban boards, and dashboard
+widgets.

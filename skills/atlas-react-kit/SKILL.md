@@ -49,33 +49,40 @@ Import each component from its subpath, e.g.
 `import { Button } from "atlas-react-kit/button"`. There is no root barrel, and
 `dist/` or `internal/` paths are not public API.
 
-| Need                                            | Use                                                                                                 |
-| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Short fixed list (a handful of options)         | `Select` family from `select`                                                                       |
-| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                        |
-| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                   |
-| Date and time (not `datetime-local`)            | `DateTimePickerButton` from `date-time-picker`                                                      |
-| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField`, `FormDateTimePickerField` from `form/*`  |
-| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                      |
-| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                        |
-| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()` |
-| Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success"`, `"warning"`, `"destructive"`, or `"neutral"`          |
-| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                 |
-| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                     |
-| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                         |
-| Modal                                           | `Dialog` family from `dialog`                                                                       |
-| Label for an icon button, or a short hint       | `Tooltip` from `tooltip`; keep `aria-label` on icon buttons                                         |
-| Row actions or an overflow menu of commands     | `DropdownMenu` family from `dropdown-menu`                                                          |
-| Setting that applies immediately                | `Switch` from `switch`; `Checkbox` for choices submitted with a form                                |
-| One choice from a few visible options           | `RadioGroup` and `RadioGroupItem` from `radio-group`                                                |
-| Inline message about a page or section          | `Alert` from `alert` (`success`, `warning`, `destructive` variants)                                 |
-| Person or workspace image                       | `Avatar`, `AvatarImage`, `AvatarFallback` from `avatar`                                             |
-| Sections that expand in place                   | `Accordion` family from `accordion`                                                                 |
-| Pages of a long list                            | `Pagination` family from `pagination`                                                               |
-| Where the page sits in a hierarchy              | `Breadcrumb` family from `breadcrumb`                                                               |
-| Work in progress                                | `Progress` from `progress` when the percent is known, else `Spinner` from `spinner`                 |
-| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                               |
-| Conditional classes                             | `cn` from `utils`                                                                                   |
+| Need                                            | Use                                                                                                                     |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Short fixed list (a handful of options)         | `Select` family from `select`                                                                                           |
+| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                                            |
+| Always-visible searchable list (places)         | `SearchPicker` from `search-picker`                                                                                     |
+| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                       |
+| Date and time (not `datetime-local`)            | `DateTimePickerButton` from `date-time-picker`                                                                          |
+| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField`, `FormDateTimePickerField`, `FormMarkdownField` from `form/*` |
+| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                                          |
+| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                            |
+| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`                     |
+| Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success"`, `"warning"`, `"destructive"`, or `"neutral"`                              |
+| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                                     |
+| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                                         |
+| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                                             |
+| Modal                                           | `Dialog` family from `dialog`                                                                                           |
+| Label for an icon button, or a short hint       | `Tooltip` from `tooltip`; keep `aria-label` on icon buttons                                                             |
+| Longer help from a glyph                        | `InfoTip` / `InlineTip` from `info-tip` (not `Tooltip`)                                                                 |
+| Color scale key                                 | `ColorLegend` from `color-legend`                                                                                       |
+| GitHub-flavoured Markdown                       | `Markdown` from `markdown`; write/preview with `FormMarkdownField`                                                      |
+| Summary figure in a strip                       | `StatTile` from `stat-tile` (`statTileGrid`, `sectionLabel`)                                                            |
+| Value against a scale, optional ticks           | `Meter` from `meter` (not `Progress`)                                                                                   |
+| Number on a continuous scale                    | `Slider` from `slider`                                                                                                  |
+| Row actions or an overflow menu of commands     | `DropdownMenu` family from `dropdown-menu`                                                                              |
+| Setting that applies immediately                | `Switch` from `switch`; `Checkbox` for choices submitted with a form                                                    |
+| One choice from a few visible options           | `RadioGroup` and `RadioGroupItem` from `radio-group`                                                                    |
+| Inline message about a page or section          | `Alert` from `alert` (`success`, `warning`, `destructive` variants)                                                     |
+| Person or workspace image                       | `Avatar`, `AvatarImage`, `AvatarFallback` from `avatar`                                                                 |
+| Sections that expand in place                   | `Accordion` family from `accordion`                                                                                     |
+| Pages of a long list                            | `Pagination` family from `pagination`                                                                                   |
+| Where the page sits in a hierarchy              | `Breadcrumb` family from `breadcrumb`                                                                                   |
+| Work in progress                                | `Progress` from `progress` when the percent is known, else `Spinner` from `spinner`                                     |
+| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                                                   |
+| Conditional classes                             | `cn` from `utils`                                                                                                       |
 
 If nothing fits, build the piece in the app from kit primitives and semantic
 tokens. Do not copy kit source into the app; a missing shared component belongs

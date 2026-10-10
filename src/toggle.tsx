@@ -6,8 +6,20 @@ import { Toggle as TogglePrimitive } from "radix-ui"
 
 import { cn } from "./utils.js"
 
+/**
+ * Selected chrome shared by standalone Toggle and ToggleGroupItem.
+ *
+ * Radix Toggle sets `data-state=on` and `aria-pressed`. ToggleGroup items
+ * always set `data-state=on`; in multiple mode they also set `aria-pressed`,
+ * but in single mode they are radios with `aria-checked` and no
+ * `aria-pressed`. All three selectors apply the same wash, text, and
+ * selected-foreground border so the state meets WCAG 1.4.11 in every mode.
+ */
+const selectedToggleChrome =
+  "data-on:border-selected-foreground data-on:bg-selected data-on:text-selected-foreground aria-pressed:border-selected-foreground aria-pressed:bg-selected aria-pressed:text-selected-foreground aria-checked:border-selected-foreground aria-checked:bg-selected aria-checked:text-selected-foreground"
+
 const toggleVariants = cva(
-  "group/toggle inline-flex items-center justify-center gap-1.5 rounded-none text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-colors outline-none hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground focus-visible:text-selected-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 aria-pressed:border-selected-foreground aria-pressed:bg-selected aria-pressed:text-selected-foreground dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+  `group/toggle inline-flex items-center justify-center gap-1.5 rounded-none text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-colors outline-none hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground focus-visible:border-ring focus-visible:text-selected-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 ${selectedToggleChrome} [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5`,
   {
     variants: {
       variant: {
@@ -44,4 +56,4 @@ function Toggle({
   )
 }
 
-export { Toggle, toggleVariants }
+export { Toggle, toggleVariants, selectedToggleChrome }

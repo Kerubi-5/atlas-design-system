@@ -2,8 +2,11 @@ import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 
 import { FieldError, getFieldErrorMessage } from "../src/form/field-error.js"
+import { FormMarkdownField } from "../src/form/markdown-field.js"
 import { FormTextField } from "../src/form/text-field.js"
 import { cn, onInputChange } from "../src/utils.js"
+
+import { createUser, render, screen } from "./helpers.js"
 
 describe("portable forms", () => {
   it("preserves error messages and suppresses absent errors", () => {
@@ -62,6 +65,27 @@ describe("portable forms", () => {
     expect(html).toContain('id="email"')
     expect(html).toContain('for="signup-email"')
     expect(html).toContain('id="signup-email"')
+  })
+
+  it("toggles markdown write and preview", async () => {
+    const field = {
+      name: "notes",
+      state: { value: "## Hello", meta: { errors: ["Required"] } },
+      handleChange: () => {},
+      handleBlur: () => {},
+    }
+    const user = createUser()
+    render(<FormMarkdownField field={field} label="Notes" />)
+
+    expect(screen.getByLabelText("Notes")).toHaveValue("## Hello")
+    expect(screen.getByRole("alert")).toHaveTextContent("Required")
+    expect(
+      screen.getByRole("radiogroup", { name: "Notes mode" })
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole("radio", { name: "Preview" }))
+    expect(screen.getByRole("heading", { name: "Hello" })).toBeInTheDocument()
+    expect(screen.queryByLabelText("Notes")).not.toBeInTheDocument()
   })
 
   it("keeps utility class precedence and controlled input values", () => {

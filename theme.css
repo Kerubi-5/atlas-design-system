@@ -19,6 +19,11 @@
     @slot;
   }
 }
+@custom-variant data-on {
+  &:where([data-state="on"]) {
+    @slot;
+  }
+}
 @custom-variant data-disabled {
   &:where([data-disabled="true"]),
   &:where([data-disabled]:not([data-disabled="false"])) {
