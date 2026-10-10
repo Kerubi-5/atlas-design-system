@@ -2,11 +2,21 @@
 
 ## 0.5.0 - 2026-10-10
 
-Minor release that adds 11 components (accordion, alert, avatar, breadcrumb,
-dropdown menu, pagination, progress, radio group, spinner, switch, and
-tooltip), the shipped agent skill, the `FormTextField` `id` prop, and the
-public `tabsTriggerVariants` export, plus QA fixes for Combobox, the theme
-shortcut, and range picking. Everything is additive; no existing API changed.
+Minor release that adds a date-time picker and 11 components (accordion,
+alert, avatar, breadcrumb, dropdown menu, pagination, progress, radio group,
+spinner, switch, and tooltip), the shipped agent skill, the `FormTextField`
+`id` prop, the public `tabsTriggerVariants` export, and `Combobox`
+`aria-label`, plus QA and accessibility fixes. No existing API changed.
+Light-mode muted and destructive text are darker, and brand-colored hover
+text uses `text-selected-foreground`, so every Storybook story passes the
+automated WCAG 2.2 AA check in both themes.
+
+- `DateTimePickerButton` (`atlas-react-kit/date-time-picker`) and
+  `FormDateTimePickerField` (`atlas-react-kit/form/date-time-picker-field`)
+  pick a local date and time from Calendar, hour/minute selects, and Clear.
+  The controlled value is `Date | null`. `timeStep` (default 15) steps the
+  minute list. The trigger uses the shared form-control chrome; the popover
+  stays on-screen at 390px.
 
 - The package ships `skills/atlas-react-kit/SKILL.md`, an agent skill that
   points AI coding assistants at the guides for the installed version, maps
@@ -35,6 +45,21 @@ shortcut, and range picking. Everything is additive; no existing API changed.
   `switch`, and `tooltip`. They follow the shape rules (square, except round
   radio dots and avatars), use `bg-selected` for the current page and focus
   styles shared with existing controls, and keep status tones off body text.
+- Accessibility gate: CI runs axe-core's WCAG 2.2 A/AA rules on every
+  Storybook story in light and dark mode. Fixes for what it found:
+  - `--muted-foreground` (light) is `oklch(0.53 0 0)`, so muted text passes on
+    `bg-muted` as well as the page (it was 4.3:1).
+  - `--destructive` (light) is `oklch(0.505 0.213 27.518)`, so destructive
+    text passes on its own soft tint (it was 3.6:1). The soft destructive
+    `Badge` tone and the destructive `Button` are now AA in both themes.
+  - Outline/ghost button and toggle hovers, link buttons, and field
+    description links use `text-selected-foreground` instead of
+    `text-primary`, which was about 2:1 on the dark background.
+  - Calendar day buttons are named "Tuesday, October 27, 2026" (no ordinal)
+    so the name contains the visible number (WCAG 2.5.3).
+  - `Table`'s scroller joins the tab order while it overflows, so keyboard
+    users can scroll it.
+  - `Combobox` accepts `aria-label` and `aria-labelledby`.
 
 ## 0.4.1
 

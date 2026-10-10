@@ -102,10 +102,10 @@ The Storybook preview disables the kit's theme shortcut and uses the theme
 toolbar instead. The accessibility panel checks the rendered story; it does not
 replace keyboard or assistive-technology testing.
 
-0.4.1 is already on npm. Bumping the version in `package.json` and
-merging to `main` (path-filtered to package files) or running
-`workflow_dispatch` publishes through npm OIDC trusted publishing after
-check, test, and pack gates. Versions already on npm are skipped.
+Bumping the version in `package.json` and merging to `main` (path-filtered
+to package files) or running `workflow_dispatch` publishes through npm OIDC
+trusted publishing after check, test, and pack gates. Versions already on npm
+are skipped.
 
 If trusted publishing is not configured, pack and publish a validated
 artifact with the package owner's npm login:
@@ -115,6 +115,9 @@ mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
 npm publish ./release-artifacts/atlas-react-kit-0.5.0.tgz --access public
 ```
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser
+checks, versioning, and deprecations.
 
 Pin an exact package version in consuming applications. Roll back an upgrade by
 restoring the previous version and lockfile. License: MIT; upstream notices are

@@ -96,18 +96,18 @@
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
   --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
+  /* 4.8:1 on --muted and 5.3:1 on the page, so muted text also works on muted fills. */
+  --muted-foreground: oklch(0.53 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
   /* Soft brand-purple wash for selected/active chrome (nav, tabs, chips, rows). */
   --selected: color-mix(in oklch, var(--primary) 12%, var(--background));
   --selected-foreground: var(--primary);
-  --destructive: oklch(0.577 0.245 27.325);
+  /* AA as text on the page (6.4:1) and on its own /10 and /15 tints. */
+  --destructive: oklch(0.505 0.213 27.518);
   /* Status tones: AA (4.5:1) as text on the page, on a card, and on a /10–/25
      tint of themselves; also used as solid fills (meters). No -foreground:
-     nothing puts text on a solid fill. See DESIGN_RULES.md. --destructive
-     (above) passes as text on the page and card but not yet on its own tint
-     in light mode (about 3.6:1 on /15). */
+     nothing puts text on a solid fill. See DESIGN_RULES.md. */
   --success: oklch(0.45 0.11 160);
   --warning: oklch(0.48 0.115 70);
   --border: oklch(0.922 0 0);
