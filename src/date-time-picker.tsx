@@ -185,7 +185,6 @@ export function DateTimePickerButton({
           <p className="text-xs font-semibold tracking-wide uppercase">Time</p>
           <div className="flex min-w-0 items-center gap-2">
             <Select
-              modal={false}
               value={date ? padTimePart(date.getHours()) : undefined}
               onValueChange={(nextHour) => {
                 if (!date) return
@@ -214,7 +213,6 @@ export function DateTimePickerButton({
               :
             </span>
             <Select
-              modal={false}
               value={date ? padTimePart(date.getMinutes()) : undefined}
               onValueChange={(nextMinute) => {
                 if (!date) return
