@@ -6,7 +6,8 @@ import { Label } from "../label.js"
 import { Markdown } from "../markdown.js"
 import { Textarea } from "../textarea.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
-import { onInputChange } from "../utils.js"
+import { fieldSurface } from "../internal/styles.js"
+import { cn, onInputChange } from "../utils.js"
 
 import { FieldError, getFieldErrorMessage } from "./field-error.js"
 import type { TextFieldApi } from "./text-field.js"
@@ -76,10 +77,7 @@ export function FormMarkdownField({
           aria-invalid={errorText ? true : undefined}
         />
       ) : (
-        <div
-          className="min-h-16 rounded-none border border-input bg-background px-3 py-2"
-          aria-live="polite"
-        >
+        <div className={cn(fieldSurface, "min-h-16")} aria-live="polite">
           {trimmed ? (
             <Markdown content={trimmed} />
           ) : (

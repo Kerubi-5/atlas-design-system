@@ -6,6 +6,7 @@ import {
 } from "lucide-react"
 
 import { buttonVariants } from "./button.js"
+import { selectedState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -62,7 +63,8 @@ function PaginationLink({
           variant: isActive ? "outline" : "ghost",
           size: size === "icon" ? "icon-sm" : "sm",
         }),
-        "font-medium tracking-normal normal-case tabular-nums data-[active=true]:border-selected-foreground data-[active=true]:bg-selected data-[active=true]:text-selected-foreground",
+        selectedState.current,
+        "font-medium tracking-normal normal-case tabular-nums",
         className
       )}
       {...props}

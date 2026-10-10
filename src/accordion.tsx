@@ -4,6 +4,7 @@ import * as React from "react"
 import { Accordion as AccordionPrimitive } from "radix-ui"
 import { ChevronDownIcon } from "lucide-react"
 
+import { disabledState, focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /** Stacked sections that expand in place (FAQs, settings groups). */
@@ -36,7 +37,9 @@ function AccordionTrigger({
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
-          "flex flex-1 items-start justify-between gap-4 rounded-none py-4 text-left text-sm font-medium transition-colors outline-none hover:text-selected-foreground focus-visible:text-selected-foreground focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180",
+          focusRing,
+          disabledState,
+          "flex flex-1 items-start justify-between gap-4 rounded-none py-4 text-left text-sm font-medium transition-colors hover:text-selected-foreground focus-visible:text-selected-foreground [&[data-state=open]>svg]:rotate-180",
           className
         )}
         {...props}

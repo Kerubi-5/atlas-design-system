@@ -7,6 +7,7 @@ import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
+import { optionState } from "./internal/styles.js"
 import { cn, onInputChange } from "./utils.js"
 
 export type ComboboxOption = {
@@ -223,9 +224,8 @@ export function Combobox({
                     aria-selected={isSelected}
                     className={cn(
                       "relative flex w-full cursor-default items-center gap-2 rounded-none py-2 pr-8 pl-3 text-left text-sm outline-hidden select-none",
-                      isSelected && "bg-selected text-selected-foreground",
-                      isActive &&
-                        "bg-accent text-accent-foreground shadow-[inset_2px_0_0_var(--color-ring)]"
+                      isSelected && optionState.selected,
+                      isActive && optionState.active
                     )}
                     onMouseEnter={() => setHighlight(index)}
                     onClick={() => selectValue(option.value)}

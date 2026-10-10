@@ -4,11 +4,15 @@ import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
+import { dataDisabledState, optionState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /** Item highlight and selected chrome shared with `SelectItem`. */
-const menuItemClassName =
-  "relative flex cursor-default items-center gap-2.5 rounded-none px-3 py-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)] data-disabled:pointer-events-none data-disabled:opacity-50 data-inset:pl-9 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5"
+const menuItemClassName = cn(
+  optionState.focus,
+  dataDisabledState,
+  "relative flex cursor-default items-center gap-2.5 rounded-none px-3 py-2 text-sm outline-hidden select-none data-inset:pl-9 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5"
+)
 
 const menuContentClassName =
   "z-50 min-w-40 overflow-x-hidden overflow-y-auto rounded-none bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"

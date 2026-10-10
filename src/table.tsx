@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -42,7 +43,10 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       ref={containerRef}
       data-slot="table-container"
       tabIndex={scrollable ? 0 : undefined}
-      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className={cn(
+        focusRing,
+        "relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain"
+      )}
     >
       <table
         data-slot="table"

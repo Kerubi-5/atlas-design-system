@@ -2,6 +2,12 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
+import {
+  disabledState,
+  focusRing,
+  invalidState,
+  selectedState,
+} from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -10,11 +16,19 @@ import { cn } from "./utils.js"
  * stays readable on dark), no muted grey fill. Used by quiet actions such as
  * "Clear selection" sitting on a selected row.
  */
-const quietButtonInteraction =
-  "hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground focus-visible:text-selected-foreground aria-expanded:border-selected-foreground aria-expanded:bg-selected aria-expanded:text-selected-foreground"
+const quietButtonInteraction = [
+  selectedState.hover,
+  "focus-visible:text-selected-foreground",
+  selectedState.expanded,
+].join(" ")
 
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+  [
+    focusRing,
+    invalidState,
+    disabledState,
+    "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-all select-none active:not-aria-[haspopup]:translate-y-px [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+  ],
   {
     variants: {
       variant: {
