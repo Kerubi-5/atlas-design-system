@@ -52,11 +52,12 @@ jobs:
             site/playwright-report
             site/test-results
           retention-days: 7
-      - name: Print screenshot diffs (temporary)
+      - name: Describe screenshot diffs (temporary)
         if: failure()
+        working-directory: site
         run: |
-          for f in site/test-results/*/*-actual.png site/test-results/*/*-diff.png; do
-            echo "=== $f"
-            base64 -w 4000 "$f"
-            echo "=== end"
+          for f in test-results/*/*-actual.png; do
+            name=$(basename "$f" -actual.png)
+            echo "=== $name"
+            node tests/visual/describe-diff.cjs "tests/visual/__screenshots__/$name-linux.png" "$f"
           done
