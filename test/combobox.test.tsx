@@ -52,6 +52,14 @@ function getCombobox() {
   return screen.getByRole("combobox")
 }
 
+/** Label of the option the search field's aria-activedescendant points at. */
+function activeOptionLabel() {
+  const id = screen
+    .getByPlaceholderText("Search")
+    .getAttribute("aria-activedescendant")
+  return id ? document.getElementById(id)?.textContent : undefined
+}
+
 async function openCombobox(user: ReturnType<typeof createUser>) {
   await user.click(getCombobox())
   return waitFor(() => {
@@ -104,23 +112,22 @@ describe("Combobox", () => {
     render(<ComboboxHarness />)
     await openCombobox(user)
 
-    const search = screen.getByPlaceholderText("Search")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-usd")
+    expect(activeOptionLabel()).toBe("US Dollar")
 
     await user.keyboard("{ArrowDown}")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-eur")
+    expect(activeOptionLabel()).toBe("Euro")
 
     await user.keyboard("{End}")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-jpy")
+    expect(activeOptionLabel()).toBe("Japanese Yen")
 
     await user.keyboard("{Home}")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-usd")
+    expect(activeOptionLabel()).toBe("US Dollar")
 
     await user.keyboard("{ArrowUp}")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-usd")
+    expect(activeOptionLabel()).toBe("US Dollar")
 
     await user.keyboard("{ArrowDown}{ArrowDown}")
-    expect(search.getAttribute("aria-activedescendant")).toContain("option-gbp")
+    expect(activeOptionLabel()).toBe("British Pound")
 
     await user.keyboard("{Enter}")
     await waitFor(() => {
@@ -271,6 +278,66 @@ describe("Combobox", () => {
       expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
     })
     expect(getCombobox()).toHaveTextContent("Euro")
+  })
+
+  it("clears the search after a selection so reopening does not pick the wrong option", async () => {
+    const user = createUser()
+    render(<ComboboxHarness />)
+    await openCombobox(user)
+
+    // "e" leaves Euro and Japanese Yen; pick Euro with the pointer.
+    await user.type(screen.getByPlaceholderText("Search"), "e")
+    await user.click(screen.getByRole("option", { name: "Euro" }))
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+
+    await openCombobox(user)
+    expect(screen.getByPlaceholderText("Search")).toHaveValue("")
+    expect(screen.getAllByRole("option")).toHaveLength(options.length)
+    expect(activeOptionLabel()).toBe("Euro")
+
+    await user.keyboard("{Enter}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(getCombobox()).toHaveTextContent("Euro")
+  })
+
+  it("clears the search after selecting with Enter", async () => {
+    const user = createUser()
+    render(<ComboboxHarness />)
+    await openCombobox(user)
+
+    await user.type(screen.getByPlaceholderText("Search"), "yen")
+    await user.keyboard("{Enter}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(getCombobox()).toHaveTextContent("Japanese Yen")
+
+    await openCombobox(user)
+    expect(screen.getByPlaceholderText("Search")).toHaveValue("")
+    expect(activeOptionLabel()).toBe("Japanese Yen")
+  })
+
+  it("uses valid option ids when values contain spaces", async () => {
+    const user = createUser()
+    render(
+      <Combobox
+        options={[
+          { value: "America/New York", label: "New York" },
+          { value: "Europe/London", label: "London" },
+        ]}
+        onValueChange={() => {}}
+      />
+    )
+    await openCombobox(user)
+
+    for (const option of screen.getAllByRole("option")) {
+      expect(option.id).not.toMatch(/\s/)
+    }
+    expect(activeOptionLabel()).toBe("New York")
   })
 
   it("does not open when disabled", async () => {

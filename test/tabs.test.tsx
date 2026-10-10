@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 
-import { TabsNav } from "../src/tabs.js"
+import { TabsNav, tabsTriggerVariants } from "../src/tabs.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
@@ -33,5 +33,27 @@ describe("TabsNav", () => {
 
   it("has no tab roles or panel references", () => {
     expect(html).not.toMatch(/role="tab|aria-controls|aria-selected/)
+  })
+})
+
+describe("TabsNav without Next", () => {
+  it("styles plain links with the public trigger variants", () => {
+    const plain = renderToStaticMarkup(
+      <TabsNav aria-label="Preview views">
+        <a
+          href="#list"
+          data-state="active"
+          aria-current="page"
+          className={tabsTriggerVariants()}
+        >
+          List
+        </a>
+      </TabsNav>
+    )
+    // Same classes as the Next adapter, so both paths share the active style.
+    const linkClass = (markup: string) =>
+      /<a[^>]*class="([^"]*)"/.exec(markup)?.[1]
+    expect(linkClass(plain)).toContain("bg-selected")
+    expect(linkClass(plain)).toBe(linkClass(html))
   })
 })

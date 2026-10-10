@@ -101,10 +101,18 @@ export function Combobox({
     setHighlight(0)
   })
 
+  // Closing from here does not go through Radix's onOpenChange, so clear the
+  // query too. A stale query would filter the next open while the highlight
+  // is computed against the full list, and Enter would pick the wrong option.
   const selectValue = (next: string) => {
     onValueChange(next)
     setOpen(false)
+    setQuery("")
   }
+
+  // Index-based ids: option values may contain spaces, which are not valid
+  // in an id or an aria-activedescendant reference.
+  const optionId = (index: number) => `${listId}-option-${index}`
 
   const activeOption = filtered[highlight]
 
@@ -185,9 +193,7 @@ export function Combobox({
             aria-autocomplete="list"
             aria-controls={listId}
             aria-activedescendant={
-              activeOption
-                ? `${listId}-option-${activeOption.value}`
-                : undefined
+              activeOption ? optionId(highlight) : undefined
             }
           />
         </div>
@@ -204,7 +210,7 @@ export function Combobox({
                 <li key={option.value} role="none">
                   <button
                     ref={isActive ? scrollHighlightedOption : undefined}
-                    id={`${listId}-option-${option.value}`}
+                    id={optionId(index)}
                     type="button"
                     role="option"
                     aria-selected={isSelected}

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   loadThemeTokens,
@@ -9,17 +9,36 @@ import {
 
 const tokens = loadThemeTokens()
 
-function useComputedVars(names: string[]) {
+/**
+ * How the Computed column is read from a hidden probe element:
+ * - `theme`: custom property under the active theme (toolbar).
+ * - `dark`: custom property under `.dark`, whatever the toolbar says.
+ * - `radius`: the raw value applied as a border radius. Radius scale tokens
+ *   live in `@theme inline`, so Tailwind inlines them and never emits them
+ *   as custom properties to read back.
+ */
+type Probe = "theme" | "dark" | "radius"
+
+function useComputedValues(vars: CssVar[], probe: Probe) {
+  const probeRef = useRef<HTMLSpanElement>(null)
   const [values, setValues] = useState<Record<string, string>>({})
-  const key = names.join("\0")
+  const key = vars.map((item) => `${item.name}:${item.value}`).join("\0")
 
   useEffect(() => {
-    function read() {
-      const style = getComputedStyle(document.documentElement)
+    const target = probeRef.current
+    if (!target) return
+
+    const read = () => {
       const next: Record<string, string> = {}
-      for (const name of key.split("\0")) {
-        if (!name) continue
-        next[name] = style.getPropertyValue(name).trim()
+      for (const item of vars) {
+        if (probe === "radius") {
+          target.style.borderTopLeftRadius = item.value
+          next[item.name] = getComputedStyle(target).borderTopLeftRadius
+        } else {
+          next[item.name] = getComputedStyle(target)
+            .getPropertyValue(item.name)
+            .trim()
+        }
       }
       setValues(next)
     }
@@ -31,17 +50,31 @@ function useComputedVars(names: string[]) {
       attributeFilter: ["class"],
     })
     return () => observer.disconnect()
-  }, [key])
+    // `key` stands in for `vars`, which is rebuilt each render.
+  }, [key, probe])
 
-  return values
+  return { probeRef, values }
 }
 
-function TokenTable({ vars, swatch }: { vars: CssVar[]; swatch?: boolean }) {
-  const names = vars.map((item) => item.name)
-  const computed = useComputedVars(names)
+function TokenTable({
+  vars,
+  swatch,
+  probe = "theme",
+}: {
+  vars: CssVar[]
+  swatch?: boolean
+  probe?: Probe
+}) {
+  const { probeRef, values: computed } = useComputedValues(vars, probe)
 
   return (
     <div className="overflow-x-auto ring-1 ring-border">
+      <span
+        ref={probeRef}
+        aria-hidden="true"
+        hidden
+        className={probe === "dark" ? "dark" : undefined}
+      />
       <table className="w-full text-left text-sm">
         <thead className="bg-muted text-xs font-semibold tracking-wider uppercase">
           <tr>
@@ -106,10 +139,11 @@ export function TokensPage() {
           Dark color values
         </h2>
         <p className="text-sm text-muted-foreground">
-          Raw <code className="bg-muted px-1">.dark</code> assignments. The live
-          swatches above already switch with the theme.
+          Raw <code className="bg-muted px-1">.dark</code> assignments, computed
+          under <code className="bg-muted px-1">.dark</code> whatever the
+          toolbar theme. The live swatches above already switch with the theme.
         </p>
-        <TokenTable vars={tokens.darkColors} />
+        <TokenTable vars={tokens.darkColors} probe="dark" />
       </section>
 
       <section className="grid gap-4">
@@ -147,7 +181,7 @@ export function TokensPage() {
           <code className="bg-muted px-1">px-3</code>, card{" "}
           <code className="bg-muted px-1">--card-p</code>).
         </p>
-        <TokenTable vars={tokens.spacing} />
+        <TokenTable vars={tokens.spacing} probe="radius" />
         <div className="flex flex-wrap items-end gap-4">
           {spacingScale.map((step) => (
             <div key={step} className="grid justify-items-center gap-2">
@@ -169,7 +203,7 @@ export function TokensPage() {
             <div key={item.name} className="grid justify-items-center gap-2">
               <div
                 className="size-16 bg-selected ring-1 ring-border"
-                style={{ borderRadius: `var(${item.name})` }}
+                style={{ borderRadius: item.value }}
               />
               <span className="font-mono text-[0.65rem] text-muted-foreground">
                 {item.name.replace("--", "")}

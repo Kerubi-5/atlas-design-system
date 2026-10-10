@@ -282,6 +282,60 @@ describe("DatePickerButton range mode", () => {
     expect(trigger).toHaveFocus()
   })
 
+  it("starts a new range when opened on a complete range", async () => {
+    const user = createUser()
+    const onChange = vi.fn<(range: DateRange | undefined) => void>()
+    render(
+      <RangePickerHarness
+        initial={{ from: new Date(2026, 9, 5), to: new Date(2026, 9, 10) }}
+        onChange={onChange}
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: /October 5/ }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    // The first click restarts the range instead of extending Oct 5 – 10.
+    await user.click(getDayButton(new Date(2026, 9, 20)))
+    expect(screen.getAllByRole("grid")).toHaveLength(2)
+    const started = onChange.mock.calls.at(-1)?.[0]
+    expect(started?.from?.getDate()).toBe(20)
+    expect(started?.to?.getDate()).toBe(20)
+
+    await user.click(getDayButton(new Date(2026, 9, 25)))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    const last = onChange.mock.calls.at(-1)?.[0]
+    expect(last?.from?.getDate()).toBe(20)
+    expect(last?.to?.getDate()).toBe(25)
+    expect(
+      screen.getByRole("button", { name: /October 20.*October 25/ })
+    ).toBeInTheDocument()
+  })
+
+  it("finishes an incomplete range on the next click", async () => {
+    const user = createUser()
+    const onChange = vi.fn<(range: DateRange | undefined) => void>()
+    render(
+      <RangePickerHarness
+        initial={{ from: new Date(2026, 9, 5), to: undefined }}
+        onChange={onChange}
+      />
+    )
+
+    await user.click(screen.getByRole("button", { name: /October 5/ }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+
+    await user.click(getDayButton(new Date(2026, 9, 9)))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    const last = onChange.mock.calls.at(-1)?.[0]
+    expect(last?.from?.getDate()).toBe(5)
+    expect(last?.to?.getDate()).toBe(9)
+  })
+
   it("keeps a two-month, auto-sized popover while the calendar is open", async () => {
     const user = createUser()
     render(<RangePickerHarness />)

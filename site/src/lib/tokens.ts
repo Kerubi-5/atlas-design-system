@@ -39,11 +39,16 @@ export function parseCssVars(block: string): CssVar[] {
   return vars
 }
 
-function extractBlock(css: string, header: string) {
-  const start = css.indexOf(header)
-  if (start === -1) return ""
-  const open = css.indexOf("{", start)
-  if (open === -1) return ""
+/**
+ * Body of the rule whose prelude is exactly `selector` (`:root`, `.dark`,
+ * `@theme inline`). The prelude must start a rule, so `.dark` inside
+ * `@custom-variant dark (&:is(.dark *))` does not match.
+ */
+function extractBlock(css: string, selector: string) {
+  const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+  const match = new RegExp(`(?:^|[;{}]|\\*\\/)\\s*${escaped}\\s*\\{`).exec(css)
+  if (!match) return ""
+  const open = match.index + match[0].length - 1
 
   let depth = 0
   for (let i = open; i < css.length; i++) {

@@ -1,5 +1,26 @@
 # Changelog
 
+## Unreleased
+
+Bug fixes from a QA pass. Not yet versioned; bump `package.json` to release.
+
+- `Combobox` clears its search after a selection. Before, the old query
+  stayed, the highlight landed on the wrong row on reopen, and Enter could
+  replace the value with a different option. Option ids are now index-based
+  so values with spaces still give valid `aria-activedescendant` targets.
+- `ThemeProvider`'s `d` shortcut no longer fires inside widgets with letter
+  typeahead (`Select`, listboxes, menus, grids, ARIA text fields), when a
+  focused control already handled the key, on key repeat, or during IME
+  composition. Typing `d` on a `Select` used to change both the value and
+  the theme.
+- `DatePickerButton` in range mode starts a new range on the first click
+  when it opens on a complete range. Before, that click extended the old
+  range and closed the popover, so picking a fresh range needed Clear.
+- `FormTextField` accepts an optional `id` (default stays `field.name`) for
+  pages where two forms share a field name.
+- `tabsTriggerVariants` is exported from `atlas-react-kit/tabs` so `TabsNav`
+  links can match tab styling without the Next adapter.
+
 ## 0.4.1
 
 Patch so default-density tables scroll inside a ~390px panel instead of

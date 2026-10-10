@@ -1,5 +1,13 @@
+import { useState } from "react"
 import { afterEach, describe, expect, it } from "vitest"
 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../src/select.js"
 import { ThemeProvider, useTheme } from "../src/theme-provider.js"
 
 import { createUser, render, screen, waitFor } from "./helpers.js"
@@ -135,6 +143,66 @@ describe("ThemeProvider", () => {
     await user.keyboard("d")
 
     expect(screen.getByLabelText("Notes")).toHaveValue("d")
+    expect(themeOutput()).toHaveTextContent(/light:light/)
+  })
+
+  it("leaves d to Select typeahead instead of toggling the theme", async () => {
+    function MonthSelect() {
+      const [month, setMonth] = useState("")
+      return (
+        <>
+          <Select value={month} onValueChange={setMonth}>
+            <SelectTrigger aria-label="Month">
+              <SelectValue placeholder="Month" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="jan">January</SelectItem>
+              <SelectItem value="dec">December</SelectItem>
+            </SelectContent>
+          </Select>
+          <p data-testid="month">{month}</p>
+        </>
+      )
+    }
+
+    const user = createUser()
+    render(
+      <ThemeProvider defaultTheme="light" enableSystem={false}>
+        <MonthSelect />
+        <ThemeProbe />
+      </ThemeProvider>
+    )
+
+    await waitForTheme(/light:light/)
+    screen.getByRole("combobox", { name: "Month" }).focus()
+    await user.keyboard("d")
+
+    await waitFor(() => {
+      expect(screen.getByTestId("month")).toHaveTextContent("dec")
+    })
+    expect(themeOutput()).toHaveTextContent(/light:light/)
+    expect(document.documentElement).not.toHaveClass("dark")
+  })
+
+  it("does not toggle when a focused control already handled the key", async () => {
+    const user = createUser()
+    render(
+      <ThemeProvider defaultTheme="light" enableSystem={false}>
+        <button
+          type="button"
+          onKeyDown={(event) => {
+            if (event.key === "d") event.preventDefault()
+          }}
+        >
+          Duplicate
+        </button>
+        <ThemeProbe />
+      </ThemeProvider>
+    )
+
+    await waitForTheme(/light:light/)
+    screen.getByRole("button", { name: "Duplicate" }).focus()
+    await user.keyboard("d")
     expect(themeOutput()).toHaveTextContent(/light:light/)
   })
 

@@ -1,11 +1,11 @@
 import { cn } from "../src/utils.js"
-import { tabsTriggerVariants } from "../src/internal/tabs-styles.js"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsNav,
   TabsTrigger,
+  tabsTriggerVariants,
 } from "../src/tabs.js"
 
 /** Default and line tab lists with panels. */

@@ -152,7 +152,12 @@ test("every visual kit export is imported by a Storybook story", async () => {
   }
 })
 
-test("hosting serves Storybook from the site root with SPA fallback", async () => {
+/** `/docs/<id>` or `/story/<id>` Storybook path → index.json entry id. */
+function storyIdFromPath(storyPath) {
+  return /^\/(?:docs|story)\/([\w-]+--[\w-]+)$/.exec(storyPath)?.[1]
+}
+
+test("hosting serves Storybook from the site root without an SPA fallback", async () => {
   const config = JSON.parse(
     await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")
   )
@@ -172,11 +177,42 @@ test("hosting serves Storybook from the site root with SPA fallback", async () =
       ?.destination,
     "/?path=/story/tokens--theme"
   )
-  assert.deepEqual(
-    config.rewrites.map((rewrite) => rewrite.source),
-    ["/:path*"]
-  )
-  assert.equal(config.rewrites[0]?.destination, "/index.html")
+  // Storybook routes with `?path=` and loads assets relative to the page. A
+  // catch-all rewrite to index.html served the manager for nested paths,
+  // where its relative assets resolved to more index.html (blank page).
+  // Unknown paths should 404 instead.
+  assert.equal(config.rewrites, undefined)
   await fs.access(path.join(output, "iframe.html"))
   await fs.access(path.join(output, "index.json"))
+})
+
+test("redirects and doc cross-links point at indexed entries", async () => {
+  const index = JSON.parse(
+    await fs.readFile(path.join(output, "index.json"), "utf8")
+  )
+  const config = JSON.parse(
+    await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")
+  )
+  for (const { destination } of config.redirects) {
+    const storyPath = new URL(
+      destination,
+      "https://site.test"
+    ).searchParams.get("path")
+    if (!storyPath) continue
+    const id = storyIdFromPath(storyPath)
+    assert.ok(id && index.entries[id], `redirect ${destination} is indexed`)
+  }
+
+  // Storybook's docs Link prefixes a leading-slash href with `./?path=`, so
+  // the map holds bare story paths, never `/?path=` URLs.
+  const docs = await fs.readFile(path.join(siteRoot, "src/lib/docs.ts"), "utf8")
+  const targets = [...docs.matchAll(/"\.\/[\w.]+":\s*"([^"]+)"/g)].map(
+    (match) => match[1]
+  )
+  assert.ok(targets.length >= 3, "docs.ts maps the markdown guides")
+  for (const target of targets) {
+    assert.doesNotMatch(target, /\?path=/, `${target} is a bare story path`)
+    const id = storyIdFromPath(target)
+    assert.ok(id && index.entries[id], `doc link ${target} is indexed`)
+  }
 })

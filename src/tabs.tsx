@@ -74,7 +74,10 @@ function TabsContent({
 /**
  * Tab-styled links for a view switcher that changes the URL. Use this, not
  * `Tabs` + `TabsTrigger asChild`, when there are no `TabsContent` panels:
- * tabs would point assistive tech at panels that don't exist.
+ * tabs would point assistive tech at panels that don't exist. Style each link
+ * with `tabsTriggerVariants()` and mark the active one with
+ * `data-state="active"` and `aria-current="page"` (the Next adapter
+ * `TabsNavLink` does this for you).
  */
 function TabsNav({
   className,
@@ -99,4 +102,12 @@ function TabsNav({
   )
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent, TabsNav, tabsListVariants }
+export {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsNav,
+  tabsListVariants,
+  tabsTriggerVariants,
+}

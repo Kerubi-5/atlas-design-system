@@ -23,6 +23,7 @@ export type TextFieldApi = {
 
 export function FormTextField({
   field,
+  id = field.name,
   label,
   placeholder,
   description,
@@ -36,6 +37,12 @@ export function FormTextField({
   minLength,
 }: {
   field: TextFieldApi
+  /**
+   * Control id the label points at. Defaults to `field.name`; pass a unique
+   * id when two forms on one page share a field name (login and sign-up
+   * `email`), or the second label focuses the first input.
+   */
+  id?: string
   label: string
   placeholder?: string
   /** Optional hint under the label (employer vs referrer, etc.). */
@@ -63,7 +70,7 @@ export function FormTextField({
     ? getFieldErrorMessage(field.state.meta.errors[0])
     : undefined
   const controlProps = {
-    id: field.name,
+    id,
     value: field.state.value,
     onChange,
     onBlur: field.handleBlur,
@@ -76,7 +83,7 @@ export function FormTextField({
 
   return (
     <div className="flex flex-col gap-1.5">
-      <Label htmlFor={field.name}>{label}</Label>
+      <Label htmlFor={id}>{label}</Label>
       {description ? (
         <p className="text-xs text-muted-foreground">{description}</p>
       ) : null}
