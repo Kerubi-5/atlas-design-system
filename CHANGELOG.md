@@ -1,9 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 - 2026-10-10
 
-Bug fixes from a QA pass, plus an agent skill. Not yet versioned; bump
-`package.json` to release.
+Minor release so apps can use the new `FormTextField` `id`, the public
+`tabsTriggerVariants` export, and the shipped agent skill, and pick up
+QA fixes for Combobox, the theme shortcut, and range picking.
 
 - The package ships `skills/atlas-react-kit/SKILL.md`, an agent skill that
   points AI coding assistants at the guides for the installed version, maps
