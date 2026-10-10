@@ -12,12 +12,15 @@
     "build-storybook": "storybook build -o dist --disable-telemetry",
     "test:build": "node --test tests/build.test.mjs",
     "test:a11y": "node --test tests/a11y.test.mjs",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
     "preview": "vite preview"
   },
   "engines": {
     "node": ">=20.19.0"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@storybook/addon-a11y": "10.6.1",
     "@storybook/addon-docs": "10.6.1",
     "@storybook/addon-themes": "10.6.1",
