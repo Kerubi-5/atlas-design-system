@@ -2,6 +2,15 @@ import type { Preview, ReactRenderer } from "@storybook/react-vite"
 import { withThemeByClassName } from "@storybook/addon-themes"
 import { MINIMAL_VIEWPORTS } from "storybook/viewport"
 
+const atlasViewports = {
+  ...MINIMAL_VIEWPORTS,
+  phone390: {
+    name: "390",
+    styles: { width: "390px", height: "844px" },
+    type: "mobile" as const,
+  },
+}
+
 import { ThemeProvider } from "../../src/theme-provider.js"
 import { Toaster } from "../../src/sonner.js"
 import "../src/styles.css"
@@ -11,7 +20,7 @@ const preview: Preview = {
   parameters: {
     layout: "padded",
     controls: { expanded: true },
-    viewport: { options: MINIMAL_VIEWPORTS },
+    viewport: { options: atlasViewports },
     options: {
       storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
     },
