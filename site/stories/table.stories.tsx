@@ -8,7 +8,7 @@ import {
 } from "../../stories/table-overflow.js"
 
 const meta = {
-  title: "Components/Table",
+  title: "Data display/Table",
   component: Table,
   parameters: { controls: { disable: true } },
 } satisfies Meta<typeof Table>

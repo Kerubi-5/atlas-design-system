@@ -14,7 +14,7 @@ const items = [
 ]
 
 const meta = {
-  title: "Components/Search picker",
+  title: "Forms/Search picker",
   args: {
     value: "south",
     label: "Place",

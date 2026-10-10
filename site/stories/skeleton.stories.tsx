@@ -4,7 +4,7 @@ import { Skeleton } from "../../src/skeleton.js"
 import { SkeletonAndSeparatorStory } from "../../stories/display.js"
 
 const meta = {
-  title: "Components/Skeleton",
+  title: "Feedback/Skeleton",
   component: Skeleton,
   args: { className: "h-4 w-48" },
   argTypes: { className: { control: "text" } },

@@ -38,7 +38,7 @@ function CalendarPlayground({
 }
 
 const meta = {
-  title: "Components/Calendar",
+  title: "Forms/Calendar",
   args: { selected: "2026-10-09" },
   argTypes: {
     selected: {

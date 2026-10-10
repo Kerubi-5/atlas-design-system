@@ -4,7 +4,7 @@ import { Separator } from "../../src/separator.js"
 import { SkeletonAndSeparatorStory } from "../../stories/display.js"
 
 const meta = {
-  title: "Components/Separator",
+  title: "Layout/Separator",
   component: Separator,
   args: { orientation: "horizontal" },
   argTypes: {

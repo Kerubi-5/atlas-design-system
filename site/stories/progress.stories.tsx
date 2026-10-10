@@ -4,7 +4,7 @@ import { Progress } from "../../src/progress.js"
 import { ProgressStory } from "../../stories/feedback.js"
 
 const meta = {
-  title: "Components/Progress",
+  title: "Feedback/Progress",
   component: Progress,
   args: { value: 40, "aria-label": "Upload progress" },
   argTypes: {

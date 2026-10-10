@@ -4,7 +4,7 @@ import { StatTile } from "../../src/stat-tile.js"
 import { StatTileStory } from "../../stories/stat-tile.js"
 
 const meta = {
-  title: "Components/Stat tile",
+  title: "Data display/Stat tile",
   component: StatTile,
   args: {
     label: "Spent",

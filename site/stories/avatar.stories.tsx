@@ -6,7 +6,7 @@ import { AvatarStory } from "../../stories/content.js"
 type Args = { size: "sm" | "default" | "lg"; src: string; initials: string }
 
 const meta = {
-  title: "Components/Avatar",
+  title: "Data display/Avatar",
   args: { size: "default", src: "/favicon.svg", initials: "AT" },
   argTypes: {
     size: { control: "select", options: ["sm", "default", "lg"] },

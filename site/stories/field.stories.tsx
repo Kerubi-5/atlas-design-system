@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { FieldStory, FormHelpersStory } from "../../stories/fields.js"
 
 const meta = {
-  title: "Components/Field",
+  title: "Forms/Field",
   parameters: {
     controls: { disable: true },
     docs: {

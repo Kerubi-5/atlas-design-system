@@ -4,7 +4,7 @@ import { InfoTip } from "../../src/info-tip.js"
 import { InfoTipStory } from "../../stories/info-tip.js"
 
 const meta = {
-  title: "Components/Info tip",
+  title: "Overlays/Info tip",
   component: InfoTip,
   args: {
     label: "About this field",

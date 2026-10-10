@@ -9,7 +9,7 @@ import {
 } from "../../stories/button-hover.js"
 
 const meta = {
-  title: "Components/Button",
+  title: "Actions/Button",
   component: Button,
   args: {
     children: "Save",

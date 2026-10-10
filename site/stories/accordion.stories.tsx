@@ -16,7 +16,7 @@ const items = [
 ] as const
 
 const meta = {
-  title: "Components/Accordion",
+  title: "Layout/Accordion",
   args: { value: "exports" },
   argTypes: {
     value: { control: "select", options: ["", "exports", "formats"] },

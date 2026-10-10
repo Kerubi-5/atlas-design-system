@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { TokensPage } from "../src/tokens-page.js"
 
 const meta = {
-  title: "Tokens",
+  title: "Foundations/Tokens",
   tags: ["!autodocs"],
   parameters: {
     layout: "padded",

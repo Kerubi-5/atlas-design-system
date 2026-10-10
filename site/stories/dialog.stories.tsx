@@ -21,7 +21,7 @@ type Args = {
   confirmLabel: string
 }
 const meta = {
-  title: "Components/Dialog",
+  title: "Overlays/Dialog",
   args: {
     open: false,
     title: "Archive export",

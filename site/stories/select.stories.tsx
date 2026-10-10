@@ -13,7 +13,7 @@ import { formControlOptions } from "../../stories/form-control-triggers.js"
 
 type Args = { value: string; placeholder: string; disabled: boolean }
 const meta = {
-  title: "Components/Select",
+  title: "Forms/Select",
   args: { value: "usd", placeholder: "Choose a currency", disabled: false },
   argTypes: {
     value: {

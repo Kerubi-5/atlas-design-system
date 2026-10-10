@@ -6,7 +6,7 @@ import { Input } from "../../src/input.js"
 import { Label } from "../../src/label.js"
 
 const meta = {
-  title: "Components/Input",
+  title: "Forms/Input",
   component: Input,
   args: {
     value: "Q4 export",

@@ -6,7 +6,7 @@ import { ToggleGroupStory } from "../../stories/selection.js"
 
 type Args = { value: string }
 const meta = {
-  title: "Components/Toggle group",
+  title: "Actions/Toggle group",
   args: { value: "list" },
   argTypes: {
     value: { control: "select", options: ["list", "board", "chart"] },

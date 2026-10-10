@@ -3,7 +3,7 @@ import { Badge } from "../../src/badge.js"
 import { BadgeVariantsStory } from "../../stories/badge.js"
 
 const meta = {
-  title: "Components/Badge",
+  title: "Data display/Badge",
   component: Badge,
   args: { children: "Paid", variant: "soft", tone: "success" },
   argTypes: {

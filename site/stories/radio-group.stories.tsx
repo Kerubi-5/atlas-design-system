@@ -9,7 +9,7 @@ type Args = { value: string; disabled: boolean }
 const options = ["Daily", "Weekly", "Monthly"]
 
 const meta = {
-  title: "Components/Radio group",
+  title: "Forms/Radio group",
   args: { value: "Weekly", disabled: false },
   argTypes: {
     value: { control: "select", options },

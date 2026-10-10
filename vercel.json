@@ -10,7 +10,7 @@
     { "source": "/storybook/", "destination": "/", "permanent": true },
     {
       "source": "/tokens",
-      "destination": "/?path=/story/tokens--theme",
+      "destination": "/?path=/story/foundations-tokens--theme",
       "permanent": true
     },
     {

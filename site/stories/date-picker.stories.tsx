@@ -12,7 +12,7 @@ type Args = {
   numberOfMonths: number
 }
 const meta = {
-  title: "Components/Date picker",
+  title: "Forms/Date picker",
   args: {
     value: "2026-10-09",
     placeholder: "Pick a date",

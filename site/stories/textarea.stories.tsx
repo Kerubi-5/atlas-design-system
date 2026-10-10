@@ -5,7 +5,7 @@ import { Textarea } from "../../src/textarea.js"
 import { Label } from "../../src/label.js"
 
 const meta = {
-  title: "Components/Textarea",
+  title: "Forms/Textarea",
   component: Textarea,
   args: {
     value: "Include last month.",

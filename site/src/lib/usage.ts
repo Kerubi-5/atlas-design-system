@@ -26,7 +26,7 @@ export const beta = new Set([
 
 /**
  * "When to use" guidance shown on each component's docs page, keyed by the
- * story title after `Components/`. The build test fails when a component
+ * component name in the story title (`Forms/Input` → `Input`). The build test fails when a component
  * story has no entry here.
  */
 export const usage: Record<string, string> = {

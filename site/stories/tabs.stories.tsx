@@ -6,7 +6,7 @@ import { TabsNavStory, TabsStory } from "../../stories/navigation.js"
 
 type Args = { value: string }
 const meta = {
-  title: "Components/Tabs",
+  title: "Navigation/Tabs",
   args: { value: "overview" },
   argTypes: {
     value: { control: "select", options: ["overview", "activity"] },

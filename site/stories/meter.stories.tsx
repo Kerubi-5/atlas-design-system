@@ -4,7 +4,7 @@ import { Meter } from "../../src/meter.js"
 import { MeterStory } from "../../stories/meter.js"
 
 const meta = {
-  title: "Components/Meter",
+  title: "Data display/Meter",
   component: Meter,
   args: {
     value: 72,

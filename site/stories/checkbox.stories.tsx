@@ -7,7 +7,7 @@ import { Label } from "../../src/label.js"
 import { CheckboxStory } from "../../stories/selection.js"
 
 const meta = {
-  title: "Components/Checkbox",
+  title: "Forms/Checkbox",
   component: Checkbox,
   args: { checked: true, disabled: false, "aria-invalid": false },
   argTypes: {

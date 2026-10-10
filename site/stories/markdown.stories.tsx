@@ -7,7 +7,7 @@ import {
 } from "../../stories/markdown.js"
 
 const meta = {
-  title: "Components/Markdown",
+  title: "Data display/Markdown",
   component: Markdown,
   args: {
     content:

@@ -27,8 +27,12 @@ CI runs all of these on every pull request. Run them before you push.
 2. An export in `package.json`, and the module in `test/artifact.test.ts`
    (the module list, plus the `"use client"` list when it applies).
 3. A shared example in `stories/` and a Storybook file in `site/stories/`
-   with a `Playground` whose controls drive the component. The site tests
-   fail when an export or example has no story.
+   with a `Playground` whose controls drive the component. Title it
+   `<Group>/<Name>` with the sidebar group people would look in:
+   Foundations, Actions, Forms, Navigation, Feedback, Overlays, Data
+   display, or Layout (the list is `storySort` in
+   `site/.storybook/preview.tsx`). The site tests fail when an export or
+   example has no story, or a story has no group.
 4. A usage entry in `site/src/lib/usage.ts` (use for, not for,
    accessibility). The site tests fail without one.
 5. Tests in `test/` for the behavior people rely on: roles, keyboard,
@@ -42,6 +46,22 @@ CI runs all of these on every pull request. Run them before you push.
 If the accessibility check fails, fix the component or the token, not the
 check. If screenshots change on purpose, run `npm run test:visual:update
 --prefix site` and commit the new baselines with the change.
+
+## Layers
+
+Files stay flat, so every import path is `atlas-react-kit/<name>`, but
+imports follow layers, bottom to top:
+
+- **Helpers**: `utils.ts` and `src/internal/` (shared classes and hooks).
+- **Components**: the top-level modules. A component may build on others
+  (`Combobox` uses `Button`, `Input`, and `Popover`; `DatePickerButton`
+  uses `Calendar`).
+- **Adapters**: `src/form/` (form-library fields) and `src/next/`
+  (framework links).
+
+Imports point down or sideways, never up, and never in a cycle, so apps can
+use any component without pulling in an adapter. `test/layers.test.ts`
+checks this.
 
 ## Change a component or token
 

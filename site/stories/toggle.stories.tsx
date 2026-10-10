@@ -5,7 +5,7 @@ import { Toggle } from "../../src/toggle.js"
 import { ToggleStory } from "../../stories/selection.js"
 
 const meta = {
-  title: "Components/Toggle",
+  title: "Actions/Toggle",
   component: Toggle,
   args: {
     children: "Bold",

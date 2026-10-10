@@ -11,11 +11,11 @@ import { distDir, serve } from "./serve.mjs"
 
 const stories = [
   {
-    id: "components-toggle-group--playground",
+    id: "actions-toggle-group--playground",
     selected: { role: "radio", name: "List" },
   },
   {
-    id: "components-toggle--variants",
+    id: "actions-toggle--variants",
     selected: { role: "button", name: "Italic" },
   },
 ]

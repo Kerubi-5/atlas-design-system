@@ -10,7 +10,7 @@ const items = [
 ]
 
 const meta = {
-  title: "Components/Color legend",
+  title: "Data display/Color legend",
   component: ColorLegend,
   args: {
     title: "Depth",

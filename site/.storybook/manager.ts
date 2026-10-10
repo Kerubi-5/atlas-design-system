@@ -53,6 +53,44 @@ if (typeof document !== "undefined") {
   )
 }
 
+/**
+ * Component pages moved from `Components/<Name>` (and `Tokens`) into purpose
+ * groups such as `Forms/<Name>`, which changed their ids. Send old links
+ * (`?path=/story/components-button--variants`, `.../tokens--theme`) to the
+ * same page in its group, looked up in the story index.
+ */
+async function redirectMovedPage() {
+  const params = new URLSearchParams(window.location.search)
+  const match = /^\/(docs|story)\/([a-z0-9-]+--[a-z0-9-]+)$/.exec(
+    params.get("path") ?? ""
+  )
+  const [, kind, oldId] = match ?? []
+  if (!kind || !oldId) return
+  const response = await fetch("./index.json")
+  if (!response.ok) return
+  const { entries } = (await response.json()) as {
+    entries: Record<string, { id: string; title: string }>
+  }
+  if (entries[oldId]) return
+  const rest = oldId.replace(/^components-/, "")
+  const slug = (text: string) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+  const moved = Object.values(entries).find(
+    (entry) => entry.id === `${slug(entry.title.split("/")[0] ?? "")}-${rest}`
+  )
+  if (!moved) return
+  window.location.replace(
+    window.location.href.replace(/([?&]path=)[^&#]*/, `$1/${kind}/${moved.id}`)
+  )
+}
+
+if (typeof window !== "undefined") {
+  redirectMovedPage().catch(() => {})
+}
+
 addons.setConfig({
   theme: create({
     base: "light",

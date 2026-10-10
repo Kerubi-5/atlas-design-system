@@ -33,7 +33,8 @@ import "../src/styles.css"
 /** "Usage" guidance for the component this docs page documents. */
 function UsageBlock() {
   const { preparedMeta } = useOf("meta", ["meta"])
-  const name = preparedMeta.title.replace(/^Components\//, "")
+  // Titles are "<Group>/<Name>"; guidance is keyed by the component name.
+  const name = preparedMeta.title.split("/").at(-1) ?? ""
   const guidance = usage[name]
   if (!guidance) return null
   const status = beta.has(name)
@@ -71,7 +72,22 @@ const preview: Preview = {
     controls: { expanded: true },
     viewport: { options: atlasViewports },
     options: {
-      storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
+      // Component pages are grouped by purpose; the build test keeps every
+      // component story in one of these groups.
+      storySort: {
+        order: [
+          "Docs",
+          "Foundations",
+          "Actions",
+          "Forms",
+          "Navigation",
+          "Feedback",
+          "Overlays",
+          "Data display",
+          "Layout",
+          "Examples",
+        ],
+      },
     },
     // CI runs axe on every story (tests/a11y.test.mjs); show failures as errors.
     a11y: { test: "error" },
