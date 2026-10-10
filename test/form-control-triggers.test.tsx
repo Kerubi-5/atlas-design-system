@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest"
 
 import { Combobox } from "../src/combobox.js"
 import { DatePickerButton } from "../src/date-picker.js"
+import { DateTimePickerButton } from "../src/date-time-picker.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
+import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import { formControlTriggerClassName } from "../src/internal/form-control.js"
 import {
   Select,
@@ -21,7 +23,7 @@ import {
 } from "./helpers.js"
 
 describe("form-control trigger chrome", () => {
-  it("shares Input-matching tokens across DatePicker, Combobox, and Select", () => {
+  it("shares Input-matching tokens across DatePicker, DateTimePicker, Combobox, and Select", () => {
     for (const token of formControlTriggerTokens) {
       expect(formControlTriggerClassName.split(/\s+/)).toContain(token)
     }
@@ -30,6 +32,9 @@ describe("form-control trigger chrome", () => {
 
     expectFormControlTrigger(screen.getByLabelText("Plain input"))
     expectFormControlTrigger(screen.getByRole("button", { name: /^October 9/ }))
+    expectFormControlTrigger(
+      screen.getByRole("button", { name: /^October 10/ })
+    )
     const combobox = screen
       .getAllByRole("combobox")
       .find((node) => node.getAttribute("data-slot") === "popover-trigger")
@@ -52,11 +57,16 @@ describe("form-control trigger chrome", () => {
     )
   })
 
-  it("keeps consumer className workarounds on DatePicker and Combobox", () => {
+  it("keeps consumer className workarounds on DatePicker, DateTimePicker, and Combobox", () => {
     render(
       <>
         <DatePickerButton
           value="2026-10-09"
+          onChange={() => {}}
+          className="px-3 text-sm"
+        />
+        <DateTimePickerButton
+          value={new Date(2026, 9, 10, 14, 30)}
           onChange={() => {}}
           className="px-3 text-sm"
         />
@@ -70,12 +80,18 @@ describe("form-control trigger chrome", () => {
     )
 
     const dateTrigger = screen.getByRole("button", { name: /^October 9/ })
+    const dateTimeTrigger = screen.getByRole("button", { name: /^October 10/ })
     const combobox = screen.getByRole("combobox")
     expect(dateTrigger.className.split(/\s+/)).toContain("px-3")
     expect(dateTrigger.className.split(/\s+/)).toContain("text-sm")
     expect(dateTrigger.className.split(/\s+/)).toContain("hover:bg-background")
     expect(dateTrigger.className.split(/\s+/)).not.toContain(
       "hover:bg-selected"
+    )
+    expect(dateTimeTrigger.className.split(/\s+/)).toContain("px-3")
+    expect(dateTimeTrigger.className.split(/\s+/)).toContain("text-sm")
+    expect(dateTimeTrigger.className.split(/\s+/)).toContain(
+      "hover:bg-background"
     )
     expect(combobox.className.split(/\s+/)).toContain("px-3")
     expect(combobox.className.split(/\s+/)).toContain("text-sm")
@@ -93,6 +109,21 @@ describe("form-control trigger chrome", () => {
     )
 
     const trigger = screen.getByLabelText("Due")
+    expect(trigger.className.split(/\s+/)).toContain("w-40")
+    expectFormControlTrigger(trigger)
+  })
+
+  it("forwards FormDateTimePickerField className to the trigger", () => {
+    render(
+      <FormDateTimePickerField
+        value={new Date(2026, 9, 10, 14, 30)}
+        onValueChange={() => {}}
+        label="Starts"
+        className="w-40"
+      />
+    )
+
+    const trigger = screen.getByLabelText("Starts")
     expect(trigger.className.split(/\s+/)).toContain("w-40")
     expectFormControlTrigger(trigger)
   })
