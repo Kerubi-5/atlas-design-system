@@ -1,5 +1,23 @@
 # Changelog
 
+## Unreleased
+
+Shared state classes and consistency fixes. No API changed.
+
+- Focus, invalid, disabled, field, selected, and option states come from one
+  module (`src/internal/styles.ts`), so they look the same in every
+  component. Fixes found while unifying them:
+  - A destructive `Badge` used as a link drew a translucent red focus ring
+    (about 1.5:1); it now gets the solid focus ring.
+  - `Toggle` showed no ring when `aria-invalid`; `RadioGroupItem` and
+    `Switch` had no dark-mode invalid style.
+  - Disabled `Textarea`, `SelectTrigger`, `Checkbox`, `RadioGroupItem`, and
+    `Switch` now ignore hover and clicks like disabled buttons
+    (`pointer-events: none`) instead of only showing a not-allowed cursor.
+  - `SearchPicker`'s highlighted option gets the grey fill as well as the
+    bar, matching `Combobox`; tab triggers take the ring-colored border on
+    focus like other controls.
+
 ## 0.6.0 - 2026-10-10
 
 Minor release for visual token changes (WCAG 1.4.11 non-text contrast), a

@@ -32,9 +32,11 @@ belong to the application.
 ## Accessibility
 
 The target is WCAG 2.2 AA. CI runs axe-core's WCAG 2.2 A and AA rules against
-every Storybook story in light and dark mode, and checks the theme's token
-pairs for text and non-text contrast in both themes (`npm run test:a11y
---prefix site`). A violation fails the build. Automated checks do not replace
+every Storybook story and every open overlay (menus, listboxes, dialogs,
+popovers, tooltips, toasts) in light and dark mode, checks that focus never
+lands in content an open overlay hides, and checks the theme's token pairs
+for text and non-text contrast in both themes (`npm run test:a11y --prefix
+site`). A violation fails the build. Automated checks do not replace
 keyboard and screen-reader testing.
 
 - Text meets 4.5:1 against its background. The token pairs are tuned for it,
