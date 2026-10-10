@@ -127,17 +127,22 @@ describe("focus and state cues (WCAG 1.4.11)", () => {
 
   it("marks pressed toggles, toggle-group items, and active tabs with a border", () => {
     render(<Toggle aria-label="Bold" pressed />)
-    expect(screen.getByRole("button", { name: "Bold" }).className).toContain(
+    const toggle = screen.getByRole("button", { name: "Bold" })
+    expect(toggle.className).toContain(
       "aria-pressed:border-selected-foreground"
     )
+    expect(toggle.className).toContain("data-on:border-selected-foreground")
     render(
       <ToggleGroup type="single" defaultValue="list" aria-label="View">
         <ToggleGroupItem value="list">List</ToggleGroupItem>
       </ToggleGroup>
     )
-    expect(screen.getByRole("radio", { name: "List" }).className).toContain(
-      "data-[state=on]:border-selected-foreground"
-    )
+    const item = screen.getByRole("radio", { name: "List" })
+    expect(item).toHaveAttribute("data-state", "on")
+    expect(item).toHaveAttribute("aria-checked", "true")
+    expect(item).not.toHaveAttribute("aria-pressed")
+    expect(item.className).toContain("data-on:border-selected-foreground")
+    expect(item.className).toContain("aria-checked:border-selected-foreground")
     expect(tabsTriggerVariants()).toContain(
       'data-[state="active"]:border-selected-foreground'
     )

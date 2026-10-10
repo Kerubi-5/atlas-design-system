@@ -14,6 +14,7 @@ const stories: Array<{ id: string; open?: (page: Page) => Promise<void> }> = [
   { id: "components-table--profile-card" },
   { id: "components-tabs--composition" },
   { id: "components-toggle-group--playground" },
+  { id: "components-toggle--variants" },
   { id: "components-switch--settings" },
   { id: "components-radio-group--composition" },
   { id: "components-pagination--with-ellipsis" },

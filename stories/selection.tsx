@@ -25,13 +25,20 @@ export function ToggleStory() {
   )
 }
 
-/** Single-select group using the selected wash. */
+/** Single- and multi-select groups using the selected wash and border. */
 export function ToggleGroupStory() {
   return (
-    <ToggleGroup type="single" variant="outline" defaultValue="list">
-      <ToggleGroupItem value="list">List</ToggleGroupItem>
-      <ToggleGroupItem value="board">Board</ToggleGroupItem>
-      <ToggleGroupItem value="chart">Chart</ToggleGroupItem>
-    </ToggleGroup>
+    <div className="flex flex-col gap-4">
+      <ToggleGroup type="single" variant="outline" defaultValue="list">
+        <ToggleGroupItem value="list">List</ToggleGroupItem>
+        <ToggleGroupItem value="board">Board</ToggleGroupItem>
+        <ToggleGroupItem value="chart">Chart</ToggleGroupItem>
+      </ToggleGroup>
+      <ToggleGroup type="multiple" variant="outline" defaultValue={["bold"]}>
+        <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+        <ToggleGroupItem value="italic">Italic</ToggleGroupItem>
+        <ToggleGroupItem value="underline">Underline</ToggleGroupItem>
+      </ToggleGroup>
+    </div>
   )
 }

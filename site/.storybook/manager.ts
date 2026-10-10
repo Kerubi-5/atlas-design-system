@@ -5,10 +5,53 @@ import { create } from "storybook/theming"
 
 import { GITHUB_URL, NPM_URL } from "../src/lib/docs.js"
 
+const KIT_TITLE = "Atlas React Kit"
+
 // Storybook renders brandTitle as HTML when there is no brandImage. Keeping
 // the name as live text (next to the favicon mark) uses the sidebar font and
-// stays selectable, which an image wordmark would not.
-const brandTitle = `<span style="display:inline-flex;align-items:center;gap:8px;font-weight:700"><img src="./favicon.svg" alt="" width="22" height="22" style="display:block" />Atlas React Kit</span>`
+// stays selectable, which an image wordmark would not. The HTML string is
+// not used for document.title; applyKitDocumentTitle() sets the tab name.
+const brandTitle = `<span style="display:inline-flex;align-items:center;gap:8px;font-weight:700"><img src="./favicon.svg" alt="" width="22" height="22" style="display:block" />${KIT_TITLE}</span>`
+
+/**
+ * Storybook hardcodes a "Storybook" tab suffix (`storybook - Storybook` on
+ * the index, `{story} ⋅ Storybook` after navigation). Replace that brand
+ * with the kit name so the manager tab matches the sidebar.
+ */
+function applyKitDocumentTitle() {
+  const current = document.title
+  if (!current || current === "Storybook") {
+    document.title = KIT_TITLE
+    return
+  }
+  if (/^storybook\s+-\s+Storybook$/i.test(current)) {
+    document.title = KIT_TITLE
+    return
+  }
+  if (current === `${KIT_TITLE} - Storybook`) {
+    document.title = KIT_TITLE
+    return
+  }
+  if (current.endsWith("Storybook") && !current.includes(KIT_TITLE)) {
+    document.title = current.replace(
+      /\s*[⋅·-]\s*Storybook$/u,
+      ` ⋅ ${KIT_TITLE}`
+    )
+  }
+}
+
+if (typeof document !== "undefined") {
+  applyKitDocumentTitle()
+  const titleEl = document.querySelector("title")
+  new MutationObserver(applyKitDocumentTitle).observe(
+    titleEl ?? document.head,
+    {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    }
+  )
+}
 
 addons.setConfig({
   theme: create({

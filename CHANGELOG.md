@@ -1,26 +1,36 @@
 # Changelog
 
-## Unreleased
+## 0.6.0 - 2026-10-10
 
-Non-text contrast (WCAG 1.4.11): control boundaries, checked fills, selected
-states, and focus now reach 3:1 in both themes. A site test checks the token
-pairs in light and dark.
+Minor release for visual token changes (WCAG 1.4.11 non-text contrast) and a
+ToggleGroup selected-state fix. No existing API changed.
 
-- `--input` is darker (`oklch(0.62 0 0)` light, `oklch(0.52 0 0)` dark), so
-  field, checkbox, radio, and switch-track boundaries are 3.6:1 on the page
-  (they were 1.3:1). `--border` stays light for dividers and card edges.
-- Focus is a solid ring: `--ring` is the brand purple in light mode (7.3:1)
-  and a light purple in dark mode (8.6:1), and every component uses
-  `ring-ring` instead of a translucent glow (1.3–1.8:1 before). Keyboard-
-  highlighted menu, select, and combobox options get a 2px ring-colored bar;
-  the grey highlight alone was 1.1:1.
-- Dark `--primary` is lighter (`oklch(0.55 0.25 292.7)`), so checked
-  checkboxes, radios, and switches reach 3:1 on dark surfaces (2.2:1 before);
-  primary button text stays at 5:1.
-- The `--selected` wash mixes in oklab, so it is lavender instead of pink.
-  Pressed toggles, active tabs, the current pagination page, and expanded or
-  hovered outline buttons take a `border-selected-foreground` border, and
-  selected table rows a leading bar, because the wash alone is 1.2:1.
+- Non-text contrast: control boundaries, checked fills, selected states, and
+  focus now reach 3:1 in both themes. A site test checks the token pairs in
+  light and dark.
+  - `--input` is darker (`oklch(0.62 0 0)` light, `oklch(0.52 0 0)` dark), so
+    field, checkbox, radio, and switch-track boundaries are 3.6:1 on the page
+    (they were 1.3:1). `--border` stays light for dividers and card edges.
+  - Focus is a solid ring: `--ring` is the brand purple in light mode (7.3:1)
+    and a light purple in dark mode (8.6:1), and every component uses
+    `ring-ring` instead of a translucent glow (1.3–1.8:1 before). Keyboard-
+    highlighted menu, select, and combobox options get a 2px ring-colored bar;
+    the grey highlight alone was 1.1:1.
+  - Dark `--primary` is lighter (`oklch(0.55 0.25 292.7)`), so checked
+    checkboxes, radios, and switches reach 3:1 on dark surfaces (2.2:1 before);
+    primary button text stays at 5:1.
+  - The `--selected` wash mixes in oklab, so it is lavender instead of pink.
+    Pressed toggles, active tabs, the current pagination page, and expanded or
+    hovered outline buttons take a `border-selected-foreground` border, and
+    selected table rows a leading bar, because the wash alone is 1.2:1.
+- Toggle and ToggleGroup share one selected treatment: `bg-selected`,
+  `text-selected-foreground`, and a `selected-foreground` border, keyed off
+  `data-state=on`, `aria-pressed`, and `aria-checked`. Single-mode group items
+  are radios with `aria-checked` (no `aria-pressed`), so they used to miss the
+  pressed styles and render a pink fill without a border. Hover and focus use
+  the same wash and the solid `ring-ring`.
+- The Storybook manager tab title is "Atlas React Kit" (it was
+  "storybook - Storybook").
 
 ## 0.5.0 - 2026-10-10
 

@@ -4,7 +4,7 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.5.0
+npm install --save-exact atlas-react-kit@0.6.0
 ```
 
 Import components by subpath:
@@ -113,7 +113,7 @@ artifact with the package owner's npm login:
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.5.0.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.6.0.tgz --access public
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser

@@ -226,13 +226,13 @@ export const usage: Record<string, string> = {
 
 **Not for** form values submitted later (use \`RadioGroup\` or \`Checkbox\`) or navigation (use \`Tabs\` or \`TabsNav\`).
 
-**Accessibility** Give icon-only items \`aria-label\`; arrow keys move between items.`,
+**Accessibility** Give icon-only items \`aria-label\`; arrow keys move between items. The selected item uses the same wash, \`text-selected-foreground\`, and \`border-selected-foreground\` as a pressed \`Toggle\`, including in single (radio) mode.`,
   Toggle: `
 **Use for** a single pressed/unpressed control, such as Bold in a toolbar.
 
 **Not for** settings (use \`Switch\`).
 
-**Accessibility** Exposes \`aria-pressed\`; icon-only toggles need \`aria-label\`.`,
+**Accessibility** Exposes \`aria-pressed\` and \`data-state=on\`; icon-only toggles need \`aria-label\`. The pressed look is the selected wash plus a \`selected-foreground\` border.`,
   Tooltip: `
 **Use for** short labels on icon-only buttons and hints for truncated text.
 
