@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.6.1 - 2026-10-10
 
-Shared state classes and consistency fixes. No API changed.
+Patch release: shared state classes and the consistency fixes they exposed.
+No API changed; upgrading needs no code changes.
 
 - Focus, invalid, disabled, field, selected, and option states come from one
   module (`src/internal/styles.ts`), so they look the same in every
