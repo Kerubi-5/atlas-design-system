@@ -45,6 +45,25 @@ describe("portable forms", () => {
     expect(multiline).not.toContain('role="alert"')
   })
 
+  it("accepts an id so two forms can share a field name", () => {
+    const field = {
+      name: "email",
+      state: { value: "", meta: { errors: [] } },
+      handleChange: () => {},
+      handleBlur: () => {},
+    }
+    const html = renderToStaticMarkup(
+      <>
+        <FormTextField field={field} label="Login email" />
+        <FormTextField field={field} id="signup-email" label="Sign-up email" />
+      </>
+    )
+    expect(html).toContain('for="email"')
+    expect(html).toContain('id="email"')
+    expect(html).toContain('for="signup-email"')
+    expect(html).toContain('id="signup-email"')
+  })
+
   it("keeps utility class precedence and controlled input values", () => {
     expect(cn("px-2", false && "hidden", "px-4")).toBe("px-4")
     let value = ""

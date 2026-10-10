@@ -26,7 +26,7 @@ no root component barrel.
 | `sonner`                     | `Toaster`; Sonner props, with `next-themes` theme defaults                                                                                                                                                                                                                                       |
 | `table`                      | Table, header, body, footer, row, head, cell, caption; root scroller is `min-w-0 overflow-x-auto` with a fade cue; cells are `px-2` below `sm`                                                                                                                                                   |
 | `table-body-skeleton`        | `TableBodySkeleton`; `columns`, optional `rows` (default 5)                                                                                                                                                                                                                                      |
-| `tabs`                       | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsNav`, `tabsListVariants`; list `variant` is `default` or `line`                                                                                                                                                                           |
+| `tabs`                       | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent`, `TabsNav`, `tabsListVariants`, `tabsTriggerVariants`; list `variant` is `default` or `line`; style `TabsNav` links with `tabsTriggerVariants()`                                                                                                |
 | `toggle`                     | `Toggle`, `toggleVariants`; `variant`, `size`                                                                                                                                                                                                                                                    |
 | `toggle-group`               | `ToggleGroup`, `ToggleGroupItem`; `variant`, `size`                                                                                                                                                                                                                                              |
 | `theme-provider`             | `ThemeProvider`, `useTheme`; optional `storageKey` (default `atlas-theme`), `enableShortcut` for the `d` toggle                                                                                                                                                                                  |
@@ -136,7 +136,32 @@ export function ViewSwitcher({ view }: { view: string }) {
 }
 ```
 
-Outside Next, compose `TabsNav` with your own links and active-page semantics.
+Outside Next, compose `TabsNav` with your own links: style each one with
+`tabsTriggerVariants()` and set `data-state="active"` plus `aria-current="page"`
+on the active link.
+
+```tsx
+import { TabsNav, tabsTriggerVariants } from "atlas-react-kit/tabs"
+
+export function ViewSwitcher({ view }: { view: string }) {
+  return (
+    <TabsNav aria-label="Items view">
+      {["list", "board"].map((item) => (
+        <a
+          key={item}
+          href={`?view=${item}`}
+          data-state={view === item ? "active" : "inactive"}
+          aria-current={view === item ? "page" : undefined}
+          className={tabsTriggerVariants()}
+        >
+          {item}
+        </a>
+      ))}
+    </TabsNav>
+  )
+}
+```
+
 Hook-driven controls and form handlers declare their client boundary; presentational
 modules such as `button`, `badge`, `card`, and `skeleton` can be composed from
 React Server Components. Pass interactive callbacks from client components.

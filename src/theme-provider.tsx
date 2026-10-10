@@ -7,20 +7,42 @@ import {
   type ThemeProviderProps as NextThemesProviderProps,
 } from "next-themes"
 
-const EDITABLE_SELECTOR =
-  "input, textarea, select, [contenteditable]:not([contenteditable='false'])"
+/**
+ * Targets where a bare `d` is input, not a shortcut: native and ARIA text
+ * fields, plus widgets with letter typeahead (Select trigger and list, menus,
+ * trees, grids).
+ */
+const KEY_CONSUMING_SELECTOR = [
+  "input",
+  "textarea",
+  "select",
+  "[contenteditable]:not([contenteditable='false'])",
+  ...[
+    "textbox",
+    "searchbox",
+    "spinbutton",
+    "combobox",
+    "listbox",
+    "menu",
+    "menubar",
+    "tree",
+    "treegrid",
+    "grid",
+  ].map((role) => `[role="${role}"]`),
+].join(", ")
 
 export type ThemeProviderProps = NextThemesProviderProps & {
   /**
    * When true, pressing `d` toggles dark/light unless focus is in an editable
-   * field. Defaults to true.
+   * field or a widget with letter typeahead (such as `Select`). Defaults to
+   * true.
    */
   enableShortcut?: boolean
 }
 
-function isEditableTarget(target: EventTarget | null) {
+function isKeyConsumingTarget(target: EventTarget | null) {
   if (!(target instanceof HTMLElement)) return false
-  return Boolean(target.closest(EDITABLE_SELECTOR))
+  return Boolean(target.closest(KEY_CONSUMING_SELECTOR))
 }
 
 /** Listens for the optional `d` shortcut inside an existing theme context. */
@@ -29,9 +51,10 @@ function ThemeShortcut() {
 
   React.useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      if (event.defaultPrevented || event.repeat || event.isComposing) return
       if (event.metaKey || event.ctrlKey || event.altKey) return
       if (event.key !== "d" && event.key !== "D") return
-      if (isEditableTarget(event.target)) return
+      if (isKeyConsumingTarget(event.target)) return
       event.preventDefault()
       setTheme(resolvedTheme === "dark" ? "light" : "dark")
     }

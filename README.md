@@ -84,7 +84,7 @@ The Storybook preview disables the kit's theme shortcut and uses the theme
 toolbar instead. The accessibility panel checks the rendered story; it does not
 replace keyboard or assistive-technology testing.
 
-0.4.0 is already on npm. Bumping the version in `package.json` and
+0.4.1 is already on npm. Bumping the version in `package.json` and
 merging to `main` (path-filtered to package files) or running
 `workflow_dispatch` publishes through npm OIDC trusted publishing after
 check, test, and pack gates. Versions already on npm are skipped.

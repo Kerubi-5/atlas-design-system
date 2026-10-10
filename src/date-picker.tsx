@@ -227,6 +227,15 @@ function DatePickerRangeButton({
   const from = toDate(value?.from)
   const to = toDate(value?.to)
   const selected: DateRange | undefined = from || to ? { from, to } : undefined
+  // Opening on a complete range means the next click starts a new one.
+  // Without this, Day Picker extends the old range and the popover closes
+  // on that first click, so a fresh range needs Clear first.
+  const restartRef = React.useRef(false)
+
+  const onOpenChange = (next: boolean) => {
+    if (next) restartRef.current = Boolean(from && to)
+    setOpen(next)
+  }
 
   return (
     <DatePickerShell
@@ -237,7 +246,7 @@ function DatePickerRangeButton({
       empty={!from}
       label={formatRangeTriggerLabel(from, to, placeholder)}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={onOpenChange}
       side={side}
     >
       <Calendar
@@ -245,11 +254,13 @@ function DatePickerRangeButton({
         selected={selected}
         defaultMonth={defaultMonth ?? from ?? to}
         numberOfMonths={months}
-        onSelect={(next) => {
-          onChange(next)
+        onSelect={(next, day) => {
+          const range = restartRef.current ? { from: day, to: day } : next
+          restartRef.current = false
+          onChange(range)
           // First click is a same-day range; keep the popover open so the
           // user can set `to`. Close once the ends differ.
-          if (next?.from && next.to && !isSameDay(next.from, next.to)) {
+          if (range?.from && range.to && !isSameDay(range.from, range.to)) {
             setOpen(false)
           }
         }}
