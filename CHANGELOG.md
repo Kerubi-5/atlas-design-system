@@ -1,9 +1,15 @@
 # Changelog
 
-## Unreleased
+## 0.5.0 - 2026-10-10
 
-Date-time picker, bug fixes from a QA pass, plus an agent skill. Not yet
-versioned; bump `package.json` to release.
+Minor release that adds a date-time picker and 11 components (accordion,
+alert, avatar, breadcrumb, dropdown menu, pagination, progress, radio group,
+spinner, switch, and tooltip), the shipped agent skill, the `FormTextField`
+`id` prop, the public `tabsTriggerVariants` export, and `Combobox`
+`aria-label`, plus QA and accessibility fixes. No existing API changed.
+Light-mode muted and destructive text are darker, and brand-colored hover
+text uses `text-selected-foreground`, so every Storybook story passes the
+automated WCAG 2.2 AA check in both themes.
 
 - `DateTimePickerButton` (`atlas-react-kit/date-time-picker`) and
   `FormDateTimePickerField` (`atlas-react-kit/form/date-time-picker-field`)

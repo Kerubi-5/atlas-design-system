@@ -4,7 +4,7 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.4.1
+npm install --save-exact atlas-react-kit@0.5.0
 ```
 
 Import components by subpath:
@@ -102,10 +102,10 @@ The Storybook preview disables the kit's theme shortcut and uses the theme
 toolbar instead. The accessibility panel checks the rendered story; it does not
 replace keyboard or assistive-technology testing.
 
-0.4.1 is already on npm. Bumping the version in `package.json` and
-merging to `main` (path-filtered to package files) or running
-`workflow_dispatch` publishes through npm OIDC trusted publishing after
-check, test, and pack gates. Versions already on npm are skipped.
+Bumping the version in `package.json` and merging to `main` (path-filtered
+to package files) or running `workflow_dispatch` publishes through npm OIDC
+trusted publishing after check, test, and pack gates. Versions already on npm
+are skipped.
 
 If trusted publishing is not configured, pack and publish a validated
 artifact with the package owner's npm login:
@@ -113,7 +113,7 @@ artifact with the package owner's npm login:
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.4.1.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.5.0.tgz --access public
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser
