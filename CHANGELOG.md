@@ -27,6 +27,11 @@ Bug fixes from a QA pass, plus an agent skill. Not yet versioned; bump
   pages where two forms share a field name.
 - `tabsTriggerVariants` is exported from `atlas-react-kit/tabs` so `TabsNav`
   links can match tab styling without the Next adapter.
+- New components: `accordion`, `alert`, `avatar`, `breadcrumb`,
+  `dropdown-menu`, `pagination`, `progress`, `radio-group`, `spinner`,
+  `switch`, and `tooltip`. They follow the shape rules (square, except round
+  radio dots and avatars), use `bg-selected` for the current page and focus
+  styles shared with existing controls, and keep status tones off body text.
 
 ## 0.4.1
 

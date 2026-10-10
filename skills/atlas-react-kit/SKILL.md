@@ -63,6 +63,16 @@ Import each component from its subpath, e.g.
 | Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                     |
 | Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                         |
 | Modal                                           | `Dialog` family from `dialog`                                                                       |
+| Label for an icon button, or a short hint       | `Tooltip` from `tooltip`; keep `aria-label` on icon buttons                                         |
+| Row actions or an overflow menu of commands     | `DropdownMenu` family from `dropdown-menu`                                                          |
+| Setting that applies immediately                | `Switch` from `switch`; `Checkbox` for choices submitted with a form                                |
+| One choice from a few visible options           | `RadioGroup` and `RadioGroupItem` from `radio-group`                                                |
+| Inline message about a page or section          | `Alert` from `alert` (`success`, `warning`, `destructive` variants)                                 |
+| Person or workspace image                       | `Avatar`, `AvatarImage`, `AvatarFallback` from `avatar`                                             |
+| Sections that expand in place                   | `Accordion` family from `accordion`                                                                 |
+| Pages of a long list                            | `Pagination` family from `pagination`                                                               |
+| Where the page sits in a hierarchy              | `Breadcrumb` family from `breadcrumb`                                                               |
+| Work in progress                                | `Progress` from `progress` when the percent is known, else `Spinner` from `spinner`                 |
 | Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                               |
 | Conditional classes                             | `cn` from `utils`                                                                                   |
 
