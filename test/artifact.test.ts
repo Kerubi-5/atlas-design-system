@@ -80,6 +80,7 @@ describe("published modules", () => {
       "DESIGN_RULES.md",
       "COMPONENTS.md",
       "NOTICE",
+      "skills",
     ])
   })
 

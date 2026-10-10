@@ -2,7 +2,14 @@
 
 ## Unreleased
 
-Bug fixes from a QA pass. Not yet versioned; bump `package.json` to release.
+Bug fixes from a QA pass, plus an agent skill. Not yet versioned; bump
+`package.json` to release.
+
+- The package ships `skills/atlas-react-kit/SKILL.md`, an agent skill that
+  points AI coding assistants at the guides for the installed version, maps
+  common needs to kit components, and lists checks for raw palette colors,
+  rounded corners, and non-public imports. The README shows how to link it
+  into `.claude/skills/`.
 
 - `Combobox` clears its search after a selection. Before, the old query
   stayed, the highlight landed on the wrong row on reopen, and Enter could
