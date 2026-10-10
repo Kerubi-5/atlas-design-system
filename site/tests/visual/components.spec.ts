@@ -60,6 +60,7 @@ const stories: Story[] = [
   { id: "feedback-skeleton--loading" },
   { id: "feedback-empty-panel--sizes" },
   { id: "feedback-error-boundary--fallback" },
+  { id: "feedback-sonner--types" },
   {
     id: "feedback-sonner--playground",
     open: async (page) => {

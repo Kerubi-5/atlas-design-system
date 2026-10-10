@@ -121,7 +121,10 @@ const preview: Preview = {
         <div className="min-h-40 bg-background p-6 text-foreground">
           <Story />
         </div>
-        {context.viewMode === "docs" ? null : <Toaster />}
+        {context.viewMode === "docs" ||
+        context.parameters.toaster === false ? null : (
+          <Toaster />
+        )}
       </ThemeProvider>
     ),
   ],

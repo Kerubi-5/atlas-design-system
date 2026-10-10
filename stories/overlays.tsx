@@ -1,4 +1,4 @@
-import { toast } from "sonner"
+import * as React from "react"
 
 import { Button } from "../src/button.js"
 import {
@@ -19,6 +19,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../src/popover.js"
+import { Toaster, toast } from "../src/sonner.js"
 
 /** Dialog with header, body, and square chrome. */
 export function DialogStory() {
@@ -77,4 +78,33 @@ export function ToastStory() {
       Show toast
     </Button>
   )
+}
+
+/**
+ * Every toast type at once, kept open, with its own expanded toaster. Mount
+ * it where no other Toaster is rendered.
+ */
+export function ToastTypesStory() {
+  React.useEffect(() => {
+    const keep = { duration: Number.POSITIVE_INFINITY }
+    toast("Export scheduled", { ...keep, id: "default" })
+    toast.success("Settings saved", { ...keep, id: "success" })
+    toast.info("Exports run nightly", {
+      ...keep,
+      id: "info",
+      description: "Files land in the shared drive by 6am.",
+    })
+    toast.warning("Trial ends in 3 days", { ...keep, id: "warning" })
+    toast.error("Could not save", {
+      ...keep,
+      id: "error",
+      description: "The server did not respond.",
+      action: { label: "Retry", onClick: () => {} },
+      cancel: { label: "Dismiss", onClick: () => {} },
+    })
+    return () => {
+      toast.dismiss()
+    }
+  }, [])
+  return <Toaster expand visibleToasts={5} position="top-left" />
 }

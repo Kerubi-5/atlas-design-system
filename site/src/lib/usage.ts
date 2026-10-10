@@ -227,7 +227,7 @@ export const usage: Record<string, string> = {
 
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
-**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\` from \`sonner\`.`,
+**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/sonner\`, not from \`sonner\` directly.`,
   "Stat tile": `
 **Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
 
