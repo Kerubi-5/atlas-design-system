@@ -49,22 +49,22 @@ Import each component from its subpath, e.g.
 `import { Button } from "atlas-react-kit/button"`. There is no root barrel, and
 `dist/` or `internal/` paths are not public API.
 
-| Need                                            | Use                                                                                                              |
-| ----------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Short fixed list (a handful of options)         | `Select` family from `select`                                                                                    |
-| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                                     |
-| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                |
-| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField` from `form/*`                                          |
-| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                                   |
-| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                     |
-| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`              |
-| Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success" \| "warning" \| "neutral"`; `Badge variant="destructive"` for failed |
-| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                              |
-| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                                  |
-| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                                      |
-| Modal                                           | `Dialog` family from `dialog`                                                                                    |
-| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                                            |
-| Conditional classes                             | `cn` from `utils`                                                                                                |
+| Need                                            | Use                                                                                                 |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| Short fixed list (a handful of options)         | `Select` family from `select`                                                                       |
+| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                        |
+| One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                   |
+| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField` from `form/*`                             |
+| Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                      |
+| Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                        |
+| View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()` |
+| Status chip (paid, pending, failed)             | `Badge variant="soft"` (`success`, `warning`, `neutral` tones); `variant="destructive"` for failed  |
+| Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                 |
+| Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                     |
+| Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                         |
+| Modal                                           | `Dialog` family from `dialog`                                                                       |
+| Crash recovery around a section                 | `ErrorBoundary` from `error-boundary`                                                               |
+| Conditional classes                             | `cn` from `utils`                                                                                   |
 
 If nothing fits, build the piece in the app from kit primitives and semantic
 tokens. Do not copy kit source into the app; a missing shared component belongs
