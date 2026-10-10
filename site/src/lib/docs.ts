@@ -1,7 +1,7 @@
-const GITHUB_NOTICE =
-  "https://github.com/Kerubi-5/atlas-design-system/blob/main/NOTICE"
-const GITHUB_CONTRIBUTING =
-  "https://github.com/Kerubi-5/atlas-design-system/blob/main/CONTRIBUTING.md"
+export const GITHUB_URL = "https://github.com/Kerubi-5/atlas-design-system"
+export const NPM_URL = "https://www.npmjs.com/package/atlas-react-kit"
+const GITHUB_NOTICE = `${GITHUB_URL}/blob/main/NOTICE`
+const GITHUB_CONTRIBUTING = `${GITHUB_URL}/blob/main/CONTRIBUTING.md`
 
 // Storybook's docs links turn a leading-slash href into `./?path=<href>`, so
 // targets are story paths, not full `/?path=...` URLs.
@@ -23,4 +23,12 @@ export function rewriteDocLinks(markdown: string) {
     next = next.replaceAll(`](${from})`, `](${to})`)
   }
   return next
+}
+
+/** Put GitHub and npm links under the README's title on the docs landing page. */
+export function addProjectLinks(markdown: string) {
+  return markdown.replace(
+    /^(# .+\n)/,
+    `$1\n[GitHub](${GITHUB_URL}) · [npm](${NPM_URL})\n`
+  )
 }
