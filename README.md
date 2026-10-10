@@ -1,7 +1,10 @@
 # Atlas React Kit
 
 Shared React components and a Tailwind theme with square corners, semantic
-colors, and distinct selected states. React 19 and Tailwind 4 are required.
+colors, and distinct selected states. 0.6.0 adds generic pieces apps were
+keeping locally (`InfoTip`, `ColorLegend`, `SearchPicker`, `Markdown`,
+`StatTile`, `Meter`, `Slider`) plus the ToggleGroup selected-state fix.
+React 19 and Tailwind 4 are required.
 
 ```sh
 npm install --save-exact atlas-react-kit@0.6.0

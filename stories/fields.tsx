@@ -11,6 +11,7 @@ import {
 } from "../src/field.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
+import { FormMarkdownField } from "../src/form/markdown-field.js"
 import { FieldError } from "../src/form/field-error.js"
 import { FormFeedbackField } from "../src/form/feedback-field.js"
 import { FormSelectField } from "../src/form/select-field.js"
@@ -62,6 +63,7 @@ export function FieldStory() {
 /** Portable form helpers, including an error and form-level feedback. */
 export function FormHelpersStory() {
   const name = useDemoField("name", "Atlas")
+  const notes = useDemoField("notes", "Use **bold** for emphasis.")
   const [currency, setCurrency] = useState("usd")
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 9, 9))
   const [dateTime, setDateTime] = useState<Date | null>(
@@ -71,6 +73,7 @@ export function FormHelpersStory() {
   return (
     <div className="grid max-w-md gap-4">
       <FormTextField field={name} label="Name" description="Shown on exports" />
+      <FormMarkdownField field={notes} label="Notes" rows={4} />
       <FormSelectField
         label="Currency"
         value={currency}

@@ -20,6 +20,16 @@ const stories: Array<{ id: string; open?: (page: Page) => Promise<void> }> = [
   { id: "components-pagination--with-ellipsis" },
   { id: "components-breadcrumb--collapsed" },
   { id: "components-progress--labelled" },
+  { id: "components-slider--labelled" },
+  { id: "components-meter--with-markers" },
+  { id: "components-stat-tile--row" },
+  { id: "components-color-legend--scale" },
+  { id: "components-search-picker--example" },
+  { id: "components-markdown--gfm" },
+  {
+    id: "components-info-tip--layouts",
+    open: (page) => page.getByRole("button", { name: "About depth" }).click(),
+  },
   {
     id: "components-dropdown-menu--row-actions",
     open: (page) => page.getByRole("button", { name: "Actions" }).click(),

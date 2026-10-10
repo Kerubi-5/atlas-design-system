@@ -2,8 +2,10 @@
 
 ## 0.6.0 - 2026-10-10
 
-Minor release for visual token changes (WCAG 1.4.11 non-text contrast) and a
-ToggleGroup selected-state fix. No existing API changed.
+Minor release for visual token changes (WCAG 1.4.11 non-text contrast), a
+ToggleGroup selected-state fix, and generic components extracted from QCheck
+and KairOS so those apps can drop local copies in one upgrade. No existing
+API changed.
 
 - Non-text contrast: control boundaries, checked fills, selected states, and
   focus now reach 3:1 in both themes. A site test checks the token pairs in
@@ -31,6 +33,36 @@ ToggleGroup selected-state fix. No existing API changed.
   the same wash and the solid `ring-ring`.
 - The Storybook manager tab title is "Atlas React Kit" (it was
   "storybook - Storybook").
+- New components from the QCheck and KairOS audits (beta). Each is generic:
+  no app domain types, copy, or data. `SectionHeading` is not shipped: it
+  was one class string (`text-xs font-semibold tracking-widest
+text-muted-foreground uppercase`). `CardTitle` / `DialogTitle` already
+  own tracked headings, and `StatTile` exports `sectionLabel` for the same
+  chrome. `BUDGET_HEADER_ACTION` stays in KairOS.
+  - `InfoTip` / `InlineTip` (`atlas-react-kit/info-tip`): a Popover help
+    glyph (20px icon, 44px hit). `layout` is `box` or `inline` (inline does
+    not change line height). Hover opens only on a fine pointer; click, tap,
+    and keyboard always work. Required `label`. Not a Tooltip, glossary, or
+    "Coming soon" chip.
+  - `ColorLegend` (`atlas-react-kit/color-legend`): swatch, optional range,
+    and label. Overlay chrome is `className`. Attribution and license text
+    stay in the app.
+  - `SearchPicker<T>` (`atlas-react-kit/search-picker`): always-visible
+    combobox + listbox (not Combobox's popover). Default filter is casefold
+    - accent-fold includes. Arrows, Home/End, PageUp/PageDown, Enter, Escape.
+  - `Markdown` / `MarkdownContent` (`atlas-react-kit/markdown`) and
+    `FormMarkdownField` (`atlas-react-kit/form/markdown-field`): sanitized
+    GFM (no Next, no raw HTML, no typography plugin). `react-markdown` and
+    `remark-gfm` are regular dependencies imported only from the markdown
+    subpath. Write / preview field uses the same `TextFieldApi` as
+    `FormTextField`.
+  - `StatTile` (`atlas-react-kit/stat-tile`): label, tabular value, optional
+    sub and children, plus `statTileGrid` and `sectionLabel`.
+  - `Meter` (`atlas-react-kit/meter`): track, fill, optional markers
+    (`position` on the value scale). `role="meter"` with aria values.
+    Separate from `Progress`.
+  - `Slider` (`atlas-react-kit/slider`): Radix Slider, number `value`,
+    44px thumb hit, square track, primary fill, solid focus ring.
 
 ## 0.5.0 - 2026-10-10
 
