@@ -2,9 +2,11 @@
 
 ## 0.5.0 - 2026-10-10
 
-Minor release so apps can use the new `FormTextField` `id`, the public
-`tabsTriggerVariants` export, and the shipped agent skill, and pick up
-QA fixes for Combobox, the theme shortcut, and range picking.
+Minor release that adds 11 components (accordion, alert, avatar, breadcrumb,
+dropdown menu, pagination, progress, radio group, spinner, switch, and
+tooltip), the shipped agent skill, the `FormTextField` `id` prop, and the
+public `tabsTriggerVariants` export, plus QA fixes for Combobox, the theme
+shortcut, and range picking. Everything is additive; no existing API changed.
 
 - The package ships `skills/atlas-react-kit/SKILL.md`, an agent skill that
   points AI coding assistants at the guides for the installed version, maps
