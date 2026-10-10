@@ -44,6 +44,29 @@ keyboard and screen-reader testing.
 - Keep the focus rings the kit ships. Content that scrolls must be reachable
   by keyboard; `Table` adds itself to the tab order while it overflows.
 
+## Writing
+
+Write labels and messages in sentence case; components that display uppercase
+(buttons, card and dialog titles, badges) apply it with CSS, so screen readers
+still read normal words.
+
+- **Buttons** say what happens: a verb and, when needed, a noun ("Save",
+  "Export orders", "Delete order"). Avoid "OK", "Submit", and "Click here".
+  In a confirmation dialog, the confirm button repeats the action from the
+  title ("Delete order?" / "Delete order").
+- **Errors** say what happened and what to do next, in plain words: "Could
+  not save. Check your connection and try again." Don't blame the user or
+  show only a code. Field errors name the fix: "Enter an email address like
+  name@company.com."
+- **Empty states** say what will appear and how to add the first one: "No
+  orders yet. Orders you create show up here."
+- **Toasts** confirm in past tense and stay short ("Settings saved"). Anything
+  the user must act on belongs in an `Alert` or dialog, not a toast.
+- **Placeholders** show an example, never the label; every field keeps a
+  visible `Label`.
+- Skip "please", exclamation marks, and filler ("Successfully saved" is
+  "Saved"). Use numerals, and `tabular-nums` where numbers line up in columns.
+
 ## Shape and composition
 
 Primitives have square corners. Reserve `rounded-full` for dots, avatars, and

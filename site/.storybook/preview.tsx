@@ -1,8 +1,17 @@
 import type { PropsWithChildren } from "react"
 import type { Preview, ReactRenderer } from "@storybook/react-vite"
 import {
+  Controls,
+  Description,
   DocsContainer,
   type DocsContainerProps,
+  Heading,
+  Markdown,
+  Primary,
+  Stories,
+  Subtitle,
+  Title,
+  useOf,
 } from "@storybook/addon-docs/blocks"
 import { withThemeByClassName } from "@storybook/addon-themes"
 import { MINIMAL_VIEWPORTS } from "storybook/viewport"
@@ -18,7 +27,38 @@ const atlasViewports = {
 
 import { ThemeProvider } from "../../src/theme-provider.js"
 import { Toaster } from "../../src/sonner.js"
+import { usage } from "../src/lib/usage.js"
 import "../src/styles.css"
+
+/** "Usage" guidance for the component this docs page documents. */
+function UsageBlock() {
+  const { preparedMeta } = useOf("meta", ["meta"])
+  const guidance = usage[preparedMeta.title.replace(/^Components\//, "")]
+  if (!guidance) return null
+  return (
+    <>
+      <Heading>Usage</Heading>
+      <div className="markdown">
+        <Markdown>{guidance}</Markdown>
+      </div>
+    </>
+  )
+}
+
+/** Storybook's default autodocs page with a Usage section after the description. */
+function DocsPage() {
+  return (
+    <>
+      <Title />
+      <Subtitle />
+      <Description />
+      <UsageBlock />
+      <Primary />
+      <Controls />
+      <Stories />
+    </>
+  )
+}
 
 const preview: Preview = {
   tags: ["autodocs"],
@@ -32,6 +72,7 @@ const preview: Preview = {
     // CI runs axe on every story (tests/a11y.test.mjs); show failures as errors.
     a11y: { test: "error" },
     docs: {
+      page: DocsPage,
       // One Toaster per docs page. The story decorator skips its own in docs
       // mode, or every story on the page would show the same toast.
       container: ({

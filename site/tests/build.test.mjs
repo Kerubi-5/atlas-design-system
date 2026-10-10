@@ -176,6 +176,26 @@ function storyIdFromPath(storyPath) {
   return /^\/(?:docs|story)\/([\w-]+--[\w-]+)$/.exec(storyPath)?.[1]
 }
 
+test("every component story has usage guidance", async () => {
+  const storiesDir = path.join(siteRoot, "stories")
+  const usageSource = await fs.readFile(
+    path.join(siteRoot, "src/lib/usage.ts"),
+    "utf8"
+  )
+  const keys = new Set(
+    [...usageSource.matchAll(/^  (?:"([^"]+)"|(\w+)): `/gm)].map(
+      (match) => match[1] ?? match[2]
+    )
+  )
+  for (const file of await fs.readdir(storiesDir)) {
+    if (!file.endsWith(".stories.tsx")) continue
+    const source = await fs.readFile(path.join(storiesDir, file), "utf8")
+    const title = /title: "Components\/([^"]+)"/.exec(source)?.[1]
+    if (!title) continue
+    assert.ok(keys.has(title), `${file}: add "${title}" to src/lib/usage.ts`)
+  }
+})
+
 test("hosting serves Storybook from the site root without an SPA fallback", async () => {
   const config = JSON.parse(
     await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")
