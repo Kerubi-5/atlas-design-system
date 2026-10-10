@@ -58,7 +58,7 @@ Import each component from its subpath, e.g.
 | Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                      |
 | Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                        |
 | View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()` |
-| Status chip (paid, pending, failed)             | `Badge variant="soft"` (`success`, `warning`, `neutral` tones); `variant="destructive"` for failed  |
+| Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success"`, `"warning"`, `"destructive"`, or `"neutral"`          |
 | Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                 |
 | Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                     |
 | Grouped content                                 | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                         |
@@ -98,11 +98,15 @@ list; the ones that come up most:
   current nav item, chip, row, or toggle. Grey fills read as hover, not
   selection.
 - **Status**: `success`, `warning`, and `destructive` for good, caution, and
-  bad. Use them as text or soft tints (the `Badge` tones). The destructive tint
-  is too low-contrast in light mode, so show bad states as plain destructive
-  text (`Badge variant="destructive"`) rather than overriding a soft badge's
-  colors. There is no foreground token for text on a solid status fill, so
-  avoid that combination too.
+  bad. Use them as text or soft tints (the `Badge` tones), which meet AA in
+  both themes. Don't override a soft badge's colors. There is no foreground
+  token for text on a solid status fill, so avoid that combination.
+- **Brand-colored text**: `text-selected-foreground`, not `text-primary`,
+  which is too dark to read on the dark background.
+- **Accessibility**: the kit targets WCAG 2.2 AA. Give every control a name
+  (`Label htmlFor`, or `aria-label` on icon-only buttons and an unlabelled
+  `Combobox`), keep the shipped focus rings, and don't lower contrast with raw
+  colors or opacity.
 - **Square corners**: primitives have none. Use `rounded-full` only for real
   circles (avatars, dots). Adding `rounded-md` to a card or button breaks the
   system.

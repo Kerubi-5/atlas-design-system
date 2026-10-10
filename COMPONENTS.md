@@ -84,7 +84,7 @@ action. Pass `side` to prefer a placement; Radix still flips on collision.
 `FormDatePickerField` forwards `className` to that trigger.
 
 Outline and ghost `Button` hover and focus use `border-primary`,
-`text-primary`, and `bg-selected`. They do not use a muted grey fill, including
+`text-selected-foreground`, and `bg-selected`. They do not use a muted grey fill, including
 when the control sits on a selected row (for example "Clear selection").
 
 ```tsx

@@ -29,7 +29,8 @@ const preview: Preview = {
     options: {
       storySort: { order: ["Docs", "Tokens", "Components", "Examples"] },
     },
-    a11y: { test: "todo" },
+    // CI runs axe on every story (tests/a11y.test.mjs); show failures as errors.
+    a11y: { test: "error" },
     docs: {
       // One Toaster per docs page. The story decorator skips its own in docs
       // mode, or every story on the page would show the same toast.

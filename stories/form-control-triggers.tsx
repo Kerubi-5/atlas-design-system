@@ -36,6 +36,7 @@ export function FormControlTriggersStory() {
         options={formControlOptions}
         value="usd"
         onValueChange={() => {}}
+        aria-label="Combobox trigger"
       />
     </div>
   )
