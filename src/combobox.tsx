@@ -224,7 +224,8 @@ export function Combobox({
                     className={cn(
                       "relative flex w-full cursor-default items-center gap-2 rounded-none py-2 pr-8 pl-3 text-left text-sm outline-hidden select-none",
                       isSelected && "bg-selected text-selected-foreground",
-                      isActive && "bg-accent text-accent-foreground"
+                      isActive &&
+                        "bg-accent text-accent-foreground shadow-[inset_2px_0_0_var(--color-ring)]"
                     )}
                     onMouseEnter={() => setHighlight(index)}
                     onClick={() => selectValue(option.value)}

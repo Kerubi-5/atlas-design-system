@@ -62,7 +62,7 @@ function PaginationLink({
           variant: isActive ? "outline" : "ghost",
           size: size === "icon" ? "icon-sm" : "sm",
         }),
-        "font-medium tracking-normal normal-case tabular-nums data-[active=true]:border-primary data-[active=true]:bg-selected data-[active=true]:text-selected-foreground",
+        "font-medium tracking-normal normal-case tabular-nums data-[active=true]:border-selected-foreground data-[active=true]:bg-selected data-[active=true]:text-selected-foreground",
         className
       )}
       {...props}

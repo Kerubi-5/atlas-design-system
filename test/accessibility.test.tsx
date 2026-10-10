@@ -1,8 +1,15 @@
+import { readdirSync, readFileSync } from "node:fs"
+import path from "node:path"
+import { fileURLToPath } from "node:url"
+
 import { describe, expect, it } from "vitest"
 
 import { Calendar } from "../src/calendar.js"
 import { Combobox } from "../src/combobox.js"
+import { tabsTriggerVariants } from "../src/internal/tabs-styles.js"
 import { Table, TableBody, TableCell, TableRow } from "../src/table.js"
+import { Toggle } from "../src/toggle.js"
+import { ToggleGroup, ToggleGroupItem } from "../src/toggle-group.js"
 
 import { render, screen, waitFor } from "./helpers.js"
 
@@ -94,5 +101,45 @@ describe("Table scroll region", () => {
         }
       }
     }
+  })
+})
+
+describe("focus and state cues (WCAG 1.4.11)", () => {
+  const srcDir = path.resolve(
+    path.dirname(fileURLToPath(import.meta.url)),
+    "../src"
+  )
+  const sources = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
+    .filter((file) => /\.tsx?$/.test(file))
+    .map(
+      (file) => [file, readFileSync(path.join(srcDir, file), "utf8")] as const
+    )
+
+  it("draws focus with the solid ring color, never a translucent one", () => {
+    expect(sources.length).toBeGreaterThan(20)
+    for (const [file, source] of sources) {
+      expect(
+        source.match(/(focus-visible|\/day):ring-(ring|primary)\/\d+/g),
+        file
+      ).toBeNull()
+    }
+  })
+
+  it("marks pressed toggles, toggle-group items, and active tabs with a border", () => {
+    render(<Toggle aria-label="Bold" pressed />)
+    expect(screen.getByRole("button", { name: "Bold" }).className).toContain(
+      "aria-pressed:border-selected-foreground"
+    )
+    render(
+      <ToggleGroup type="single" defaultValue="list" aria-label="View">
+        <ToggleGroupItem value="list">List</ToggleGroupItem>
+      </ToggleGroup>
+    )
+    expect(screen.getByRole("radio", { name: "List" }).className).toContain(
+      "data-[state=on]:border-selected-foreground"
+    )
+    expect(tabsTriggerVariants()).toContain(
+      'data-[state="active"]:border-selected-foreground'
+    )
   })
 })

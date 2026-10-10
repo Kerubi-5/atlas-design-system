@@ -11,7 +11,7 @@
     "storybook": "storybook dev -p 6006 --no-open --disable-telemetry",
     "build-storybook": "storybook build -o dist --disable-telemetry",
     "test:build": "node --test tests/build.test.mjs",
-    "test:a11y": "node --test tests/a11y.test.mjs",
+    "test:a11y": "node --test tests/contrast.test.mjs tests/a11y.test.mjs",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots",
     "preview": "vite preview"

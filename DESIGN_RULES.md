@@ -11,14 +11,16 @@ Use semantic colors, radii, and fonts: `bg-primary`, `text-muted-foreground`,
 light/dark color pairs; tokens already switch with the theme.
 
 Selected or active navigation, tabs, toggles, chips, rows, and labels use
-`bg-selected text-selected-foreground`. Outline and ghost buttons hover and
-focus with `border-primary`, `text-selected-foreground`, and the selected wash,
-not a muted grey fill. Table row hover can stay `hover:bg-muted`. The shipped
-controls apply this distinction.
+`bg-selected text-selected-foreground` plus a `border-selected-foreground`
+border or bar: the wash alone is too faint to show state (1.2:1 against the
+page). Outline and ghost buttons hover with `border-selected-foreground`,
+`text-selected-foreground`, and the selected wash, not a muted grey fill.
+Table row hover can stay `hover:bg-muted`. The shipped controls apply this
+distinction.
 
 For brand-colored text (links, hovered labels), use `text-selected-foreground`:
 it is the primary purple in light mode and a lighter purple in dark mode.
-`text-primary` as text fails contrast on the dark background (about 2:1).
+`text-primary` as text fails contrast on the dark background (about 3.6:1).
 
 Use `success`, `warning`, and `destructive` for good, caution, and bad states.
 For tinted status chips, use `Badge variant="soft"` with `tone="success"`,
@@ -30,8 +32,9 @@ belong to the application.
 ## Accessibility
 
 The target is WCAG 2.2 AA. CI runs axe-core's WCAG 2.2 A and AA rules against
-every Storybook story in light and dark mode (`npm run test:a11y --prefix
-site`), and a violation fails the build. Automated checks do not replace
+every Storybook story in light and dark mode, and checks the theme's token
+pairs for text and non-text contrast in both themes (`npm run test:a11y
+--prefix site`). A violation fails the build. Automated checks do not replace
 keyboard and screen-reader testing.
 
 - Text meets 4.5:1 against its background. The token pairs are tuned for it,
@@ -41,8 +44,16 @@ keyboard and screen-reader testing.
   `aria-label` on icon-only buttons and an unlabelled `Combobox`.
 - Visible text is part of the accessible name, so speech users can say what
   they see (the calendar labels days "September 27", not "27th").
-- Keep the focus rings the kit ships. Content that scrolls must be reachable
-  by keyboard; `Table` adds itself to the tab order while it overflows.
+- Non-text contrast is 3:1 against what the element sits on (WCAG 1.4.11):
+  field, checkbox, radio, and switch boundaries (`border-input`), checked
+  fills (`bg-primary`), selected borders (`border-selected-foreground`), and
+  the focus ring. `border-border` is for dividers and card edges only; never
+  make it the only boundary of a control.
+- Focus is a solid `ring-ring` (brand purple), never a translucent ring such
+  as `ring-ring/30`, which fades below 3:1. Keyboard-highlighted menu and list
+  items show a 2px `ring` bar on their leading edge. Content that scrolls must
+  be reachable by keyboard; `Table` adds itself to the tab order while it
+  overflows.
 
 ## Writing
 

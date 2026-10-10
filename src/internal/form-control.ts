@@ -7,4 +7,4 @@
  * outline Button's purple selected wash.
  */
 export const formControlTriggerClassName =
-  "h-10 w-full border-input bg-background px-3 font-normal text-base tracking-normal shadow-xs normal-case md:text-sm hover:border-input hover:bg-background hover:text-foreground focus-visible:border-ring focus-visible:text-foreground focus-visible:ring-ring/30 aria-expanded:border-input aria-expanded:bg-background aria-expanded:text-foreground has-data-[icon=inline-start]:pl-3 has-data-[icon=inline-end]:pr-3 dark:hover:bg-background dark:aria-expanded:bg-background"
+  "h-10 w-full border-input bg-background px-3 font-normal text-base tracking-normal shadow-xs normal-case md:text-sm hover:border-input hover:bg-background hover:text-foreground focus-visible:border-ring focus-visible:text-foreground focus-visible:ring-ring aria-expanded:border-input aria-expanded:bg-background aria-expanded:text-foreground has-data-[icon=inline-start]:pl-3 has-data-[icon=inline-end]:pr-3 dark:hover:bg-background dark:aria-expanded:bg-background"

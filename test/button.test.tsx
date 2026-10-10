@@ -12,12 +12,10 @@ import { render, screen } from "./helpers.js"
 describe("Button quiet hover", () => {
   it("uses brand purple chrome instead of a muted grey fill", () => {
     for (const token of [
-      "hover:border-primary",
+      "hover:border-selected-foreground",
       "hover:bg-selected",
       "hover:text-selected-foreground",
-      "focus-visible:border-primary",
       "focus-visible:text-selected-foreground",
-      "focus-visible:ring-primary/30",
     ]) {
       expect(quietButtonInteraction.split(/\s+/)).toContain(token)
     }
@@ -34,7 +32,11 @@ describe("Button quiet hover", () => {
       expect(button.className.split(/\s+/)).toContain(
         "hover:text-selected-foreground"
       )
-      expect(button.className.split(/\s+/)).toContain("hover:border-primary")
+      expect(button.className.split(/\s+/)).toContain(
+        "hover:border-selected-foreground"
+      )
+      // Focus is the shared solid ring, not a translucent glow (WCAG 1.4.11).
+      expect(button.className.split(/\s+/)).toContain("focus-visible:ring-ring")
       expect(button.className.split(/\s+/)).not.toContain("hover:bg-muted")
     }
 
@@ -55,9 +57,9 @@ describe("Button quiet hover", () => {
   it("documents the hover chrome with a static story", () => {
     render(<QuietButtonHoverStory />)
     const hovered = screen.getByRole("button", { name: "Clear selection" })
-    expect(hovered.className.split(/\s+/)).toContain("border-primary")
+    expect(hovered.className.split(/\s+/)).toContain("border-ring")
     expect(hovered.className.split(/\s+/)).toContain("bg-selected")
     expect(hovered.className.split(/\s+/)).toContain("text-selected-foreground")
-    expect(hovered.className.split(/\s+/)).toContain("ring-primary/30")
+    expect(hovered.className.split(/\s+/)).toContain("ring-ring")
   })
 })
