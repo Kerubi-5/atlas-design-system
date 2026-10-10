@@ -15,7 +15,7 @@ import { DropdownMenuStory } from "../../stories/menus.js"
 type Args = { open: boolean; label: string; destructiveItem: boolean }
 
 const meta = {
-  title: "Components/Dropdown menu",
+  title: "Actions/Dropdown menu",
   args: { open: false, label: "Actions", destructiveItem: true },
   argTypes: {
     open: { control: "boolean" },

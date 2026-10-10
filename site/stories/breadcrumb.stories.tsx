@@ -13,7 +13,7 @@ import { BreadcrumbStory } from "../../stories/wayfinding.js"
 type Args = { section: string; page: string }
 
 const meta = {
-  title: "Components/Breadcrumb",
+  title: "Navigation/Breadcrumb",
   args: { section: "Orders", page: "Order 1042" },
   argTypes: {
     section: { control: "text" },

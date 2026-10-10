@@ -4,7 +4,7 @@ import { Badge } from "../../src/badge.js"
 import { Button } from "../../src/button.js"
 
 const meta = {
-  title: "Components/Theme provider",
+  title: "Foundations/Theme provider",
   parameters: {
     controls: { disable: true },
     docs: {

@@ -7,7 +7,7 @@ import { Slider } from "../../src/slider.js"
 import { SliderStory } from "../../stories/slider.js"
 
 const meta = {
-  title: "Components/Slider",
+  title: "Forms/Slider",
   component: Slider,
   args: {
     value: 40,

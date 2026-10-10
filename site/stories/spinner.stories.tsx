@@ -4,7 +4,7 @@ import { Spinner } from "../../src/spinner.js"
 import { SpinnerStory } from "../../stories/feedback.js"
 
 const meta = {
-  title: "Components/Spinner",
+  title: "Feedback/Spinner",
   component: Spinner,
   args: { "aria-label": "Loading", className: "size-4" },
   argTypes: {

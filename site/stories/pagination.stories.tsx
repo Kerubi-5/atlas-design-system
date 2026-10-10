@@ -14,7 +14,7 @@ import { PaginationStory } from "../../stories/wayfinding.js"
 type Args = { page: number; pageCount: number }
 
 const meta = {
-  title: "Components/Pagination",
+  title: "Navigation/Pagination",
   args: { page: 2, pageCount: 5 },
   argTypes: {
     page: { control: { type: "number", min: 1, max: 10 } },

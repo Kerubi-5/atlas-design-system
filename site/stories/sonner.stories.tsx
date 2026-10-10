@@ -6,7 +6,7 @@ import { ToastStory } from "../../stories/overlays.js"
 
 type Args = { message: string }
 const meta = {
-  title: "Components/Sonner",
+  title: "Feedback/Sonner",
   args: { message: "Saved" },
   argTypes: { message: { control: "text" } },
   render: (args) => (

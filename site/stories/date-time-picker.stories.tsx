@@ -16,7 +16,7 @@ type Args = {
 }
 
 const meta = {
-  title: "Components/Date time picker",
+  title: "Forms/Date time picker",
   args: {
     value: "2026-10-10T14:30",
     placeholder: "Pick a date and time",

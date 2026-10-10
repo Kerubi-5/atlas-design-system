@@ -20,7 +20,7 @@ type Args = {
 }
 
 const meta = {
-  title: "Components/Popover",
+  title: "Overlays/Popover",
   args: {
     open: false,
     title: "Shortcuts",

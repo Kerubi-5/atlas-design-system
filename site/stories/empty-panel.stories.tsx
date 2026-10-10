@@ -4,7 +4,7 @@ import { EmptyPanel } from "../../src/empty-panel.js"
 import { EmptyPanelStory } from "../../stories/display.js"
 
 const meta = {
-  title: "Components/Empty panel",
+  title: "Feedback/Empty panel",
   component: EmptyPanel,
   args: {
     children: "Nothing to show",

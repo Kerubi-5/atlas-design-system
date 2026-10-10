@@ -15,7 +15,7 @@ function Boom({ shouldThrow }: { shouldThrow: boolean }) {
 }
 
 const meta = {
-  title: "Components/Error boundary",
+  title: "Feedback/Error boundary",
   parameters: {
     docs: {
       description: {

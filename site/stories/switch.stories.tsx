@@ -7,7 +7,7 @@ import { Switch } from "../../src/switch.js"
 import { SwitchStory } from "../../stories/choices.js"
 
 const meta = {
-  title: "Components/Switch",
+  title: "Forms/Switch",
   component: Switch,
   args: { checked: true, disabled: false, "aria-invalid": false },
   argTypes: {

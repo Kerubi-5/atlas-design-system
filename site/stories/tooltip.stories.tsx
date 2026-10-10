@@ -12,7 +12,7 @@ type Args = {
 }
 
 const meta = {
-  title: "Components/Tooltip",
+  title: "Overlays/Tooltip",
   args: { open: false, content: "Copy link", side: "top" },
   argTypes: {
     open: { control: "boolean" },

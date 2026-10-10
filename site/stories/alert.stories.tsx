@@ -12,7 +12,7 @@ type Args = {
 }
 
 const meta = {
-  title: "Components/Alert",
+  title: "Feedback/Alert",
   args: {
     variant: "destructive",
     title: "Could not save",

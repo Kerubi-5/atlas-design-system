@@ -7,7 +7,7 @@ import { Label } from "../../src/label.js"
 import { formControlOptions } from "../../stories/form-control-triggers.js"
 
 const meta = {
-  title: "Components/Combobox",
+  title: "Forms/Combobox",
   component: Combobox,
   args: {
     options: formControlOptions,

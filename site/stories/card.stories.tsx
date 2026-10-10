@@ -21,7 +21,7 @@ type Args = {
 }
 
 const meta = {
-  title: "Components/Card",
+  title: "Layout/Card",
   component: Card,
   args: {
     title: "Profile",

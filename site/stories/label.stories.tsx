@@ -5,7 +5,7 @@ import { Input } from "../../src/input.js"
 import { Label } from "../../src/label.js"
 
 const meta = {
-  title: "Components/Label",
+  title: "Forms/Label",
   component: Label,
   args: { children: "Email address" },
   argTypes: { children: { control: "text" } },
