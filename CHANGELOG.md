@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.7.0 - 2026-10-10
+
+Minor release: one toast setup for every app. No existing API was removed;
+toasts look different (kit-styled, with a close button).
 
 - `atlas-react-kit/sonner` exports `toast`. Import it from the kit instead
   of from `sonner`, and drop `sonner` from the app's own dependencies: an app
