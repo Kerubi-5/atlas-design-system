@@ -41,8 +41,8 @@ export function OutlineOnSelectedStory() {
 }
 
 /**
- * Static stand-in for `:hover` / `:focus-visible` so tests and captures can
- * assert the purple chrome without a pointer.
+ * Static stand-in for `:hover` + `:focus-visible` so tests and captures can
+ * assert the purple chrome and the solid focus ring without a pointer.
  */
 export function QuietButtonHoverStory() {
   return (
@@ -51,14 +51,14 @@ export function QuietButtonHoverStory() {
         type="button"
         variant="outline"
         size="sm"
-        className="border-primary bg-selected text-selected-foreground ring-2 ring-primary/30"
+        className="border-ring bg-selected text-selected-foreground ring-2 ring-ring"
       >
         Clear selection
       </Button>
       <Button
         type="button"
         variant="ghost"
-        className="border-primary bg-selected text-selected-foreground ring-2 ring-primary/30"
+        className="border-ring bg-selected text-selected-foreground ring-2 ring-ring"
       >
         Ghost
       </Button>

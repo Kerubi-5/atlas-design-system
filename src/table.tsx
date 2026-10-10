@@ -42,7 +42,7 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       ref={containerRef}
       data-slot="table-container"
       tabIndex={scrollable ? 0 : undefined}
-      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+      className="relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       <table
         data-slot="table"
@@ -91,7 +91,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-selected",
+        "border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-selected data-[state=selected]:shadow-[inset_2px_0_0_var(--color-selected-foreground)]",
         className
       )}
       {...props}

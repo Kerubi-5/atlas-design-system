@@ -25,7 +25,7 @@ no root component barrel.
 | `error-boundary`              | `ErrorBoundary`, `ErrorFallback`; optional `message`; retry resets, reload refreshes the page                                                                                                                                                                                                    |
 | `field`                       | Field, label, legend, description, group, set, title, content, separator, error; `Field` supports `orientation`                                                                                                                                                                                  |
 | `input`, `textarea`, `label`  | `Input`, `Textarea`, `Label`                                                                                                                                                                                                                                                                     |
-| `pagination`                  | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink` (`isActive` sets `aria-current` and the selected wash), `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`                                                                                                       |
+| `pagination`                  | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink` (`isActive` sets `aria-current`, the selected wash, and a selected border), `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`                                                                                   |
 | `popover`                     | `Popover`, trigger, anchor, content, header, title, description                                                                                                                                                                                                                                  |
 | `progress`                    | `Progress`; Radix props, `value` 0–100; label it with `aria-label` or `aria-labelledby`                                                                                                                                                                                                          |
 | `radio-group`                 | `RadioGroup`, `RadioGroupItem`; short visible lists; arrow keys move the selection; round dots                                                                                                                                                                                                   |
@@ -109,9 +109,10 @@ capped at `min(100vw - 2rem, 24rem)` so it stays on-screen at 390px. Pass
 `side` to prefer a placement. `FormDateTimePickerField` forwards `className`
 and `timeStep` to that control.
 
-Outline and ghost `Button` hover and focus use `border-primary`,
-`text-selected-foreground`, and `bg-selected`. They do not use a muted grey fill, including
-when the control sits on a selected row (for example "Clear selection").
+Outline and ghost `Button` hover uses `border-selected-foreground`,
+`text-selected-foreground`, and `bg-selected`; keyboard focus adds the shared
+solid `ring-ring`. They do not use a muted grey fill, including when the
+control sits on a selected row (for example "Clear selection").
 
 ```tsx
 import { DateTimePickerButton } from "atlas-react-kit/date-time-picker"

@@ -95,9 +95,10 @@ list; the ones that come up most:
   `border-border`, `bg-card`, `text-destructive`. Raw palette classes
   (`bg-purple-600`, `text-gray-500`) and paired `dark:` colors drift from the
   theme; tokens already switch with light and dark.
-- **Selected and active state**: `bg-selected text-selected-foreground` for the
-  current nav item, chip, row, or toggle. Grey fills read as hover, not
-  selection.
+- **Selected and active state**: `bg-selected text-selected-foreground` plus
+  a `border-selected-foreground` border (or bar) for the current nav item,
+  chip, row, or toggle; the wash alone is too faint to show state. Grey fills
+  read as hover, not selection.
 - **Status**: `success`, `warning`, and `destructive` for good, caution, and
   bad. Use them as text or soft tints (the `Badge` tones), which meet AA in
   both themes. Don't override a soft badge's colors. There is no foreground
@@ -106,8 +107,9 @@ list; the ones that come up most:
   which is too dark to read on the dark background.
 - **Accessibility**: the kit targets WCAG 2.2 AA. Give every control a name
   (`Label htmlFor`, or `aria-label` on icon-only buttons and an unlabelled
-  `Combobox`), keep the shipped focus rings, and don't lower contrast with raw
-  colors or opacity.
+  `Combobox`), keep the shipped focus rings (solid `ring-ring`, never
+  `ring-ring/30`), keep field borders on `border-input` (3:1; `border-border`
+  is for dividers), and don't lower contrast with raw colors or opacity.
 - **Square corners**: primitives have none. Use `rounded-full` only for real
   circles (avatars, dots). Adding `rounded-md` to a card or button breaks the
   system.
