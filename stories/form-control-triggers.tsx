@@ -1,5 +1,6 @@
 import { Combobox } from "../src/combobox.js"
 import { DatePickerButton } from "../src/date-picker.js"
+import { DateTimePickerButton } from "../src/date-time-picker.js"
 import { Input } from "../src/input.js"
 import {
   Select,
@@ -15,8 +16,9 @@ export const formControlOptions = [
 ]
 
 /**
- * Side-by-side Input, SelectTrigger, DatePickerButton, and Combobox.
- * Used by kit tests and visual captures so form chrome stays aligned.
+ * Side-by-side Input, SelectTrigger, DatePickerButton, DateTimePickerButton,
+ * and Combobox. Used by kit tests and visual captures so form chrome stays
+ * aligned.
  */
 export function FormControlTriggersStory() {
   return (
@@ -32,6 +34,10 @@ export function FormControlTriggersStory() {
         </SelectContent>
       </Select>
       <DatePickerButton value="2026-10-09" onChange={() => {}} />
+      <DateTimePickerButton
+        value={new Date(2026, 9, 10, 14, 30)}
+        onChange={() => {}}
+      />
       <Combobox
         options={formControlOptions}
         value="usd"
