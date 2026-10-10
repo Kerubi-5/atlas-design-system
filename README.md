@@ -46,10 +46,10 @@ files ship in the npm package. Shared component changes belong in this repositor
 applications compose their feature UI around the package and upgrade deliberately.
 
 Public docs and a live playground are at
-[design.querobines.com](https://design.querobines.com). The docs site shows the
-tokens in `theme.css` and these markdown guides. Its
-[Storybook playground](https://design.querobines.com/storybook/) provides editable
-component props, light/dark themes, viewport previews, and accessibility checks.
+[design.querobines.com](https://design.querobines.com). The site is Storybook:
+tokens parsed from `theme.css`, these markdown guides rendered from source, and
+editable component stories with light/dark themes, viewport previews, and
+accessibility checks.
 
 ## Development and releases
 
@@ -65,23 +65,20 @@ npm run preview --prefix site
 
 `tsc` emits individual ESM files and TypeScript declarations. CSS is shipped
 without compilation and processed by the consuming application's Tailwind build.
-The docs site is a Vite app in `site/`. `npm run build --prefix site` typechecks
-the site and stories, builds docs first, builds Storybook into
-`site/dist/storybook`, then checks the combined static output. Vercel serves
-both from `site/dist`; `/playground` redirects to `/storybook/`. The site and
-Storybook dependencies are not part of the npm package.
-The optional Next.js 16 adapter requires Next only when imported. The package
-does not bundle React.
+The public site is Storybook in `site/`. `npm run build --prefix site`
+typechecks the stories, builds Storybook into `site/dist`, then checks the
+static output. Vercel serves that directory; `/playground` and `/storybook`
+redirect to `/`. The site and Storybook dependencies are not part of the npm
+package. The optional Next.js 16 adapter requires Next only when imported. The
+package does not bundle React.
 
-Run `npm run dev --prefix site` for docs or `npm run storybook --prefix site`
-for the playground on port 6006. The docs playground link works in the combined
-production preview; the separate docs development server does not serve
-Storybook. Existing examples live in `stories/` and are imported by CSF story
-files in `site/stories/`, so component tests and previews share the same examples.
-Add Storybook entries there when adding an example; the static-output check
-reports any existing demo that has no Storybook entry. Interactive stories use
-Storybook args so changing a control or interacting with the component updates
-the same value. Configuration is in `site/.storybook/`.
+Run `npm run dev --prefix site` (or `npm run storybook --prefix site`) for the
+playground on port 6006. Existing examples live in `stories/` and are imported
+by CSF story files in `site/stories/`, so component tests and previews share the
+same examples. Add Storybook entries there when adding an example; the
+static-output check reports any existing demo that has no Storybook entry.
+Interactive stories use Storybook args so changing a control or interacting with
+the component updates the same value. Configuration is in `site/.storybook/`.
 
 The Storybook preview disables the kit's theme shortcut and uses the theme
 toolbar instead. The accessibility panel checks the rendered story; it does not

@@ -1,0 +1,10 @@
+import { Meta, Markdown } from "@storybook/addon-docs/blocks"
+
+import { rewriteDocLinks } from "../../src/lib/docs.js"
+import designRules from "../../../DESIGN_RULES.md?raw"
+
+<Meta title="Docs/Design rules" />
+
+<div className="markdown">
+  <Markdown>{rewriteDocLinks(designRules)}</Markdown>
+</div>

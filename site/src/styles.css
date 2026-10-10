@@ -6,7 +6,7 @@
 @source "../../stories";
 @source "../stories";
 @source "../.storybook";
-@source ".";
+@source "../src";
 
 @theme inline {
   --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
@@ -118,4 +118,12 @@
   border-left: 2px solid var(--primary);
   padding-left: 1rem;
   color: var(--muted-foreground);
+}
+
+/* Docs pages render in the preview iframe; keep kit type and colors. */
+.sbdocs.sbdocs-wrapper,
+.sbdocs .sbdocs-content {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
 }

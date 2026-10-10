@@ -5,7 +5,7 @@ import {
   spacingScale,
   typeSamples,
   type CssVar,
-} from "../lib/tokens.js"
+} from "./lib/tokens.js"
 
 const tokens = loadThemeTokens()
 
@@ -77,6 +77,10 @@ function TokenTable({ vars, swatch }: { vars: CssVar[]; swatch?: boolean }) {
   )
 }
 
+/**
+ * Live token reference parsed from `theme.css`. Swatches follow the Storybook
+ * theme toolbar so light and dark values stay in sync with consuming apps.
+ */
 export function TokensPage() {
   return (
     <div className="grid gap-12">
@@ -86,8 +90,7 @@ export function TokensPage() {
         </h1>
         <p className="text-sm leading-relaxed text-muted-foreground">
           Parsed from <code className="bg-muted px-1">theme.css</code>. Swatches
-          and computed values follow the active theme (press D or use the
-          toggle).
+          and computed values follow the active theme (use the toolbar).
         </p>
       </header>
 
