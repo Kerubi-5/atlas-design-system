@@ -52,3 +52,11 @@ jobs:
             site/playwright-report
             site/test-results
           retention-days: 7
+      - name: Print screenshot diffs (temporary)
+        if: failure()
+        run: |
+          for f in site/test-results/*/*-actual.png site/test-results/*/*-diff.png; do
+            echo "=== $f"
+            base64 -w 4000 "$f"
+            echo "=== end"
+          done
