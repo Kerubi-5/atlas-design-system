@@ -54,7 +54,8 @@ Import each component from its subpath, e.g.
 | Short fixed list (a handful of options)         | `Select` family from `select`                                                                       |
 | Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                        |
 | One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                   |
-| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField` from `form/*`                             |
+| Date and time (not `datetime-local`)            | `DateTimePickerButton` from `date-time-picker`                                                      |
+| Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField`, `FormDateTimePickerField` from `form/*`  |
 | Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                      |
 | Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                        |
 | View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()` |
@@ -107,8 +108,9 @@ list; the ones that come up most:
   circles (avatars, dots). Adding `rounded-md` to a card or button breaks the
   system.
 - **Don't restyle kit controls**: `Input`, `SelectTrigger`, `DatePickerButton`,
-  and `Combobox` share 40px form-control chrome. Overriding their height,
-  padding, or border makes one field look different from its neighbors.
+  `DateTimePickerButton`, and `Combobox` share 40px form-control chrome.
+  Overriding their height, padding, or border makes one field look different
+  from its neighbors.
 - **Layout overrides**: `CardContent className="px-0"` makes one section flush
   without `!important`. Tables already scroll horizontally inside cards, so do
   not wrap them in another overflow container.

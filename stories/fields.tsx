@@ -10,6 +10,7 @@ import {
   FieldLabel,
 } from "../src/field.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
+import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import { FieldError } from "../src/form/field-error.js"
 import { FormFeedbackField } from "../src/form/feedback-field.js"
 import { FormSelectField } from "../src/form/select-field.js"
@@ -63,6 +64,9 @@ export function FormHelpersStory() {
   const name = useDemoField("name", "Atlas")
   const [currency, setCurrency] = useState("usd")
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 9, 9))
+  const [dateTime, setDateTime] = useState<Date | null>(
+    new Date(2026, 9, 9, 14, 30)
+  )
 
   return (
     <div className="grid max-w-md gap-4">
@@ -80,6 +84,12 @@ export function FormHelpersStory() {
         value={date}
         onValueChange={setDate}
         placeholder="Pick a date"
+      />
+      <FormDateTimePickerField
+        label="Starts"
+        value={dateTime}
+        onValueChange={setDateTime}
+        placeholder="Pick a date and time"
       />
       <FieldError message="This name is already taken." />
       <FormFeedbackField message="Could not save. Try again." />

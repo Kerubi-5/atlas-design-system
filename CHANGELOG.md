@@ -2,8 +2,15 @@
 
 ## Unreleased
 
-Bug fixes from a QA pass, plus an agent skill. Not yet versioned; bump
-`package.json` to release.
+Date-time picker, bug fixes from a QA pass, plus an agent skill. Not yet
+versioned; bump `package.json` to release.
+
+- `DateTimePickerButton` (`atlas-react-kit/date-time-picker`) and
+  `FormDateTimePickerField` (`atlas-react-kit/form/date-time-picker-field`)
+  pick a local date and time from Calendar, hour/minute selects, and Clear.
+  The controlled value is `Date | null`. `timeStep` (default 15) steps the
+  minute list. The trigger uses the shared form-control chrome; the popover
+  stays on-screen at 390px.
 
 - The package ships `skills/atlas-react-kit/SKILL.md`, an agent skill that
   points AI coding assistants at the guides for the installed version, maps
