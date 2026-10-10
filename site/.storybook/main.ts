@@ -19,6 +19,9 @@ const config: StorybookConfig = {
     "@storybook/addon-themes",
   ],
   core: { disableTelemetry: true },
+  // Storybook links public/favicon.svg itself; iOS home screens need a PNG.
+  managerHead: (head) =>
+    `${head}<link rel="apple-touch-icon" href="./apple-touch-icon.png" />`,
   async viteFinal(config) {
     // Relative preview chunks work at the site root and in the dev server.
     config.base = "./"

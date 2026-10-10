@@ -1,14 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Atlas React Kit</title>
+  <!-- Square tile (kit primitives have square corners) with a geometric A
+       drawn as paths, so it does not depend on a font being available. -->
   <rect width="32" height="32" fill="#6d28d9" />
-  <text
-    x="16"
-    y="23"
-    text-anchor="middle"
-    font-family="IBM Plex Sans, sans-serif"
-    font-size="18"
-    font-weight="700"
+  <path
     fill="#f5f3ff"
-  >
-    A
-  </text>
+    fill-rule="evenodd"
+    d="M13.5 6h5L26 26h-4.5l-1.69-4.5h-7.62L10.5 26H6zM16 11.33 18.5 18h-5z"
+  />
 </svg>
