@@ -27,19 +27,23 @@ const atlasViewports = {
 
 import { ThemeProvider } from "../../src/theme-provider.js"
 import { Toaster } from "../../src/sonner.js"
-import { usage } from "../src/lib/usage.js"
+import { beta, usage } from "../src/lib/usage.js"
 import "../src/styles.css"
 
 /** "Usage" guidance for the component this docs page documents. */
 function UsageBlock() {
   const { preparedMeta } = useOf("meta", ["meta"])
-  const guidance = usage[preparedMeta.title.replace(/^Components\//, "")]
+  const name = preparedMeta.title.replace(/^Components\//, "")
+  const guidance = usage[name]
   if (!guidance) return null
+  const status = beta.has(name)
+    ? "**Status: beta.** The API may still change in a minor release.\n\n"
+    : ""
   return (
     <>
       <Heading>Usage</Heading>
       <div className="markdown">
-        <Markdown>{guidance}</Markdown>
+        <Markdown>{status + guidance}</Markdown>
       </div>
     </>
   )

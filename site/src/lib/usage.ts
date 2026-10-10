@@ -1,4 +1,22 @@
 /**
+ * Beta components (see COMPONENTS.md "Status"), keyed like `usage`. The build
+ * test keeps this list and COMPONENTS.md in sync.
+ */
+export const beta = new Set([
+  "Accordion",
+  "Alert",
+  "Avatar",
+  "Breadcrumb",
+  "Dropdown menu",
+  "Pagination",
+  "Progress",
+  "Radio group",
+  "Spinner",
+  "Switch",
+  "Tooltip",
+])
+
+/**
  * "When to use" guidance shown on each component's docs page, keyed by the
  * story title after `Components/`. The build test fails when a component
  * story has no entry here.

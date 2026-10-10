@@ -1,5 +1,7 @@
 const GITHUB_NOTICE =
   "https://github.com/Kerubi-5/atlas-design-system/blob/main/NOTICE"
+const GITHUB_CONTRIBUTING =
+  "https://github.com/Kerubi-5/atlas-design-system/blob/main/CONTRIBUTING.md"
 
 // Storybook's docs links turn a leading-slash href into `./?path=<href>`, so
 // targets are story paths, not full `/?path=...` URLs.
@@ -8,6 +10,7 @@ const docLinkMap: Record<string, string> = {
   "./COMPONENTS.md": "/docs/docs-components--docs",
   "./README.md": "/docs/docs-readme--docs",
   "./NOTICE": GITHUB_NOTICE,
+  "./CONTRIBUTING.md": GITHUB_CONTRIBUTING,
 }
 
 /**

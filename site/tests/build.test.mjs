@@ -196,6 +196,24 @@ test("every component story has usage guidance", async () => {
   }
 })
 
+test("beta labels match between COMPONENTS.md and the docs site", async () => {
+  const guide = await fs.readFile(path.join(repoRoot, "COMPONENTS.md"), "utf8")
+  const betaLine = /\*\*Beta\*\*[\s\S]*?:([\s\S]*?)\n\n/.exec(guide)?.[1] ?? ""
+  const inGuide = [...betaLine.matchAll(/`([a-z-]+)`/g)].map((m) => m[1]).sort()
+  const usageSource = await fs.readFile(
+    path.join(siteRoot, "src/lib/usage.ts"),
+    "utf8"
+  )
+  const betaBlock = /export const beta = new Set\(\[([\s\S]*?)\]\)/.exec(
+    usageSource
+  )?.[1]
+  const inSite = [...(betaBlock ?? "").matchAll(/"([^"]+)"/g)]
+    .map((m) => m[1].toLowerCase().replaceAll(" ", "-"))
+    .sort()
+  assert.ok(inGuide.length > 0, "COMPONENTS.md lists beta components")
+  assert.deepEqual(inSite, inGuide)
+})
+
 test("hosting serves Storybook from the site root without an SPA fallback", async () => {
   const config = JSON.parse(
     await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")

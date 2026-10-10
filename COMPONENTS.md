@@ -50,6 +50,18 @@ no root component barrel.
 | `utils`                      | `cn`, `onInputChange`                                                                                                                                                                                                                                                                            |
 | `theme.css`                  | Tailwind 4 theme; installation in [README](./README.md)                                                                                                                                                                                                                                          |
 
+## Status
+
+Components are **stable** unless listed here. Stable components change
+through the deprecation policy in
+[CONTRIBUTING.md](https://github.com/Kerubi-5/atlas-design-system/blob/main/CONTRIBUTING.md):
+a deprecation notice first, removal in a later minor release.
+
+**Beta** components may still change shape in a minor release; the
+changelog calls out every change: `accordion`, `alert`, `avatar`,
+`breadcrumb`, `dropdown-menu`, `pagination`, `progress`, `radio-group`,
+`spinner`, `switch`, `tooltip`.
+
 ## Forms
 
 `TextFieldApi` is a structural interface, with no form library dependency:
