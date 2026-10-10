@@ -43,6 +43,25 @@ test("Storybook is the static site at the output root", async () => {
   }
 })
 
+test("the site ships its own icon set", async () => {
+  const html = await fs.readFile(path.join(output, "index.html"), "utf8")
+  assert.match(
+    html,
+    /<link rel="icon" type="image\/svg\+xml" href="\.\/favicon\.svg"/
+  )
+  assert.match(
+    html,
+    /<link rel="apple-touch-icon" href="\.\/apple-touch-icon\.png"/
+  )
+  const favicon = await fs.readFile(path.join(output, "favicon.svg"), "utf8")
+  // Paths, not <text>: favicons render without the page's web fonts.
+  assert.match(favicon, /<path\b/)
+  assert.doesNotMatch(favicon, /<text\b/)
+  const touch = await fs.readFile(path.join(output, "apple-touch-icon.png"))
+  assert.equal(touch.readUInt32BE(16), 180, "touch icon is 180px wide")
+  assert.equal(touch.readUInt32BE(20), 180, "touch icon is 180px tall")
+})
+
 test("required interactive stories, tokens, and docs survive the static build", async () => {
   const index = JSON.parse(
     await fs.readFile(path.join(output, "index.json"), "utf8")
