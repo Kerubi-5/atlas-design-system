@@ -67,6 +67,26 @@ describe("InfoTip", () => {
     restore()
   })
 
+  it("stays open after a click when the pointer leaves", async () => {
+    const restore = stubMatchMedia(
+      (query) =>
+        query.includes("(hover: hover)") && query.includes("(pointer: fine)")
+    )
+    const user = createUser()
+    render(
+      <div>
+        <InfoTip label="Hint" title="Hint title" description="Longer help." />
+        <button type="button">Away</button>
+      </div>
+    )
+
+    await user.click(screen.getByRole("button", { name: "Hint" }))
+    expect(await screen.findByText("Hint title")).toBeVisible()
+    await user.hover(screen.getByRole("button", { name: "Away" }))
+    expect(screen.getByText("Hint title")).toBeVisible()
+    restore()
+  })
+
   it("does not open on hover for a coarse pointer", async () => {
     const restore = stubMatchMedia(false)
     const user = createUser()

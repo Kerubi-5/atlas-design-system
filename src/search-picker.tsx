@@ -63,7 +63,6 @@ function SearchPicker<T>({
   className,
 }: SearchPickerProps<T>) {
   const [query, setQuery] = React.useState("")
-  const [highlight, setHighlight] = React.useState(0)
   const listId = React.useId()
   const inputId = React.useId()
 
@@ -72,9 +71,16 @@ function SearchPicker<T>({
     [items, filter, query, getLabel]
   )
 
+  const selectedIndex = React.useMemo(() => {
+    const index = filtered.findIndex((item) => getValue(item) === value)
+    return index >= 0 ? index : 0
+  }, [filtered, getValue, value])
+
+  const [highlight, setHighlight] = React.useState(selectedIndex)
+
   React.useEffect(() => {
-    setHighlight(0)
-  }, [query])
+    setHighlight(query ? 0 : selectedIndex)
+  }, [query, selectedIndex])
 
   const optionId = (index: number) => `${listId}-option-${index}`
   const active = filtered[highlight]
@@ -182,8 +188,10 @@ function SearchPicker<T>({
                   className={cn(
                     "relative flex w-full cursor-default items-center rounded-none py-2 pr-3 pl-3 text-left text-sm outline-hidden select-none",
                     isSelected && "bg-selected text-selected-foreground",
+                    isActive && "shadow-[inset_2px_0_0_var(--color-ring)]",
                     isActive &&
-                      "bg-accent text-accent-foreground shadow-[inset_2px_0_0_var(--color-ring)]"
+                      !isSelected &&
+                      "bg-accent text-accent-foreground"
                   )}
                   onMouseEnter={() => setHighlight(index)}
                   onClick={() => selectItem(item)}

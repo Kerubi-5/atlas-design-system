@@ -13,6 +13,7 @@ export function InfoTipStory() {
           label="About depth"
           title="Depth"
           description="Height of standing water at this point."
+          side="bottom"
           badge={
             <Badge variant="soft" tone="neutral">
               Scale

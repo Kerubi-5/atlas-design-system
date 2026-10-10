@@ -26,10 +26,7 @@ const stories: Array<{ id: string; open?: (page: Page) => Promise<void> }> = [
   { id: "components-color-legend--scale" },
   { id: "components-search-picker--example" },
   { id: "components-markdown--gfm" },
-  {
-    id: "components-info-tip--layouts",
-    open: (page) => page.getByRole("button", { name: "About depth" }).click(),
-  },
+  { id: "components-info-tip--layouts" },
   {
     id: "components-dropdown-menu--row-actions",
     open: (page) => page.getByRole("button", { name: "Actions" }).click(),

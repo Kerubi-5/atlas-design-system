@@ -58,6 +58,7 @@ function InfoTip({
 }: InfoTipProps) {
   const [open, setOpen] = React.useState(false)
   const closeTimer = React.useRef<number | null>(null)
+  const hoverOpened = React.useRef(false)
   const inline = layout === "inline"
 
   const cancelClose = () => {
@@ -70,11 +71,12 @@ function InfoTip({
   const openFromHover = () => {
     if (!canHoverOpen()) return
     cancelClose()
+    hoverOpened.current = true
     setOpen(true)
   }
 
   const closeFromHover = () => {
-    if (!canHoverOpen()) return
+    if (!canHoverOpen() || !hoverOpened.current) return
     cancelClose()
     // Leave a beat so the pointer can travel from the glyph into the panel.
     closeTimer.current = window.setTimeout(() => setOpen(false), 120)
@@ -83,7 +85,20 @@ function InfoTip({
   React.useEffect(() => () => cancelClose(), [])
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(next) => {
+        // Hover already opened the panel; the following click should pin
+        // it, not toggle it closed (Playwright and real mice both hover
+        // before they click).
+        if (hoverOpened.current && open && !next) {
+          hoverOpened.current = false
+          return
+        }
+        hoverOpened.current = false
+        setOpen(next)
+      }}
+    >
       <PopoverTrigger asChild>
         <button
           type="button"

@@ -75,10 +75,10 @@ describe("SearchPicker", () => {
     render(<PickerHarness />)
 
     getCombobox().focus()
-    expect(activeOptionLabel()).toBe("Niño")
+    expect(activeOptionLabel()).toBe("North")
 
     await user.keyboard("{ArrowDown}")
-    expect(activeOptionLabel()).toBe("North")
+    expect(activeOptionLabel()).toBe("South")
     await user.keyboard("{End}")
     expect(activeOptionLabel()).toBe("East")
     await user.keyboard("{Home}")
