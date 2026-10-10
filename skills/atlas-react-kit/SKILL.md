@@ -39,8 +39,8 @@ and tells Tailwind to scan the kit's compiled files:
 
 Dark mode needs `ThemeProvider` from `atlas-react-kit/theme-provider` near the
 root (or a `dark` class on an ancestor). Toasts need one `<Toaster />` from
-`atlas-react-kit/sonner`; call `toast()` from the `sonner` package, which the
-app should list as its own dependency. Fix missing setup rather than working
+`atlas-react-kit/sonner`; import `toast` from `atlas-react-kit/sonner` too,
+never from `sonner` (a second copy of Sonner never reaches the kit's toaster). Fix missing setup rather than working
 around unstyled components.
 
 ## 3. Pick the kit component for the job

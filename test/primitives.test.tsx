@@ -1,6 +1,6 @@
+import * as React from "react"
 import { act } from "react"
-import { toast } from "sonner"
-import { describe, expect, it, vi } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { Checkbox } from "../src/checkbox.js"
 import {
@@ -17,13 +17,13 @@ import { Label } from "../src/label.js"
 import { SelectItem } from "../src/select.js"
 import { Separator } from "../src/separator.js"
 import { Skeleton } from "../src/skeleton.js"
-import { Toaster } from "../src/sonner.js"
+import { Toaster, toast } from "../src/sonner.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../src/tabs.js"
 import { ThemeProvider } from "../src/theme-provider.js"
 
-import { createUser, render, screen, within } from "./helpers.js"
+import { createUser, render, screen, waitFor, within } from "./helpers.js"
 
 describe("Checkbox", () => {
   it("toggles from its label and the keyboard", async () => {
@@ -199,15 +199,69 @@ describe("form adapters", () => {
 })
 
 describe("Toaster", () => {
-  it("shows a toast() message", async () => {
-    render(
+  function renderToaster(props: React.ComponentProps<typeof Toaster> = {}) {
+    return render(
       <ThemeProvider forcedTheme="light" enableShortcut={false}>
-        <Toaster />
+        <Toaster {...props} />
       </ThemeProvider>
     )
+  }
+
+  afterEach(() => {
+    act(() => {
+      toast.dismiss()
+    })
+  })
+
+  it("shows a toast() message from the kit's own toast export", async () => {
+    renderToaster()
     act(() => {
       toast("Settings saved")
     })
     expect(await screen.findByText("Settings saved")).toBeInTheDocument()
+  })
+
+  it("styles status toasts with kit tones, icons, and buttons", async () => {
+    const user = createUser()
+    const onRetry = vi.fn()
+    renderToaster()
+    act(() => {
+      toast.error("Could not save", {
+        description: "The server did not respond.",
+        action: { label: "Retry", onClick: onRetry },
+      })
+    })
+    const title = await screen.findByText("Could not save")
+    const item = title.closest("[data-sonner-toast]") as HTMLElement
+    expect(item).toHaveAttribute("data-type", "error")
+    expect(item).toHaveAttribute("data-styled", "false")
+    expect(item.className).toContain("bg-popover")
+    expect(item.className).toContain("border-destructive/40")
+    expect(item.querySelector("[data-icon] svg")).toHaveClass(
+      "text-destructive"
+    )
+    expect(screen.getByText("The server did not respond.")).toBeVisible()
+    const retry = screen.getByRole("button", { name: "Retry" })
+    expect(retry.className).toContain("bg-primary")
+    expect(retry.className).toContain("focus-visible:ring-ring")
+    await user.click(retry)
+    expect(onRetry).toHaveBeenCalled()
+  })
+
+  it("adds a labelled close button and merges app class names", async () => {
+    const user = createUser()
+    renderToaster({ toastOptions: { classNames: { toast: "app-toast" } } })
+    act(() => {
+      toast.success("Order archived")
+    })
+    const item = (await screen.findByText("Order archived")).closest(
+      "[data-sonner-toast]"
+    ) as HTMLElement
+    expect(item.className).toContain("app-toast")
+    expect(item.className).toContain("bg-popover")
+    await user.click(within(item).getByRole("button", { name: "Close toast" }))
+    await waitFor(() => {
+      expect(screen.queryByText("Order archived")).toBeNull()
+    })
   })
 })

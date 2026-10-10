@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- `atlas-react-kit/sonner` exports `toast`. Import it from the kit instead
+  of from `sonner`, and drop `sonner` from the app's own dependencies: an app
+  with a second copy of Sonner sends toasts the kit's `Toaster` never sees.
+- Toasts are drawn with kit classes (Sonner runs `unstyled`): the popover
+  surface with square corners; success, warning, and error toasts color the
+  icon, title, and border like `Alert`; action and cancel buttons are kit
+  buttons on their own row; every toast has a labelled close button
+  (`closeButton={false}` turns it off). `richColors` no longer changes the
+  look. App `toastOptions.classNames` are merged with the kit's per part.
+
 ## 0.6.1 - 2026-10-10
 
 Patch release: shared state classes and the consistency fixes they exposed.
