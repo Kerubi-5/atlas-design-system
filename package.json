@@ -20,9 +20,25 @@
     "**/*.css"
   ],
   "exports": {
+    "./accordion": {
+      "types": "./dist/accordion.d.ts",
+      "default": "./dist/accordion.js"
+    },
+    "./alert": {
+      "types": "./dist/alert.d.ts",
+      "default": "./dist/alert.js"
+    },
+    "./avatar": {
+      "types": "./dist/avatar.d.ts",
+      "default": "./dist/avatar.js"
+    },
     "./badge": {
       "types": "./dist/badge.d.ts",
       "default": "./dist/badge.js"
+    },
+    "./breadcrumb": {
+      "types": "./dist/breadcrumb.d.ts",
+      "default": "./dist/breadcrumb.js"
     },
     "./button": {
       "types": "./dist/button.d.ts",
@@ -52,6 +68,10 @@
       "types": "./dist/dialog.d.ts",
       "default": "./dist/dialog.js"
     },
+    "./dropdown-menu": {
+      "types": "./dist/dropdown-menu.d.ts",
+      "default": "./dist/dropdown-menu.js"
+    },
     "./empty-panel": {
       "types": "./dist/empty-panel.d.ts",
       "default": "./dist/empty-panel.js"
@@ -72,9 +92,21 @@
       "types": "./dist/label.d.ts",
       "default": "./dist/label.js"
     },
+    "./pagination": {
+      "types": "./dist/pagination.d.ts",
+      "default": "./dist/pagination.js"
+    },
     "./popover": {
       "types": "./dist/popover.d.ts",
       "default": "./dist/popover.js"
+    },
+    "./progress": {
+      "types": "./dist/progress.d.ts",
+      "default": "./dist/progress.js"
+    },
+    "./radio-group": {
+      "types": "./dist/radio-group.d.ts",
+      "default": "./dist/radio-group.js"
     },
     "./select": {
       "types": "./dist/select.d.ts",
@@ -88,13 +120,21 @@
       "types": "./dist/skeleton.d.ts",
       "default": "./dist/skeleton.js"
     },
+    "./sonner": {
+      "types": "./dist/sonner.d.ts",
+      "default": "./dist/sonner.js"
+    },
     "./sortable-table-head": {
       "types": "./dist/sortable-table-head.d.ts",
       "default": "./dist/sortable-table-head.js"
     },
-    "./sonner": {
-      "types": "./dist/sonner.d.ts",
-      "default": "./dist/sonner.js"
+    "./spinner": {
+      "types": "./dist/spinner.d.ts",
+      "default": "./dist/spinner.js"
+    },
+    "./switch": {
+      "types": "./dist/switch.d.ts",
+      "default": "./dist/switch.js"
     },
     "./table": {
       "types": "./dist/table.d.ts",
@@ -123,6 +163,10 @@
     "./toggle-group": {
       "types": "./dist/toggle-group.d.ts",
       "default": "./dist/toggle-group.js"
+    },
+    "./tooltip": {
+      "types": "./dist/tooltip.d.ts",
+      "default": "./dist/tooltip.js"
     },
     "./form/date-picker-field": {
       "types": "./dist/form/date-picker-field.d.ts",
