@@ -13,7 +13,8 @@
     "theme.css",
     "DESIGN_RULES.md",
     "COMPONENTS.md",
-    "NOTICE"
+    "NOTICE",
+    "skills"
   ],
   "sideEffects": [
     "**/*.css"

@@ -42,7 +42,25 @@ with the application.
 
 See [design rules](./DESIGN_RULES.md) for shared styling decisions and the
 [component guide](./COMPONENTS.md) for exports and composition examples. Both
-files ship in the npm package. Shared component changes belong in this repository;
+files ship in the npm package.
+
+## AI coding assistants
+
+The package also ships an agent skill,
+[`skills/atlas-react-kit/SKILL.md`](./skills/atlas-react-kit/SKILL.md). It
+tells an assistant to read the guides for the installed version, pick kit
+components over hand-rolled markup, style with tokens, and check its work. Link
+it into Claude Code from the app root, so it updates with the package:
+
+```sh
+mkdir -p .claude/skills
+ln -s ../../node_modules/atlas-react-kit/skills/atlas-react-kit .claude/skills/atlas-react-kit
+```
+
+On Windows, or to commit a pinned copy, use
+`cp -r node_modules/atlas-react-kit/skills/atlas-react-kit .claude/skills/`
+instead. For Cursor, Codex, or other agents, point your `AGENTS.md` at
+`node_modules/atlas-react-kit/skills/atlas-react-kit/SKILL.md`. Shared component changes belong in this repository;
 applications compose their feature UI around the package and upgrade deliberately.
 
 Public docs and a live playground are at

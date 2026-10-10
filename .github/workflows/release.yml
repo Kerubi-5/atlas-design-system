@@ -29,6 +29,7 @@ on:
       - "DESIGN_RULES.md"
       - "COMPONENTS.md"
       - "NOTICE"
+      - "skills/**"
       - "tsconfig.json"
   workflow_dispatch:
 
