@@ -14,6 +14,12 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4400",
     viewport: { width: 900, height: 700 },
     deviceScaleFactor: 1,
+    // Grayscale, unhinted text on every machine. Hosts whose fontconfig turns
+    // on subpixel (LCD) text, like GitHub's runners, otherwise draw colored
+    // glyph edges that no baseline from another machine matches.
+    launchOptions: {
+      args: ["--disable-lcd-text", "--font-render-hinting=none"],
+    },
   },
   expect: {
     toHaveScreenshot: {

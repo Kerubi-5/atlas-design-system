@@ -7,6 +7,7 @@ export const beta = new Set([
   "Alert",
   "Avatar",
   "Breadcrumb",
+  "Date time picker",
   "Dropdown menu",
   "Pagination",
   "Progress",

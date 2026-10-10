@@ -36,7 +36,7 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix site
       - run: npm run build --prefix site
-      - name: Install Chromium for the accessibility check
+      - name: Install Chromium for the browser checks
         working-directory: site
         run: npx playwright install --with-deps chromium
       - name: Accessibility check (axe, WCAG 2.2 AA, light and dark)
@@ -52,12 +52,3 @@ jobs:
             site/playwright-report
             site/test-results
           retention-days: 7
-      - name: Describe screenshot diffs (temporary)
-        if: failure()
-        working-directory: site
-        run: |
-          for f in test-results/*/*-actual.png; do
-            name=$(basename "$f" -actual.png)
-            echo "=== $name"
-            node tests/visual/describe-diff.cjs "tests/visual/__screenshots__/$name-linux.png" "$f"
-          done

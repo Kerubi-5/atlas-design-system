@@ -61,8 +61,8 @@ a deprecation notice first, removal in a later minor release.
 
 **Beta** components may still change shape in a minor release; the
 changelog calls out every change: `accordion`, `alert`, `avatar`,
-`breadcrumb`, `dropdown-menu`, `pagination`, `progress`, `radio-group`,
-`spinner`, `switch`, `tooltip`.
+`breadcrumb`, `date-time-picker`, `dropdown-menu`, `pagination`, `progress`,
+`radio-group`, `spinner`, `switch`, `tooltip`.
 
 ## Forms
 
