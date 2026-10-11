@@ -105,8 +105,8 @@ export type MarkdownProps = {
 
 /**
  * GitHub-flavoured Markdown, token-styled and sanitized. No Next, no raw
- * HTML, no typography plugin. `react-markdown` and `remark-gfm` stay in this
- * module so other subpaths do not pay for them.
+ * HTML, no typography plugin. `react-markdown` and `remark-gfm` are optional
+ * peers imported only here so other subpaths do not pay for them.
  */
 function Markdown({ content, className }: MarkdownProps) {
   return (

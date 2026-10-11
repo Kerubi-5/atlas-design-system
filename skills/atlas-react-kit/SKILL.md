@@ -42,7 +42,9 @@ root (or a `dark` class on an ancestor). Toasts need one `<Toaster />` from
 `atlas-react-kit/toast`; show them with `toast()` from the same module, using
 only the options it declares. Never import a toast library such as `sonner`
 directly: the kit owns the toast API, and a second copy never reaches its
-toaster. Fix missing setup rather than working
+toaster. Markdown, dates, toasts, and `ThemeProvider` are optional peers —
+install the extras listed in `COMPONENTS.md` when you import those entry
+points. Fix missing setup rather than working
 around unstyled components.
 
 ## 3. Pick the kit component for the job

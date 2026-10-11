@@ -7,7 +7,7 @@ keeping locally (`InfoTip`, `ColorLegend`, `SearchPicker`, `Markdown`,
 React 19 and Tailwind 4 are required.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.8.2
+npm install --save-exact atlas-react-kit@0.9.0
 ```
 
 Import components by subpath:
@@ -26,6 +26,18 @@ export function Example() {
   )
 }
 ```
+
+Core entries need only the kit. These feature entries need an extra install
+(same version ranges as the kit's optional peers). `Toaster` also reads the
+theme from `next-themes`, so toast consumers install that too.
+
+| Entry points                                                                                           | Extra install                                    |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `calendar`, `date-picker`, `date-time-picker`, `form/date-picker-field`, `form/date-time-picker-field` | `npm i react-day-picker@^10.0.1 date-fns@^4.4.0` |
+| `markdown`, `form/markdown-field`                                                                      | `npm i react-markdown@^10.1.0 remark-gfm@^4.0.1` |
+| `theme-provider`                                                                                       | `npm i next-themes@^0.4.6`                       |
+| `toast`                                                                                                | `npm i sonner@^2.0.7 next-themes@^0.4.6`         |
+| `next/tabs-nav-link`                                                                                   | `npm i next@^16.0.0`                             |
 
 In your global stylesheet, import the theme after Tailwind and register the
 installed JavaScript directory. Paths in `@source` are relative to that stylesheet;
@@ -90,8 +102,9 @@ The public site is Storybook in `site/`. `npm run build --prefix site`
 typechecks the stories, builds Storybook into `site/dist`, then checks the
 static output. Vercel serves that directory; `/playground` and `/storybook`
 redirect to `/`. The site and Storybook dependencies are not part of the npm
-package. The optional Next.js 16 adapter requires Next only when imported. The
-package does not bundle React.
+package. Optional feature libraries (markdown, dates, toasts, theme, Next) are
+peer dependencies and are required only when those entry points are imported.
+The package does not bundle React.
 
 Run `npm run dev --prefix site` (or `npm run storybook --prefix site`) for the
 playground on port 6006. Existing examples live in `stories/` and are imported
@@ -116,7 +129,7 @@ artifact with the package owner's npm login:
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.8.2.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.9.0.tgz --access public
 ```
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser
