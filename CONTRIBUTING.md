@@ -4,6 +4,8 @@ Atlas React Kit is the shared UI for Atlas apps. Changes land here, ship as a
 package version, and apps upgrade deliberately. People and AI agents follow
 the same steps.
 
+Heading to 1.0? Start with [ROADMAP-1.0.md](./ROADMAP-1.0.md).
+
 ## Set up and check
 
 ```sh
@@ -40,7 +42,7 @@ CI runs all of these on every pull request. Run them before you push.
    accessibility). The site tests fail without one.
 5. Tests in `test/` for the behavior people rely on: roles, keyboard,
    labels, state changes. `npm run test:coverage` fails below the floors in
-   `vitest.config.ts` (94% of lines).
+   `vitest.config.ts` (95% of lines).
 6. A screenshot entry in `site/tests/visual/components.spec.ts` (with an
    `open` step if it shows an overlay, and in `phoneStories` if its layout
    changes at 390px); the visual test fails when a component page has none.

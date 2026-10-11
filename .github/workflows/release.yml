@@ -40,7 +40,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write # push the vX.Y.Z tag and GitHub Release
       id-token: write # OIDC trusted publishing
     steps:
       - uses: actions/checkout@v4
@@ -84,3 +84,27 @@ jobs:
       - name: Publish to npm
         if: steps.check.outputs.skip == 'false'
         run: npm publish --access public --provenance
+
+      # Keeps GitHub in step with npm: every published version gets a
+      # vX.Y.Z tag and a GitHub Release whose notes are that version's
+      # CHANGELOG.md section. Runs even when publish was skipped, so a
+      # missing tag for an already-published version is backfilled.
+      - name: Tag and GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v${VERSION}"
+          npm view "atlas-react-kit@${VERSION}" version >/dev/null 2>&1 || {
+            echo "atlas-react-kit@${VERSION} is not on npm; not tagging."; exit 0; }
+          awk -v v="$VERSION" '
+            $0 ~ "^## " v "( |$)" {on=1; next}
+            on && /^## / {exit}
+            on {print}
+          ' CHANGELOG.md > release-notes.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "$TAG already has a GitHub Release."
+          else
+            gh release create "$TAG" --target "$GITHUB_SHA" \
+              --title "atlas-react-kit ${VERSION}" --notes-file release-notes.md
+          fi
