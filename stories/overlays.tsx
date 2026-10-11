@@ -102,10 +102,9 @@ export function ToastTypesStory() {
       action: { label: "Retry", onClick: () => {} },
       cancel: { label: "Dismiss", onClick: () => {} },
     })
-    toast.loading("Saving", { ...keep, id: "loading" })
     return () => {
       toast.dismiss()
     }
   }, [])
-  return <Toaster expand visibleToasts={6} position="top-left" />
+  return <Toaster expand visibleToasts={5} position="top-left" />
 }

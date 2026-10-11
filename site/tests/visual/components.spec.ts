@@ -85,7 +85,7 @@ const stories: Story[] = [
   { id: "feedback-skeleton--loading" },
   { id: "feedback-empty-panel--sizes" },
   { id: "feedback-error-boundary--fallback" },
-  { id: "feedback-toast--types", open: waitForToasts(6) },
+  { id: "feedback-toast--types", open: waitForToasts(5) },
   {
     id: "feedback-toast--playground",
     open: async (page) => {
@@ -134,7 +134,6 @@ const phoneStories = new Set([
   "data-display-table--profile-card",
   "data-display-stat-tile--row",
   "overlays-dialog--playground",
-  "feedback-toast--types",
   "feedback-toast--playground",
   ...toastVariantIds,
 ])

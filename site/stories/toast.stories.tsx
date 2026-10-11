@@ -45,7 +45,7 @@ export const Composition: Story = {
   render: () => <ToastStory />,
   parameters: { controls: { disable: true } },
 }
-/** Default, success, info, warning, error, and loading toasts, kept open. */
+/** Default, success, info, warning, and error toasts, kept open. */
 export const Types: Story = {
   render: () => <ToastTypesStory />,
   // The story mounts its own expanded Toaster instead of the global one.
