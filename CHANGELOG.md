@@ -15,6 +15,21 @@ No package changes; the published 0.8.0 is unchanged.
 - Lockfile refreshed (`radix-ui` 1.7.0, `lucide-react` 1.55.0, Prettier
   3.9.10) within existing ranges.
 
+## 0.8.1 - 2026-10-11
+
+Patch so a long `TabsNav` / `TabsList` row scrolls inside itself instead of
+growing a stray vertical scrollbar when an app adds `overflow-x-auto`.
+
+- `TabsNav` and `TabsList` own overflow: `overflow-x-auto` with
+  `overflow-y-hidden` (so CSS overflow pairing cannot turn the y axis to
+  `auto`), padding for the active border and focus ring, a hidden
+  horizontal scrollbar, and the same pinned edge-fade cue as `Table` in
+  0.4.1+. The list fill covers the full row. The active tab or link
+  scrolls into view on mount. The scroller joins the tab order while it
+  overflows.
+- Apps should drop `className="max-w-full overflow-x-auto"` on `TabsNav`
+  (KairOS: `components/settings/settings-nav.tsx`) once they upgrade.
+
 ## 0.8.0 - 2026-10-11
 
 Minor release with one breaking rename (allowed before 1.0): toasts get a

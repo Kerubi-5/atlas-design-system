@@ -257,7 +257,7 @@ export const usage: Record<string, string> = {
 
 **Not for** navigation that changes the URL (use \`TabsNav\` with links).
 
-**Accessibility** Arrow keys move between tabs; every \`TabsTrigger\` needs a matching \`TabsContent\`.`,
+**Accessibility** Arrow keys move between tabs; every \`TabsTrigger\` needs a matching \`TabsContent\`. A long row scrolls horizontally inside \`TabsList\` / \`TabsNav\` (no vertical scrollbar) and joins the tab order while it overflows, like \`Table\`.`,
   Textarea: `
 **Use for** multi-line text: notes, descriptions, messages. It grows with its content.
 

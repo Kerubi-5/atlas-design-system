@@ -255,4 +255,53 @@
   [data-slot="card"] [data-slot="table-container"] {
     --table-scroll-fade: var(--card);
   }
+
+  /*
+   * Tab row overflow: same pinned-shadow / local-cover trick as tables.
+   * Covers match the muted list so a clipped label reads as overflow.
+   * The fifth layer is the list fill — the list itself stays transparent
+   * so the fades show through. Scrollbars stay hidden; the fade is the cue.
+   */
+  [data-slot="tabs-scroller"] {
+    --tabs-scroll-fade: var(--muted);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-padding-inline: 1rem;
+    background:
+      linear-gradient(to right, var(--tabs-scroll-fade) 40%, transparent),
+      linear-gradient(to left, var(--tabs-scroll-fade) 40%, transparent),
+      linear-gradient(
+        to right,
+        color-mix(in oklch, var(--foreground) 16%, transparent),
+        transparent 80%
+      ),
+      linear-gradient(
+        to left,
+        color-mix(in oklch, var(--foreground) 16%, transparent),
+        transparent 80%
+      ),
+      var(--tabs-scroll-fade);
+    background-repeat: no-repeat;
+    background-size:
+      1.5rem 100%,
+      1.5rem 100%,
+      0.75rem 100%,
+      0.75rem 100%,
+      100% 100%;
+    background-position:
+      left center,
+      right center,
+      left center,
+      right center,
+      center;
+    background-attachment: local, local, scroll, scroll, scroll;
+  }
+
+  [data-slot="tabs-scroller"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  [data-slot="tabs-scroller"][data-variant="line"] {
+    --tabs-scroll-fade: var(--background);
+  }
 }

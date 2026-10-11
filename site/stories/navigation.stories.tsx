@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
-import { TabsStory, TabsNavStory } from "../../stories/navigation.js"
+import {
+  TabsNavNarrowStory,
+  TabsNavStory,
+  TabsOverflowStory,
+  TabsStory,
+} from "../../stories/navigation.js"
 
 const meta = {
   title: "Examples/Navigation",
@@ -8,4 +13,6 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Tabs: Story = { render: () => <TabsStory /> }
+export const TabsOverflow: Story = { render: () => <TabsOverflowStory /> }
 export const Links: Story = { render: () => <TabsNavStory /> }
+export const LinksNarrow: Story = { render: () => <TabsNavNarrowStory /> }

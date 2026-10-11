@@ -4,11 +4,13 @@ import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
 import { Tabs as TabsPrimitive } from "radix-ui"
 
-import { cn } from "./utils.js"
+import { focusRing } from "./internal/styles.js"
 import {
   tabsListVariants,
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
+import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
+import { cn } from "./utils.js"
 
 function Tabs({
   className,
@@ -29,6 +31,53 @@ function Tabs({
   )
 }
 
+/**
+ * Horizontal scroller around a tab row. `overflow-x: auto` alone would
+ * compute `overflow-y` to `auto` as well (CSS overflow pairing), so the
+ * active tab's border and focus ring grow a vertical scrollbar. Clip the
+ * y axis, pad for those strokes, and fade the edges while the row
+ * overflows — same cue as `Table`.
+ */
+function TabsScroller({
+  variant = "default",
+  children,
+}: {
+  variant?: "default" | "line"
+  children: React.ReactNode
+}) {
+  const ref = React.useRef<HTMLDivElement>(null)
+  const overflowing = useHorizontalOverflow(ref)
+
+  React.useLayoutEffect(() => {
+    const scroller = ref.current
+    if (!scroller) return
+    const active = scroller.querySelector<HTMLElement>(
+      '[aria-current="page"], [data-state="active"]'
+    )
+    active?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+      behavior: "auto",
+    })
+  }, [])
+
+  return (
+    <div
+      ref={ref}
+      data-slot="tabs-scroller"
+      data-variant={variant}
+      tabIndex={overflowing ? 0 : undefined}
+      className={cn(
+        focusRing,
+        "relative w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+        variant === "line" && "pb-2"
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
 function TabsList({
   className,
   variant = "default",
@@ -36,12 +85,19 @@ function TabsList({
 }: React.ComponentProps<typeof TabsPrimitive.List> &
   VariantProps<typeof tabsListVariants>) {
   return (
-    <TabsPrimitive.List
-      data-slot="tabs-list"
-      data-variant={variant}
-      className={cn(tabsListVariants({ variant }), className)}
-      {...props}
-    />
+    <TabsScroller variant={variant ?? "default"}>
+      <TabsPrimitive.List
+        data-slot="tabs-list"
+        data-variant={variant}
+        className={cn(
+          tabsListVariants({ variant }),
+          // The scroller owns the muted fill so edge fades show through.
+          variant === "default" && "bg-transparent",
+          className
+        )}
+        {...props}
+      />
+    </TabsScroller>
   )
 }
 
@@ -78,6 +134,11 @@ function TabsContent({
  * with `tabsTriggerVariants()` and mark the active one with
  * `data-state="active"` and `aria-current="page"` (the Next adapter
  * `TabsNavLink` does this for you).
+ *
+ * Overflow is handled here: the row scrolls horizontally only, with padding
+ * for active borders and focus rings, an edge fade while it overflows, and
+ * the active link scrolled into view on mount. Do not wrap it in
+ * `overflow-x-auto`.
  */
 function TabsNav({
   className,
@@ -88,16 +149,18 @@ function TabsNav({
     <nav
       data-slot="tabs-nav"
       data-orientation="horizontal"
-      className={cn("group/tabs", className)}
+      className={cn("group/tabs min-w-0 w-full max-w-full", className)}
       {...props}
     >
-      <div
-        data-slot="tabs-list"
-        data-variant="default"
-        className={tabsListVariants()}
-      >
-        {children}
-      </div>
+      <TabsScroller>
+        <div
+          data-slot="tabs-list"
+          data-variant="default"
+          className={cn(tabsListVariants(), "bg-transparent")}
+        >
+          {children}
+        </div>
+      </TabsScroller>
     </nav>
   )
 }

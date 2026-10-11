@@ -8,6 +8,16 @@ import {
   tabsTriggerVariants,
 } from "../src/tabs.js"
 
+/** Settings-style labels long enough to overflow a 390px row. */
+export const SETTINGS_LINKS = [
+  "Activity",
+  "Preferences",
+  "Notifications",
+  "API tokens",
+  "Calendar feed",
+  "Apple Reminders",
+] as const
+
 /** Default and line tab lists with panels. */
 export function TabsStory() {
   return (
@@ -32,25 +42,67 @@ export function TabsStory() {
   )
 }
 
-/** URL-style tab links; the active item uses aria-current. */
-export function TabsNavStory() {
+/**
+ * Many triggers in a 390px panel — same overflow case as TabsNav.
+ */
+export function TabsOverflowStory() {
   return (
-    <TabsNav aria-label="Preview views">
-      <a
-        href="#list"
-        aria-current="page"
-        data-state="active"
-        className={cn(tabsTriggerVariants())}
-      >
-        List
-      </a>
-      <a
-        href="#board"
-        data-state="inactive"
-        className={cn(tabsTriggerVariants())}
-      >
-        Board
-      </a>
+    <div className="w-[390px] max-w-full border border-border p-3">
+      <Tabs defaultValue="activity">
+        <TabsList>
+          {SETTINGS_LINKS.map((label) => (
+            <TabsTrigger key={label} value={label.toLowerCase()}>
+              {label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+        <TabsContent value="activity">
+          Recent tool calls from the CLI and agents.
+        </TabsContent>
+      </Tabs>
+    </div>
+  )
+}
+
+type SettingsLink = (typeof SETTINGS_LINKS)[number]
+
+/** URL-style tab links; the active item uses aria-current. */
+export function TabsNavStory({
+  active = "Activity",
+  className,
+}: {
+  active?: SettingsLink
+  className?: string
+} = {}) {
+  return (
+    <TabsNav aria-label="Settings" className={className}>
+      {SETTINGS_LINKS.map((label) => {
+        const isActive = label === active
+        return (
+          <a
+            key={label}
+            href={`#${label.toLowerCase().replace(/\s+/g, "-")}`}
+            aria-current={isActive ? "page" : undefined}
+            data-state={isActive ? "active" : "inactive"}
+            className={cn(tabsTriggerVariants())}
+          >
+            {label}
+          </a>
+        )
+      })}
     </TabsNav>
+  )
+}
+
+/**
+ * The KairOS Settings case: six links in a 390px column. The kit owns
+ * overflow; apps should not pass `overflow-x-auto` on `TabsNav`.
+ */
+export function TabsNavNarrowStory() {
+  return (
+    <div className="w-[390px] max-w-full border border-border p-3">
+      <p className="mb-4 text-lg font-medium">Settings</p>
+      <TabsNavStory />
+    </div>
   )
 }
