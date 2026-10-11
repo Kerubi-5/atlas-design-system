@@ -79,6 +79,12 @@ describe("published modules", () => {
     )
     expect(theme).toContain('[data-slot="card"] [data-slot="table-container"]')
     expect(theme).toContain("--table-scroll-fade: var(--card)")
+    expect(theme).toContain('[data-slot="tabs-scroller"]')
+    expect(theme).toContain("--tabs-scroll-fade: var(--muted)")
+    expect(theme).toContain(
+      "background-attachment: local, local, scroll, scroll, scroll"
+    )
+    expect(theme).toContain("scrollbar-width: none")
   })
 
   it("resolves the compiled framework adapter in native ESM", async () => {

@@ -52,6 +52,10 @@ const stories: Story[] = [
     open: clickFirst("button", "dialog"),
   },
   { id: "navigation-tabs--composition" },
+  { id: "navigation-tabs--nav" },
+  { id: "navigation-tabs--nav-narrow" },
+  { id: "navigation-tabs--nav-desktop" },
+  { id: "navigation-tabs--overflow" },
   { id: "navigation-breadcrumb--collapsed" },
   { id: "navigation-pagination--with-ellipsis" },
   { id: "feedback-alert--tones" },
@@ -99,10 +103,19 @@ const phoneStories = new Set([
   "examples-fields--trigger-alignment",
   "forms-date-time-picker--playground",
   "navigation-tabs--composition",
+  "navigation-tabs--nav",
+  "navigation-tabs--nav-desktop",
+  "navigation-tabs--overflow",
   "navigation-pagination--with-ellipsis",
   "data-display-table--profile-card",
   "data-display-stat-tile--row",
   "overlays-dialog--playground",
+])
+
+/** Settings-style tab rows compared at desktop width. */
+const wideStories = new Set([
+  "navigation-tabs--nav",
+  "navigation-tabs--nav-desktop",
 ])
 
 async function capture(page: Page, story: Story, theme: string, name: string) {
@@ -131,8 +144,44 @@ for (const theme of ["light", "dark"] as const) {
         await capture(page, story, theme, `${story.id}-${theme}-390.png`)
       })
     }
+    if (wideStories.has(story.id)) {
+      test(`${story.id} (${theme}, 1280px)`, async ({ page }) => {
+        await page.setViewportSize({ width: 1280, height: 720 })
+        await capture(page, story, theme, `${story.id}-${theme}-1280.png`)
+      })
+    }
   }
 }
+
+test("settings tabs share one horizontal padding at 1280 and 390", async ({
+  page,
+}) => {
+  for (const width of [1280, 390] as const) {
+    await page.setViewportSize({
+      width,
+      height: width === 390 ? 844 : 720,
+    })
+    await page.goto(
+      "/iframe.html?id=navigation-tabs--nav&viewMode=story&globals=theme:light"
+    )
+    await page.waitForSelector("body.sb-show-main")
+    await page.evaluate(() => document.fonts.ready)
+    const links = root(page).locator("[data-slot=tabs-nav] a")
+    await expect(links).toHaveCount(6)
+    const pads = await links.evaluateAll((nodes) =>
+      nodes.map((link) => {
+        const style = getComputedStyle(link)
+        return { left: style.paddingLeft, right: style.paddingRight }
+      })
+    )
+    expect(pads, `${width}px should render six settings links`).toHaveLength(6)
+    for (const pad of pads) {
+      expect(pad.left).toBe(pads[0]?.left)
+      expect(pad.right).toBe(pads[0]?.right)
+      expect(pad.left).toBe(pad.right)
+    }
+  }
+})
 
 test("every component page has a screenshot", () => {
   const index = JSON.parse(

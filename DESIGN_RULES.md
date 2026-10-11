@@ -54,8 +54,8 @@ keyboard and screen-reader testing.
 - Focus is a solid `ring-ring` (brand purple), never a translucent ring such
   as `ring-ring/30`, which fades below 3:1. Keyboard-highlighted menu and list
   items show a 2px `ring` bar on their leading edge. Content that scrolls must
-  be reachable by keyboard; `Table` adds itself to the tab order while it
-  overflows.
+  be reachable by keyboard; `Table`, `TabsList`, and `TabsNav` add their
+  scroller to the tab order while they overflow.
 
 ## Writing
 
@@ -103,7 +103,11 @@ triggers as outline buttons in application code.
 
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
-Next adapter provides `TabsNavLink` with this behavior.
+Next adapter provides `TabsNavLink` with this behavior. `TabsNav` and `TabsList`
+scroll overflowing labels inside themselves (`overflow-x-auto overflow-y-hidden`,
+with padding for the active border and focus ring, and an edge fade like
+`Table`). Do not wrap them in another `overflow-x-auto` — that pairing forces
+`overflow-y: auto` and a stray vertical scrollbar.
 
 Use `FormTextField`, `FormSelectField`, `FormDatePickerField`,
 `FormDateTimePickerField`, `FormMarkdownField`, and `FormFeedbackField` for

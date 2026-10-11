@@ -1,8 +1,22 @@
 import { renderToStaticMarkup } from "react-dom/server"
-import { describe, expect, it } from "vitest"
+import { afterEach, describe, expect, it, vi } from "vitest"
 
-import { TabsNav, tabsTriggerVariants } from "../src/tabs.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsNav,
+  TabsTrigger,
+  tabsTriggerVariants,
+} from "../src/tabs.js"
+import {
+  TabsNavNarrowStory,
+  TabsNavStory,
+  TabsOverflowStory,
+} from "../stories/navigation.js"
+
+import { render, screen, waitFor } from "./helpers.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
 // in a labelled nav, not a tab widget whose tabs point at panels that don't
@@ -19,7 +33,27 @@ const html = renderToStaticMarkup(
   </TabsNav>
 )
 
+function scrollerOf(element: HTMLElement | null) {
+  return element?.closest("[data-slot=tabs-scroller]") ?? null
+}
+
+function expectHorizontalOnlyScroller(element: Element | null) {
+  expect(element).toBeTruthy()
+  const classes = element?.className.split(/\s+/) ?? []
+  expect(classes).toContain("overflow-x-auto")
+  expect(classes).toContain("overflow-y-hidden")
+  expect(classes).toContain("min-w-0")
+  expect(classes).toContain("max-w-full")
+  expect(classes).toContain("overscroll-x-contain")
+  expect(classes).toContain("p-1")
+  expect(classes).not.toContain("overflow-y-auto")
+}
+
 describe("TabsNav", () => {
+  afterEach(() => {
+    HTMLElement.prototype.scrollIntoView = () => {}
+  })
+
   it("renders a labelled nav of links", () => {
     expect(html).toMatch(/^<nav[^>]*aria-label="Items view"/)
     expect(html).toMatch(/<a[^>]*href="\/items\?view=pipeline"/)
@@ -33,6 +67,116 @@ describe("TabsNav", () => {
 
   it("has no tab roles or panel references", () => {
     expect(html).not.toMatch(/role="tab|aria-controls|aria-selected/)
+  })
+
+  it("owns horizontal overflow so apps do not wrap it in overflow-x-auto", () => {
+    const { container } = render(<TabsNavStory />)
+    const nav = screen.getByRole("navigation", { name: "Settings" })
+    const scroller = container.querySelector("[data-slot=tabs-scroller]")
+    const list = container.querySelector("[data-slot=tabs-list]")
+    expect(nav.className.split(/\s+/)).toContain("min-w-0")
+    expect(nav.className.split(/\s+/)).toContain("max-w-full")
+    expectHorizontalOnlyScroller(scroller)
+    expect(list?.className.split(/\s+/)).toContain("min-w-full")
+    expect(list?.className.split(/\s+/)).toContain("bg-transparent")
+    expect(screen.getAllByRole("link")).toHaveLength(6)
+  })
+
+  it("keeps six links inside a 390px panel scroller", () => {
+    render(<TabsNavNarrowStory />)
+    expect(screen.getByText("Settings").parentElement?.className).toMatch(
+      /w-\[390px]/
+    )
+    expectHorizontalOnlyScroller(
+      scrollerOf(screen.getByRole("link", { name: "Activity" }))
+    )
+    expect(screen.getByRole("link", { name: "Apple Reminders" })).toBeVisible()
+  })
+
+  it("scrolls the active link into view on mount", () => {
+    const scrollIntoView = vi.fn()
+    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    render(<TabsNavStory active="Apple Reminders" />)
+    expect(scrollIntoView).toHaveBeenCalled()
+    const active = screen.getByRole("link", { name: "Apple Reminders" })
+    expect(scrollIntoView.mock.instances[0]).toBe(active)
+    expect(scrollIntoView).toHaveBeenCalledWith(
+      expect.objectContaining({ inline: "nearest", block: "nearest" })
+    )
+  })
+
+  it("joins the tab order while the row is wider than the box", async () => {
+    const descriptors = {
+      scrollWidth: Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "scrollWidth"
+      ),
+      clientWidth: Object.getOwnPropertyDescriptor(
+        HTMLElement.prototype,
+        "clientWidth"
+      ),
+    }
+    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+      configurable: true,
+      get: () => 800,
+    })
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+      configurable: true,
+      get: () => 390,
+    })
+    try {
+      const { container } = render(<TabsNavStory />)
+      const scroller = container.querySelector("[data-slot=tabs-scroller]")
+      await waitFor(() => {
+        expect(scroller).toHaveAttribute("tabindex", "0")
+      })
+    } finally {
+      for (const [key, descriptor] of Object.entries(descriptors)) {
+        if (descriptor) {
+          Object.defineProperty(HTMLElement.prototype, key, descriptor)
+        } else {
+          delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+            key
+          ]
+        }
+      }
+    }
+  })
+})
+
+describe("tab trigger padding", () => {
+  it("uses the same px on every trigger and link, with no flex shrink", () => {
+    const classes = tabsTriggerVariants().split(/\s+/)
+    expect(classes).toContain("px-4")
+    expect(classes).toContain("flex-none")
+    expect(classes).not.toContain("flex-1")
+    expect(classes.some((token) => token.startsWith("last:"))).toBe(false)
+    expect(classes.some((token) => /last-child/.test(token))).toBe(false)
+  })
+
+  it("keeps that padding on every Settings link and trigger", () => {
+    render(<TabsNavStory />)
+    const links = screen.getAllByRole("link")
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Activity",
+      "Preferences",
+      "Notifications",
+      "API Tokens",
+      "Calendar feed",
+      "Apple Reminders",
+    ])
+    for (const link of links) {
+      const classes = link.className.split(/\s+/)
+      expect(classes).toContain("px-4")
+      expect(classes).toContain("flex-none")
+    }
+
+    render(<TabsOverflowStory />)
+    for (const tab of screen.getAllByRole("tab")) {
+      const classes = tab.className.split(/\s+/)
+      expect(classes).toContain("px-4")
+      expect(classes).toContain("flex-none")
+    }
   })
 })
 
@@ -55,5 +199,62 @@ describe("TabsNav without Next", () => {
       /<a[^>]*class="([^"]*)"/.exec(markup)?.[1]
     expect(linkClass(plain)).toContain("bg-selected")
     expect(linkClass(plain)).toBe(linkClass(html))
+  })
+})
+
+describe("TabsList overflow", () => {
+  afterEach(() => {
+    HTMLElement.prototype.scrollIntoView = () => {}
+  })
+
+  it("uses the same horizontal-only scroller as TabsNav", () => {
+    render(
+      <Tabs defaultValue="overview">
+        <TabsList aria-label="Order">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">Overview panel</TabsContent>
+      </Tabs>
+    )
+    const list = screen.getByRole("tablist", { name: "Order" })
+    expectHorizontalOnlyScroller(scrollerOf(list))
+    expect(list.className.split(/\s+/)).toContain("min-w-full")
+  })
+
+  it("scrolls the active trigger into view on mount", () => {
+    const scrollIntoView = vi.fn()
+    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    render(<TabsOverflowStory />)
+    const active = screen.getByRole("tab", { name: "Activity" })
+    expect(scrollIntoView.mock.instances[0]).toBe(active)
+  })
+
+  it("treats a missing list variant as default", () => {
+    render(
+      <Tabs defaultValue="overview">
+        <TabsList variant={null} aria-label="Order">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">Overview panel</TabsContent>
+      </Tabs>
+    )
+    const scroller = scrollerOf(screen.getByRole("tablist", { name: "Order" }))
+    expect(scroller).toHaveAttribute("data-variant", "default")
+    expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
+  })
+
+  it("gives the line variant extra bottom padding for the underline", () => {
+    render(
+      <Tabs defaultValue="list">
+        <TabsList variant="line" aria-label="Views">
+          <TabsTrigger value="list">List</TabsTrigger>
+        </TabsList>
+        <TabsContent value="list">List panel</TabsContent>
+      </Tabs>
+    )
+    const scroller = scrollerOf(screen.getByRole("tablist", { name: "Views" }))
+    expect(scroller?.className.split(/\s+/)).toContain("pb-2")
+    expect(scroller).toHaveAttribute("data-variant", "line")
   })
 })

@@ -2,7 +2,13 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { useArgs } from "storybook/preview-api"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../src/tabs.js"
-import { TabsNavStory, TabsStory } from "../../stories/navigation.js"
+import {
+  TabsNavDesktopStory,
+  TabsNavNarrowStory,
+  TabsNavStory,
+  TabsOverflowStory,
+  TabsStory,
+} from "../../stories/navigation.js"
 
 type Args = { value: string }
 const meta = {
@@ -42,5 +48,17 @@ export const Composition: Story = {
 }
 export const Nav: Story = {
   render: () => <TabsNavStory />,
+  parameters: { controls: { disable: true } },
+}
+export const NavNarrow: Story = {
+  render: () => <TabsNavNarrowStory />,
+  parameters: { controls: { disable: true } },
+}
+export const NavDesktop: Story = {
+  render: () => <TabsNavDesktopStory />,
+  parameters: { controls: { disable: true } },
+}
+export const Overflow: Story = {
+  render: () => <TabsOverflowStory />,
   parameters: { controls: { disable: true } },
 }

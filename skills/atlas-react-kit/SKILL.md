@@ -127,7 +127,7 @@ list; the ones that come up most:
   Overriding their height, padding, or border makes one field look different
   from its neighbors.
 - **Layout overrides**: `CardContent className="px-0"` makes one section flush
-  without `!important`. Tables already scroll horizontally inside cards, so do
+  without `!important`. Tables and tab rows already scroll horizontally, so do
   not wrap them in another overflow container.
 - **Headings**: `CardTitle` and `DialogTitle` already apply the uppercase,
   tracked heading style; use `font-heading` for other headings.
