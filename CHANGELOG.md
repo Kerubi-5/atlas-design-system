@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+No package changes; the published 0.8.0 is unchanged.
+
+- Tests for form select and markdown fields, toast action and cancel
+  buttons, and the media-query hook; coverage floors raised to 95% lines
+  and 88% branches.
+- A public API snapshot test (`test/api-surface.test.ts`) fails on any
+  renamed or removed export.
+- The release workflow tags each published version and creates its GitHub
+  Release from this changelog. Tags `v0.2.1`–`v0.8.0` were backfilled.
+- `ROADMAP-1.0.md` lists the exit criteria for 1.0.
+- Lockfile refreshed (`radix-ui` 1.7.0, `lucide-react` 1.55.0, Prettier
+  3.9.10) within existing ranges.
+
 ## 0.8.0 - 2026-10-11
 
 Minor release with one breaking rename (allowed before 1.0): toasts get a
