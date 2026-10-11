@@ -23,6 +23,27 @@ const clickFirst =
     await expect(page.getByRole(shows as "dialog").first()).toBeVisible()
   }
 
+const waitForToasts =
+  (count = 1) =>
+  async (page: Page) => {
+    await expect(page.locator("[data-sonner-toast]")).toHaveCount(count)
+    await expect(page.locator("[data-sonner-toast]").first()).toBeVisible()
+  }
+
+/** One story per toast chrome variant; captured at 1280 and 390, light and dark. */
+const toastVariantStories: Story[] = [
+  { id: "feedback-toast--plain", open: waitForToasts() },
+  { id: "feedback-toast--success", open: waitForToasts() },
+  { id: "feedback-toast--info", open: waitForToasts() },
+  { id: "feedback-toast--warning", open: waitForToasts() },
+  { id: "feedback-toast--error", open: waitForToasts() },
+  { id: "feedback-toast--loading", open: waitForToasts() },
+  { id: "feedback-toast--with-description", open: waitForToasts() },
+  { id: "feedback-toast--with-action-and-cancel", open: waitForToasts() },
+  { id: "feedback-toast--long-text", open: waitForToasts() },
+  { id: "feedback-toast--stacked", open: waitForToasts(3) },
+]
+
 const stories: Story[] = [
   { id: "foundations-tokens--theme" },
   { id: "foundations-theme-provider--toolbar" },
@@ -64,7 +85,7 @@ const stories: Story[] = [
   { id: "feedback-skeleton--loading" },
   { id: "feedback-empty-panel--sizes" },
   { id: "feedback-error-boundary--fallback" },
-  { id: "feedback-toast--types" },
+  { id: "feedback-toast--types", open: waitForToasts(6) },
   {
     id: "feedback-toast--playground",
     open: async (page) => {
@@ -72,6 +93,7 @@ const stories: Story[] = [
       await expect(page.locator("[data-sonner-toast]").first()).toBeVisible()
     },
   },
+  ...toastVariantStories,
   { id: "overlays-dialog--playground", open: clickFirst("button", "dialog") },
   { id: "overlays-popover--playground", open: clickFirst("button", "dialog") },
   {
@@ -98,6 +120,8 @@ const stories: Story[] = [
   },
 ]
 
+const toastVariantIds = toastVariantStories.map((story) => story.id)
+
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([
   "examples-fields--trigger-alignment",
@@ -110,12 +134,18 @@ const phoneStories = new Set([
   "data-display-table--profile-card",
   "data-display-stat-tile--row",
   "overlays-dialog--playground",
+  "feedback-toast--types",
+  "feedback-toast--playground",
+  ...toastVariantIds,
 ])
 
 /** Settings-style tab rows compared at desktop width. */
 const wideStories = new Set([
   "navigation-tabs--nav",
   "navigation-tabs--nav-desktop",
+  "feedback-toast--types",
+  "feedback-toast--playground",
+  ...toastVariantIds,
 ])
 
 async function capture(page: Page, story: Story, theme: string, name: string) {

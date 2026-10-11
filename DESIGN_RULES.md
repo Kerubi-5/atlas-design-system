@@ -84,7 +84,12 @@ still read normal words.
 
 Primitives have square corners. Reserve `rounded-full` for dots, avatars, and
 other circles. Card and dialog titles already use uppercase, tracked
-`font-heading` styling.
+`font-heading` styling. Toasts are overlay popovers with the same square
+corners, Alert padding (`py-3 pl-4`), and a ghost close control. A plain
+`toast()` has no icon — status icons belong to `success`, `info`, `warning`,
+`error`, and `loading`. Tone colors the icon, title, and border, not the body.
+Width is the content up to 356px, or the viewport minus gutters on small
+screens.
 
 Use `EmptyPanel` for empty states, `TableBodySkeleton` for loading table bodies,
 and `<Card flush>` for an edge-to-edge list or table. `Table` scrolls wide

@@ -250,6 +250,26 @@ describe("Toaster", () => {
     expect(onRetry).toHaveBeenCalled()
   })
 
+  it("draws a compact plain toast with a ghost close X and no icon", async () => {
+    renderToaster()
+    act(() => {
+      toast("Saved")
+    })
+    const item = (await screen.findByText("Saved")).closest(
+      "[data-sonner-toast]"
+    ) as HTMLElement
+    expect(item.querySelector("[data-icon]")).toBeNull()
+    expect(item.className).toContain("w-max")
+    expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
+    expect(item.className).toContain("rounded-none")
+    const close = within(item).getByRole("button", { name: "Close toast" })
+    // Ghost sets no fill; these ! utilities beat Sonner's unlayered
+    // [data-button] / [data-close-button] foreground square.
+    expect(close.className).toContain("!bg-transparent")
+    expect(close.className).toContain("!text-muted-foreground")
+    expect(close.className).not.toContain("bg-primary")
+  })
+
   it("adds a labelled close button unless closeButton is false", async () => {
     const user = createUser()
     const { unmount } = renderToaster()
