@@ -165,14 +165,15 @@ test("settings tabs share one horizontal padding at 1280 and 390", async ({
       "/iframe.html?id=navigation-tabs--nav&viewMode=story&globals=theme:light"
     )
     await page.waitForSelector("body.sb-show-main")
-    const pads = await root(page)
-      .locator("[data-slot=tabs-nav] a")
-      .evaluateAll((links) =>
-        links.map((link) => {
-          const style = getComputedStyle(link)
-          return { left: style.paddingLeft, right: style.paddingRight }
-        })
-      )
+    await page.evaluate(() => document.fonts.ready)
+    const links = root(page).locator("[data-slot=tabs-nav] a")
+    await expect(links).toHaveCount(6)
+    const pads = await links.evaluateAll((nodes) =>
+      nodes.map((link) => {
+        const style = getComputedStyle(link)
+        return { left: style.paddingLeft, right: style.paddingRight }
+      })
+    )
     expect(pads, `${width}px should render six settings links`).toHaveLength(6)
     for (const pad of pads) {
       expect(pad.left).toBe(pads[0]?.left)
