@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-No package changes; the published 0.8.0 is unchanged.
+No package changes; the published 0.8.2 is unchanged.
 
 - Tests for form select and markdown fields, toast action and cancel
   buttons, and the media-query hook; coverage floors raised to 95% lines
@@ -14,6 +14,18 @@ No package changes; the published 0.8.0 is unchanged.
 - `ROADMAP-1.0.md` lists the exit criteria for 1.0.
 - Lockfile refreshed (`radix-ui` 1.7.0, `lucide-react` 1.55.0, Prettier
   3.9.10) within existing ranges.
+
+## 0.8.2 - 2026-10-11
+
+Patch so the `TabsNav` / `TabsList` row fits its scroller: `p-1` for the
+active border and focus ring is part of the box, not extra overflow that
+`overflow-y: hidden` was clipping. A stray vertical scrollbar no longer
+appears if `overflow-y` is not hidden.
+
+- The scroller height is the `h-11` list plus that padding (`h-13`; line
+  variant is `h-14` with `pb-2`). `scrollHeight` equals `clientHeight` on
+  the y axis even when `overflow-y` is `auto`.
+- No API change. Trigger and link padding is unchanged.
 
 ## 0.8.1 - 2026-10-11
 

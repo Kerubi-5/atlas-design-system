@@ -46,7 +46,40 @@ function expectHorizontalOnlyScroller(element: Element | null) {
   expect(classes).toContain("max-w-full")
   expect(classes).toContain("overscroll-x-contain")
   expect(classes).toContain("p-1")
+  expect(classes).toContain("box-border")
   expect(classes).not.toContain("overflow-y-auto")
+}
+
+/**
+ * `p-1` (0.5rem) sits on the overflow scroller. The used height must include
+ * that padding (`h-13` = `h-11` + `p-1`×2) so the list fits the content box.
+ * jsdom has no layout, so this is a computed-size check; Playwright asserts
+ * `scrollHeight === clientHeight` with `overflow-y` forced off `hidden`.
+ */
+function expectScrollerFitsList(
+  scroller: Element | null,
+  list: Element | null
+) {
+  const scrollerClasses = scroller?.className.split(/\s+/) ?? []
+  const listClasses = list?.className.split(/\s+/) ?? []
+  expect(scrollerClasses).toContain("p-1")
+  expect(scrollerClasses).toContain("box-border")
+  expect(listClasses).toContain(
+    'group-data-[orientation="horizontal"]/tabs:h-11'
+  )
+  const line = scrollerClasses.includes("pb-2")
+  expect(scrollerClasses).toContain(
+    line
+      ? 'group-data-[orientation="horizontal"]/tabs:h-14'
+      : 'group-data-[orientation="horizontal"]/tabs:h-13'
+  )
+  if (scroller instanceof HTMLElement) {
+    const previous = scroller.style.overflowY
+    scroller.style.overflowY = "auto"
+    expect(scroller.style.overflowY).not.toBe("hidden")
+    expect(scroller.scrollHeight).toBe(scroller.clientHeight)
+    scroller.style.overflowY = previous
+  }
 }
 
 describe("TabsNav", () => {
@@ -77,6 +110,7 @@ describe("TabsNav", () => {
     expect(nav.className.split(/\s+/)).toContain("min-w-0")
     expect(nav.className.split(/\s+/)).toContain("max-w-full")
     expectHorizontalOnlyScroller(scroller)
+    expectScrollerFitsList(scroller, list)
     expect(list?.className.split(/\s+/)).toContain("min-w-full")
     expect(list?.className.split(/\s+/)).toContain("bg-transparent")
     expect(screen.getAllByRole("link")).toHaveLength(6)
@@ -218,7 +252,9 @@ describe("TabsList overflow", () => {
       </Tabs>
     )
     const list = screen.getByRole("tablist", { name: "Order" })
-    expectHorizontalOnlyScroller(scrollerOf(list))
+    const scroller = scrollerOf(list)
+    expectHorizontalOnlyScroller(scroller)
+    expectScrollerFitsList(scroller, list)
     expect(list.className.split(/\s+/)).toContain("min-w-full")
   })
 
@@ -239,9 +275,11 @@ describe("TabsList overflow", () => {
         <TabsContent value="overview">Overview panel</TabsContent>
       </Tabs>
     )
-    const scroller = scrollerOf(screen.getByRole("tablist", { name: "Order" }))
+    const list = screen.getByRole("tablist", { name: "Order" })
+    const scroller = scrollerOf(list)
     expect(scroller).toHaveAttribute("data-variant", "default")
     expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
+    expectScrollerFitsList(scroller, list)
   })
 
   it("gives the line variant extra bottom padding for the underline", () => {
@@ -253,8 +291,10 @@ describe("TabsList overflow", () => {
         <TabsContent value="list">List panel</TabsContent>
       </Tabs>
     )
-    const scroller = scrollerOf(screen.getByRole("tablist", { name: "Views" }))
+    const list = screen.getByRole("tablist", { name: "Views" })
+    const scroller = scrollerOf(list)
     expect(scroller?.className.split(/\s+/)).toContain("pb-2")
     expect(scroller).toHaveAttribute("data-variant", "line")
+    expectScrollerFitsList(scroller, list)
   })
 })

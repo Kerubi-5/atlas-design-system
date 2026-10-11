@@ -7,6 +7,7 @@ import { Tabs as TabsPrimitive } from "radix-ui"
 import { focusRing } from "./internal/styles.js"
 import {
   tabsListVariants,
+  tabsScrollerVariants,
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
 import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
@@ -34,9 +35,10 @@ function Tabs({
 /**
  * Horizontal scroller around a tab row. `overflow-x: auto` alone would
  * compute `overflow-y` to `auto` as well (CSS overflow pairing), so the
- * active tab's border and focus ring grow a vertical scrollbar. Clip the
- * y axis, pad for those strokes, and fade the edges while the row
- * overflows — same cue as `Table`.
+ * active tab's border and focus ring grow a vertical scrollbar. Pad for
+ * those strokes *inside* the box (`h-13` = `h-11` list + `p-1`), clip the
+ * y axis as a backstop, and fade the edges while the row overflows —
+ * same cue as `Table`.
  */
 function TabsScroller({
   variant = "default",
@@ -67,11 +69,7 @@ function TabsScroller({
       data-slot="tabs-scroller"
       data-variant={variant}
       tabIndex={overflowing ? 0 : undefined}
-      className={cn(
-        focusRing,
-        "relative w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
-        variant === "line" && "pb-2"
-      )}
+      className={cn(focusRing, tabsScrollerVariants({ variant }))}
     >
       {children}
     </div>
@@ -136,8 +134,9 @@ function TabsContent({
  * `TabsNavLink` does this for you).
  *
  * Overflow is handled here: the row scrolls horizontally only, with padding
- * for active borders and focus rings, an edge fade while it overflows, and
- * the active link scrolled into view on mount. Do not wrap it in
+ * for active borders and focus rings counted in the scroller height (so the
+ * list cannot overflow on y), an edge fade while it overflows, and the
+ * active link scrolled into view on mount. Do not wrap it in
  * `overflow-x-auto`.
  */
 function TabsNav({

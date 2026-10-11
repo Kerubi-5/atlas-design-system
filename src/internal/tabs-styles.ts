@@ -17,6 +17,30 @@ const tabsListVariants = cva(
   }
 )
 
+/**
+ * Horizontal scroller around a tab row. `p-1` leaves room for the active
+ * border and focus ring; the height is the `h-11` list plus that padding
+ * (`h-13` = 44px + 8px) so the list fits the content box. Putting padding
+ * on an overflow box without this height makes `scrollHeight` 4px taller
+ * than `clientHeight` (48 vs 44) and a vertical scrollbar appears if
+ * `overflow-y` is not hidden. Line variant adds `pb-2` for the underline
+ * (`h-14` = 44px + 4px + 8px).
+ */
+const tabsScrollerVariants = cva(
+  "relative box-border w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+  {
+    variants: {
+      variant: {
+        default: 'group-data-[orientation="horizontal"]/tabs:h-13',
+        line: 'group-data-[orientation="horizontal"]/tabs:h-14 pb-2',
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
 const tabsTriggerVariants = cva([
   focusRing,
   disabledState,
@@ -29,4 +53,4 @@ const tabsTriggerVariants = cva([
   'after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation="horizontal"]/tabs:after:inset-x-0 group-data-[orientation="horizontal"]/tabs:after:bottom-[-5px] group-data-[orientation="horizontal"]/tabs:after:h-0.5 group-data-[orientation="vertical"]/tabs:after:inset-y-0 group-data-[orientation="vertical"]/tabs:after:-right-1 group-data-[orientation="vertical"]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state="active"]:after:opacity-100',
 ])
 
-export { tabsListVariants, tabsTriggerVariants }
+export { tabsListVariants, tabsScrollerVariants, tabsTriggerVariants }
