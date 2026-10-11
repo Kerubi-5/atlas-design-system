@@ -80,6 +80,25 @@ const featureEntries = new Set([
   "toast",
 ])
 
+/**
+ * QCheck's live `atlas-react-kit/` imports (plus `theme.css`, which is CSS
+ * only). None of these may pull an optional feature library, even through
+ * `internal/` or `utils`.
+ */
+const qcheckEntries = [
+  "badge",
+  "button",
+  "card",
+  "color-legend",
+  "empty-panel",
+  "info-tip",
+  "search-picker",
+  "table",
+  "tabs",
+  "toggle-group",
+  "utils",
+]
+
 const optionalPeers = [
   "date-fns",
   "next-themes",
@@ -212,7 +231,12 @@ describe("published modules", () => {
   })
 
   it("imports each core entry while optional peers are unresolvable", async () => {
-    const core = components.filter((name) => !featureEntries.has(name))
+    const core = [
+      ...new Set([
+        ...components.filter((name) => !featureEntries.has(name)),
+        ...qcheckEntries,
+      ]),
+    ]
     const loader = resolve(root, "test/register-optional-peers.mjs")
     const { stdout } = await runNode(
       process.execPath,
@@ -226,6 +250,19 @@ describe("published modules", () => {
       { cwd: root }
     )
     expect(stdout.trim()).toBe("ok")
+  })
+
+  it("treats QCheck's entry set as core: no optional peers, even transitively", async () => {
+    for (const name of qcheckEntries) {
+      expect(featureEntries.has(name), `${name} must stay a core entry`).toBe(
+        false
+      )
+      const { bare } = await collectedImports(name)
+      const leaked = [...bare].filter((specifier) =>
+        optionalPeerPattern.test(`from "${specifier}"`)
+      )
+      expect(leaked, `${name} must not import optional peers`).toEqual([])
+    }
   })
 
   it("names the toast module and its types after the kit, not the library underneath", async () => {
