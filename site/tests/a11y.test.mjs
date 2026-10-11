@@ -83,6 +83,14 @@ const OVERLAYS = [
     "[data-sonner-toast]",
     (page) => root(page).getByRole("button").first().click(),
   ],
+  ["feedback-toast--types", "[data-sonner-toast]", async () => {}],
+  ["feedback-toast--plain", "[data-sonner-toast]", async () => {}],
+  [
+    "feedback-toast--with-action-and-cancel",
+    "[data-sonner-toast]",
+    async () => {},
+  ],
+  ["feedback-toast--stacked", "[data-sonner-toast]", async () => {}],
 ]
 
 async function auditStory(context, baseUrl, entry, theme, overlay) {

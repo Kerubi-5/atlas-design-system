@@ -120,20 +120,32 @@ const toast: Toast = Object.assign(show(sonnerToast), {
 /**
  * Toasts drawn entirely with kit classes. Sonner's own styles are unlayered
  * CSS that Tailwind utilities cannot override, so the toaster runs Sonner
- * `unstyled` and styles every part here: the popover surface, Alert-style
- * status icons (the tone colors the icon, title, and border, not the body
- * text), kit buttons for actions, and a labelled close button with the
- * shared focus ring.
+ * `unstyled` and styles every part here.
+ *
+ * Icon policy: a plain `toast()` has no icon. `success`, `info`, `warning`,
+ * `error`, and `loading` each show a status icon. Tone colors the icon, title,
+ * and border (same approach as Alert), not the body text.
+ *
+ * Close button: a circular badge centred on the top-right corner (`-top-2
+ * -right-2`, half outside the border). Ghost / icon-xs still supplies the
+ * shared focus ring, but Sonner's unlayered `[data-button]` default
+ * (`background: var(--normal-text)`) and the dark `[data-close-button]` rule
+ * (not gated on `data-styled`) would paint a foreground square. Important
+ * popover fill, border, and muted text beat those fills. The 24px hit area
+ * is the badge itself; the X is 12px. `overflow-visible` on the toast and
+ * toaster keeps stacked badges from being clipped.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast:
-    "flex w-(--width) flex-wrap items-start justify-end gap-3 rounded-none border border-border bg-popover p-4 pr-10 text-sm text-popover-foreground shadow-lg",
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-3 gap-y-2 overflow-visible rounded-none border border-border bg-popover px-4 py-3 text-sm text-popover-foreground shadow-md",
   // Fills the row beside the icon, so action buttons wrap to their own row
-  // (aligned right by the toast's justify-end).
-  content: "flex min-w-0 flex-1 basis-[calc(100%-1.75rem)] flex-col gap-0.5",
+  // (aligned right by the toast's justify-end). Without an icon the basis
+  // falls back to the title's width, so a one-word toast stays compact.
+  content:
+    "flex min-w-0 flex-1 basis-full flex-col gap-1 [[data-icon]+&]:basis-[calc(100%-1.75rem)]",
   title: "font-medium leading-5",
   description: "leading-5 text-muted-foreground",
-  icon: "mt-0.5 flex size-4 shrink-0 items-center justify-center [&_svg]:size-4",
+  icon: "flex size-4 shrink-0 items-center justify-center [&_svg]:size-4",
   actionButton: cn(buttonVariants({ size: "xs" }), "shrink-0"),
   cancelButton: cn(
     buttonVariants({ variant: "outline", size: "xs" }),
@@ -141,9 +153,10 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   ),
   closeButton: cn(
     buttonVariants({ variant: "ghost", size: "icon-xs" }),
-    "absolute top-2 right-2 text-muted-foreground"
+    "!absolute !-top-2 !-right-2 !left-auto !z-10 !size-6 !rounded-full !border !border-border !bg-popover !p-0 !text-muted-foreground !shadow-xs !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
   ),
   success: "border-success/40 [&_[data-title]]:text-success",
+  info: "[&_[data-title]]:text-foreground",
   warning: "border-warning/40 [&_[data-title]]:text-warning",
   error: "border-destructive/40 [&_[data-title]]:text-destructive",
 }
@@ -159,7 +172,7 @@ const icons: SonnerProps["icons"] = {
       className="animate-spin text-muted-foreground"
     />
   ),
-  close: <XIcon aria-hidden />,
+  close: <XIcon aria-hidden className="size-3" />,
 }
 
 /**
@@ -178,7 +191,7 @@ const Toaster = ({
   return (
     <Sonner
       theme={theme as SonnerProps["theme"]}
-      className="toaster group"
+      className="toaster group overflow-visible"
       position={position}
       closeButton={closeButton}
       expand={expand}

@@ -2,7 +2,28 @@
 
 ## Unreleased
 
-No package changes; the published 0.9.0 is unchanged.
+No package changes; the published 0.9.1 is unchanged.
+
+## 0.9.1 - 2026-10-11
+
+Patch: toast chrome only. The public API is unchanged.
+
+- Close button is a circular badge (`rounded-full`, the allowed exception
+  to square corners) centred on the toast's top-right corner (`-top-2
+-right-2`, half outside the border): `bg-popover`, `border-border`, a
+  light shadow, and a muted 12px X that tints to `text-foreground` on
+  hover and focus. The hit area is 24px. Ghost sets no background, so
+  Sonner's unlayered `[data-button]` default (`background: var(--normal-text)`)
+  and the dark `[data-close-button]` rule (not gated on `data-styled`)
+  were painting a solid foreground square and hiding the X. Important
+  popover-fill utilities beat those fills. The toast does not reserve
+  `pr-11` or clip the badge (`overflow-visible`), including in a stack.
+- Width is content up to 356px, or the viewport minus gutters below that
+  (390). Padding (`px-4 py-3`), title/description gap, and square corners
+  match Alert.
+- A plain `toast()` has no icon. `success`, `info`, `warning`, `error`, and
+  `loading` stay distinguishable by a status icon plus tone on the icon,
+  title, and border.
 
 ## 0.9.0 - 2026-10-11
 

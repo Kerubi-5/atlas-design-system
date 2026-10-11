@@ -227,7 +227,9 @@ export const usage: Record<string, string> = {
 
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
-**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.`,
+**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.
+
+**Look** A plain \`toast("Saved")\` has no icon. \`success\`, \`info\`, \`warning\`, \`error\`, and \`loading\` add a status icon. Tone colors the icon, title, and border, not the body. The close control is a circular badge on the top-right corner.`,
   "Stat tile": `
 **Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
 
