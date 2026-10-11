@@ -194,6 +194,20 @@ describe("TabsList overflow", () => {
     expect(scrollIntoView.mock.instances[0]).toBe(active)
   })
 
+  it("treats a missing list variant as default", () => {
+    render(
+      <Tabs defaultValue="overview">
+        <TabsList variant={null} aria-label="Order">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">Overview panel</TabsContent>
+      </Tabs>
+    )
+    const scroller = scrollerOf(screen.getByRole("tablist", { name: "Order" }))
+    expect(scroller).toHaveAttribute("data-variant", "default")
+    expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
+  })
+
   it("gives the line variant extra bottom padding for the underline", () => {
     render(
       <Tabs defaultValue="list">
