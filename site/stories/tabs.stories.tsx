@@ -3,6 +3,7 @@ import { useArgs } from "storybook/preview-api"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../src/tabs.js"
 import {
+  TabsNavDesktopStory,
   TabsNavNarrowStory,
   TabsNavStory,
   TabsOverflowStory,
@@ -51,6 +52,10 @@ export const Nav: Story = {
 }
 export const NavNarrow: Story = {
   render: () => <TabsNavNarrowStory />,
+  parameters: { controls: { disable: true } },
+}
+export const NavDesktop: Story = {
+  render: () => <TabsNavDesktopStory />,
   parameters: { controls: { disable: true } },
 }
 export const Overflow: Story = {

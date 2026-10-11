@@ -144,6 +144,42 @@ describe("TabsNav", () => {
   })
 })
 
+describe("tab trigger padding", () => {
+  it("uses the same px on every trigger and link, with no flex shrink", () => {
+    const classes = tabsTriggerVariants().split(/\s+/)
+    expect(classes).toContain("px-4")
+    expect(classes).toContain("flex-none")
+    expect(classes).not.toContain("flex-1")
+    expect(classes.some((token) => token.startsWith("last:"))).toBe(false)
+    expect(classes.some((token) => /last-child/.test(token))).toBe(false)
+  })
+
+  it("keeps that padding on every Settings link and trigger", () => {
+    render(<TabsNavStory />)
+    const links = screen.getAllByRole("link")
+    expect(links.map((link) => link.textContent)).toEqual([
+      "Activity",
+      "Preferences",
+      "Notifications",
+      "API Tokens",
+      "Calendar feed",
+      "Apple Reminders",
+    ])
+    for (const link of links) {
+      const classes = link.className.split(/\s+/)
+      expect(classes).toContain("px-4")
+      expect(classes).toContain("flex-none")
+    }
+
+    render(<TabsOverflowStory />)
+    for (const tab of screen.getAllByRole("tab")) {
+      const classes = tab.className.split(/\s+/)
+      expect(classes).toContain("px-4")
+      expect(classes).toContain("flex-none")
+    }
+  })
+})
+
 describe("TabsNav without Next", () => {
   it("styles plain links with the public trigger variants", () => {
     const plain = renderToStaticMarkup(

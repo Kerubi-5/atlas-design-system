@@ -8,15 +8,19 @@ import {
   tabsTriggerVariants,
 } from "../src/tabs.js"
 
-/** Settings-style labels long enough to overflow a 390px row. */
+/** KairOS Settings labels — long enough to overflow a 390px row. */
 export const SETTINGS_LINKS = [
   "Activity",
   "Preferences",
   "Notifications",
-  "API tokens",
+  "API Tokens",
   "Calendar feed",
   "Apple Reminders",
 ] as const
+
+function settingsSlug(label: string) {
+  return label.toLowerCase().replace(/\s+/g, "-")
+}
 
 /** Default and line tab lists with panels. */
 export function TabsStory() {
@@ -51,7 +55,7 @@ export function TabsOverflowStory() {
       <Tabs defaultValue="activity">
         <TabsList>
           {SETTINGS_LINKS.map((label) => (
-            <TabsTrigger key={label} value={label.toLowerCase()}>
+            <TabsTrigger key={label} value={settingsSlug(label)}>
               {label}
             </TabsTrigger>
           ))}
@@ -81,7 +85,7 @@ export function TabsNavStory({
         return (
           <a
             key={label}
-            href={`#${label.toLowerCase().replace(/\s+/g, "-")}`}
+            href={`#${settingsSlug(label)}`}
             aria-current={isActive ? "page" : undefined}
             data-state={isActive ? "active" : "inactive"}
             className={cn(tabsTriggerVariants())}
@@ -101,6 +105,19 @@ export function TabsNavStory({
 export function TabsNavNarrowStory() {
   return (
     <div className="w-[390px] max-w-full border border-border p-3">
+      <p className="mb-4 text-lg font-medium">Settings</p>
+      <TabsNavStory />
+    </div>
+  )
+}
+
+/**
+ * Same six Settings links at desktop width so padding can be compared
+ * across short and long labels.
+ */
+export function TabsNavDesktopStory() {
+  return (
+    <div className="w-[1280px] max-w-full border border-border p-3">
       <p className="mb-4 text-lg font-medium">Settings</p>
       <TabsNavStory />
     </div>

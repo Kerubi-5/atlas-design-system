@@ -29,6 +29,8 @@ growing a stray vertical scrollbar when an app adds `overflow-x-auto`.
   overflows.
 - Apps should drop `className="max-w-full overflow-x-auto"` on `TabsNav`
   (KairOS: `components/settings/settings-nav.tsx`) once they upgrade.
+- Triggers and `TabsNav` links share one `px-4` and `flex-none`, so a long
+  last label (Apple Reminders) is not squeezed. No last-child padding.
 
 ## 0.8.0 - 2026-10-11
 
