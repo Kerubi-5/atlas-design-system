@@ -148,10 +148,6 @@
       "types": "./dist/slider.d.ts",
       "default": "./dist/slider.js"
     },
-    "./sonner": {
-      "types": "./dist/sonner.d.ts",
-      "default": "./dist/sonner.js"
-    },
     "./sortable-table-head": {
       "types": "./dist/sortable-table-head.d.ts",
       "default": "./dist/sortable-table-head.js"
@@ -187,6 +183,10 @@
     "./theme-provider": {
       "types": "./dist/theme-provider.d.ts",
       "default": "./dist/theme-provider.js"
+    },
+    "./toast": {
+      "types": "./dist/toast.d.ts",
+      "default": "./dist/toast.js"
     },
     "./toggle": {
       "types": "./dist/toggle.d.ts",

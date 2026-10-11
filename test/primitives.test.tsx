@@ -17,11 +17,11 @@ import { Label } from "../src/label.js"
 import { SelectItem } from "../src/select.js"
 import { Separator } from "../src/separator.js"
 import { Skeleton } from "../src/skeleton.js"
-import { Toaster, toast } from "../src/sonner.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../src/tabs.js"
 import { ThemeProvider } from "../src/theme-provider.js"
+import { Toaster, toast } from "../src/toast.js"
 
 import { createUser, render, screen, waitFor, within } from "./helpers.js"
 
@@ -213,12 +213,14 @@ describe("Toaster", () => {
     })
   })
 
-  it("shows a toast() message from the kit's own toast export", async () => {
+  it("shows a toast() message and returns its id", async () => {
     renderToaster()
+    let id: string | number = ""
     act(() => {
-      toast("Settings saved")
+      id = toast("Settings saved")
     })
     expect(await screen.findByText("Settings saved")).toBeInTheDocument()
+    expect(["string", "number"]).toContain(typeof id)
   })
 
   it("styles status toasts with kit tones, icons, and buttons", async () => {
@@ -248,20 +250,69 @@ describe("Toaster", () => {
     expect(onRetry).toHaveBeenCalled()
   })
 
-  it("adds a labelled close button and merges app class names", async () => {
+  it("adds a labelled close button unless closeButton is false", async () => {
     const user = createUser()
-    renderToaster({ toastOptions: { classNames: { toast: "app-toast" } } })
+    const { unmount } = renderToaster()
     act(() => {
       toast.success("Order archived")
     })
     const item = (await screen.findByText("Order archived")).closest(
       "[data-sonner-toast]"
     ) as HTMLElement
-    expect(item.className).toContain("app-toast")
-    expect(item.className).toContain("bg-popover")
     await user.click(within(item).getByRole("button", { name: "Close toast" }))
     await waitFor(() => {
       expect(screen.queryByText("Order archived")).toBeNull()
     })
+    unmount()
+
+    renderToaster({ closeButton: false })
+    act(() => {
+      toast.info("Sync finished")
+    })
+    await screen.findByText("Sync finished")
+    expect(screen.queryByRole("button", { name: "Close toast" })).toBeNull()
+  })
+
+  it("updates a toast in place when its id is reused, and dismisses by id", async () => {
+    renderToaster()
+    let id: string | number = ""
+    act(() => {
+      id = toast.loading("Saving")
+    })
+    await screen.findByText("Saving")
+    act(() => {
+      toast.success("Saved", { id })
+    })
+    expect(await screen.findByText("Saved")).toBeInTheDocument()
+    expect(screen.queryByText("Saving")).toBeNull()
+    expect(document.querySelectorAll("[data-sonner-toast]")).toHaveLength(1)
+    act(() => {
+      toast.dismiss(id)
+    })
+    await waitFor(() => {
+      expect(screen.queryByText("Saved")).toBeNull()
+    })
+  })
+
+  it("passes only kit options through, so callers cannot restyle toasts", async () => {
+    // Plain JavaScript callers can still hand over options of the library
+    // underneath; the kit drops them instead of forwarding them.
+    renderToaster({
+      richColors: true,
+      toastOptions: { classNames: { toast: "app-toaster" } },
+    } as React.ComponentProps<typeof Toaster>)
+    act(() => {
+      toast.warning("Storage almost full", {
+        className: "app-toast",
+        unstyled: false,
+      } as Parameters<typeof toast.warning>[1])
+    })
+    const item = (await screen.findByText("Storage almost full")).closest(
+      "[data-sonner-toast]"
+    ) as HTMLElement
+    expect(item).toHaveAttribute("data-styled", "false")
+    expect(item.getAttribute("data-rich-colors")).not.toBe("true")
+    expect(item.className).not.toContain("app-toast")
+    expect(item.className).toContain("border-warning/40")
   })
 })

@@ -60,9 +60,9 @@ const stories: Story[] = [
   { id: "feedback-skeleton--loading" },
   { id: "feedback-empty-panel--sizes" },
   { id: "feedback-error-boundary--fallback" },
-  { id: "feedback-sonner--types" },
+  { id: "feedback-toast--types" },
   {
-    id: "feedback-sonner--playground",
+    id: "feedback-toast--playground",
     open: async (page) => {
       await root(page).getByRole("button").first().click()
       await expect(page.locator("[data-sonner-toast]").first()).toBeVisible()

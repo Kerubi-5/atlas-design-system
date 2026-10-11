@@ -79,7 +79,7 @@ const OVERLAYS = [
     (page) => root(page).getByRole("button").first().click(),
   ],
   [
-    "feedback-sonner--playground",
+    "feedback-toast--playground",
     "[data-sonner-toast]",
     (page) => root(page).getByRole("button").first().click(),
   ],

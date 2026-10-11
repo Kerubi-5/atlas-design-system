@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.8.0 - 2026-10-11
+
+Minor release with one breaking rename (allowed before 1.0): toasts get a
+kit-owned API, so the library that draws them can change without app changes.
+
+- **Breaking:** `atlas-react-kit/sonner` is now `atlas-react-kit/toast`.
+  Change the import path; `Toaster` and `toast` keep their names, and the
+  look is unchanged.
+- `toast()` and `Toaster` take only the kit's own options and types:
+  - `toast(message, options)`, `.success`, `.info`, `.warning`, `.error`, and
+    `.loading` return the toast's id; `.dismiss(id?)` closes one or all.
+  - Options are `id` (reuse it to replace a toast in place, e.g. loading →
+    success), `description`, `duration`, and `action` / `cancel` as
+    `{ label, onClick }`.
+  - `Toaster` takes `position`, `closeButton` (default on), `expand`,
+    `visibleToasts`, and `duration`.
+  - Sonner's own props and options (`richColors`, `toastOptions`, class
+    names, `unstyled`, `toast.promise`, `toast.custom`) are no longer part of
+    the API, and are dropped if passed from plain JavaScript.
+- The docs page is now Feedback/Toast; old Feedback/Sonner links redirect.
+
 ## 0.7.0 - 2026-10-10
 
 Minor release: one toast setup for every app. No existing API was removed;
