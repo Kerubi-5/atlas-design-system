@@ -153,6 +153,53 @@ for (const theme of ["light", "dark"] as const) {
   }
 }
 
+test("tab scroller content fits the box without a vertical scrollbar", async ({
+  page,
+}) => {
+  for (const { id, width } of [
+    { id: "navigation-tabs--nav", width: 1280 },
+    { id: "navigation-tabs--nav", width: 390 },
+    { id: "navigation-tabs--overflow", width: 390 },
+  ] as const) {
+    await page.setViewportSize({
+      width,
+      height: width === 390 ? 844 : 720,
+    })
+    await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=theme:light`)
+    await page.waitForSelector("body.sb-show-main")
+    await page.evaluate(() => document.fonts.ready)
+    const scrollers = root(page).locator("[data-slot=tabs-scroller]")
+    await expect(scrollers.first()).toBeVisible()
+    const metrics = await scrollers.evaluateAll((nodes) =>
+      nodes.map((node) => {
+        const el = node as HTMLElement
+        const previous = el.style.overflowY
+        el.style.overflowY = "auto"
+        const next = {
+          scrollHeight: el.scrollHeight,
+          clientHeight: el.clientHeight,
+          listHeight:
+            el.querySelector("[data-slot=tabs-list]")?.getBoundingClientRect()
+              .height ?? 0,
+        }
+        el.style.overflowY = previous
+        return next
+      })
+    )
+    expect(metrics.length, `${id} @ ${width}px`).toBeGreaterThan(0)
+    for (const box of metrics) {
+      expect(
+        box.scrollHeight,
+        `${id} @ ${width}px scrollHeight === clientHeight`
+      ).toBe(box.clientHeight)
+      expect(
+        box.listHeight,
+        `${id} @ ${width}px list fits the scroller content box`
+      ).toBeLessThanOrEqual(box.clientHeight)
+    }
+  }
+})
+
 test("settings tabs share one horizontal padding at 1280 and 390", async ({
   page,
 }) => {

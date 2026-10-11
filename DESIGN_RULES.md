@@ -105,9 +105,10 @@ Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labell
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
 Next adapter provides `TabsNavLink` with this behavior. `TabsNav` and `TabsList`
 scroll overflowing labels inside themselves (`overflow-x-auto overflow-y-hidden`,
-with padding for the active border and focus ring, and an edge fade like
-`Table`). Do not wrap them in another `overflow-x-auto` — that pairing forces
-`overflow-y: auto` and a stray vertical scrollbar.
+with padding for the active border and focus ring counted in the scroller
+height, and an edge fade like `Table`). Do not wrap them in another
+`overflow-x-auto` — that pairing forces `overflow-y: auto` and a stray
+vertical scrollbar.
 
 Use `FormTextField`, `FormSelectField`, `FormDatePickerField`,
 `FormDateTimePickerField`, `FormMarkdownField`, and `FormFeedbackField` for
