@@ -26,7 +26,7 @@ const atlasViewports = {
 }
 
 import { ThemeProvider } from "../../src/theme-provider.js"
-import { Toaster } from "../../src/sonner.js"
+import { Toaster } from "../../src/toast.js"
 import { beta, usage } from "../src/lib/usage.js"
 import "../src/styles.css"
 

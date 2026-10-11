@@ -43,7 +43,6 @@ const components = [
   "separator",
   "skeleton",
   "slider",
-  "sonner",
   "sortable-table-head",
   "spinner",
   "stat-tile",
@@ -53,6 +52,7 @@ const components = [
   "tabs",
   "textarea",
   "theme-provider",
+  "toast",
   "toggle",
   "toggle-group",
   "tooltip",
@@ -119,6 +119,14 @@ describe("published modules", () => {
     expect(manifest.peerDependenciesMeta.next.optional).toBe(true)
   })
 
+  it("names the toast module and its types after the kit, not the library underneath", async () => {
+    // Apps import toasts from atlas-react-kit/toast; the toast library is an
+    // implementation detail that can change without touching app code.
+    expect(manifest.exports["./sonner"]).toBeUndefined()
+    const types = await readFile(resolve(root, "dist/toast.d.ts"), "utf8")
+    expect(types).not.toMatch(/sonner/i)
+  })
+
   it("preserves client boundaries for hooks and event handlers", async () => {
     for (const name of [
       "accordion",
@@ -141,12 +149,12 @@ describe("published modules", () => {
       "select",
       "separator",
       "slider",
-      "sonner",
       "sortable-table-head",
       "switch",
       "table",
       "tabs",
       "theme-provider",
+      "toast",
       "toggle",
       "toggle-group",
       "tooltip",

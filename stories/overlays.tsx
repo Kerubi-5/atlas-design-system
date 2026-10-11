@@ -19,7 +19,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../src/popover.js"
-import { Toaster, toast } from "../src/sonner.js"
+import { Toaster, toast } from "../src/toast.js"
 
 /** Dialog with header, body, and square chrome. */
 export function DialogStory() {
@@ -71,7 +71,7 @@ export function PopoverStory() {
   )
 }
 
-/** Sonner toast using the kit toaster tokens. */
+/** A toast drawn with the kit toaster. */
 export function ToastStory() {
   return (
     <Button type="button" variant="outline" onClick={() => toast("Saved")}>

@@ -222,12 +222,12 @@ export const usage: Record<string, string> = {
 **Not for** unknown layouts (use \`Spinner\`) or empty results (use \`EmptyPanel\`).
 
 **Accessibility** Mark the loading region \`aria-busy\` and announce completion when it matters.`,
-  Sonner: `
+  Toast: `
 **Use for** brief confirmations after an action: "Settings saved", "Order archived".
 
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
-**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/sonner\`, not from \`sonner\` directly.`,
+**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.`,
   "Stat tile": `
 **Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
 

@@ -53,3 +53,12 @@ test("links to a page's old Components/ id land on its new page", async ({
   await page.goto("/?path=/story/tokens--theme")
   await expect(page).toHaveURL(/path=\/story\/foundations-tokens--theme$/)
 })
+
+test("links to the old Sonner page land on the Toast page", async ({
+  page,
+}) => {
+  await page.goto("/?path=/story/feedback-sonner--types")
+  await expect(page).toHaveURL(/path=\/story\/feedback-toast--types$/)
+  await page.goto("/?path=/story/components-sonner--playground")
+  await expect(page).toHaveURL(/path=\/story\/feedback-toast--playground$/)
+})
