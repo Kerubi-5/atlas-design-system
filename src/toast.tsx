@@ -126,17 +126,18 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * `error`, and `loading` each show a status icon. Tone colors the icon, title,
  * and border (same approach as Alert), not the body text.
  *
- * Close button: ghost / icon-xs with muted text. Ghost sets no background, so
- * Sonner's unlayered `[data-button]` default (`background: var(--normal-text)`,
- * a foreground square) and the dark `[data-close-button]` rule (not gated on
- * `data-styled`) would win and hide the X under `text-muted-foreground`.
- * Important transparent / muted utilities beat those fills; hover and focus
- * tint the X only. `!` also pins position and size so a leftover
- * `data-close-button` transform cannot sit it on a corner.
+ * Close button: a circular badge centred on the top-right corner (`-top-2
+ * -right-2`, half outside the border). Ghost / icon-xs still supplies the
+ * shared focus ring, but Sonner's unlayered `[data-button]` default
+ * (`background: var(--normal-text)`) and the dark `[data-close-button]` rule
+ * (not gated on `data-styled`) would paint a foreground square. Important
+ * popover fill, border, and muted text beat those fills. The 24px hit area
+ * is the badge itself; the X is 12px. `overflow-visible` on the toast and
+ * toaster keeps stacked badges from being clipped.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast:
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-3 gap-y-2 rounded-none border border-border bg-popover py-3 pr-11 pl-4 text-sm text-popover-foreground shadow-md",
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-3 gap-y-2 overflow-visible rounded-none border border-border bg-popover px-4 py-3 text-sm text-popover-foreground shadow-md",
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
   // falls back to the title's width, so a one-word toast stays compact.
@@ -152,7 +153,7 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   ),
   closeButton: cn(
     buttonVariants({ variant: "ghost", size: "icon-xs" }),
-    "!absolute !top-1/2 !right-2 !left-auto !size-7 !-translate-y-1/2 !translate-x-0 !border-transparent !bg-transparent !text-muted-foreground !shadow-none hover:!border-transparent hover:!bg-transparent hover:!text-foreground focus-visible:!text-foreground"
+    "!absolute !-top-2 !-right-2 !left-auto !z-10 !size-6 !rounded-full !border !border-border !bg-popover !p-0 !text-muted-foreground !shadow-xs !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
   ),
   success: "border-success/40 [&_[data-title]]:text-success",
   info: "[&_[data-title]]:text-foreground",
@@ -171,7 +172,7 @@ const icons: SonnerProps["icons"] = {
       className="animate-spin text-muted-foreground"
     />
   ),
-  close: <XIcon aria-hidden />,
+  close: <XIcon aria-hidden className="size-3" />,
 }
 
 /**
@@ -190,7 +191,7 @@ const Toaster = ({
   return (
     <Sonner
       theme={theme as SonnerProps["theme"]}
-      className="toaster group"
+      className="toaster group overflow-visible"
       position={position}
       closeButton={closeButton}
       expand={expand}
