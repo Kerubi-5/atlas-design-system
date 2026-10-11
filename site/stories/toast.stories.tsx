@@ -7,11 +7,6 @@ import { ToastStory, ToastTypesStory } from "../../stories/overlays.js"
 
 const keep = { duration: Number.POSITIVE_INFINITY }
 
-const preview = {
-  tags: ["!autodocs"],
-  parameters: { controls: { disable: true }, toaster: false },
-} as const
-
 /**
  * Mounts one kit toaster and shows the given toasts for the story lifetime.
  * Stories that use this skip the preview decorator toaster.
@@ -40,6 +35,11 @@ const meta = {
 } satisfies Meta<Args>
 export default meta
 type Story = StoryObj<typeof meta>
+
+const preview: Pick<Story, "tags" | "parameters"> = {
+  tags: ["!autodocs"],
+  parameters: { controls: { disable: true }, toaster: false },
+}
 export const Playground: Story = {}
 export const Composition: Story = {
   render: () => <ToastStory />,
