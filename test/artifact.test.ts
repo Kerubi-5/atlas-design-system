@@ -67,6 +67,83 @@ const components = [
   "utils",
 ]
 
+/** Feature entries that may import optional peers. Everything else is core. */
+const featureEntries = new Set([
+  "calendar",
+  "date-picker",
+  "date-time-picker",
+  "form/date-picker-field",
+  "form/date-time-picker-field",
+  "form/markdown-field",
+  "markdown",
+  "theme-provider",
+  "toast",
+])
+
+/**
+ * QCheck's live `atlas-react-kit/` imports (plus `theme.css`, which is CSS
+ * only). None of these may pull an optional feature library, even through
+ * `internal/` or `utils`.
+ */
+const qcheckEntries = [
+  "badge",
+  "button",
+  "card",
+  "color-legend",
+  "empty-panel",
+  "info-tip",
+  "search-picker",
+  "table",
+  "tabs",
+  "toggle-group",
+  "utils",
+]
+
+const optionalPeers = [
+  "date-fns",
+  "next-themes",
+  "react-day-picker",
+  "react-markdown",
+  "remark-gfm",
+  "sonner",
+]
+
+const optionalPeerPattern = new RegExp(
+  `from ["'](?:${optionalPeers.join("|")})(?:/[^"']*)?["']`
+)
+
+/**
+ * Walk compiled JS from a public entry and collect relative modules plus
+ * bare specifiers. Used so a leak through `utils` or `internal/` still
+ * fails the core-entry optional-peer check.
+ *
+ * @param {string} entry Public subpath without `./` (`button`, `form/text-field`).
+ */
+async function collectedImports(entry) {
+  const visited = new Set()
+  const bare = new Set()
+  const queue = [entry]
+  while (queue.length > 0) {
+    const name = queue.pop()
+    if (!name || visited.has(name)) continue
+    visited.add(name)
+    const source = await readFile(resolve(root, `dist/${name}.js`), "utf8")
+    for (const match of source.matchAll(/from ["']([^"']+)["']/g)) {
+      const specifier = match[1]
+      if (specifier.startsWith(".")) {
+        const next = resolve(root, "dist", name, "..", specifier)
+          .replace(/\\/g, "/")
+          .replace(/^.*\/dist\//, "")
+          .replace(/\.js$/, "")
+        queue.push(next)
+      } else {
+        bare.add(specifier)
+      }
+    }
+  }
+  return { visited, bare }
+}
+
 describe("published modules", () => {
   it("keeps card padding in the theme component layer so px-0 overrides it", async () => {
     const theme = await readFile(resolve(root, "theme.css"), "utf8")
@@ -123,6 +200,69 @@ describe("published modules", () => {
     }
     expect(manifest.exports["./theme.css"]).toBe("./theme.css")
     expect(manifest.peerDependenciesMeta.next.optional).toBe(true)
+    for (const name of optionalPeers) {
+      expect(manifest.dependencies[name]).toBeUndefined()
+      expect(manifest.peerDependencies[name]).toBe(
+        manifest.devDependencies[name]
+      )
+      expect(manifest.peerDependenciesMeta[name].optional).toBe(true)
+    }
+    for (const name of [
+      "class-variance-authority",
+      "clsx",
+      "lucide-react",
+      "radix-ui",
+      "tailwind-merge",
+      "tw-animate-css",
+    ]) {
+      expect(manifest.dependencies[name]).toEqual(expect.any(String))
+    }
+  })
+
+  it("keeps optional feature libraries out of every core entry, including transitive internals", async () => {
+    for (const name of components) {
+      if (featureEntries.has(name)) continue
+      const { bare } = await collectedImports(name)
+      const leaked = [...bare].filter((specifier) =>
+        optionalPeerPattern.test(`from "${specifier}"`)
+      )
+      expect(leaked, `${name} must not import optional peers`).toEqual([])
+    }
+  })
+
+  it("imports each core entry while optional peers are unresolvable", async () => {
+    const core = [
+      ...new Set([
+        ...components.filter((name) => !featureEntries.has(name)),
+        ...qcheckEntries,
+      ]),
+    ]
+    const loader = resolve(root, "test/register-optional-peers.mjs")
+    const { stdout } = await runNode(
+      process.execPath,
+      [
+        "--import",
+        loader,
+        "--input-type=module",
+        "-e",
+        `await Promise.all(${JSON.stringify(core)}.map((name) => import(new URL("./dist/" + name + ".js", import.meta.url).href))); console.log("ok")`,
+      ],
+      { cwd: root }
+    )
+    expect(stdout.trim()).toBe("ok")
+  })
+
+  it("treats QCheck's entry set as core: no optional peers, even transitively", async () => {
+    for (const name of qcheckEntries) {
+      expect(featureEntries.has(name), `${name} must stay a core entry`).toBe(
+        false
+      )
+      const { bare } = await collectedImports(name)
+      const leaked = [...bare].filter((specifier) =>
+        optionalPeerPattern.test(`from "${specifier}"`)
+      )
+      expect(leaked, `${name} must not import optional peers`).toEqual([])
+    }
   })
 
   it("names the toast module and its types after the kit, not the library underneath", async () => {
