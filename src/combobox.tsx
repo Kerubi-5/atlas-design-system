@@ -6,6 +6,7 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
+import { moveListboxHighlight } from "./internal/listbox-navigation.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { optionState } from "./internal/styles.js"
 import { cn, onInputChange } from "./utils.js"
@@ -30,13 +31,6 @@ type ComboboxProps = {
   "aria-label"?: string
   "aria-labelledby"?: string
 }
-
-/**
- * PageUp/PageDown jump size. The option list is `max-h-60`; ten rows is a
- * bit more than one viewport so long lists (timezones, currencies) move
- * without requiring an End key.
- */
-const LISTBOX_PAGE_SIZE = 10
 
 /**
  * Searchable single-select built from Button, Popover, and Input.
@@ -123,42 +117,20 @@ export function Combobox({
   const activeOption = filtered[highlight]
 
   const onSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown") {
+    const nextHighlight = moveListboxHighlight(
+      event.key,
+      highlight,
+      filtered.length
+    )
+    if (nextHighlight !== undefined) {
       event.preventDefault()
-      setHighlight((index) =>
-        filtered.length === 0 ? 0 : Math.min(index + 1, filtered.length - 1)
-      )
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault()
-      setHighlight((index) => Math.max(index - 1, 0))
+      setHighlight(nextHighlight)
+      return
     }
     if (event.key === "Enter") {
       event.preventDefault()
       const option = filtered[highlight]
       if (option) selectValue(option.value)
-    }
-    // Home/End/Page jump the highlight; preventDefault so the search caret
-    // stays put and the page behind the list does not scroll.
-    if (event.key === "Home") {
-      event.preventDefault()
-      setHighlight(0)
-    }
-    if (event.key === "End") {
-      event.preventDefault()
-      setHighlight(filtered.length === 0 ? 0 : filtered.length - 1)
-    }
-    if (event.key === "PageDown") {
-      event.preventDefault()
-      setHighlight((index) =>
-        filtered.length === 0
-          ? 0
-          : Math.min(index + LISTBOX_PAGE_SIZE, filtered.length - 1)
-      )
-    }
-    if (event.key === "PageUp") {
-      event.preventDefault()
-      setHighlight((index) => Math.max(index - LISTBOX_PAGE_SIZE, 0))
     }
   }
 

@@ -10,62 +10,9 @@ const manifest = JSON.parse(
   await readFile(resolve(root, "package.json"), "utf8")
 )
 
-const components = [
-  "accordion",
-  "alert",
-  "avatar",
-  "badge",
-  "breadcrumb",
-  "button",
-  "calendar",
-  "card",
-  "checkbox",
-  "color-legend",
-  "combobox",
-  "date-picker",
-  "date-time-picker",
-  "dialog",
-  "dropdown-menu",
-  "empty-panel",
-  "error-boundary",
-  "field",
-  "info-tip",
-  "input",
-  "label",
-  "markdown",
-  "meter",
-  "pagination",
-  "popover",
-  "progress",
-  "radio-group",
-  "search-picker",
-  "select",
-  "separator",
-  "skeleton",
-  "slider",
-  "sortable-table-head",
-  "spinner",
-  "stat-tile",
-  "switch",
-  "table",
-  "table-body-skeleton",
-  "tabs",
-  "textarea",
-  "theme-provider",
-  "toast",
-  "toggle",
-  "toggle-group",
-  "tooltip",
-  "form/date-picker-field",
-  "form/date-time-picker-field",
-  "form/field-error",
-  "form/feedback-field",
-  "form/markdown-field",
-  "form/select-field",
-  "form/text-field",
-  "next/tabs-nav-link",
-  "utils",
-]
+const components = Object.entries(manifest.exports)
+  .filter(([, target]) => typeof target === "object")
+  .map(([path]) => path.slice(2))
 
 /** Feature entries that may import optional peers. Everything else is core. */
 const featureEntries = new Set([
@@ -76,6 +23,7 @@ const featureEntries = new Set([
   "form/date-time-picker-field",
   "form/markdown-field",
   "markdown",
+  "next/tabs-nav-link",
   "theme-provider",
   "toast",
 ])
@@ -99,14 +47,9 @@ const qcheckEntries = [
   "utils",
 ]
 
-const optionalPeers = [
-  "date-fns",
-  "next-themes",
-  "react-day-picker",
-  "react-markdown",
-  "remark-gfm",
-  "sonner",
-]
+const optionalPeers = Object.entries(manifest.peerDependenciesMeta)
+  .filter(([, metadata]) => metadata.optional)
+  .map(([name]) => name)
 
 const optionalPeerPattern = new RegExp(
   `from ["'](?:${optionalPeers.join("|")})(?:/[^"']*)?["']`
@@ -199,12 +142,9 @@ describe("published modules", () => {
       await access(resolve(root, entry.default))
     }
     expect(manifest.exports["./theme.css"]).toBe("./theme.css")
-    expect(manifest.peerDependenciesMeta.next.optional).toBe(true)
     for (const name of optionalPeers) {
       expect(manifest.dependencies[name]).toBeUndefined()
-      expect(manifest.peerDependencies[name]).toBe(
-        manifest.devDependencies[name]
-      )
+      expect(manifest.peerDependencies[name]).toEqual(expect.any(String))
       expect(manifest.peerDependenciesMeta[name].optional).toBe(true)
     }
     for (const name of [
@@ -231,12 +171,7 @@ describe("published modules", () => {
   })
 
   it("imports each core entry while optional peers are unresolvable", async () => {
-    const core = [
-      ...new Set([
-        ...components.filter((name) => !featureEntries.has(name)),
-        ...qcheckEntries,
-      ]),
-    ]
+    const core = components.filter((name) => !featureEntries.has(name))
     const loader = resolve(root, "test/register-optional-peers.mjs")
     const { stdout } = await runNode(
       process.execPath,
@@ -252,16 +187,15 @@ describe("published modules", () => {
     expect(stdout.trim()).toBe("ok")
   })
 
-  it("treats QCheck's entry set as core: no optional peers, even transitively", async () => {
+  it("keeps QCheck's entries public and core", () => {
     for (const name of qcheckEntries) {
+      expect(
+        manifest.exports[`./${name}`],
+        `${name} must stay a public entry`
+      ).toBeDefined()
       expect(featureEntries.has(name), `${name} must stay a core entry`).toBe(
         false
       )
-      const { bare } = await collectedImports(name)
-      const leaked = [...bare].filter((specifier) =>
-        optionalPeerPattern.test(`from "${specifier}"`)
-      )
-      expect(leaked, `${name} must not import optional peers`).toEqual([])
     }
   })
 

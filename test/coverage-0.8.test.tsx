@@ -25,8 +25,8 @@ function markdownField(value: string, errors: unknown[] = []) {
 }
 
 describe("FormSelectField", () => {
-  it("renders without meta and stays valid", () => {
-    render(
+  it("stays valid without meta or when meta has no errors", () => {
+    const { rerender } = render(
       <FormSelectField
         value={undefined}
         label="Plan"
@@ -40,6 +40,20 @@ describe("FormSelectField", () => {
     expect(trigger).not.toHaveAttribute("aria-invalid")
     expect(trigger).toHaveTextContent("Pick a plan")
     expect(screen.queryByRole("alert")).toBeNull()
+
+    rerender(
+      <FormSelectField
+        value="free"
+        meta={{ errors: [] }}
+        label="Plan"
+        onValueChange={() => {}}
+      >
+        <SelectItem value="free">Free</SelectItem>
+      </FormSelectField>
+    )
+    expect(screen.getByRole("combobox", { name: "Plan" })).not.toHaveAttribute(
+      "aria-invalid"
+    )
   })
 
   it("marks the trigger invalid and shows the first error", () => {
@@ -58,22 +72,6 @@ describe("FormSelectField", () => {
       "true"
     )
     expect(screen.getByRole("alert")).toHaveTextContent("Choose a plan")
-  })
-
-  it("keeps valid styling when meta has no errors", () => {
-    render(
-      <FormSelectField
-        value="free"
-        meta={{ errors: [] }}
-        label="Plan"
-        onValueChange={() => {}}
-      >
-        <SelectItem value="free">Free</SelectItem>
-      </FormSelectField>
-    )
-    expect(screen.getByRole("combobox", { name: "Plan" })).not.toHaveAttribute(
-      "aria-invalid"
-    )
   })
 })
 
