@@ -187,6 +187,23 @@ describe("published modules", () => {
     expect(stdout.trim()).toBe("ok")
   })
 
+  it("loads the calendar and markdown renderer on demand", async () => {
+    // Pickers and the markdown field draw their trigger and textarea up
+    // front; the calendar and preview renderer arrive when first shown.
+    const deferred = {
+      "date-picker": ["calendar", "react-day-picker"],
+      "date-time-picker": ["calendar", "react-day-picker"],
+      "form/date-picker-field": ["calendar", "react-day-picker"],
+      "form/date-time-picker-field": ["calendar", "react-day-picker"],
+      "form/markdown-field": ["markdown", "react-markdown", "remark-gfm"],
+    }
+    for (const [entry, heavy] of Object.entries(deferred)) {
+      const { visited, bare } = await collectedImports(entry)
+      const eager = heavy.filter((name) => visited.has(name) || bare.has(name))
+      expect(eager, `${entry} must not load these up front`).toEqual([])
+    }
+  })
+
   it("keeps QCheck's entries public and core", () => {
     for (const name of qcheckEntries) {
       expect(

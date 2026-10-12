@@ -81,7 +81,11 @@ const stories: Story[] = [
   { id: "forms-date-picker--range-reference" },
   {
     id: "forms-date-time-picker--playground",
-    open: clickFirst("button", "dialog"),
+    open: async (page) => {
+      await clickFirst("button", "dialog")(page)
+      // The calendar loads on first open; capture it, not the spinner.
+      await expect(page.getByRole("grid")).toBeVisible()
+    },
   },
   { id: "navigation-tabs--composition" },
   { id: "navigation-tabs--nav" },

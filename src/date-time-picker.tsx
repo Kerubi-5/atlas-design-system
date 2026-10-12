@@ -5,12 +5,12 @@ import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
 import { Button } from "./button.js"
-import { Calendar } from "./calendar.js"
 import {
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
   pickerTriggerClassName,
 } from "./internal/form-control.js"
+import { LazyCalendar, preloadCalendar } from "./lazy-calendar.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import {
   Select,
@@ -145,6 +145,8 @@ export function DateTimePickerButton({
           aria-invalid={ariaInvalid}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
+          onPointerEnter={preloadCalendar}
+          onFocus={preloadCalendar}
         >
           <CalendarIcon data-icon="inline-start" />
           {label}
@@ -160,7 +162,7 @@ export function DateTimePickerButton({
           pickerContentClassName
         )}
       >
-        <Calendar
+        <LazyCalendar
           mode="single"
           selected={date ?? undefined}
           defaultMonth={defaultMonth ?? date ?? undefined}
