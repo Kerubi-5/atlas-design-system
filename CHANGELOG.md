@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Package internals only; the public API and rendered markup are unchanged.
+
+- `SearchPicker` resets its highlight while rendering instead of in an
+  effect, so each keystroke commits once instead of twice.
+- The `form/*` fields share one internal label, control, and error layout.
+- `Combobox` and `SearchPicker` share option ids, the scroll-into-view
+  ref, and the empty-row classes. `DatePickerButton` and
+  `DateTimePickerButton` share their trigger and popover chrome.
+
 ## 0.9.3 - 2026-10-12
 
 Patch: optional creatable Combobox. Existing callers keep working with no
