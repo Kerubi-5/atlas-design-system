@@ -7,7 +7,11 @@ import type { DateRange } from "react-day-picker"
 
 import { Button } from "./button.js"
 import { Calendar } from "./calendar.js"
-import { formControlTriggerClassName } from "./internal/form-control.js"
+import {
+  PICKER_COLLISION_PADDING,
+  pickerContentClassName,
+  pickerTriggerClassName,
+} from "./internal/form-control.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn } from "./utils.js"
@@ -109,9 +113,6 @@ function formatRangeTriggerLabel(
   return `${format(from, "PPP")} – ${format(to, "PPP")}`
 }
 
-/** Gutter used when the calendar popover collides with the viewport. */
-const DATE_PICKER_COLLISION_PADDING = 16
-
 /** Shared trigger + auto-sized popover chrome for single and range modes. */
 function DatePickerShell({
   id,
@@ -146,11 +147,7 @@ function DatePickerShell({
           disabled={disabled}
           aria-invalid={ariaInvalid}
           data-empty={empty}
-          className={cn(
-            formControlTriggerClassName,
-            "justify-start data-[empty=true]:text-muted-foreground",
-            className
-          )}
+          className={cn(pickerTriggerClassName, className)}
         >
           <CalendarIcon data-icon="inline-start" />
           {label}
@@ -159,8 +156,8 @@ function DatePickerShell({
       <PopoverContent
         align="start"
         side={side}
-        collisionPadding={DATE_PICKER_COLLISION_PADDING}
-        className="w-auto max-h-(--radix-popover-content-available-height) overflow-y-auto rounded-none p-0"
+        collisionPadding={PICKER_COLLISION_PADDING}
+        className={cn("w-auto", pickerContentClassName)}
       >
         {children}
       </PopoverContent>
