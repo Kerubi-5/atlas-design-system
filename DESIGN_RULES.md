@@ -85,7 +85,9 @@ still read normal words.
 Primitives have square corners. Reserve `rounded-full` for dots, avatars,
 other circles, and the toast close badge. Card and dialog titles already use
 uppercase, tracked `font-heading` styling. Toasts are overlay popovers with
-the same square corners and Alert padding (`px-4 py-3`). The close control is
+the same square corners and Alert left/vertical padding (`pl-4 py-3`). Right
+padding is `pr-6` so copy clears the floating close badge. Icon-to-text is
+`gap-x-2.5` so the status icon and copy read as one unit. The close control is
 a circular badge centred on the top-right corner (half outside the border),
 not a control in the text row. A plain `toast()` has no icon — status icons
 belong to `success`, `info`, `warning`, `error`, and `loading`. Tone colors

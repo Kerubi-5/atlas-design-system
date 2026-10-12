@@ -2,7 +2,16 @@
 
 ## Unreleased
 
-No package changes; the published 0.9.1 is unchanged.
+No package changes; the published 0.9.2 is unchanged.
+
+## 0.9.2 - 2026-10-11
+
+Patch: toast chrome only. The public API is unchanged.
+
+- Right padding is `pr-6` (left stays `pl-4`) so title and description
+  clear the floating close badge instead of sitting tight against the
+  right edge. Icon-to-text gap is `gap-x-2.5` so the status icon and
+  copy read as one unit.
 
 ## 0.9.1 - 2026-10-11
 

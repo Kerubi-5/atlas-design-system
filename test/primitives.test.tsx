@@ -262,9 +262,12 @@ describe("Toaster", () => {
     expect(item.className).toContain("w-max")
     expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
     expect(item.className).toContain("rounded-none")
-    expect(item.className).toContain("px-4")
+    expect(item.className).toContain("pl-4")
+    expect(item.className).toContain("pr-6")
+    expect(item.className).toContain("gap-x-2.5")
     expect(item.className).toContain("overflow-visible")
     expect(item.className).not.toContain("pr-11")
+    expect(item.className).not.toContain("px-4")
     const close = within(item).getByRole("button", { name: "Close toast" })
     // Popover-fill ! utilities beat Sonner's unlayered [data-button] /
     // [data-close-button] foreground square; the badge sits on the corner.

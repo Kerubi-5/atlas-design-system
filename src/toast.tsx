@@ -134,15 +134,20 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * popover fill, border, and muted text beat those fills. The 24px hit area
  * is the badge itself; the X is 12px. `overflow-visible` on the toast and
  * toaster keeps stacked badges from being clipped.
+ *
+ * Padding is asymmetric: `pl-4` matches Alert; `pr-6` clears the badge
+ * (about 16px of it sits inside the border). Icon-to-text is `gap-x-2.5`
+ * so the status icon and copy read as one unit.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast:
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-3 gap-y-2 overflow-visible rounded-none border border-border bg-popover px-4 py-3 text-sm text-popover-foreground shadow-md",
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-6 text-sm text-popover-foreground shadow-md",
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
   // falls back to the title's width, so a one-word toast stays compact.
+  // 1.625rem = 16px icon + 10px gap-x-2.5.
   content:
-    "flex min-w-0 flex-1 basis-full flex-col gap-1 [[data-icon]+&]:basis-[calc(100%-1.75rem)]",
+    "flex min-w-0 flex-1 basis-full flex-col gap-1 [[data-icon]+&]:basis-[calc(100%-1.625rem)]",
   title: "font-medium leading-5",
   description: "leading-5 text-muted-foreground",
   icon: "flex size-4 shrink-0 items-center justify-center [&_svg]:size-4",
