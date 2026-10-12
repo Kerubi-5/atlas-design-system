@@ -96,9 +96,20 @@ function SearchPicker<T>({
 
   const [highlight, setHighlight] = React.useState(selectedIndex)
 
-  React.useEffect(() => {
+  // Reset the highlight while rendering, not in an effect, when the query or
+  // the selected row changes: an effect commits every keystroke twice, once
+  // with the stale highlight and again with the reset.
+  const [highlightFor, setHighlightFor] = React.useState({
+    query,
+    selectedIndex,
+  })
+  if (
+    highlightFor.query !== query ||
+    highlightFor.selectedIndex !== selectedIndex
+  ) {
+    setHighlightFor({ query, selectedIndex })
     setHighlight(query ? 0 : selectedIndex)
-  }, [query, selectedIndex])
+  }
 
   const active = filtered[highlight]
 
