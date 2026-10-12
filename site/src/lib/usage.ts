@@ -85,11 +85,11 @@ export const usage: Record<string, string> = {
 
 **Accessibility** Pair with a \`Label htmlFor\`; the label is part of the click target.`,
   Combobox: `
-**Use for** picking one value from a long or searchable list: timezones, currencies, countries.
+**Use for** picking one value from a long or searchable list: timezones, currencies, countries. Set \`creatable\` when the search can become a new option (for example a 3-letter currency code the catalog does not have yet). Domain lists and validation stay in the app (\`normalizeCreateValue\`). Creating calls \`onValueChange\` like a selection.
 
-**Not for** short lists of a handful of options (use \`Select\`), free text entry, or an always-visible filtered list (use \`SearchPicker\`).
+**Not for** short lists of a handful of options (use \`Select\`) or an always-visible filtered list (use \`SearchPicker\`). Creatable is still a picker: it does not turn Combobox into a text field.
 
-**Accessibility** Name it with \`Label htmlFor={id}\` or \`aria-label\`; a combobox does not take its name from the selected value.`,
+**Accessibility** Name it with \`Label htmlFor={id}\` or \`aria-label\`; a combobox does not take its name from the selected value. The create row is a listbox option (\`Create "PHP"\`); Enter selects it like any other option.`,
   "Color legend": `
 **Use for** a key next to a color scale: map bins, status ramps. Pass CSS colors the app owns.
 

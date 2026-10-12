@@ -29,19 +29,39 @@ function timezoneOptions(count = 48) {
 function ComboboxHarness({
   initialValue,
   emptyText,
+  creatable,
+  normalizeCreateValue,
+  createLabel,
+  onValueChange,
 }: {
   initialValue?: string
   emptyText?: string
+  creatable?: boolean
+  normalizeCreateValue?: (query: string) => string | null
+  createLabel?: (value: string) => string
+  onValueChange?: (value: string) => void
 }) {
   const [value, setValue] = useState(initialValue)
   return (
     <Combobox
       options={options}
       value={value}
-      onValueChange={setValue}
+      onValueChange={(next) => {
+        onValueChange?.(next)
+        setValue(next)
+      }}
       emptyText={emptyText}
+      creatable={creatable}
+      normalizeCreateValue={normalizeCreateValue}
+      createLabel={createLabel}
     />
   )
+}
+
+/** App-side ISO 4217-style check: three letters, normalized to uppercase. */
+function iso4217Code(query: string) {
+  const code = query.trim().toUpperCase()
+  return /^[A-Z]{3}$/.test(code) ? code : null
 }
 
 /**
@@ -347,5 +367,162 @@ describe("Combobox", () => {
     await user.click(screen.getByRole("combobox"))
     expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
     expect(screen.getByRole("combobox")).toBeDisabled()
+  })
+
+  it("does not offer a create action when creatable is off", async () => {
+    const onValueChange = vi.fn()
+    const user = createUser()
+    render(
+      <ComboboxHarness
+        emptyText="No currencies"
+        onValueChange={onValueChange}
+      />
+    )
+    await openCombobox(user)
+
+    await user.type(screen.getByPlaceholderText("Search"), "php")
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
+    expect(screen.getByText("No currencies")).toBeVisible()
+    expect(
+      screen.queryByRole("option", { name: /create/i })
+    ).not.toBeInTheDocument()
+
+    await user.keyboard("{Enter}")
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(screen.getByRole("listbox")).toBeVisible()
+    expect(getCombobox()).toHaveTextContent("Select")
+  })
+
+  it("creates an unmatched query with pointer and Enter", async () => {
+    const onValueChange = vi.fn()
+    const user = createUser()
+    render(<ComboboxHarness creatable onValueChange={onValueChange} />)
+    await openCombobox(user)
+
+    await user.type(screen.getByPlaceholderText("Search"), "PHP")
+    const createOption = screen.getByRole("option", { name: 'Create "PHP"' })
+    expect(createOption).toBeVisible()
+    expect(screen.queryByText("No results")).not.toBeInTheDocument()
+    expect(activeOptionLabel()).toBe('Create "PHP"')
+
+    await user.click(createOption)
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(onValueChange).toHaveBeenCalledWith("PHP")
+    expect(getCombobox()).toHaveTextContent("PHP")
+
+    await openCombobox(user)
+    await user.clear(screen.getByPlaceholderText("Search"))
+    await user.type(screen.getByPlaceholderText("Search"), "kyd")
+    expect(activeOptionLabel()).toBe('Create "kyd"')
+    await user.keyboard("{Enter}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(onValueChange).toHaveBeenCalledWith("kyd")
+    expect(getCombobox()).toHaveTextContent("kyd")
+  })
+
+  it("does not create on empty query, Escape, or a rejected normalize", async () => {
+    const onValueChange = vi.fn()
+    const user = createUser()
+    const { unmount } = render(
+      <ComboboxHarness
+        creatable
+        emptyText="No currencies"
+        normalizeCreateValue={iso4217Code}
+        onValueChange={onValueChange}
+      />
+    )
+    await openCombobox(user)
+
+    expect(
+      screen.queryByRole("option", { name: /create/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getAllByRole("option")).toHaveLength(options.length)
+
+    await user.type(screen.getByPlaceholderText("Search"), "xx")
+    expect(screen.queryByRole("option")).not.toBeInTheDocument()
+    expect(screen.getByText("No currencies")).toBeVisible()
+    await user.keyboard("{Enter}")
+    expect(onValueChange).not.toHaveBeenCalled()
+
+    await user.clear(screen.getByPlaceholderText("Search"))
+    await user.type(screen.getByPlaceholderText("Search"), "php")
+    expect(screen.getByRole("option", { name: 'Create "PHP"' })).toBeVisible()
+
+    await user.keyboard("{Escape}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(getCombobox()).toHaveTextContent("Select")
+    unmount()
+
+    render(
+      <ComboboxHarness
+        creatable
+        emptyText="No currencies"
+        normalizeCreateValue={() => "   "}
+        onValueChange={onValueChange}
+      />
+    )
+    await openCombobox(user)
+    await user.type(screen.getByPlaceholderText("Search"), "php")
+    expect(
+      screen.queryByRole("option", { name: /create/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("No currencies")).toBeVisible()
+  })
+
+  it("does not offer create when the query already matches an option", async () => {
+    const user = createUser()
+    const { unmount } = render(
+      <ComboboxHarness creatable normalizeCreateValue={iso4217Code} />
+    )
+    await openCombobox(user)
+
+    await user.type(screen.getByPlaceholderText("Search"), "usd")
+    expect(
+      screen.queryByRole("option", { name: /create/i })
+    ).not.toBeInTheDocument()
+    expect(screen.getByText("No results")).toBeVisible()
+    unmount()
+
+    render(<ComboboxHarness creatable />)
+    await openCombobox(user)
+    await user.type(screen.getByPlaceholderText("Search"), "Euro")
+    expect(screen.getByRole("option", { name: "Euro" })).toBeVisible()
+    expect(
+      screen.queryByRole("option", { name: /create/i })
+    ).not.toBeInTheDocument()
+
+    await user.keyboard("{Enter}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(getCombobox()).toHaveTextContent("Euro")
+  })
+
+  it("keeps matching options and appends a create action", async () => {
+    const user = createUser()
+    render(
+      <ComboboxHarness creatable createLabel={(value) => `Add ${value}`} />
+    )
+    await openCombobox(user)
+
+    await user.type(screen.getByPlaceholderText("Search"), "e")
+    expect(screen.getByRole("option", { name: "Euro" })).toBeVisible()
+    expect(screen.getByRole("option", { name: "Add e" })).toBeVisible()
+    expect(activeOptionLabel()).toBe("Euro")
+
+    await user.keyboard("{End}")
+    expect(activeOptionLabel()).toBe("Add e")
+    await user.keyboard("{Enter}")
+    await waitFor(() => {
+      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
+    })
+    expect(getCombobox()).toHaveTextContent("e")
   })
 })

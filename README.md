@@ -8,7 +8,7 @@ React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
 when using `next/tabs-nav-link`.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.9.2
+npm install --save-exact atlas-react-kit@0.9.3
 ```
 
 Import components by subpath:
@@ -128,7 +128,7 @@ artifact with the package owner's npm login:
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.9.2.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-0.9.3.tgz --access public
 ```
 
 Pin an exact package version in consuming applications. Roll back an upgrade by

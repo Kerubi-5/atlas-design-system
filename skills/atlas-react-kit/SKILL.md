@@ -56,7 +56,7 @@ Import each component from its subpath, e.g.
 | Need                                            | Use                                                                                                                     |
 | ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | Short fixed list (a handful of options)         | `Select` family from `select`                                                                                           |
-| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options                                                            |
+| Long or searchable list (timezones, currencies) | `Combobox` from `combobox` with `{ value, label }[]` options; set `creatable` to invent a value the catalog lacks       |
 | Always-visible searchable list (places)         | `SearchPicker` from `search-picker`                                                                                     |
 | One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                       |
 | Date and time (not `datetime-local`)            | `DateTimePickerButton` from `date-time-picker`                                                                          |

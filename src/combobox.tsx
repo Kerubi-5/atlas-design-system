@@ -30,6 +30,62 @@ type ComboboxProps = {
   /** Name the trigger when there is no `<Label htmlFor={id}>`. */
   "aria-label"?: string
   "aria-labelledby"?: string
+  /**
+   * Offer creating the current query when it is not already an option.
+   * Off by default so existing callers stay search-and-select.
+   */
+  creatable?: boolean
+  /**
+   * Turn the search query into a value to create, or `null` to hide the
+   * create action. Default trims the query. Apps own domain rules (for
+   * example `^[A-Z]{3}$` for currency codes); catalogs stay in the app.
+   */
+  normalizeCreateValue?: (query: string) => string | null
+  /**
+   * Visible and accessible name for the create option. Default is
+   * `Create "{value}"`.
+   */
+  createLabel?: (value: string) => string
+}
+
+const CREATE_OPTION_KEY = "__atlas-combobox-create"
+
+/**
+ * Trimmed query, or `null` when there is nothing to create.
+ */
+function defaultNormalizeCreateValue(query: string) {
+  const next = query.trim()
+  return next.length > 0 ? next : null
+}
+
+/**
+ * Accessible create action: the word "Create" plus the quoted value.
+ */
+function defaultCreateLabel(value: string) {
+  return `Create "${value}"`
+}
+
+/**
+ * Value to offer as a new option, or `null` when the query is empty,
+ * rejected by `normalize`, or already in the list (value or label,
+ * case-insensitive). Domain catalogs stay with the caller.
+ */
+function resolveCreateValue(
+  query: string,
+  options: ComboboxOption[],
+  normalize: (query: string) => string | null
+) {
+  const created = normalize(query)
+  if (created == null) return null
+  const value = created.trim()
+  if (!value) return null
+  const needle = value.toLowerCase()
+  const exists = options.some(
+    (option) =>
+      option.value.toLowerCase() === needle ||
+      option.label.toLowerCase() === needle
+  )
+  return exists ? null : value
 }
 
 /**
@@ -38,6 +94,8 @@ type ComboboxProps = {
  * Options are a plain `{ value, label }` list; domain data stays in the app.
  * Keyboard highlight (arrows, Home/End, PageUp/PageDown) scrolls the active
  * option into view inside the overflow list.
+ * Opt-in `creatable` appends a create action when the query is not already
+ * an option; choosing it calls `onValueChange` like a normal selection.
  */
 export function Combobox({
   options,
@@ -52,20 +110,37 @@ export function Combobox({
   "aria-invalid": ariaInvalid,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
+  creatable = false,
+  normalizeCreateValue = defaultNormalizeCreateValue,
+  createLabel = defaultCreateLabel,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const [highlight, setHighlight] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listId = React.useId()
-  const selected = options.find((option) => option.value === value)
+  // A created value may not be in `options` yet (the app owns the catalog).
+  // Keep it visible on the trigger and in the list so reopen/Enter still work.
+  const resolvedOptions = React.useMemo(() => {
+    if (!creatable || !value) return options
+    if (options.some((option) => option.value === value)) return options
+    return [...options, { value, label: value }]
+  }, [creatable, options, value])
+  const selected = resolvedOptions.find((option) => option.value === value)
   const filtered = React.useMemo(() => {
     const needle = query.trim().toLowerCase()
-    if (!needle) return options
-    return options.filter((option) =>
+    if (!needle) return resolvedOptions
+    return resolvedOptions.filter((option) =>
       option.label.toLowerCase().includes(needle)
     )
-  }, [options, query])
+  }, [resolvedOptions, query])
+  const createValue = creatable
+    ? resolveCreateValue(query, resolvedOptions, normalizeCreateValue)
+    : null
+  const createOption = createValue
+    ? { value: createValue, label: createLabel(createValue) }
+    : null
+  const list = createOption ? [...filtered, createOption] : filtered
 
   const onOpenChange = (next: boolean) => {
     setOpen(next)
@@ -76,7 +151,9 @@ export function Combobox({
     // Set the highlight in the same turn as open so the first painted list
     // already points at the selected option (a timezone at the end of 400
     // rows) instead of flashing index 0 and scrolling twice.
-    const selectedIndex = options.findIndex((option) => option.value === value)
+    const selectedIndex = resolvedOptions.findIndex(
+      (option) => option.value === value
+    )
     setHighlight(selectedIndex >= 0 ? selectedIndex : 0)
   }
 
@@ -114,13 +191,13 @@ export function Combobox({
   // in an id or an aria-activedescendant reference.
   const optionId = (index: number) => `${listId}-option-${index}`
 
-  const activeOption = filtered[highlight]
+  const activeOption = list[highlight]
 
   const onSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const nextHighlight = moveListboxHighlight(
       event.key,
       highlight,
-      filtered.length
+      list.length
     )
     if (nextHighlight !== undefined) {
       event.preventDefault()
@@ -129,7 +206,7 @@ export function Combobox({
     }
     if (event.key === "Enter") {
       event.preventDefault()
-      const option = filtered[highlight]
+      const option = list[highlight]
       if (option) selectValue(option.value)
     }
   }
@@ -178,16 +255,20 @@ export function Combobox({
           />
         </div>
         <ul id={listId} role="listbox" className="max-h-60 overflow-y-auto p-1">
-          {filtered.length === 0 ? (
+          {list.length === 0 ? (
             <li className="px-3 py-4 text-center text-sm text-muted-foreground">
               {emptyText}
             </li>
           ) : (
-            filtered.map((option, index) => {
-              const isSelected = option.value === value
+            list.map((option, index) => {
+              const isCreate = createOption != null && option === createOption
+              const isSelected = option.value === value && !isCreate
               const isActive = index === highlight
               return (
-                <li key={option.value} role="none">
+                <li
+                  key={isCreate ? CREATE_OPTION_KEY : option.value}
+                  role="none"
+                >
                   <button
                     ref={isActive ? scrollHighlightedOption : undefined}
                     id={optionId(index)}
