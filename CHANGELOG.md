@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.9.4 - 2026-10-12
 
-Package internals only; the public API and rendered markup are unchanged.
+Patch: package internals only; the public API and rendered markup are
+unchanged.
 
 - `SearchPicker` resets its highlight while rendering instead of in an
   effect, so each keystroke commits once instead of twice.
@@ -10,6 +11,9 @@ Package internals only; the public API and rendered markup are unchanged.
 - `Combobox` and `SearchPicker` share option ids, the scroll-into-view
   ref, and the empty-row classes. `DatePickerButton` and
   `DateTimePickerButton` share their trigger and popover chrome.
+- Tested against `radix-ui` 1.8.0 (the lockfile moves from 1.7.0; the
+  `^1.4.3` range is unchanged).
+- The branch coverage floor rises from 88% to 90%.
 
 ## 0.9.3 - 2026-10-12
 

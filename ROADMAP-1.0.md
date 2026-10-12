@@ -42,7 +42,7 @@ whether to promote it or keep it beta in 1.0.
 
 ### Quality
 
-- [ ] Raise the branch coverage floor to 90%.
+- [x] Raise the branch coverage floor to 90%.
 - [ ] Deferred major upgrades, each in its own PR with screenshots checked:
       TypeScript 7, `@vitest/coverage-v8` 5 (with Vitest 5), `next` 16.4
       dev dependency.
