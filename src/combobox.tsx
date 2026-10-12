@@ -6,9 +6,13 @@ import { CheckIcon, ChevronDownIcon } from "lucide-react"
 import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
-import { moveListboxHighlight } from "./internal/listbox-navigation.js"
+import {
+  listboxOptionId,
+  moveListboxHighlight,
+  scrollOptionIntoView,
+} from "./internal/listbox-navigation.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
-import { optionState } from "./internal/styles.js"
+import { listboxEmpty, optionState } from "./internal/styles.js"
 import { cn, onInputChange } from "./utils.js"
 
 export type ComboboxOption = {
@@ -163,16 +167,6 @@ export function Combobox({
     return () => window.cancelAnimationFrame(frame)
   }, [open])
 
-  // Callback ref (not an effect) so scroll runs when Radix mounts the list
-  // and when the highlight moves. A layout effect on `open` is too early:
-  // the option node does not exist until the popover content is in the DOM.
-  const scrollHighlightedOption = React.useCallback(
-    (node: HTMLButtonElement | null) => {
-      node?.scrollIntoView({ block: "nearest" })
-    },
-    []
-  )
-
   const onQueryChange = onInputChange((next) => {
     setQuery(next)
     setHighlight(0)
@@ -186,10 +180,6 @@ export function Combobox({
     setOpen(false)
     setQuery("")
   }
-
-  // Index-based ids: option values may contain spaces, which are not valid
-  // in an id or an aria-activedescendant reference.
-  const optionId = (index: number) => `${listId}-option-${index}`
 
   const activeOption = list[highlight]
 
@@ -250,15 +240,13 @@ export function Combobox({
             aria-autocomplete="list"
             aria-controls={listId}
             aria-activedescendant={
-              activeOption ? optionId(highlight) : undefined
+              activeOption ? listboxOptionId(listId, highlight) : undefined
             }
           />
         </div>
         <ul id={listId} role="listbox" className="max-h-60 overflow-y-auto p-1">
           {list.length === 0 ? (
-            <li className="px-3 py-4 text-center text-sm text-muted-foreground">
-              {emptyText}
-            </li>
+            <li className={listboxEmpty}>{emptyText}</li>
           ) : (
             list.map((option, index) => {
               const isCreate = createOption != null && option === createOption
@@ -270,8 +258,8 @@ export function Combobox({
                   role="none"
                 >
                   <button
-                    ref={isActive ? scrollHighlightedOption : undefined}
-                    id={optionId(index)}
+                    ref={isActive ? scrollOptionIntoView : undefined}
+                    id={listboxOptionId(listId, index)}
                     type="button"
                     role="option"
                     aria-selected={isSelected}

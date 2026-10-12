@@ -53,6 +53,10 @@ export const selectedState = {
     "hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground",
 }
 
+/** The "No results" row of a listbox. */
+export const listboxEmpty =
+  "px-3 py-4 text-center text-sm text-muted-foreground"
+
 /** Options in menus and listboxes. */
 export const optionState = {
   /** Highlight as focus moves: grey fill plus a 2px ring bar (the fill alone is 1.1:1). */

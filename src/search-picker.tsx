@@ -4,8 +4,12 @@ import * as React from "react"
 
 import { Input } from "./input.js"
 import { Label } from "./label.js"
-import { moveListboxHighlight } from "./internal/listbox-navigation.js"
-import { optionState } from "./internal/styles.js"
+import {
+  listboxOptionId,
+  moveListboxHighlight,
+  scrollOptionIntoView,
+} from "./internal/listbox-navigation.js"
+import { listboxEmpty, optionState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -96,15 +100,7 @@ function SearchPicker<T>({
     setHighlight(query ? 0 : selectedIndex)
   }, [query, selectedIndex])
 
-  const optionId = (index: number) => `${listId}-option-${index}`
   const active = filtered[highlight]
-
-  const scrollHighlightedOption = React.useCallback(
-    (node: HTMLButtonElement | null) => {
-      node?.scrollIntoView({ block: "nearest" })
-    },
-    []
-  )
 
   const selectItem = (item: T) => {
     onSelect(item)
@@ -148,7 +144,9 @@ function SearchPicker<T>({
         aria-expanded
         aria-controls={listId}
         aria-autocomplete="list"
-        aria-activedescendant={active ? optionId(highlight) : undefined}
+        aria-activedescendant={
+          active ? listboxOptionId(listId, highlight) : undefined
+        }
         value={query}
         disabled={disabled}
         placeholder={placeholder}
@@ -162,9 +160,7 @@ function SearchPicker<T>({
         className="max-h-60 overflow-y-auto border border-input bg-background"
       >
         {filtered.length === 0 ? (
-          <li className="px-3 py-4 text-center text-sm text-muted-foreground">
-            {emptyText}
-          </li>
+          <li className={listboxEmpty}>{emptyText}</li>
         ) : (
           filtered.map((item, index) => {
             const itemValue = getValue(item)
@@ -173,8 +169,8 @@ function SearchPicker<T>({
             return (
               <li key={itemValue} role="none">
                 <button
-                  ref={isActive ? scrollHighlightedOption : undefined}
-                  id={optionId(index)}
+                  ref={isActive ? scrollOptionIntoView : undefined}
+                  id={listboxOptionId(listId, index)}
                   type="button"
                   role="option"
                   aria-selected={isSelected}
