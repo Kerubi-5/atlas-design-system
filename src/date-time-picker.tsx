@@ -6,7 +6,11 @@ import { CalendarIcon } from "lucide-react"
 
 import { Button } from "./button.js"
 import { Calendar } from "./calendar.js"
-import { formControlTriggerClassName } from "./internal/form-control.js"
+import {
+  PICKER_COLLISION_PADDING,
+  pickerContentClassName,
+  pickerTriggerClassName,
+} from "./internal/form-control.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import {
   Select,
@@ -19,9 +23,6 @@ import { cn } from "./utils.js"
 
 /** Default clock increment, in minutes. Must divide 60. */
 export const DEFAULT_TIME_STEP = 15
-
-/** Gutter used when the calendar popover collides with the viewport. */
-const DATE_TIME_PICKER_COLLISION_PADDING = 16
 
 export type DateTimePickerButtonProps = {
   /** Controlled instant. `null` or omitted is empty. */
@@ -143,11 +144,7 @@ export function DateTimePickerButton({
           disabled={disabled}
           aria-invalid={ariaInvalid}
           data-empty={empty}
-          className={cn(
-            formControlTriggerClassName,
-            "justify-start data-[empty=true]:text-muted-foreground",
-            className
-          )}
+          className={cn(pickerTriggerClassName, className)}
         >
           <CalendarIcon data-icon="inline-start" />
           {label}
@@ -156,9 +153,12 @@ export function DateTimePickerButton({
       <PopoverContent
         align="start"
         side={side}
-        collisionPadding={DATE_TIME_PICKER_COLLISION_PADDING}
+        collisionPadding={PICKER_COLLISION_PADDING}
         onInteractOutside={preventDismissForPortaledSelect}
-        className="w-auto min-w-0 max-w-[min(100vw-2rem,24rem)] max-h-(--radix-popover-content-available-height) overflow-y-auto rounded-none p-0"
+        className={cn(
+          "w-auto min-w-0 max-w-[min(100vw-2rem,24rem)]",
+          pickerContentClassName
+        )}
       >
         <Calendar
           mode="single"

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { Profiler, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { defaultSearchFilter, SearchPicker } from "../src/search-picker.js"
@@ -163,5 +163,30 @@ describe("SearchPicker", () => {
 
     rerender(<PickerHarness disabled />)
     expect(getCombobox()).toBeDisabled()
+  })
+
+  it("commits once per keystroke while resetting the highlight", async () => {
+    const user = createUser()
+    let commits = 0
+    render(
+      <Profiler id="picker" onRender={() => commits++}>
+        <SearchPicker
+          items={places}
+          getValue={getPlaceId}
+          getLabel={getPlaceName}
+          value="3"
+          onSelect={() => {}}
+          label="Place"
+        />
+      </Profiler>
+    )
+    const input = screen.getByRole("combobox", { name: "Place" })
+    commits = 0
+    await user.type(input, "no")
+    expect(commits).toBe(2)
+    expect(input).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getAllByRole("option")[0]!.id
+    )
   })
 })

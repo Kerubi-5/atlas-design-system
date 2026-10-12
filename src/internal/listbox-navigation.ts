@@ -24,3 +24,21 @@ export function moveListboxHighlight(
       return undefined
   }
 }
+
+/**
+ * Option id for `aria-activedescendant`. Index-based because option values
+ * may contain spaces, which are not valid in an id reference.
+ */
+export function listboxOptionId(listId: string, index: number) {
+  return `${listId}-option-${index}`
+}
+
+/**
+ * Callback ref for the highlighted option. It runs when the option mounts
+ * (including when a popover first renders the list) and when the highlight
+ * moves, keeping the option in view inside the overflow list. Module-level,
+ * so the ref is stable without `useCallback`.
+ */
+export function scrollOptionIntoView(node: HTMLElement | null) {
+  node?.scrollIntoView({ block: "nearest" })
+}

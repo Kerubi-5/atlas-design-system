@@ -8,3 +8,16 @@
  */
 export const formControlTriggerClassName =
   "h-10 w-full border-input bg-background px-3 font-normal text-base tracking-normal shadow-xs normal-case md:text-sm hover:border-input hover:bg-background hover:text-foreground focus-visible:text-foreground aria-expanded:border-input aria-expanded:bg-background aria-expanded:text-foreground has-data-[icon=inline-start]:pl-3 has-data-[icon=inline-end]:pr-3 dark:hover:bg-background dark:aria-expanded:bg-background"
+
+/**
+ * Date and date-time picker trigger: the form-control chrome, start-aligned,
+ * with muted text while empty (`data-empty`).
+ */
+export const pickerTriggerClassName = `${formControlTriggerClassName} justify-start data-[empty=true]:text-muted-foreground`
+
+/** Calendar popover body: fits the viewport height and scrolls inside it. */
+export const pickerContentClassName =
+  "max-h-(--radix-popover-content-available-height) overflow-y-auto rounded-none p-0"
+
+/** Gutter used when a calendar popover collides with the viewport. */
+export const PICKER_COLLISION_PADDING = 16

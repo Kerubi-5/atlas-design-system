@@ -1,15 +1,11 @@
 "use client"
 
 import { Input } from "../input.js"
-import { Label } from "../label.js"
 import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
 
-import {
-  FieldError,
-  getFieldErrorMessage,
-  type FieldMetaState,
-} from "./field-error.js"
+import type { FieldMetaState } from "./field-error.js"
+import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 
 export type TextFieldApi = {
   name: string
@@ -66,9 +62,7 @@ export function FormTextField({
   minLength?: number
 }) {
   const onChange = onInputChange(field.handleChange)
-  const errorText = showError
-    ? getFieldErrorMessage(field.state.meta.errors[0])
-    : undefined
+  const errorText = showError ? metaErrorText(field.state.meta) : undefined
   const controlProps = {
     id,
     value: field.state.value,
@@ -78,12 +72,11 @@ export function FormTextField({
     autoComplete,
     required,
     minLength,
-    "aria-invalid": errorText ? true : undefined,
+    "aria-invalid": invalidWhen(errorText),
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <FormFieldShell id={id} label={label} errorText={errorText}>
       {description ? (
         <p className="text-xs text-muted-foreground">{description}</p>
       ) : null}
@@ -92,7 +85,6 @@ export function FormTextField({
       ) : (
         <Input {...controlProps} type={inputType} autoFocus={autoFocus} />
       )}
-      {showError ? <FieldError text={errorText} /> : null}
-    </div>
+    </FormFieldShell>
   )
 }

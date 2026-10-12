@@ -6,7 +6,7 @@ import { FormMarkdownField } from "../src/form/markdown-field.js"
 import { FormTextField } from "../src/form/text-field.js"
 import { cn, onInputChange } from "../src/utils.js"
 
-import { createUser, render, screen } from "./helpers.js"
+import { createUser, fakeTextField, render, screen } from "./helpers.js"
 
 describe("portable forms", () => {
   it("preserves error messages and suppresses absent errors", () => {
@@ -20,12 +20,7 @@ describe("portable forms", () => {
   })
 
   it("keeps field labels, values, invalid state, and multiline behavior", () => {
-    const field = {
-      name: "title",
-      state: { value: "Draft", meta: { errors: ["Required"] } },
-      handleChange: () => {},
-      handleBlur: () => {},
-    }
+    const field = fakeTextField("title", "Draft", ["Required"])
     const html = renderToStaticMarkup(
       <FormTextField field={field} label="Title" />
     )
@@ -49,12 +44,7 @@ describe("portable forms", () => {
   })
 
   it("accepts an id so two forms can share a field name", () => {
-    const field = {
-      name: "email",
-      state: { value: "", meta: { errors: [] } },
-      handleChange: () => {},
-      handleBlur: () => {},
-    }
+    const field = fakeTextField("email", "")
     const html = renderToStaticMarkup(
       <>
         <FormTextField field={field} label="Login email" />
@@ -68,12 +58,7 @@ describe("portable forms", () => {
   })
 
   it("toggles markdown write and preview", async () => {
-    const field = {
-      name: "notes",
-      state: { value: "## Hello", meta: { errors: ["Required"] } },
-      handleChange: () => {},
-      handleBlur: () => {},
-    }
+    const field = fakeTextField("notes", "## Hello", ["Required"])
     const user = createUser()
     render(<FormMarkdownField field={field} label="Notes" />)
 

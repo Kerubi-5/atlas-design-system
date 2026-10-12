@@ -2,14 +2,13 @@
 
 import { useState } from "react"
 
-import { Label } from "../label.js"
 import { Markdown } from "../markdown.js"
 import { Textarea } from "../textarea.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
-import { FieldError, getFieldErrorMessage } from "./field-error.js"
+import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 import type { TextFieldApi } from "./text-field.js"
 
 type Mode = "write" | "preview"
@@ -39,9 +38,7 @@ export function FormMarkdownField({
 }) {
   const [mode, setMode] = useState<Mode>("write")
   const onChange = onInputChange(field.handleChange)
-  const errorText = showError
-    ? getFieldErrorMessage(field.state.meta.errors[0])
-    : undefined
+  const errorText = showError ? metaErrorText(field.state.meta) : undefined
   const trimmed = field.state.value.trim()
 
   function handleModeChange(value: string) {
@@ -49,9 +46,11 @@ export function FormMarkdownField({
   }
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <div className="flex items-center justify-between gap-2">
-        <Label htmlFor={id}>{label}</Label>
+    <FormFieldShell
+      id={id}
+      label={label}
+      errorText={errorText}
+      labelAction={
         <ToggleGroup
           type="single"
           value={mode}
@@ -64,8 +63,8 @@ export function FormMarkdownField({
           <ToggleGroupItem value="write">Write</ToggleGroupItem>
           <ToggleGroupItem value="preview">Preview</ToggleGroupItem>
         </ToggleGroup>
-      </div>
-
+      }
+    >
       {mode === "write" ? (
         <Textarea
           id={id}
@@ -74,7 +73,7 @@ export function FormMarkdownField({
           onBlur={field.handleBlur}
           placeholder={placeholder}
           rows={rows}
-          aria-invalid={errorText ? true : undefined}
+          aria-invalid={invalidWhen(errorText)}
         />
       ) : (
         <div className={cn(fieldSurface, "min-h-16")} aria-live="polite">
@@ -85,8 +84,6 @@ export function FormMarkdownField({
           )}
         </div>
       )}
-
-      {showError ? <FieldError text={errorText} /> : null}
-    </div>
+    </FormFieldShell>
   )
 }
