@@ -8,6 +8,12 @@ no root component barrel.
 For installation, see [README.md](./README.md); for styling and accessibility,
 see [DESIGN_RULES.md](./DESIGN_RULES.md).
 
+For LLM-assisted implementation of patterns this kit does not export, use
+[COSS UI](https://coss.com/ui) as a reference before building a component from
+scratch. Its Base UI catalog includes input groups, number fields, OTP fields,
+drawers, and segmented controls. COSS is a separate library; its components
+are not Atlas exports.
+
 ## Optional peer dependencies
 
 Core entries need only the kit. These feature entries need an extra install
