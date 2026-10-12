@@ -3,13 +3,9 @@
 import { useId } from "react"
 
 import { DatePickerButton, type DateLike } from "../date-picker.js"
-import { Label } from "../label.js"
 
-import {
-  FieldError,
-  getFieldErrorMessage,
-  type FieldMetaState,
-} from "./field-error.js"
+import type { FieldMetaState } from "./field-error.js"
+import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 
 type Props = {
   value: DateLike
@@ -32,12 +28,11 @@ export function FormDatePickerField({
   disabled,
   className,
 }: Props) {
-  const errorText = meta ? getFieldErrorMessage(meta.errors[0]) : undefined
+  const errorText = metaErrorText(meta)
   const id = useId()
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <FormFieldShell id={id} label={label} errorText={errorText}>
       <DatePickerButton
         id={id}
         value={value}
@@ -45,9 +40,8 @@ export function FormDatePickerField({
         placeholder={placeholder}
         disabled={disabled}
         className={className}
-        aria-invalid={errorText ? true : undefined}
+        aria-invalid={invalidWhen(errorText)}
       />
-      <FieldError text={errorText} />
-    </div>
+    </FormFieldShell>
   )
 }

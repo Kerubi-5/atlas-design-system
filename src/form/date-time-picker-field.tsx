@@ -3,13 +3,9 @@
 import { useId } from "react"
 
 import { DateTimePickerButton } from "../date-time-picker.js"
-import { Label } from "../label.js"
 
-import {
-  FieldError,
-  getFieldErrorMessage,
-  type FieldMetaState,
-} from "./field-error.js"
+import type { FieldMetaState } from "./field-error.js"
+import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 
 type Props = {
   value: Date | null
@@ -35,12 +31,11 @@ export function FormDateTimePickerField({
   timeStep,
   className,
 }: Props) {
-  const errorText = meta ? getFieldErrorMessage(meta.errors[0]) : undefined
+  const errorText = metaErrorText(meta)
   const id = useId()
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <FormFieldShell id={id} label={label} errorText={errorText}>
       <DateTimePickerButton
         id={id}
         value={value}
@@ -49,9 +44,8 @@ export function FormDateTimePickerField({
         disabled={disabled}
         timeStep={timeStep}
         className={className}
-        aria-invalid={errorText ? true : undefined}
+        aria-invalid={invalidWhen(errorText)}
       />
-      <FieldError text={errorText} />
-    </div>
+    </FormFieldShell>
   )
 }

@@ -2,14 +2,10 @@
 
 import { type ReactNode, useId } from "react"
 
-import { Label } from "../label.js"
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
-import {
-  FieldError,
-  getFieldErrorMessage,
-  type FieldMetaState,
-} from "./field-error.js"
+import type { FieldMetaState } from "./field-error.js"
+import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 
 type Props = {
   value: string | undefined
@@ -29,19 +25,17 @@ export function FormSelectField({
   placeholder,
   children,
 }: Props) {
-  const errorText = meta ? getFieldErrorMessage(meta.errors[0]) : undefined
+  const errorText = metaErrorText(meta)
   const id = useId()
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <FormFieldShell id={id} label={label} errorText={errorText}>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger id={id} aria-invalid={errorText ? true : undefined}>
+        <SelectTrigger id={id} aria-invalid={invalidWhen(errorText)}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>{children}</SelectContent>
       </Select>
-      <FieldError text={errorText} />
-    </div>
+    </FormFieldShell>
   )
 }
