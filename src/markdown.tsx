@@ -16,7 +16,9 @@ const SAFE_PROTOCOLS = new Set(["http:", "https:", "mailto:"])
 export function safeMarkdownUrl(url: string) {
   const value = url.trim()
   if (!value) return ""
-  if (value.startsWith("#") || value.startsWith("/")) return value
+  if (value.startsWith("#")) return value
+  // `//host` and `/\host` are protocol-relative: they leave the site.
+  if (value.startsWith("/")) return /^\/[/\\]/.test(value) ? "" : value
   try {
     const parsed = new URL(value)
     return SAFE_PROTOCOLS.has(parsed.protocol) ? value : ""
@@ -84,18 +86,24 @@ const markdownComponents: Components = {
       <table className="w-full text-left text-sm">{children}</table>
     </div>
   ),
-  th: ({ children }) => (
-    <th className="border-b border-input py-1.5 pr-3 font-medium">
+  // remark-gfm sets column alignment as an inline text-align style.
+  th: ({ children, style }) => (
+    <th style={style} className="border-b border-input py-1.5 pr-3 font-medium">
       {children}
     </th>
   ),
-  td: ({ children }) => (
-    <td className="border-b border-border py-1.5 pr-3">{children}</td>
+  td: ({ children, style }) => (
+    <td style={style} className="border-b border-border py-1.5 pr-3">
+      {children}
+    </td>
   ),
-  img: ({ src, alt }) => (
-    // src already passed through safeMarkdownUrl.
-    <img src={src} alt={alt ?? ""} className="max-w-full" />
-  ),
+  img: ({ src, alt }) =>
+    // src already passed through safeMarkdownUrl; an unsafe one is now empty.
+    src ? (
+      <img src={src} alt={alt ?? ""} className="max-w-full" />
+    ) : alt ? (
+      <span>{alt}</span>
+    ) : null,
 }
 
 export type MarkdownProps = {

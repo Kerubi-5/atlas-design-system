@@ -48,20 +48,25 @@ function TabsScroller({
   children: React.ReactNode
 }) {
   const ref = React.useRef<HTMLDivElement>(null)
+  const revealed = React.useRef<HTMLElement | null>(null)
   const overflowing = useHorizontalOverflow(ref)
 
+  // Runs after every render, not just mount: TabsNav usually sits in a
+  // persistent layout, so a route change updates the active link in place.
   React.useLayoutEffect(() => {
     const scroller = ref.current
     if (!scroller) return
     const active = scroller.querySelector<HTMLElement>(
       '[aria-current="page"], [data-state="active"]'
     )
-    active?.scrollIntoView({
+    if (!active || active === revealed.current) return
+    revealed.current = active
+    active.scrollIntoView({
       block: "nearest",
       inline: "nearest",
       behavior: "auto",
     })
-  }, [])
+  })
 
   return (
     <div

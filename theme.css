@@ -195,6 +195,22 @@
   html {
     @apply font-sans;
   }
+  /*
+   * Reduced motion: overlays, accordions, spinners and skeletons stop moving.
+   * Durations go near zero rather than none so animationend still fires and
+   * Radix can unmount closing overlays. `!important` in this early layer
+   * beats the utility classes that set the animations.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
 }
 
 /*

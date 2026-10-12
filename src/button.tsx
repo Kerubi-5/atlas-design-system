@@ -33,12 +33,12 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-primary text-primary-foreground hover:bg-primary/80",
-        outline: `border-border bg-transparent ${quietButtonInteraction}`,
+        outline: `border-input bg-transparent ${quietButtonInteraction}`,
         secondary:
           "bg-secondary text-secondary-foreground hover:bg-secondary/80 aria-expanded:bg-secondary aria-expanded:text-secondary-foreground",
         ghost: quietButtonInteraction,
         destructive:
-          "bg-destructive/10 text-destructive hover:bg-destructive/15 dark:bg-destructive/20 dark:hover:bg-destructive/30",
+          "bg-destructive/10 text-destructive hover:bg-destructive/15 dark:bg-destructive/20 dark:hover:bg-destructive/25",
         link: "text-selected-foreground underline underline-offset-4 hover:underline",
       },
       size: {

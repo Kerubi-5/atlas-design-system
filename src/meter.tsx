@@ -32,6 +32,8 @@ function Meter({
   className,
 }: MeterProps) {
   const span = max - min
+  // A NaN reading (missing data upstream) draws and announces as empty.
+  const current = Number.isFinite(value) ? value : min
   const toPercent = (amount: number) => {
     if (span === 0) return 0
     return Math.min(100, Math.max(0, ((amount - min) / span) * 100))
@@ -43,7 +45,7 @@ function Meter({
       data-slot="meter"
       aria-valuemin={min}
       aria-valuemax={max}
-      aria-valuenow={Math.min(max, Math.max(min, value))}
+      aria-valuenow={Math.min(max, Math.max(min, current))}
       aria-label={ariaLabel}
       className={cn(
         "relative h-1.5 w-full overflow-hidden bg-muted",
@@ -53,7 +55,7 @@ function Meter({
       <div
         data-slot="meter-fill"
         className={cn("h-full", fillClassName)}
-        style={{ width: `${toPercent(value)}%` }}
+        style={{ width: `${toPercent(current)}%` }}
       />
       {markers?.map((marker) => (
         <div

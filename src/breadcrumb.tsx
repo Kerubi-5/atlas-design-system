@@ -2,6 +2,7 @@ import * as React from "react"
 import { Slot } from "radix-ui"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
+import { focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -49,7 +50,8 @@ function BreadcrumbLink({
     <Comp
       data-slot="breadcrumb-link"
       className={cn(
-        "transition-colors outline-none hover:text-selected-foreground focus-visible:text-selected-foreground focus-visible:underline focus-visible:underline-offset-4",
+        focusRing,
+        "transition-colors hover:text-selected-foreground focus-visible:text-selected-foreground",
         className
       )}
       {...props}
@@ -93,12 +95,10 @@ function BreadcrumbEllipsis({
   return (
     <span
       data-slot="breadcrumb-ellipsis"
-      role="presentation"
-      aria-hidden="true"
       className={cn("flex size-6 items-center justify-center", className)}
       {...props}
     >
-      <MoreHorizontalIcon className="size-4" />
+      <MoreHorizontalIcon className="size-4" aria-hidden="true" />
       <span className="sr-only">More</span>
     </span>
   )

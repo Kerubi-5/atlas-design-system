@@ -44,6 +44,11 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 type PaginationLinkProps = {
   isActive?: boolean
   size?: "default" | "icon"
+  /**
+   * No page to go to, such as Previous on the first page. Renders without
+   * `href`, announced as a disabled link and dimmed.
+   */
+  disabled?: boolean
 } & React.ComponentProps<"a">
 
 /** The current page gets `aria-current="page"` and the selected wash. */
@@ -51,10 +56,15 @@ function PaginationLink({
   className,
   isActive,
   size = "icon",
+  disabled,
+  href,
   ...props
 }: PaginationLinkProps) {
   return (
     <a
+      href={disabled ? undefined : href}
+      role={disabled ? "link" : undefined}
+      aria-disabled={disabled || undefined}
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
@@ -64,7 +74,7 @@ function PaginationLink({
           size: size === "icon" ? "icon-sm" : "sm",
         }),
         selectedState.current,
-        "font-medium tracking-normal normal-case tabular-nums",
+        "font-medium tracking-normal normal-case tabular-nums aria-disabled:pointer-events-none aria-disabled:opacity-50",
         className
       )}
       {...props}
@@ -74,35 +84,37 @@ function PaginationLink({
 
 function PaginationPrevious({
   className,
-  children = "Previous",
+  children,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
-      aria-label="Go to previous page"
+      // Custom (e.g. translated) text names the link itself (WCAG 2.5.3).
+      aria-label={children == null ? "Go to previous page" : undefined}
       size="default"
       className={cn("gap-1 px-2.5 sm:pl-2", className)}
       {...props}
     >
       <ChevronLeftIcon data-icon="inline-start" />
-      <span className="hidden sm:block">{children}</span>
+      <span className="sr-only sm:not-sr-only">{children ?? "Previous"}</span>
     </PaginationLink>
   )
 }
 
 function PaginationNext({
   className,
-  children = "Next",
+  children,
   ...props
 }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
-      aria-label="Go to next page"
+      // Custom (e.g. translated) text names the link itself (WCAG 2.5.3).
+      aria-label={children == null ? "Go to next page" : undefined}
       size="default"
       className={cn("gap-1 px-2.5 sm:pr-2", className)}
       {...props}
     >
-      <span className="hidden sm:block">{children}</span>
+      <span className="sr-only sm:not-sr-only">{children ?? "Next"}</span>
       <ChevronRightIcon data-icon="inline-end" />
     </PaginationLink>
   )

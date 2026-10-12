@@ -52,7 +52,7 @@ export function SortableTableHead({
           )
         ) : (
           <ChevronsUpDownIcon
-            className="size-3.5 opacity-40"
+            className="size-3.5 text-muted-foreground"
             aria-hidden="true"
           />
         )}
