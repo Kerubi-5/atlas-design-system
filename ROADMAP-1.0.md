@@ -1,11 +1,12 @@
 # Road to 1.0
 
 Handoff for whoever (person or AI agent) takes atlas-react-kit from 0.9 to
-1.0. Read this, then `CONTRIBUTING.md`, `DESIGN_RULES.md`, and
-`COMPONENTS.md`. Do not bump to 1.0.0 until every box below is checked.
+1.0. Read the [contribution guide](./CONTRIBUTING.md), [design rules](./DESIGN_RULES.md),
+and [component guide](./COMPONENTS.md). Do not bump to 1.0.0 until every box
+below is checked.
 
-`0.9.0` is the current release. See `CHANGELOG.md` for release history and
-`CONTRIBUTING.md` for current checks, release steps, and deprecation policy.
+The 0.9.x release line is current. See the [changelog](./CHANGELOG.md) for
+release history.
 
 ## Exit criteria for 1.0
 
@@ -33,7 +34,7 @@ whether to promote it or keep it beta in 1.0.
 
 ### Support policy
 
-- [ ] Write the supported ranges into `README.md`: React 19, Next 16
+- [x] Write the supported ranges into `README.md`: React 19, Next 16
       (optional), Tailwind 4, Node >= 20.19.
 - [ ] Define what counts as breaking after 1.0: export names, prop names and
       types, default prop values, public tokens, documented `data-*` hooks.

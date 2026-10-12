@@ -6,8 +6,10 @@
   "description": "Storybook docs and playground for atlas-react-kit. Not published to npm.",
   "scripts": {
     "dev": "npm run storybook",
-    "build": "npm run typecheck && npm run build-storybook && npm run test:build",
+    "build": "npm run docs:check && npm run typecheck && npm run build-storybook && npm run test:build",
+    "docs:check": "npm run docs:check --prefix ..",
     "typecheck": "tsc --noEmit",
+    "prestorybook": "npm run docs:check",
     "storybook": "storybook dev -p 6006 --no-open --disable-telemetry",
     "build-storybook": "storybook build -o dist --disable-telemetry",
     "test:build": "node --test tests/build.test.mjs",
