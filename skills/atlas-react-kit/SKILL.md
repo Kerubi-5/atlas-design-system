@@ -97,42 +97,12 @@ buttons). Don't copy that style into new UI. Move what the task touches onto kit
 components and tokens, and mention the rest to the user instead of rewriting
 files the task doesn't need.
 
-## 4. Style with tokens, not values
+## 4. Follow the design rules
 
-These rules are what make Atlas look like Atlas. `DESIGN_RULES.md` has the full
-list; the ones that come up most:
-
-- **Semantic colors only**: `bg-primary`, `text-muted-foreground`,
-  `border-border`, `bg-card`, `text-destructive`. Raw palette classes
-  (`bg-purple-600`, `text-gray-500`) and paired `dark:` colors drift from the
-  theme; tokens already switch with light and dark.
-- **Selected and active state**: `bg-selected text-selected-foreground` plus
-  a `border-selected-foreground` border (or bar) for the current nav item,
-  chip, row, or toggle; the wash alone is too faint to show state. Grey fills
-  read as hover, not selection.
-- **Status**: `success`, `warning`, and `destructive` for good, caution, and
-  bad. Use them as text or soft tints (the `Badge` tones), which meet AA in
-  both themes. Don't override a soft badge's colors. There is no foreground
-  token for text on a solid status fill, so avoid that combination.
-- **Brand-colored text**: `text-selected-foreground`, not `text-primary`,
-  which is too dark to read on the dark background.
-- **Accessibility**: the kit targets WCAG 2.2 AA. Give every control a name
-  (`Label htmlFor`, or `aria-label` on icon-only buttons and an unlabelled
-  `Combobox`), keep the shipped focus rings (solid `ring-ring`, never
-  `ring-ring/30`), keep field borders on `border-input` (3:1; `border-border`
-  is for dividers), and don't lower contrast with raw colors or opacity.
-- **Square corners**: primitives have none. Use `rounded-full` only for real
-  circles (avatars, dots). Adding `rounded-md` to a card or button breaks the
-  system.
-- **Don't restyle kit controls**: `Input`, `SelectTrigger`, `DatePickerButton`,
-  `DateTimePickerButton`, and `Combobox` share 40px form-control chrome.
-  Overriding their height, padding, or border makes one field look different
-  from its neighbors.
-- **Layout overrides**: `CardContent className="px-0"` makes one section flush
-  without `!important`. Tables and tab rows already scroll horizontally, so do
-  not wrap them in another overflow container.
-- **Headings**: `CardTitle` and `DialogTitle` already apply the uppercase,
-  tracked heading style; use `font-heading` for other headings.
+Use semantic tokens and the shipped component APIs. Avoid raw palette color
+classes and rounded corners on square primitives; do not restyle kit controls.
+For accessibility, copy, selection, status, and layout details, follow the
+matching sections in `DESIGN_RULES.md`; it is the source of truth.
 
 ## 5. Check before you finish
 

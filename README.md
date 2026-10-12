@@ -27,17 +27,8 @@ export function Example() {
 }
 ```
 
-Core entries need only the kit. These feature entries need an extra install
-(same version ranges as the kit's optional peers). `Toaster` also reads the
-theme from `next-themes`, so toast consumers install that too.
-
-| Entry points                                                                                           | Extra install                                    |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `calendar`, `date-picker`, `date-time-picker`, `form/date-picker-field`, `form/date-time-picker-field` | `npm i react-day-picker@^10.0.1 date-fns@^4.4.0` |
-| `markdown`, `form/markdown-field`                                                                      | `npm i react-markdown@^10.1.0 remark-gfm@^4.0.1` |
-| `theme-provider`                                                                                       | `npm i next-themes@^0.4.6`                       |
-| `toast`                                                                                                | `npm i sonner@^2.0.7 next-themes@^0.4.6`         |
-| `next/tabs-nav-link`                                                                                   | `npm i next@^16.0.0`                             |
+Core entries need only the kit. Feature entries may need optional peers; see
+the [component guide's install table](./COMPONENTS.md#optional-peer-dependencies).
 
 In your global stylesheet, import the theme after Tailwind and register the
 installed JavaScript directory. Paths in `@source` are relative to that stylesheet;
