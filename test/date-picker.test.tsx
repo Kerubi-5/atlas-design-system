@@ -132,6 +132,23 @@ describe("Calendar", () => {
   })
 })
 
+describe("Calendar dropdown caption", () => {
+  // The native month/year select is invisible over the caption label, so its
+  // wrapper carries the focus ring (WCAG 2.4.7).
+  it("shows a solid focus ring around the focused month and year", () => {
+    render(
+      <Calendar mode="single" captionLayout="dropdown" defaultMonth={october} />
+    )
+    for (const name of [/month/i, /year/i]) {
+      const root = screen
+        .getByRole("combobox", { name })
+        .closest(".rdp-dropdown_root")
+      expect(root?.className).toContain("has-focus-visible:ring-2")
+      expect(root?.className).toContain("has-focus-visible:ring-ring")
+    }
+  })
+})
+
 describe("DatePickerButton", () => {
   it("opens, selects a day, and closes", async () => {
     const user = createUser()
@@ -167,6 +184,46 @@ describe("DatePickerButton", () => {
     })
     expect(trigger).toHaveFocus()
   })
+
+  // WAI-ARIA APG date picker dialog: a named dialog, focus on the date.
+  it("opens a named dialog with focus on the selected day", async () => {
+    const user = createUser()
+    render(<DatePickerButton value="2026-10-05" onChange={() => {}} />)
+
+    await user.click(screen.getByRole("button", { name: /^October 5/ }))
+    await screen.findByRole("grid")
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Choose date")
+    await waitFor(() =>
+      expect(getDayButton(new Date(2026, 9, 5))).toHaveFocus()
+    )
+  })
+
+  it("focuses today when nothing is selected", async () => {
+    const user = createUser()
+    render(<DatePickerButton value={undefined} onChange={() => {}} />)
+
+    await user.click(screen.getByRole("button", { name: "Pick a date" }))
+    await screen.findByRole("grid")
+    await waitFor(() => expect(getDayButton(new Date())).toHaveFocus())
+  })
+
+  it("forwards aria-labelledby and aria-describedby to the trigger", () => {
+    render(
+      <>
+        <span id="due-label">Due</span>
+        <span id="due-hint">Business days only</span>
+        <DatePickerButton
+          id="due"
+          value="2026-10-05"
+          onChange={() => {}}
+          aria-labelledby="due-label due"
+          aria-describedby="due-hint"
+        />
+      </>
+    )
+    const trigger = screen.getByRole("button", { name: /^Due.*October 5/ })
+    expect(trigger).toHaveAccessibleDescription("Business days only")
+  })
 })
 
 describe("FormDatePickerField", () => {
@@ -183,10 +240,12 @@ describe("FormDatePickerField", () => {
     const trigger = screen.getByLabelText("Due")
     expectFormControlTrigger(trigger)
     expect(trigger).toHaveTextContent("October 5th, 2026")
-    expect(screen.getByText("Due")).toHaveAttribute(
-      "for",
-      trigger.getAttribute("id")
-    )
+    // aria-labelledby lists the label and the trigger text, so the picked
+    // date is read too (a <label for> alone would name it "Due" only).
+    // The <label for> stays, so clicking the label still reaches the trigger.
+    expect(screen.getByText("Due")).toHaveAttribute("for", trigger.id)
+    expect(trigger).toHaveAccessibleName(/^Due.*October 5th, 2026$/)
+    expect(trigger).not.toHaveAttribute("aria-describedby")
 
     await user.click(trigger)
     expect(await screen.findByRole("grid")).toBeVisible()
@@ -199,7 +258,32 @@ describe("FormDatePickerField", () => {
   })
 })
 
+describe("FormDatePickerField errors", () => {
+  it("describes the trigger with its error", () => {
+    render(
+      <FormDatePickerField
+        value={undefined}
+        onValueChange={() => {}}
+        label="Due"
+        meta={{ errors: ["Pick a due date"] }}
+      />
+    )
+    const trigger = screen.getByLabelText("Due")
+    expect(trigger).toHaveAttribute("aria-invalid", "true")
+    expect(trigger).toHaveAccessibleDescription("Pick a due date")
+  })
+})
+
 describe("DatePickerButton range mode", () => {
+  it("names the dialog for a range", async () => {
+    const user = createUser()
+    render(<RangePickerHarness />)
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    await screen.findAllByRole("grid")
+    expect(screen.getByRole("dialog")).toHaveAccessibleName("Choose dates")
+  })
+
   it("opens and closes from the trigger", async () => {
     const user = createUser()
     render(<RangePickerHarness />)

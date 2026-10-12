@@ -94,8 +94,10 @@ function Calendar({
           "flex h-(--cell-size) w-full items-center justify-center gap-1.5 text-sm font-medium",
           defaultClassNames.dropdowns
         ),
+        // The native select is invisible over the caption, so its wrapper
+        // shows keyboard focus with the kit's solid ring.
         dropdown_root: cn(
-          "relative rounded-(--cell-radius)",
+          "relative rounded-(--cell-radius) has-focus-visible:ring-2 has-focus-visible:ring-ring",
           defaultClassNames.dropdown_root
         ),
         dropdown: cn(

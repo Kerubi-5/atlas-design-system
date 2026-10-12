@@ -5,7 +5,12 @@ import { type ReactNode, useId } from "react"
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
 import type { FieldMetaState } from "./field-error.js"
-import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
+import {
+  describedBy,
+  FormFieldShell,
+  invalidWhen,
+  metaErrorText,
+} from "./field-shell.js"
 
 type Props = {
   value: string | undefined
@@ -31,7 +36,11 @@ export function FormSelectField({
   return (
     <FormFieldShell id={id} label={label} errorText={errorText}>
       <Select value={value} onValueChange={onValueChange}>
-        <SelectTrigger id={id} aria-invalid={invalidWhen(errorText)}>
+        <SelectTrigger
+          id={id}
+          aria-invalid={invalidWhen(errorText)}
+          aria-describedby={describedBy(id, errorText)}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>{children}</SelectContent>

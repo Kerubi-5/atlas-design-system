@@ -1,5 +1,60 @@
 # Changelog
 
+## 0.11.0 - 2026-10-12
+
+Minor: bug and accessibility fixes from the 1.0 audit. Two defaults change:
+
+- `ThemeProvider` no longer turns on the `d` dark/light shortcut by default.
+  A single-key shortcut fires by accident for speech-input users, and WCAG
+  2.1.4 needs a way for people to turn it off. Pass `enableShortcut` to keep
+  it, ideally with a setting that turns it off again.
+- The outline `Button` border uses `border-input` (3.6:1 against the page)
+  instead of `border-border` (1.3:1).
+
+New:
+
+- `PaginationLink`, `PaginationPrevious` and `PaginationNext` take
+  `disabled` for a page that does not exist, such as Previous on page 1.
+  It drops the `href`, dims the link and announces it as disabled.
+- `CardTitle` `as` accepts `h2`, `h3` and `h4` for section headings.
+- `DatePickerButton` and `DateTimePickerButton` forward `aria-labelledby`
+  and `aria-describedby` to the trigger; the trigger text has the id
+  `${id}-value`. `FieldError` takes an `id`.
+
+Fixed:
+
+- `Progress` draws its fill against `max`, clamps out-of-range values and
+  treats NaN as indeterminate. `Meter` treats a NaN reading as the minimum.
+- `Markdown` blocks protocol-relative links (`//host`, `/\host`), keeps GFM
+  column alignment, and shows the alt text instead of a broken image when an
+  image URL is unsafe.
+- Form fields link their error text, and `FormTextField` its hint, to the
+  control with `aria-describedby`. Date fields name the trigger "label,
+  date", so the picked date is announced.
+- The date picker popovers are named dialogs ("Choose date", "Choose dates",
+  "Choose date and time") and focus the selected day, or today, on open.
+  The calendar month and year dropdowns show a focus ring.
+- `InfoTip` closes on the first Escape after opening on hover, no longer
+  takes focus from a field when hover opens it, and names its panel from
+  the title.
+- An app-level `TooltipProvider` now sets the tooltip delay.
+- `Combobox` opens from ArrowDown and ArrowUp, names its list and search
+  field, and keeps options out of the Tab order (as does `SearchPicker`).
+  Both announce "no results" in a status region and ignore Enter while an
+  input method is composing text.
+- `TableBodySkeleton` marks the body `aria-busy` and hides the placeholder
+  rows from screen readers.
+- Custom `PaginationPrevious` and `PaginationNext` text is the link's name.
+- `BreadcrumbEllipsis` keeps its "More" name inside a menu trigger, and
+  `BreadcrumbLink` shows the kit focus ring.
+- `TabsNav` and `TabsList` scroll a newly active tab into view after a route
+  change that keeps the layout mounted.
+- `theme.css` stops kit animations and transitions under
+  `prefers-reduced-motion`.
+- `Switch` has the same enlarged hit area as `Checkbox`.
+- Dark destructive buttons keep 4.5:1 text contrast on hover, and the
+  unsorted table-header icon is no longer faded below 3:1.
+
 ## 0.10.0 - 2026-10-12
 
 Minor: apps decide container and overlay sizes, and the pickers and

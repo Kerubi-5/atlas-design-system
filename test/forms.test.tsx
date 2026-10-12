@@ -76,6 +76,19 @@ describe("portable forms", () => {
     expect(screen.queryByLabelText("Notes")).not.toBeInTheDocument()
   })
 
+  it("drops the label's for in preview, when the textarea is not rendered", async () => {
+    const user = createUser()
+    render(
+      <FormMarkdownField field={fakeTextField("notes", "")} label="Notes" />
+    )
+    const label = screen.getByText("Notes")
+    expect(label).toHaveAttribute("for", "notes")
+
+    await user.click(screen.getByRole("radio", { name: "Preview" }))
+    expect(label).not.toHaveAttribute("for")
+    expect(document.getElementById("notes")).toBeNull()
+  })
+
   it("keeps utility class precedence and controlled input values", () => {
     expect(cn("px-2", false && "hidden", "px-4")).toBe("px-4")
     let value = ""
@@ -83,5 +96,65 @@ describe("portable forms", () => {
       value = next
     })({ target: { value: "Changed" } } as React.ChangeEvent<HTMLInputElement>)
     expect(value).toBe("Changed")
+  })
+})
+
+/**
+ * WCAG 1.3.1 / 3.3.1: the error text, and the text field's hint, are the
+ * control's description (`aria-describedby`), not only text next to it.
+ */
+describe("form field descriptions", () => {
+  it("describes a text field with its error", () => {
+    render(
+      <FormTextField
+        field={fakeTextField("email", "", ["Enter an email address"])}
+        label="Email"
+      />
+    )
+    const input = screen.getByLabelText("Email")
+    expect(input).toHaveAttribute("aria-invalid", "true")
+    expect(input).toHaveAccessibleDescription("Enter an email address")
+  })
+
+  it("describes a text field with its hint, then its error", () => {
+    const { rerender } = render(
+      <FormTextField
+        field={fakeTextField("referrer", "")}
+        label="Referrer"
+        description="Who sent this lead to you"
+      />
+    )
+    const input = screen.getByLabelText("Referrer")
+    expect(input).toHaveAccessibleDescription("Who sent this lead to you")
+
+    rerender(
+      <FormTextField
+        field={fakeTextField("referrer", "", ["Add a referrer"])}
+        label="Referrer"
+        description="Who sent this lead to you"
+      />
+    )
+    expect(input).toHaveAccessibleDescription(
+      "Who sent this lead to you Add a referrer"
+    )
+  })
+
+  it("leaves a valid text field without a description", () => {
+    render(<FormTextField field={fakeTextField("title", "")} label="Title" />)
+    expect(screen.getByLabelText("Title")).not.toHaveAttribute(
+      "aria-describedby"
+    )
+  })
+
+  it("describes the markdown textarea with its error", () => {
+    render(
+      <FormMarkdownField
+        field={fakeTextField("notes", "", ["Add notes"])}
+        label="Notes"
+      />
+    )
+    expect(screen.getByLabelText("Notes")).toHaveAccessibleDescription(
+      "Add notes"
+    )
   })
 })

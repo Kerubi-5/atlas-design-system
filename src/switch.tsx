@@ -22,7 +22,7 @@ function Switch({
         focusRing,
         invalidState,
         disabledState,
-        "peer inline-flex h-5 w-9 shrink-0 items-center rounded-none border border-transparent bg-input p-0.5 shadow-xs transition-colors data-checked:bg-primary dark:data-checked:bg-primary",
+        "peer relative inline-flex h-5 w-9 shrink-0 items-center rounded-none border border-transparent bg-input p-0.5 shadow-xs transition-colors after:absolute after:-inset-x-3 after:-inset-y-2 data-checked:bg-primary dark:data-checked:bg-primary",
         className
       )}
       {...props}

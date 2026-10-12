@@ -74,6 +74,15 @@ type DatePickerSharedProps = {
   className?: string
   "aria-invalid"?: boolean
   /**
+   * Forwarded to the trigger. To name it from a visible label while still
+   * reading the picked date, list the label's id and then `${id}-value`
+   * (the trigger text). A `<label for>` alone names the button by the label
+   * and drops the date; it can stay for click-to-open.
+   */
+  "aria-labelledby"?: string
+  /** Forwarded to the trigger, e.g. the id of a hint or error text. */
+  "aria-describedby"?: string
+  /**
    * Visible months in the popover calendar. Defaults to 1 in single mode.
    * In range mode, defaults to 1 below the `md` breakpoint and 2 at `md`
    * and above so two stacked months do not open off-screen on mobile.
@@ -118,9 +127,12 @@ function DatePickerShell({
   id,
   disabled,
   ariaInvalid,
+  ariaLabelledBy,
+  ariaDescribedBy,
   className,
   empty,
   label,
+  dialogLabel,
   open,
   onOpenChange,
   side,
@@ -129,9 +141,13 @@ function DatePickerShell({
   id?: string
   disabled?: boolean
   ariaInvalid?: boolean
+  ariaLabelledBy?: string
+  ariaDescribedBy?: string
   className?: string
   empty: boolean
   label: string
+  /** Accessible name of the popover dialog. */
+  dialogLabel: string
   open: boolean
   onOpenChange: (open: boolean) => void
   side?: React.ComponentProps<typeof PopoverContent>["side"]
@@ -146,19 +162,27 @@ function DatePickerShell({
           variant="outline"
           disabled={disabled}
           aria-invalid={ariaInvalid}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
           onPointerEnter={preloadCalendar}
           onFocus={preloadCalendar}
         >
           <CalendarIcon data-icon="inline-start" />
-          {label}
+          {/* `${id}-value` lets a form field name the trigger "label, value". */}
+          <span id={id ? `${id}-value` : undefined}>{label}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
         side={side}
         collisionPadding={PICKER_COLLISION_PADDING}
+        aria-label={dialogLabel}
+        // The calendar's `autoFocus` puts focus on the selected day (or
+        // today) once it loads, as the APG date picker dialog does; Radix
+        // focusing the popover first would leave it on the container.
+        onOpenAutoFocus={(event) => event.preventDefault()}
         className={cn("w-auto", pickerContentClassName)}
       >
         {children}
@@ -175,6 +199,8 @@ function DatePickerSingleButton({
   disabled,
   className,
   "aria-invalid": ariaInvalid,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   numberOfMonths,
   side,
   defaultMonth,
@@ -187,15 +213,19 @@ function DatePickerSingleButton({
       id={id}
       disabled={disabled}
       ariaInvalid={ariaInvalid}
+      ariaLabelledBy={ariaLabelledBy}
+      ariaDescribedBy={ariaDescribedBy}
       className={className}
       empty={!date}
       label={date ? format(date, "PPP") : placeholder}
+      dialogLabel="Choose date"
       open={open}
       onOpenChange={setOpen}
       side={side}
     >
       <LazyCalendar
         mode="single"
+        autoFocus
         selected={date}
         defaultMonth={defaultMonth ?? date}
         numberOfMonths={numberOfMonths}
@@ -216,6 +246,8 @@ function DatePickerRangeButton({
   disabled,
   className,
   "aria-invalid": ariaInvalid,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   numberOfMonths,
   side,
   defaultMonth,
@@ -241,15 +273,19 @@ function DatePickerRangeButton({
       id={id}
       disabled={disabled}
       ariaInvalid={ariaInvalid}
+      ariaLabelledBy={ariaLabelledBy}
+      ariaDescribedBy={ariaDescribedBy}
       className={className}
       empty={!from}
       label={formatRangeTriggerLabel(from, to, placeholder)}
+      dialogLabel="Choose dates"
       open={open}
       onOpenChange={onOpenChange}
       side={side}
     >
       <LazyCalendar
         mode="range"
+        autoFocus
         selected={selected}
         defaultMonth={defaultMonth ?? from ?? to}
         numberOfMonths={months}

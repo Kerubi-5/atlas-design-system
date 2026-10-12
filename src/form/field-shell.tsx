@@ -23,24 +23,57 @@ export function invalidWhen(errorText: string | undefined) {
   return errorText ? true : undefined
 }
 
+/** Id of the label `FormFieldShell` renders for control `id`. */
+export function labelIdFor(id: string) {
+  return `${id}-label`
+}
+
+/** Id of the error text `FormFieldShell` renders for control `id`. */
+export function errorIdFor(id: string) {
+  return `${id}-error`
+}
+
+/**
+ * `aria-describedby` for the control: the given hint ids, plus the error
+ * text while there is one, or `undefined` when there is nothing to read.
+ */
+export function describedBy(
+  id: string,
+  errorText: string | undefined,
+  ...hintIds: Array<string | undefined>
+) {
+  const ids = [...hintIds, errorText ? errorIdFor(id) : undefined].filter(
+    Boolean
+  )
+  return ids.length ? ids.join(" ") : undefined
+}
+
 /**
  * Label, control, and error text stacked with the kit's field spacing.
  * `labelAction` sits on the label's row (the Markdown field's mode toggle).
+ * Set `labelFor` to false when the control is not rendered (Markdown
+ * preview), so the label does not point at a missing element.
  */
 export function FormFieldShell({
   id,
   label,
   labelAction,
   errorText,
+  labelFor = true,
   children,
 }: {
   id: string
   label: string
   labelAction?: ReactNode
   errorText: string | undefined
+  labelFor?: boolean
   children: ReactNode
 }) {
-  const labelNode = <Label htmlFor={id}>{label}</Label>
+  const labelNode = (
+    <Label id={labelIdFor(id)} htmlFor={labelFor ? id : undefined}>
+      {label}
+    </Label>
+  )
   return (
     <div className="flex flex-col gap-1.5">
       {labelAction ? (
@@ -52,7 +85,7 @@ export function FormFieldShell({
         labelNode
       )}
       {children}
-      <FieldError text={errorText} />
+      <FieldError id={errorIdFor(id)} text={errorText} />
     </div>
   )
 }

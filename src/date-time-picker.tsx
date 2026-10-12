@@ -38,6 +38,15 @@ export type DateTimePickerButtonProps = {
   disabled?: boolean
   className?: string
   "aria-invalid"?: boolean
+  /**
+   * Forwarded to the trigger. To name it from a visible label while still
+   * reading the picked date and time, list the label's id and then `${id}-value`
+   * (the trigger text). A `<label for>` alone names the button by the label
+   * and drops the date and time; it can stay for click-to-open.
+   */
+  "aria-labelledby"?: string
+  /** Forwarded to the trigger, e.g. the id of a hint or error text. */
+  "aria-describedby"?: string
   /** Popover side. Defaults to `bottom`; Radix still flips on collision. */
   side?: React.ComponentProps<typeof PopoverContent>["side"]
   /** Month shown when the popover opens; falls back to the selected date. */
@@ -123,6 +132,8 @@ export function DateTimePickerButton({
   disabled,
   className,
   "aria-invalid": ariaInvalid,
+  "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
   side,
   defaultMonth,
 }: DateTimePickerButtonProps) {
@@ -143,24 +154,32 @@ export function DateTimePickerButton({
           variant="outline"
           disabled={disabled}
           aria-invalid={ariaInvalid}
+          aria-labelledby={ariaLabelledBy}
+          aria-describedby={ariaDescribedBy}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
           onPointerEnter={preloadCalendar}
           onFocus={preloadCalendar}
         >
           <CalendarIcon data-icon="inline-start" />
-          {label}
+          {/* `${id}-value` lets a form field name the trigger "label, value". */}
+          <span id={id ? `${id}-value` : undefined}>{label}</span>
         </Button>
       </PopoverTrigger>
       <PopoverContent
         align="start"
         side={side}
         collisionPadding={PICKER_COLLISION_PADDING}
+        aria-label="Choose date and time"
+        // Focus goes to the selected day (or today) through the calendar's
+        // `autoFocus` once it loads, not to the popover container.
+        onOpenAutoFocus={(event) => event.preventDefault()}
         onInteractOutside={preventDismissForPortaledSelect}
         className={cn("w-auto min-w-0", pickerContentClassName)}
       >
         <LazyCalendar
           mode="single"
+          autoFocus
           selected={date ?? undefined}
           defaultMonth={defaultMonth ?? date ?? undefined}
           onSelect={(next) => {

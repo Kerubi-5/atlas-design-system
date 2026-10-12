@@ -13,16 +13,19 @@ export function getFieldErrorMessage(
 }
 
 export function FieldError({
+  id,
   message,
   text,
 }: {
+  /** Point the control's `aria-describedby` here so the error is read with it. */
+  id?: string
   message?: FieldErrorMessage
   text?: string
 }) {
   const resolved = text ?? getFieldErrorMessage(message)
   if (!resolved) return null
   return (
-    <p className="text-xs text-destructive" role="alert">
+    <p id={id} className="text-xs text-destructive" role="alert">
       {resolved}
     </p>
   )

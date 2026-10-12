@@ -29,7 +29,7 @@ const components = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
 const retyped: Array<[string, RegExp, string]> = [
   [
     "focus ring",
-    /focus-visible:(?:border-ring|ring-ring|ring-2)\b/,
+    /(?<![\w-])focus-visible:(?:border-ring|ring-ring|ring-2)\b/,
     "focusRing",
   ],
   ["invalid state", /aria-invalid:(?:border|ring)-destructive/, "invalidState"],

@@ -41,7 +41,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `checkbox`                    | `Checkbox`                                                                                                                                                                                                                                                                                                                                                                               |
 | `color-legend`                | `ColorLegend`; `title`, `items` as `{ color, range?, label }[]`, optional `caption`, `children`, `aria-label`, `className` (overlay chrome). No attribution.                                                                                                                                                                                                                             |
 | `combobox`                    | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text, `creatable`, `normalizeCreateValue` (query → value or `null`), `createLabel`; trigger matches Input/SelectTrigger chrome; keyboard highlight scrolls into view; create is a listbox option selected with Enter                                                        |
-| `date-picker`                 | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`) and `side`                                                                                           |
+| `date-picker`                 | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`), `side`, `aria-labelledby`, and `aria-describedby`                                                   |
 | `date-time-picker`            | `DateTimePickerButton`, `resolveTimeStep`, `DEFAULT_TIME_STEP`; controlled `value` is `Date` or `null`; `onChange` emits `Date \                                                                                                                                                                                                                                                         |
 | `dialog`                      | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton`                                                                                                                                                                                                                                                       |
 | `dropdown-menu`               | `DropdownMenu` family (trigger, content, item, checkbox/radio items, label, separator, shortcut, sub menus); item `variant="destructive"` and `inset`; for commands, not values                                                                                                                                                                                                          |
@@ -77,7 +77,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `form/select-field`           | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder; select item children                                                                                                                                                                                                                                                                              |
 | `form/date-picker-field`      | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta`, placeholder, and `className` (forwarded to the trigger)                                                                                                                                                                                                                                                       |
 | `form/date-time-picker-field` | `FormDateTimePickerField`; `value` is `Date` or `null`; `onValueChange` emits `Date \                                                                                                                                                                                                                                                                                                    |
-| `form/field-error`            | `FieldError`, `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                                        |
+| `form/field-error`            | `FieldError` (optional `id`), `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                        |
 | `form/feedback-field`         | `FormFeedbackField`; nullable `message`                                                                                                                                                                                                                                                                                                                                                  |
 | `next/tabs-nav-link`          | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                                                                                                                                                                                                                                                                        |
 | `utils`                       | `cn`, `onInputChange`                                                                                                                                                                                                                                                                                                                                                                    |
@@ -120,7 +120,12 @@ for a Write / Preview GFM body. `FormSelectField`, `FormDatePickerField`, and
 `FormDatePickerField` takes a `Date` or `yyyy-MM-dd` string and calls
 `onValueChange` with `Date | undefined`. `FormDateTimePickerField` takes a
 `Date` or `null` and calls `onValueChange` with `Date | null`. `FieldError`
-accepts either `message` or pre-resolved `text`.
+accepts either `message` or pre-resolved `text`, and an `id` to point the
+control's `aria-describedby` at. Every `form/*` field does that for you: the
+error text (and `FormTextField`'s `description`) is the control's accessible
+description. The date fields label their trigger with `aria-labelledby` (the
+label, then the trigger) rather than `<label for>`, so the picked date is
+part of its name.
 
 `DatePickerButton` is single-day by default. For a from/to range, set
 `mode="range"`; `value` is `{ from, to }` (each side `Date` or `yyyy-MM-dd`)
@@ -130,6 +135,12 @@ one month below `md` and two months at `md+` unless `numberOfMonths` is set,
 clamps to the viewport with collision padding and scroll, stays `w-auto` so
 it does not collapse to the default popover width, and includes a Clear
 action. Pass `side` to prefer a placement; Radix still flips on collision.
+The popover is a dialog named "Choose date" ("Choose dates" in range mode),
+and focus moves to the selected day, or today, when it opens. Pass
+`aria-labelledby` and `aria-describedby` to name and describe the trigger;
+to keep the date in its name, list the label's id and then `${id}-value`,
+the trigger text's id (a `<label for>` alone names the button by the label
+only).
 `FormDatePickerField` forwards `className` to that trigger.
 
 `DateTimePickerButton` is the date-and-time control. `value` is a `Date` or
@@ -139,7 +150,9 @@ pair (24-hour, stepped by `timeStep`, default 15), and Clear. Picking a day
 keeps the popover open so the time can be set; the time selects stay
 disabled until a day is chosen. The panel is `w-auto`, sized by the
 calendar, and clamped to the viewport so it stays on-screen at 390px. Pass
-`side` to prefer a placement. `FormDateTimePickerField` forwards `className`
+`side` to prefer a placement. Like `DatePickerButton`, the popover is a
+named dialog ("Choose date and time") that focuses the selected day or
+today, and the trigger takes `aria-labelledby` and `aria-describedby`. `FormDateTimePickerField` forwards `className`
 and `timeStep` to that control.
 
 Outline and ghost `Button` hover uses `border-selected-foreground`,

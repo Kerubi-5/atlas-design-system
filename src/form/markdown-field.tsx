@@ -8,7 +8,12 @@ import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
-import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
+import {
+  describedBy,
+  FormFieldShell,
+  invalidWhen,
+  metaErrorText,
+} from "./field-shell.js"
 import type { TextFieldApi } from "./text-field.js"
 
 type Mode = "write" | "preview"
@@ -58,6 +63,7 @@ export function FormMarkdownField({
       id={id}
       label={label}
       errorText={errorText}
+      labelFor={mode === "write"}
       labelAction={
         <ToggleGroup
           type="single"
@@ -88,6 +94,7 @@ export function FormMarkdownField({
           placeholder={placeholder}
           rows={rows}
           aria-invalid={invalidWhen(errorText)}
+          aria-describedby={describedBy(id, errorText)}
         />
       ) : (
         <div className={cn(fieldSurface, "min-h-16")} aria-live="polite">

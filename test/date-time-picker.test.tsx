@@ -174,6 +174,40 @@ describe("DateTimePickerButton", () => {
     expect(trigger).toHaveFocus()
   })
 
+  // WAI-ARIA APG date picker dialog: a named dialog, focus on the date.
+  it("opens a named dialog with focus on the selected day", async () => {
+    const user = createUser()
+    render(<DateTimePickerButton value={afternoon} onChange={() => {}} />)
+
+    await user.click(screen.getByRole("button", { name: /October 10/ }))
+    await screen.findByRole("grid")
+    expect(screen.getByRole("dialog")).toHaveAccessibleName(
+      "Choose date and time"
+    )
+    await waitFor(() =>
+      expect(document.activeElement).toHaveAttribute(
+        "data-day",
+        afternoon.toLocaleDateString()
+      )
+    )
+  })
+
+  it("forwards aria-describedby to the trigger", () => {
+    render(
+      <>
+        <span id="starts-hint">Local time</span>
+        <DateTimePickerButton
+          value={afternoon}
+          onChange={() => {}}
+          aria-describedby="starts-hint"
+        />
+      </>
+    )
+    expect(
+      screen.getByRole("button", { name: /October 10/ })
+    ).toHaveAccessibleDescription("Local time")
+  })
+
   it("limits minute options to the time step and still lists an off-step value", async () => {
     const user = createUser()
     render(
@@ -260,10 +294,10 @@ describe("FormDateTimePickerField", () => {
     const trigger = screen.getByLabelText("Starts")
     expectFormControlTrigger(trigger)
     expect(trigger).toHaveTextContent(/October 10.*2:30/)
-    expect(screen.getByText("Starts")).toHaveAttribute(
-      "for",
-      trigger.getAttribute("id")
-    )
+    // Labelled by the label and itself, so the picked date and time are read.
+    // The <label for> stays, so clicking the label still reaches the trigger.
+    expect(screen.getByText("Starts")).toHaveAttribute("for", trigger.id)
+    expect(trigger).toHaveAccessibleName(/^Starts.*October 10.*2:30/)
 
     await user.click(trigger)
     expect(await screen.findByRole("grid")).toBeVisible()
@@ -279,6 +313,20 @@ describe("FormDateTimePickerField", () => {
       expect(screen.queryByRole("grid")).not.toBeInTheDocument()
     })
     expect(trigger).toHaveFocus()
+  })
+
+  it("describes the trigger with its error", () => {
+    render(
+      <FormDateTimePickerField
+        value={null}
+        onValueChange={() => {}}
+        label="Starts"
+        meta={{ errors: ["Pick a start time"] }}
+      />
+    )
+    expect(screen.getByLabelText("Starts")).toHaveAccessibleDescription(
+      "Pick a start time"
+    )
   })
 
   it("renders a labelled trigger and field error", () => {

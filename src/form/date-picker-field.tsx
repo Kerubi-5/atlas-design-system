@@ -5,7 +5,13 @@ import { useId } from "react"
 import { DatePickerButton, type DateLike } from "../date-picker.js"
 
 import type { FieldMetaState } from "./field-error.js"
-import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
+import {
+  describedBy,
+  FormFieldShell,
+  invalidWhen,
+  labelIdFor,
+  metaErrorText,
+} from "./field-shell.js"
 
 type Props = {
   value: DateLike
@@ -41,6 +47,10 @@ export function FormDatePickerField({
         disabled={disabled}
         className={className}
         aria-invalid={invalidWhen(errorText)}
+        // A <label for> alone would hide the picked value from the name, so
+        // name the trigger "label, value" explicitly.
+        aria-labelledby={`${labelIdFor(id)} ${id}-value`}
+        aria-describedby={describedBy(id, errorText)}
       />
     </FormFieldShell>
   )
