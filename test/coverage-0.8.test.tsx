@@ -7,7 +7,14 @@ import { SelectItem } from "../src/select.js"
 import { Toaster, toast } from "../src/toast.js"
 import { useMediaQuery } from "../src/internal/use-media-query.js"
 
-import { createUser, render, screen, waitFor, within } from "./helpers.js"
+import {
+  createUser,
+  fakeTextField,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "./helpers.js"
 
 /**
  * Branch coverage for the 0.8.0 polish pass: the paths an app hits that the
@@ -15,13 +22,8 @@ import { createUser, render, screen, waitFor, within } from "./helpers.js"
  * buttons, media-query fallbacks).
  */
 
-function markdownField(value: string, errors: unknown[] = []) {
-  return {
-    name: "notes",
-    state: { value, meta: { errors } },
-    handleChange: vi.fn(),
-    handleBlur: vi.fn(),
-  }
+function markdownField(value: string, errors: string[] = []) {
+  return fakeTextField("notes", value, errors)
 }
 
 describe("FormSelectField", () => {

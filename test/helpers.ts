@@ -1,6 +1,8 @@
 import { render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { expect } from "vitest"
+import { expect, vi } from "vitest"
+
+import type { FieldErrorMessage } from "../src/form/field-error.js"
 
 /**
  * Shared Testing Library entry for kit behavior tests.
@@ -72,5 +74,19 @@ export function stubMatchMedia(
 
   return () => {
     listeners.clear()
+  }
+}
+
+/** A TanStack-shaped text field for the `form/*` adapters, with spy handlers. */
+export function fakeTextField(
+  name: string,
+  value: string,
+  errors: FieldErrorMessage[] = []
+) {
+  return {
+    name,
+    state: { value, meta: { errors } },
+    handleChange: vi.fn<(value: string) => void>(),
+    handleBlur: vi.fn<() => void>(),
   }
 }
