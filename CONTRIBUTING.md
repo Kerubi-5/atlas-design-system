@@ -23,7 +23,7 @@ CI runs all of these on every pull request. Run them before you push.
 
 ## Add a component
 
-1. `src/<name>.tsx`, following `DESIGN_RULES.md`: semantic tokens, square
+1. `src/<name>.tsx`, following [DESIGN_RULES.md](./DESIGN_RULES.md): semantic tokens, square
    corners, `"use client"` when it uses hooks or handlers. Build on Radix
    primitives from `radix-ui` when one exists. Take focus, invalid,
    disabled, field, selected, and option states from
@@ -48,7 +48,7 @@ CI runs all of these on every pull request. Run them before you push.
    changes at 390px); the visual test fails when a component page has none.
    If it opens an overlay, add it to `OVERLAYS` in `site/tests/a11y.test.mjs`
    so axe scans it open.
-7. A row in `COMPONENTS.md`. New components start as **beta**: add them to
+7. A row in [COMPONENTS.md](./COMPONENTS.md). New components start as **beta**: add them to
    the Status list there and to `beta` in `site/src/lib/usage.ts`.
 8. When it covers a common need, a row in the agent skill's table in
    `skills/atlas-react-kit/SKILL.md`.

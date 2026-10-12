@@ -4,10 +4,9 @@ import * as React from "react"
 
 import { Input } from "./input.js"
 import { Label } from "./label.js"
+import { moveListboxHighlight } from "./internal/listbox-navigation.js"
 import { optionState } from "./internal/styles.js"
 import { cn } from "./utils.js"
-
-const LISTBOX_PAGE_SIZE = 10
 
 /**
  * Case-fold and strip combining marks so "nino" matches "Niño".
@@ -67,10 +66,24 @@ function SearchPicker<T>({
   const listId = React.useId()
   const inputId = React.useId()
 
-  const filtered = React.useMemo(
-    () => items.filter((item) => filter(item, query, getLabel)),
-    [items, filter, query, getLabel]
+  const normalizedItems = React.useMemo(
+    () =>
+      filter === defaultSearchFilter
+        ? items.map((item) => [item, foldSearchText(getLabel(item))] as const)
+        : null,
+    [filter, getLabel, items]
   )
+  const foldedQuery =
+    filter === defaultSearchFilter ? foldSearchText(query.trim()) : ""
+  const filtered = React.useMemo(() => {
+    if (normalizedItems) {
+      if (!foldedQuery) return items
+      return normalizedItems
+        .filter(([, label]) => label.includes(foldedQuery))
+        .map(([item]) => item)
+    }
+    return items.filter((item) => filter(item, query, getLabel))
+  }, [items, filter, foldedQuery, getLabel, normalizedItems, query])
 
   const selectedIndex = React.useMemo(() => {
     const index = filtered.findIndex((item) => getValue(item) === value)
@@ -99,35 +112,15 @@ function SearchPicker<T>({
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "ArrowDown") {
+    const nextHighlight = moveListboxHighlight(
+      event.key,
+      highlight,
+      filtered.length
+    )
+    if (nextHighlight !== undefined) {
       event.preventDefault()
-      setHighlight((index) =>
-        filtered.length === 0 ? 0 : Math.min(index + 1, filtered.length - 1)
-      )
-    }
-    if (event.key === "ArrowUp") {
-      event.preventDefault()
-      setHighlight((index) => Math.max(index - 1, 0))
-    }
-    if (event.key === "Home") {
-      event.preventDefault()
-      setHighlight(0)
-    }
-    if (event.key === "End") {
-      event.preventDefault()
-      setHighlight(filtered.length === 0 ? 0 : filtered.length - 1)
-    }
-    if (event.key === "PageDown") {
-      event.preventDefault()
-      setHighlight((index) =>
-        filtered.length === 0
-          ? 0
-          : Math.min(index + LISTBOX_PAGE_SIZE, filtered.length - 1)
-      )
-    }
-    if (event.key === "PageUp") {
-      event.preventDefault()
-      setHighlight((index) => Math.max(index - LISTBOX_PAGE_SIZE, 0))
+      setHighlight(nextHighlight)
+      return
     }
     if (event.key === "Enter") {
       event.preventDefault()

@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-/** Stable onChange handler for controlled text inputs (satisfies react/jsx-no-bind). */
+/** Read the next value from an input event for a controlled text field. */
 export function onInputChange(setValue: (value: string) => void) {
   return (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setValue(e.target.value)

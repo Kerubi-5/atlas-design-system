@@ -58,6 +58,25 @@ test("the manager document title is Atlas React Kit", async () => {
   assert.match(manager, /document\.title = KIT_TITLE/)
 })
 
+test("the site publishes its generated docs and package-entry index", async () => {
+  const index = JSON.parse(
+    await fs.readFile(path.join(output, "docs-index.json"), "utf8")
+  )
+  assert.equal(index.schemaVersion, 1)
+  assert.equal(index.package.name, kit.name)
+  assert.equal(index.package.version, kit.version)
+  assert.ok(index.components.includes("search-picker"))
+  assert.ok(
+    index.documents.some(
+      (document) =>
+        document.path === "COMPONENTS.md" &&
+        document.headings.some(
+          (heading) => heading.anchor === "optional-peer-dependencies"
+        )
+    )
+  )
+})
+
 test("the site ships its own icon set", async () => {
   const html = await fs.readFile(path.join(output, "index.html"), "utf8")
   assert.match(

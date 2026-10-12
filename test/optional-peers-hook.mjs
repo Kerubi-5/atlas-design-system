@@ -1,15 +1,17 @@
+import { readFileSync } from "node:fs"
+
 /**
- * Resolve hook that makes optional feature libraries unresolvable, so a
- * core entry import fails if it (or anything it pulls in) still touches them.
+ * Resolve hook that makes optional peers unresolvable, so a core entry fails
+ * if it or one of its dependencies imports them.
  */
-const OPTIONAL_PEERS = new Set([
-  "date-fns",
-  "next-themes",
-  "react-day-picker",
-  "react-markdown",
-  "remark-gfm",
-  "sonner",
-])
+const { peerDependenciesMeta } = JSON.parse(
+  readFileSync(new URL("../package.json", import.meta.url), "utf8")
+)
+const OPTIONAL_PEERS = new Set(
+  Object.entries(peerDependenciesMeta)
+    .filter(([, metadata]) => metadata.optional)
+    .map(([name]) => name)
+)
 
 /**
  * Bare specifier → package name (`@scope/name` or the first path segment).

@@ -4,7 +4,8 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. 0.6.0 added generic pieces apps were
 keeping locally (`InfoTip`, `ColorLegend`, `SearchPicker`, `Markdown`,
 `StatTile`, `Meter`, `Slider`) plus the ToggleGroup selected-state fix.
-React 19 and Tailwind 4 are required.
+React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
+when using `next/tabs-nav-link`.
 
 ```sh
 npm install --save-exact atlas-react-kit@0.9.2
@@ -27,17 +28,8 @@ export function Example() {
 }
 ```
 
-Core entries need only the kit. These feature entries need an extra install
-(same version ranges as the kit's optional peers). `Toaster` also reads the
-theme from `next-themes`, so toast consumers install that too.
-
-| Entry points                                                                                           | Extra install                                    |
-| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `calendar`, `date-picker`, `date-time-picker`, `form/date-picker-field`, `form/date-time-picker-field` | `npm i react-day-picker@^10.0.1 date-fns@^4.4.0` |
-| `markdown`, `form/markdown-field`                                                                      | `npm i react-markdown@^10.1.0 remark-gfm@^4.0.1` |
-| `theme-provider`                                                                                       | `npm i next-themes@^0.4.6`                       |
-| `toast`                                                                                                | `npm i sonner@^2.0.7 next-themes@^0.4.6`         |
-| `next/tabs-nav-link`                                                                                   | `npm i next@^16.0.0`                             |
+Core entries need only the kit. Feature entries may need optional peers; see
+the [component guide's install table](./COMPONENTS.md#optional-peer-dependencies).
 
 In your global stylesheet, import the theme after Tailwind and register the
 installed JavaScript directory. Paths in `@source` are relative to that stylesheet;
@@ -55,9 +47,15 @@ on an ancestor to activate dark colors. Supply your own font configuration;
 `font-heading` uses the configured sans font. Application-specific tokens stay
 with the application.
 
-See [design rules](./DESIGN_RULES.md) for shared styling decisions and the
-[component guide](./COMPONENTS.md) for exports and composition examples. Both
-files ship in the npm package.
+## Documentation
+
+- [Component guide](./COMPONENTS.md): imports, props, optional installs, and
+  composition. This guide ships in the npm package.
+- [Design rules](./DESIGN_RULES.md): tokens, accessibility, writing, and
+  composition. This guide ships in the npm package.
+- [Contributing](./CONTRIBUTING.md): component changes, checks, and releases.
+- [Roadmap to 1.0](./ROADMAP-1.0.md): decisions needed before the 1.0 release.
+- [Changelog](./CHANGELOG.md): published and upcoming changes.
 
 ## AI coding assistants
 
@@ -82,7 +80,8 @@ Public docs and a live playground are at
 [design.querobines.com](https://design.querobines.com). The site is Storybook:
 tokens parsed from `theme.css`, these markdown guides rendered from source, and
 editable component stories with light/dark themes, viewport previews, and
-accessibility checks.
+accessibility checks. Its build publishes `docs-index.json` with guide headings
+and package entry points for search and indexing tools.
 
 ## Development and releases
 
@@ -131,9 +130,6 @@ mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
 npm publish ./release-artifacts/atlas-react-kit-0.9.2.tgz --access public
 ```
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for adding components, the browser
-checks, versioning, and deprecations.
 
 Pin an exact package version in consuming applications. Roll back an upgrade by
 restoring the previous version and lockfile. License: MIT; upstream notices are

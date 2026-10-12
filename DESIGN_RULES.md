@@ -4,6 +4,9 @@ Atlas owns these shared rules, its theme, and component implementations. Change
 them here and release a package version. Build application-specific UI by composing
 the shipped components.
 
+Use [COMPONENTS.md](./COMPONENTS.md) for public entry points, props, and
+component-specific behavior.
+
 ## Tokens
 
 Use semantic colors, radii, and fonts: `bg-primary`, `text-muted-foreground`,

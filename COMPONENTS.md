@@ -5,6 +5,11 @@ underlying element or Radix props, including `className`, alongside their option
 Form helpers and `TableBodySkeleton` accept only their documented props. There is
 no root component barrel.
 
+For installation, see [README.md](./README.md); for styling and accessibility,
+see [DESIGN_RULES.md](./DESIGN_RULES.md).
+
+## Optional peer dependencies
+
 Core entries need only the kit. These feature entries need an extra install
 (same version ranges as the kit's optional peers). `Toaster` also reads the
 theme from `next-themes`, so toast consumers install that too.

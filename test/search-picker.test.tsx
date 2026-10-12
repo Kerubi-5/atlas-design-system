@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
-import { SearchPicker } from "../src/search-picker.js"
+import { defaultSearchFilter, SearchPicker } from "../src/search-picker.js"
 
 import { createUser, render, screen } from "./helpers.js"
 
@@ -11,20 +11,31 @@ const places = [
   { id: "3", name: "South" },
   { id: "4", name: "East" },
 ]
+const getPlaceId = (item: (typeof places)[number]) => item.id
+const getPlaceName = (item: (typeof places)[number]) => item.name
 
 function PickerHarness({
   onSelect = vi.fn(),
   disabled,
+  items = places,
+  filter,
 }: {
   onSelect?: (item: (typeof places)[number]) => void
   disabled?: boolean
+  items?: (typeof places)[number][]
+  filter?: (
+    item: (typeof places)[number],
+    query: string,
+    getLabel: (item: (typeof places)[number]) => string
+  ) => boolean
 }) {
   const [value, setValue] = useState("2")
   return (
     <SearchPicker
-      items={places}
-      getValue={(item) => item.id}
-      getLabel={(item) => item.name}
+      items={items}
+      getValue={getPlaceId}
+      getLabel={getPlaceName}
+      filter={filter}
       value={value}
       onSelect={(item) => {
         setValue(item.id)
@@ -61,10 +72,31 @@ describe("SearchPicker", () => {
 
   it("filters with casefold and accent-fold includes", async () => {
     const user = createUser()
-    render(<PickerHarness />)
+    const { rerender } = render(<PickerHarness />)
 
     await user.type(getCombobox(), "nino")
     expect(screen.getByRole("option", { name: "Niño" })).toBeInTheDocument()
+    expect(
+      screen.queryByRole("option", { name: "South" })
+    ).not.toBeInTheDocument()
+
+    rerender(
+      <PickerHarness items={[...places, { id: "5", name: "Nino Nuevo" }]} />
+    )
+    expect(
+      screen.getByRole("option", { name: "Nino Nuevo" })
+    ).toBeInTheDocument()
+    expect(defaultSearchFilter(places[0], " NINO ", getPlaceName)).toBe(true)
+    expect(defaultSearchFilter(places[0], " ", getPlaceName)).toBe(true)
+
+    rerender(
+      <PickerHarness
+        filter={(_item, query, getLabel) =>
+          getLabel(_item).toLowerCase().includes(query.slice(0, 1))
+        }
+      />
+    )
+    expect(screen.getByRole("option", { name: "North" })).toBeInTheDocument()
     expect(
       screen.queryByRole("option", { name: "South" })
     ).not.toBeInTheDocument()
@@ -102,6 +134,10 @@ describe("SearchPicker", () => {
       "aria-selected",
       "true"
     )
+
+    await user.type(getCombobox(), "east")
+    await user.click(screen.getByRole("option", { name: "East" }))
+    expect(onSelect).toHaveBeenLastCalledWith({ id: "4", name: "East" })
   })
 
   it("Escape clears the query, then blurs", async () => {

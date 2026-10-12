@@ -2,7 +2,13 @@
 
 ## Unreleased
 
-No package changes; the published 0.9.2 is unchanged.
+Package improvements; the public API is unchanged.
+
+- `SearchPicker` caches normalized labels for the default accent-insensitive
+  filter, reducing repeated work as users type through large lists.
+- `Combobox` and `SearchPicker` share their listbox keyboard movement logic.
+- The docs site publishes a machine-readable index of guide headings and
+  package entry points.
 
 ## 0.9.2 - 2026-10-11
 
