@@ -69,7 +69,10 @@ describe("portable forms", () => {
     ).toBeInTheDocument()
 
     await user.click(screen.getByRole("radio", { name: "Preview" }))
-    expect(screen.getByRole("heading", { name: "Hello" })).toBeInTheDocument()
+    // The renderer loads on first preview, so the heading arrives async.
+    expect(
+      await screen.findByRole("heading", { name: "Hello" })
+    ).toBeInTheDocument()
     expect(screen.queryByLabelText("Notes")).not.toBeInTheDocument()
   })
 

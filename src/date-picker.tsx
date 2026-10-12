@@ -6,13 +6,13 @@ import { CalendarIcon } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 
 import { Button } from "./button.js"
-import { Calendar } from "./calendar.js"
 import {
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
   pickerTriggerClassName,
 } from "./internal/form-control.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
+import { LazyCalendar, preloadCalendar } from "./lazy-calendar.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn } from "./utils.js"
 
@@ -148,6 +148,8 @@ function DatePickerShell({
           aria-invalid={ariaInvalid}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
+          onPointerEnter={preloadCalendar}
+          onFocus={preloadCalendar}
         >
           <CalendarIcon data-icon="inline-start" />
           {label}
@@ -192,7 +194,7 @@ function DatePickerSingleButton({
       onOpenChange={setOpen}
       side={side}
     >
-      <Calendar
+      <LazyCalendar
         mode="single"
         selected={date}
         defaultMonth={defaultMonth ?? date}
@@ -246,7 +248,7 @@ function DatePickerRangeButton({
       onOpenChange={onOpenChange}
       side={side}
     >
-      <Calendar
+      <LazyCalendar
         mode="range"
         selected={selected}
         defaultMonth={defaultMonth ?? from ?? to}

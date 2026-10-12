@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { lazy, Suspense, useState } from "react"
 
-import { Markdown } from "../markdown.js"
+import { Spinner } from "../spinner.js"
 import { Textarea } from "../textarea.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
@@ -12,6 +12,14 @@ import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
 import type { TextFieldApi } from "./text-field.js"
 
 type Mode = "write" | "preview"
+
+// The renderer (react-markdown + remark-gfm) is fetched the first time
+// Preview is shown or hovered, so a form in Write mode stays light.
+const loadMarkdown = () => import("../markdown.js")
+const preloadMarkdown = () => void loadMarkdown()
+const Markdown = lazy(() =>
+  loadMarkdown().then((module) => ({ default: module.Markdown }))
+)
 
 /**
  * GFM body field: Write is a textarea, Preview is the sanitized Markdown
@@ -61,7 +69,13 @@ export function FormMarkdownField({
           aria-label={`${label} mode`}
         >
           <ToggleGroupItem value="write">Write</ToggleGroupItem>
-          <ToggleGroupItem value="preview">Preview</ToggleGroupItem>
+          <ToggleGroupItem
+            value="preview"
+            onPointerEnter={preloadMarkdown}
+            onFocus={preloadMarkdown}
+          >
+            Preview
+          </ToggleGroupItem>
         </ToggleGroup>
       }
     >
@@ -78,7 +92,9 @@ export function FormMarkdownField({
       ) : (
         <div className={cn(fieldSurface, "min-h-16")} aria-live="polite">
           {trimmed ? (
-            <Markdown content={trimmed} />
+            <Suspense fallback={<Spinner aria-label="Loading preview" />}>
+              <Markdown content={trimmed} />
+            </Suspense>
           ) : (
             <p className="text-sm text-muted-foreground">Nothing to preview</p>
           )}

@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+Load the heavy parts of the pickers and the markdown field on demand. The
+public API is unchanged.
+
+- `DatePickerButton`, `DateTimePickerButton`, and their `form/*` fields
+  fetch the calendar (Day Picker) when the popover first opens, or earlier
+  when the trigger is hovered or focused. A page that only shows the
+  trigger downloads about 16 KB less (gzipped). A spinner fills the popover
+  for the moment the calendar takes to arrive on a cold first open.
+- `FormMarkdownField` fetches the Markdown renderer (react-markdown and
+  remark-gfm) when Preview is first shown, hovered, or focused, so a form
+  in Write mode downloads about 46 KB less (gzipped). The preview heading
+  now renders after that load instead of synchronously.
+
 ## 0.9.4 - 2026-10-12
 
 Patch: package internals only; the public API and rendered markup are
