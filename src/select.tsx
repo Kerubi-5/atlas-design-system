@@ -14,6 +14,9 @@ import {
 import { cn } from "./utils.js"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
 
+const scrollButtonClassName =
+  "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-3.5"
+
 function Select({
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
@@ -98,10 +101,7 @@ function SelectContent({
         <SelectScrollUpButton />
         <SelectPrimitive.Viewport
           data-position={position}
-          className={cn(
-            "data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)",
-            position === "popper" && ""
-          )}
+          className="data-[position=popper]:h-(--radix-select-trigger-height) data-[position=popper]:w-full data-[position=popper]:min-w-(--radix-select-trigger-width)"
         >
           {children}
         </SelectPrimitive.Viewport>
@@ -177,10 +177,7 @@ function SelectScrollUpButton({
   return (
     <SelectPrimitive.ScrollUpButton
       data-slot="select-scroll-up-button"
-      className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-3.5",
-        className
-      )}
+      className={cn(scrollButtonClassName, className)}
       {...props}
     >
       <ChevronUpIcon />
@@ -195,10 +192,7 @@ function SelectScrollDownButton({
   return (
     <SelectPrimitive.ScrollDownButton
       data-slot="select-scroll-down-button"
-      className={cn(
-        "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-3.5",
-        className
-      )}
+      className={cn(scrollButtonClassName, className)}
       {...props}
     >
       <ChevronDownIcon />
