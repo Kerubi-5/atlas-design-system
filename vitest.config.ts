@@ -11,7 +11,7 @@ export default defineConfig({
       reporter: ["text-summary", "text"],
       // Floors just under the current numbers (95% lines, 87% branches):
       // CI fails when new code lands without tests.
-      thresholds: { lines: 95, statements: 94, functions: 94, branches: 88 },
+      thresholds: { lines: 95, statements: 94, functions: 94, branches: 90 },
     },
   },
 })
