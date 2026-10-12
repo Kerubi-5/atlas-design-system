@@ -14,7 +14,7 @@ export function TableBodySkeleton({ columns, rows = 5 }: Props) {
         <TableRow key={row}>
           {Array.from({ length: columns }, (_, col) => (
             <TableCell key={col}>
-              <Skeleton className="h-4 w-full max-w-[12rem]" />
+              <Skeleton className="h-4 w-full" />
             </TableCell>
           ))}
         </TableRow>

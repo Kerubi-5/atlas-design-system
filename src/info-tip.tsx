@@ -29,7 +29,10 @@ export type InfoTipProps = {
   align?: React.ComponentProps<typeof PopoverContent>["align"]
   badge?: React.ReactNode
   icon?: React.ReactNode
+  /** Classes for the trigger button. */
   className?: string
+  /** Classes for the panel, e.g. its width. Defaults to `w-72`. */
+  contentClassName?: string
 }
 
 /**
@@ -56,6 +59,7 @@ function InfoTip({
   badge,
   icon,
   className,
+  contentClassName,
 }: InfoTipProps) {
   const [open, setOpen] = React.useState(false)
   const closeTimer = React.useRef<number | null>(null)
@@ -129,7 +133,7 @@ function InfoTip({
       <PopoverContent
         side={side}
         align={align}
-        className="w-72"
+        className={cn("w-72", contentClassName)}
         onMouseEnter={openFromHover}
         onMouseLeave={closeFromHover}
       >

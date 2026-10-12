@@ -46,7 +46,7 @@ const meta = {
             {args.triggerLabel}
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{args.title}</DialogTitle>
             <DialogDescription>{args.description}</DialogDescription>

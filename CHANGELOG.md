@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+Apps decide container and overlay sizes. These defaults change, so set a
+width in app code where the old one is wanted:
+
+- `DialogContent` no longer sets `sm:max-w-md`. Without a width class a
+  dialog is the viewport minus 2rem wide; pass e.g. `className="sm:max-w-md"`.
+- `PopoverContent` no longer sets `w-72`; it fits its content, clamped to the
+  available viewport width. Pass e.g. `className="w-72"`.
+- `DropdownMenuContent` no longer sets `min-w-40`; it fits its items.
+- `TableBodySkeleton` bars fill their cell instead of stopping at 12rem.
+- The `DateTimePickerButton` panel drops its 24rem cap; the calendar sets
+  its width and the viewport clamps it.
+- New: `InfoTip` `contentClassName`, and `Combobox` and `SearchPicker`
+  `listClassName`, for the panel width and list height they used to fix.
+
 Load the heavy parts of the pickers and the markdown field on demand. The
 public API is unchanged.
 
