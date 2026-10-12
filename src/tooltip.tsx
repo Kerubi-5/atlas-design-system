@@ -5,20 +5,26 @@ import { Tooltip as TooltipPrimitive } from "radix-ui"
 
 import { cn } from "./utils.js"
 
+/** True inside a TooltipProvider, so `Tooltip` does not add its own. */
+const HasTooltipProvider = React.createContext(false)
+
 /**
- * Shares open delay across tooltips. `Tooltip` adds one per instance, so a
- * provider at the app root is optional; add it to tune `delayDuration`.
+ * Shares open delay across tooltips. `Tooltip` adds one when none is above
+ * it, so a provider at the app root is optional; add it to tune
+ * `delayDuration`.
  */
 function TooltipProvider({
   delayDuration = 0,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
   return (
-    <TooltipPrimitive.Provider
-      data-slot="tooltip-provider"
-      delayDuration={delayDuration}
-      {...props}
-    />
+    <HasTooltipProvider.Provider value={true}>
+      <TooltipPrimitive.Provider
+        data-slot="tooltip-provider"
+        delayDuration={delayDuration}
+        {...props}
+      />
+    </HasTooltipProvider.Provider>
   )
 }
 
@@ -29,11 +35,10 @@ function TooltipProvider({
 function Tooltip({
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
-  return (
-    <TooltipProvider>
-      <TooltipPrimitive.Root data-slot="tooltip" {...props} />
-    </TooltipProvider>
-  )
+  const root = <TooltipPrimitive.Root data-slot="tooltip" {...props} />
+  // A nested provider would override the app's delayDuration.
+  if (React.useContext(HasTooltipProvider)) return root
+  return <TooltipProvider>{root}</TooltipProvider>
 }
 
 function TooltipTrigger({

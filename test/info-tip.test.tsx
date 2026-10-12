@@ -11,6 +11,9 @@ import {
   waitFor,
 } from "./helpers.js"
 
+const finePointer = (query: string) =>
+  query.includes("(hover: hover)") && query.includes("(pointer: fine)")
+
 describe("InfoTip", () => {
   it("names the glyph and opens a popover from click", async () => {
     const user = createUser()
@@ -40,6 +43,22 @@ describe("InfoTip", () => {
     expect(screen.getByText("Scale")).toBeVisible()
   })
 
+  it("names the dialog from its title, or from the label without one", async () => {
+    const user = createUser()
+    const { unmount } = render(
+      <InfoTip label="About depth" title="Depth" description="Water." />
+    )
+    await user.click(screen.getByRole("button", { name: "About depth" }))
+    expect(await screen.findByRole("dialog")).toHaveAccessibleName("Depth")
+    unmount()
+
+    render(<InfoTip label="About depth" description="Water." />)
+    await user.click(screen.getByRole("button", { name: "About depth" }))
+    expect(await screen.findByRole("dialog")).toHaveAccessibleName(
+      "About depth"
+    )
+  })
+
   it("keeps inline layout from stretching the line box", () => {
     render(
       <p>
@@ -55,10 +74,7 @@ describe("InfoTip", () => {
   })
 
   it("opens on hover only when the pointer can hover", async () => {
-    const restore = stubMatchMedia(
-      (query) =>
-        query.includes("(hover: hover)") && query.includes("(pointer: fine)")
-    )
+    const restore = stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -67,11 +83,67 @@ describe("InfoTip", () => {
     restore()
   })
 
-  it("stays open after a click when the pointer leaves", async () => {
-    const restore = stubMatchMedia(
-      (query) =>
-        query.includes("(hover: hover)") && query.includes("(pointer: fine)")
+  it("closes a hover-opened panel on the first Escape", async () => {
+    const restore = stubMatchMedia(finePointer)
+    const user = createUser()
+    render(<InfoTip label="Hint" title="Hint title" />)
+
+    await user.hover(screen.getByRole("button", { name: "Hint" }))
+    expect(await screen.findByText("Hint title")).toBeVisible()
+
+    await user.keyboard("{Escape}")
+    await waitFor(() => {
+      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
+    })
+    restore()
+  })
+
+  it("closes a click-pinned panel on Escape and returns focus to the glyph", async () => {
+    const restore = stubMatchMedia(finePointer)
+    const user = createUser()
+    render(<InfoTip label="Hint" title="Hint title" />)
+
+    const trigger = screen.getByRole("button", { name: "Hint" })
+    await user.click(trigger)
+    expect(await screen.findByText("Hint title")).toBeVisible()
+
+    await user.keyboard("{Escape}")
+    await waitFor(() => {
+      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
+    })
+    expect(trigger).toHaveFocus()
+    restore()
+  })
+
+  it("keeps focus in the field being typed in when hover opens the panel", async () => {
+    const restore = stubMatchMedia(finePointer)
+    const user = createUser()
+    render(
+      <div>
+        <label htmlFor="name">Name</label>
+        <input id="name" />
+        <InfoTip label="Hint" title="Hint title" />
+      </div>
     )
+
+    const field = screen.getByLabelText("Name")
+    await user.click(field)
+    await user.keyboard("Ada")
+
+    await user.hover(screen.getByRole("button", { name: "Hint" }))
+    expect(await screen.findByText("Hint title")).toBeVisible()
+    expect(field).toHaveFocus()
+
+    await user.keyboard("{Escape}")
+    await waitFor(() => {
+      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
+    })
+    expect(field).toHaveFocus()
+    restore()
+  })
+
+  it("stays open after a click when the pointer leaves", async () => {
+    const restore = stubMatchMedia(finePointer)
     const user = createUser()
     render(
       <div>

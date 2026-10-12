@@ -24,7 +24,12 @@ import { Progress } from "../src/progress.js"
 import { RadioGroup, RadioGroupItem } from "../src/radio-group.js"
 import { Spinner } from "../src/spinner.js"
 import { Switch } from "../src/switch.js"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../src/tooltip.js"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../src/tooltip.js"
 import { BreadcrumbStory, PaginationStory } from "../stories/wayfinding.js"
 
 import { createUser, render, screen, waitFor } from "./helpers.js"
@@ -55,6 +60,32 @@ describe("Tooltip", () => {
     await waitFor(() => {
       expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
     })
+  })
+
+  it("opens on hover without delay unless an app provider sets one", async () => {
+    const user = createUser()
+    const { unmount } = render(
+      <Tooltip>
+        <TooltipTrigger>Save</TooltipTrigger>
+        <TooltipContent>Save draft</TooltipContent>
+      </Tooltip>
+    )
+    await user.hover(screen.getByRole("button", { name: "Save" }))
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Save draft")
+    unmount()
+
+    render(
+      <TooltipProvider delayDuration={5000}>
+        <Tooltip>
+          <TooltipTrigger>Save</TooltipTrigger>
+          <TooltipContent>Save draft</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+    )
+    await user.hover(screen.getByRole("button", { name: "Save" }))
+    // Well under the 5s delay the app asked for.
+    await new Promise((resolve) => setTimeout(resolve, 50))
+    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
   })
 })
 
@@ -142,6 +173,8 @@ describe("Switch", () => {
     const toggle = screen.getByRole("switch", { name: "Weekly digest" })
     expect(toggle).toHaveAttribute("aria-checked", "false")
     expect(toggle.className).toContain("rounded-none")
+    // The 20px track gets the enlarged hit area Checkbox and Radio use.
+    expect(toggle.className).toContain("after:-inset-y-2")
 
     await user.click(screen.getByText("Weekly digest"))
     expect(toggle).toHaveAttribute("aria-checked", "true")

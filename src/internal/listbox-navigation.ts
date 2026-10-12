@@ -42,3 +42,15 @@ export function listboxOptionId(listId: string, index: number) {
 export function scrollOptionIntoView(node: HTMLElement | null) {
   node?.scrollIntoView({ block: "nearest" })
 }
+
+/**
+ * True while an IME is composing (Japanese, Chinese, Korean input). Enter
+ * then commits the composition and must not select an option. `keyCode`
+ * 229 covers Safari, which ends composition before the keydown.
+ */
+export function isComposingKey(event: {
+  nativeEvent: KeyboardEvent
+  keyCode: number
+}) {
+  return event.nativeEvent.isComposing || event.keyCode === 229
+}

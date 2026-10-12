@@ -5,6 +5,7 @@ import * as React from "react"
 import { Input } from "./input.js"
 import { Label } from "./label.js"
 import {
+  isComposingKey,
   listboxOptionId,
   moveListboxHighlight,
   scrollOptionIntoView,
@@ -48,6 +49,9 @@ export type SearchPickerProps<T> = {
   /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
   listClassName?: string
 }
+
+/** Frame shared by the listbox and the empty state that replaces it. */
+const listFrame = "border border-input bg-background"
 
 /**
  * Always-visible combobox: a labelled input and a listbox. Unlike Combobox,
@@ -115,6 +119,7 @@ function SearchPicker<T>({
   }
 
   const active = filtered[highlight]
+  const empty = filtered.length === 0
 
   const selectItem = (item: T) => {
     onSelect(item)
@@ -122,6 +127,7 @@ function SearchPicker<T>({
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (isComposingKey(event)) return
     const nextHighlight = moveListboxHighlight(
       event.key,
       highlight,
@@ -171,45 +177,50 @@ function SearchPicker<T>({
         id={listId}
         role="listbox"
         aria-label={listLabel ?? label}
-        className={cn(
-          "max-h-60 overflow-y-auto border border-input bg-background",
-          listClassName
-        )}
+        className={
+          empty
+            ? "sr-only"
+            : cn("max-h-60 overflow-y-auto", listFrame, listClassName)
+        }
       >
-        {filtered.length === 0 ? (
-          <li className={listboxEmpty}>{emptyText}</li>
-        ) : (
-          filtered.map((item, index) => {
-            const itemValue = getValue(item)
-            const isSelected = itemValue === value
-            const isActive = index === highlight
-            return (
-              <li key={itemValue} role="none">
-                <button
-                  ref={isActive ? scrollOptionIntoView : undefined}
-                  id={listboxOptionId(listId, index)}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  disabled={disabled}
-                  className={cn(
-                    "relative flex w-full cursor-default items-center rounded-none py-2 pr-3 pl-3 text-left text-sm outline-hidden select-none",
-                    isSelected && optionState.selected,
-                    isActive && optionState.active,
-                    isActive &&
-                      !isSelected &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                  onMouseEnter={() => setHighlight(index)}
-                  onClick={() => selectItem(item)}
-                >
-                  <span className="truncate">{getLabel(item)}</span>
-                </button>
-              </li>
-            )
-          })
-        )}
+        {filtered.map((item, index) => {
+          const itemValue = getValue(item)
+          const isSelected = itemValue === value
+          const isActive = index === highlight
+          return (
+            <li key={itemValue} role="none">
+              <button
+                ref={isActive ? scrollOptionIntoView : undefined}
+                id={listboxOptionId(listId, index)}
+                type="button"
+                role="option"
+                tabIndex={-1}
+                aria-selected={isSelected}
+                disabled={disabled}
+                className={cn(
+                  "relative flex w-full cursor-default items-center rounded-none py-2 pr-3 pl-3 text-left text-sm outline-hidden select-none",
+                  isSelected && optionState.selected,
+                  isActive && optionState.active,
+                  isActive && !isSelected && "bg-accent text-accent-foreground"
+                )}
+                onMouseEnter={() => setHighlight(index)}
+                onClick={() => selectItem(item)}
+              >
+                <span className="truncate">{getLabel(item)}</span>
+              </button>
+            </li>
+          )
+        })}
       </ul>
+      {/* Outside the listbox, which may own only options. Always mounted so
+          screen readers announce the empty state as the query changes; the
+          empty listbox stays in the tree (sr-only) for aria-controls. */}
+      <div
+        role="status"
+        className={empty ? cn(listboxEmpty, listFrame) : "sr-only"}
+      >
+        {empty ? emptyText : null}
+      </div>
     </div>
   )
 }

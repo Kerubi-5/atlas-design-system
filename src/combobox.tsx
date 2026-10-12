@@ -7,6 +7,7 @@ import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
 import {
+  isComposingKey,
   listboxOptionId,
   moveListboxHighlight,
   scrollOptionIntoView,
@@ -127,6 +128,8 @@ export function Combobox({
   const [highlight, setHighlight] = React.useState(0)
   const inputRef = React.useRef<HTMLInputElement>(null)
   const listId = React.useId()
+  const generatedId = React.useId()
+  const triggerId = id ?? generatedId
   // A created value may not be in `options` yet (the app owns the catalog).
   // Keep it visible on the trigger and in the list so reopen/Enter still work.
   const resolvedOptions = React.useMemo(() => {
@@ -186,8 +189,18 @@ export function Combobox({
   }
 
   const activeOption = list[highlight]
+  const empty = list.length === 0
+
+  // APG combobox: ArrowDown, ArrowUp, and Alt+ArrowDown open the list from
+  // the trigger. Radix only opens a popover on Enter, Space, and click.
+  const onTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (open || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return
+    event.preventDefault()
+    onOpenChange(true)
+  }
 
   const onSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (isComposingKey(event)) return
     const nextHighlight = moveListboxHighlight(
       event.key,
       highlight,
@@ -209,7 +222,7 @@ export function Combobox({
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
-          id={id}
+          id={triggerId}
           type="button"
           variant="outline"
           role="combobox"
@@ -219,6 +232,7 @@ export function Combobox({
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
           disabled={disabled}
+          onKeyDown={onTriggerKeyDown}
           className={cn(
             formControlTriggerClassName,
             "justify-between",
@@ -241,6 +255,7 @@ export function Combobox({
             onChange={onQueryChange}
             onKeyDown={onSearchKeyDown}
             placeholder={searchPlaceholder}
+            aria-label={searchPlaceholder}
             aria-autocomplete="list"
             aria-controls={listId}
             aria-activedescendant={
@@ -251,44 +266,54 @@ export function Combobox({
         <ul
           id={listId}
           role="listbox"
-          className={cn("max-h-60 overflow-y-auto p-1", listClassName)}
+          // Same name as the trigger: its own label, or the <Label htmlFor>
+          // that names the trigger (read through the trigger's id).
+          aria-label={ariaLabelledBy ? undefined : ariaLabel}
+          aria-labelledby={
+            ariaLabelledBy ?? (ariaLabel ? undefined : triggerId)
+          }
+          className={
+            empty
+              ? "sr-only"
+              : cn("max-h-60 overflow-y-auto p-1", listClassName)
+          }
         >
-          {list.length === 0 ? (
-            <li className={listboxEmpty}>{emptyText}</li>
-          ) : (
-            list.map((option, index) => {
-              const isCreate = createOption != null && option === createOption
-              const isSelected = option.value === value && !isCreate
-              const isActive = index === highlight
-              return (
-                <li
-                  key={isCreate ? CREATE_OPTION_KEY : option.value}
-                  role="none"
+          {list.map((option, index) => {
+            const isCreate = createOption != null && option === createOption
+            const isSelected = option.value === value && !isCreate
+            const isActive = index === highlight
+            return (
+              <li key={isCreate ? CREATE_OPTION_KEY : option.value} role="none">
+                <button
+                  ref={isActive ? scrollOptionIntoView : undefined}
+                  id={listboxOptionId(listId, index)}
+                  type="button"
+                  role="option"
+                  tabIndex={-1}
+                  aria-selected={isSelected}
+                  className={cn(
+                    "relative flex w-full cursor-default items-center gap-2 rounded-none py-2 pr-8 pl-3 text-left text-sm outline-hidden select-none",
+                    isSelected && optionState.selected,
+                    isActive && optionState.active
+                  )}
+                  onMouseEnter={() => setHighlight(index)}
+                  onClick={() => selectValue(option.value)}
                 >
-                  <button
-                    ref={isActive ? scrollOptionIntoView : undefined}
-                    id={listboxOptionId(listId, index)}
-                    type="button"
-                    role="option"
-                    aria-selected={isSelected}
-                    className={cn(
-                      "relative flex w-full cursor-default items-center gap-2 rounded-none py-2 pr-8 pl-3 text-left text-sm outline-hidden select-none",
-                      isSelected && optionState.selected,
-                      isActive && optionState.active
-                    )}
-                    onMouseEnter={() => setHighlight(index)}
-                    onClick={() => selectValue(option.value)}
-                  >
-                    <span className="truncate">{option.label}</span>
-                    {isSelected ? (
-                      <CheckIcon className="pointer-events-none absolute right-2 size-3.5" />
-                    ) : null}
-                  </button>
-                </li>
-              )
-            })
-          )}
+                  <span className="truncate">{option.label}</span>
+                  {isSelected ? (
+                    <CheckIcon className="pointer-events-none absolute right-2 size-3.5" />
+                  ) : null}
+                </button>
+              </li>
+            )
+          })}
         </ul>
+        {/* Outside the listbox, which may own only options. Mounted with the
+            popover so screen readers announce the empty state as the query
+            changes; the empty listbox stays in the tree (sr-only). */}
+        <div role="status" className={empty ? listboxEmpty : "sr-only"}>
+          {empty ? emptyText : null}
+        </div>
       </PopoverContent>
     </Popover>
   )
