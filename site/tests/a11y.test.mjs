@@ -69,6 +69,14 @@ const OVERLAYS = [
     (page) => root(page).getByRole("combobox").first().click(),
   ],
   [
+    "forms-combobox--creatable",
+    "[role=listbox]",
+    async (page) => {
+      await root(page).getByRole("combobox").first().click()
+      await page.getByPlaceholder("Search or type a 3-letter code").fill("PHP")
+    },
+  ],
+  [
     "forms-date-picker--playground",
     "[role=dialog]",
     (page) => root(page).getByRole("button").first().click(),

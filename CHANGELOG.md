@@ -1,9 +1,23 @@
 # Changelog
 
-## Unreleased
+## 0.9.3 - 2026-10-12
 
-Package improvements; the public API is unchanged.
+Patch: optional creatable Combobox. Existing callers keep working with no
+new props. Domain catalogs stay in the app.
 
+- `Combobox` accepts `creatable` (default off). When the search is not
+  already an option (value or label, case-insensitive), the listbox offers
+  a create action (`Create "{value}"`, overridable with `createLabel`). It
+  is a real `role="option"`: arrows, Home/End, PageUp/PageDown, and Enter
+  work like selecting. Clicking or pressing Enter calls `onValueChange`
+  with that value and closes the list.
+- `normalizeCreateValue(query)` lets the app validate or reshape the query
+  (trim is the default; return `null` to hide create). A currency picker
+  can enforce `^[A-Z]{3}$` and uppercase without the kit knowing ISO 4217.
+- A created value that is not yet in `options` still shows on the trigger
+  so the app can append it to its own catalog after `onValueChange`.
+- Storybook: Forms/Combobox Playground gains a `creatable` control, plus a
+  Creatable story that demonstrates an app-side 3-letter code hook.
 - `SearchPicker` caches normalized labels for the default accent-insensitive
   filter, reducing repeated work as users type through large lists.
 - `Combobox` and `SearchPicker` share their listbox keyboard movement logic.

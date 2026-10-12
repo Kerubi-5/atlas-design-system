@@ -65,6 +65,17 @@ const stories: Story[] = [
   { id: "forms-slider--labelled" },
   { id: "forms-select--playground", open: clickFirst("combobox", "listbox") },
   { id: "forms-combobox--playground", open: clickFirst("combobox", "listbox") },
+  {
+    id: "forms-combobox--creatable",
+    open: async (page) => {
+      await root(page).getByRole("combobox").first().click()
+      await expect(page.getByRole("listbox").first()).toBeVisible()
+      await page.getByPlaceholder("Search or type a 3-letter code").fill("PHP")
+      await expect(
+        page.getByRole("option", { name: 'Create "PHP"' })
+      ).toBeVisible()
+    },
+  },
   { id: "forms-search-picker--example" },
   { id: "forms-calendar--single-day" },
   { id: "forms-date-picker--range-reference" },
