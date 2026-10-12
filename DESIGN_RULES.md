@@ -107,6 +107,20 @@ column, and `min-w-0` so nested tables scroll instead of widening the card.
 `Dialog` already scrolls inside the viewport on small screens; avoid
 additional height limits.
 
+Apps decide how wide and tall containers and overlays are. The kit sets
+intrinsic control sizes (the button, input, tab and row heights, icons,
+checkboxes, switches, avatars, slider thumbs, and track thickness) and
+clamps overlays to the viewport, but no design widths or heights on
+dialogs, popovers, menus, or lists. Set them with `className`: give each
+`DialogContent` a width such as `sm:max-w-md`, and each `PopoverContent`
+one such as `w-72`. Where the sized part is not the element `className`
+reaches, a prop names it: `InfoTip` takes `contentClassName` (default
+`w-72`), and `Combobox` and `SearchPicker` take `listClassName` (default
+`max-h-60`). `TabsNav` fills a block container but sizes to its links in a
+flex row; add `w-full` to stretch it there. `Tooltip` keeps a `max-w-xs` reading width, `Textarea` a
+`min-h-16` starting height, and toasts their 356px width; override the first
+two with `className`.
+
 `Input`, `SelectTrigger`, `DatePickerButton`, `DateTimePickerButton`, and
 `Combobox` share form-control chrome: 40px height, `px-3`,
 `text-base md:text-sm`, `border-input`, and `shadow-xs`. Do not restyle those

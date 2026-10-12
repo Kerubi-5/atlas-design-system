@@ -45,6 +45,8 @@ export type SearchPickerProps<T> = {
   listLabel?: string
   disabled?: boolean
   className?: string
+  /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
+  listClassName?: string
 }
 
 /**
@@ -65,6 +67,7 @@ function SearchPicker<T>({
   listLabel,
   disabled,
   className,
+  listClassName,
 }: SearchPickerProps<T>) {
   const [query, setQuery] = React.useState("")
   const listId = React.useId()
@@ -168,7 +171,10 @@ function SearchPicker<T>({
         id={listId}
         role="listbox"
         aria-label={listLabel ?? label}
-        className="max-h-60 overflow-y-auto border border-input bg-background"
+        className={cn(
+          "max-h-60 overflow-y-auto border border-input bg-background",
+          listClassName
+        )}
       >
         {filtered.length === 0 ? (
           <li className={listboxEmpty}>{emptyText}</li>

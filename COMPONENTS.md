@@ -137,8 +137,8 @@ action. Pass `side` to prefer a placement; Radix still flips on collision.
 form-control chrome. The popover is one month, a labelled Hour and Minute
 pair (24-hour, stepped by `timeStep`, default 15), and Clear. Picking a day
 keeps the popover open so the time can be set; the time selects stay
-disabled until a day is chosen. The panel is `w-auto`, viewport-clamped, and
-capped at `min(100vw - 2rem, 24rem)` so it stays on-screen at 390px. Pass
+disabled until a day is chosen. The panel is `w-auto`, sized by the
+calendar, and clamped to the viewport so it stays on-screen at 390px. Pass
 `side` to prefer a placement. `FormDateTimePickerField` forwards `className`
 and `timeStep` to that control.
 

@@ -30,7 +30,7 @@ export function DialogStory() {
           Open dialog
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Archive export</DialogTitle>
           <DialogDescription>

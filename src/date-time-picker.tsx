@@ -157,10 +157,7 @@ export function DateTimePickerButton({
         side={side}
         collisionPadding={PICKER_COLLISION_PADDING}
         onInteractOutside={preventDismissForPortaledSelect}
-        className={cn(
-          "w-auto min-w-0 max-w-[min(100vw-2rem,24rem)]",
-          pickerContentClassName
-        )}
+        className={cn("w-auto min-w-0", pickerContentClassName)}
       >
         <LazyCalendar
           mode="single"

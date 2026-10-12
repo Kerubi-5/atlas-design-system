@@ -214,7 +214,7 @@ describe("DateTimePickerButton", () => {
     const classes = popover.className.split(/\s+/)
     expect(classes).toContain("w-auto")
     expect(classes).toContain("min-w-0")
-    expect(classes).toContain("max-w-[min(100vw-2rem,24rem)]")
+    expect(classes).toContain("max-w-(--radix-popover-content-available-width)")
     expect(classes).toContain(
       "max-h-(--radix-popover-content-available-height)"
     )

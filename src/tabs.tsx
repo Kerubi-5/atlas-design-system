@@ -148,7 +148,7 @@ function TabsNav({
     <nav
       data-slot="tabs-nav"
       data-orientation="horizontal"
-      className={cn("group/tabs min-w-0 w-full max-w-full", className)}
+      className={cn("group/tabs min-w-0 max-w-full", className)}
       {...props}
     >
       <TabsScroller>

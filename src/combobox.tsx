@@ -29,7 +29,10 @@ type ComboboxProps = {
   emptyText?: string
   disabled?: boolean
   id?: string
+  /** Classes for the trigger, e.g. its width; the list matches it. */
   className?: string
+  /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
+  listClassName?: string
   "aria-invalid"?: boolean
   /** Name the trigger when there is no `<Label htmlFor={id}>`. */
   "aria-label"?: string
@@ -111,6 +114,7 @@ export function Combobox({
   disabled,
   id,
   className,
+  listClassName,
   "aria-invalid": ariaInvalid,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
@@ -244,7 +248,11 @@ export function Combobox({
             }
           />
         </div>
-        <ul id={listId} role="listbox" className="max-h-60 overflow-y-auto p-1">
+        <ul
+          id={listId}
+          role="listbox"
+          className={cn("max-h-60 overflow-y-auto p-1", listClassName)}
+        >
           {list.length === 0 ? (
             <li className={listboxEmpty}>{emptyText}</li>
           ) : (
