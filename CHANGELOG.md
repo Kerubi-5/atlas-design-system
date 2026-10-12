@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.10.0 - 2026-10-12
 
-Apps decide container and overlay sizes. These defaults change, so set a
+Minor: apps decide container and overlay sizes, and the pickers and
+markdown field load their heavy parts on demand. These defaults change, so set a
 width in app code where the old one is wanted:
 
 - `DialogContent` no longer sets `sm:max-w-md`. Without a width class a
@@ -11,13 +12,16 @@ width in app code where the old one is wanted:
   available viewport width. Pass e.g. `className="w-72"`.
 - `DropdownMenuContent` no longer sets `min-w-40`; it fits its items.
 - `TableBodySkeleton` bars fill their cell instead of stopping at 12rem.
+- `TabsNav` no longer sets `w-full`. In a flex row it took the whole row
+  and squeezed or wrapped the items beside it; now it sizes to its links,
+  and a long row still shrinks and scrolls sideways. In normal block layout
+  it still fills its container. Add `w-full` to `className` for the old fill.
 - The `DateTimePickerButton` panel drops its 24rem cap; the calendar sets
   its width and the viewport clamps it.
 - New: `InfoTip` `contentClassName`, and `Combobox` and `SearchPicker`
   `listClassName`, for the panel width and list height they used to fix.
 
-Load the heavy parts of the pickers and the markdown field on demand. The
-public API is unchanged.
+On-demand loading (the public API is unchanged):
 
 - `DatePickerButton`, `DateTimePickerButton`, and their `form/*` fields
   fetch the calendar (Day Picker) when the popover first opens, or earlier

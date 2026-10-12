@@ -14,6 +14,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../src/popover.js"
 import { SearchPicker } from "../src/search-picker.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
+import { TabsNav } from "../src/tabs.js"
 import { createUser, render, screen } from "./helpers.js"
 
 /**
@@ -62,6 +63,24 @@ describe("consumer sizing", () => {
     await user.click(screen.getByRole("button", { name: "Menu" }))
     const menu = await screen.findByRole("menu")
     expect(classes(menu)).not.toContain("min-w-40")
+  })
+
+  it("lets TabsNav size to its links in a flex row", () => {
+    render(
+      <div className="flex">
+        <TabsNav aria-label="Views">
+          <a href="#a">A</a>
+        </TabsNav>
+        <button type="button">New</button>
+      </div>
+    )
+
+    // w-full made the nav take the whole row and squeeze its neighbours.
+    // As a block it still fills a normal container; min-w-0 lets it shrink
+    // and scroll in a row.
+    const nav = screen.getByRole("navigation", { name: "Views" })
+    expect(classes(nav)).not.toContain("w-full")
+    expect(classes(nav)).toContain("min-w-0")
   })
 
   it("lets the app size the InfoTip panel", async () => {

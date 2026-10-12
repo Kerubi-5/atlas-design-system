@@ -116,7 +116,8 @@ dialogs, popovers, menus, or lists. Set them with `className`: give each
 one such as `w-72`. Where the sized part is not the element `className`
 reaches, a prop names it: `InfoTip` takes `contentClassName` (default
 `w-72`), and `Combobox` and `SearchPicker` take `listClassName` (default
-`max-h-60`). `Tooltip` keeps a `max-w-xs` reading width, `Textarea` a
+`max-h-60`). `TabsNav` fills a block container but sizes to its links in a
+flex row; add `w-full` to stretch it there. `Tooltip` keeps a `max-w-xs` reading width, `Textarea` a
 `min-h-16` starting height, and toasts their 356px width; override the first
 two with `className`.
 
