@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Keep calendar DOM nodes and keyboard focus through parent renders with stable
+  adapters in `src/calendar.tsx`.
+- Share the indexed search path in `src/internal/search.ts` and memoized picker
+  rows in `src/internal/listbox-option.tsx`; cache Combobox creation checks.
+
 ## 0.11.0 - 2026-10-12
 
 Minor: bug and accessibility fixes from the 1.0 audit, less duplicated code,
