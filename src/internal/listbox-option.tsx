@@ -1,4 +1,5 @@
 import * as React from "react"
+import { CheckIcon } from "lucide-react"
 
 import { cn } from "../utils.js"
 import { listboxOptionId, scrollOptionIntoView } from "./listbox-navigation.js"
@@ -51,6 +52,48 @@ export function ListboxOption({
     </li>
   )
 }
+
+type PickerOptionProps<T> = {
+  item: T
+  getLabel: (item: T) => string
+  onSelect: (item: T) => void
+  onHighlight: (index: number) => void
+  listId: string
+  index: number
+  active: boolean
+  selected: boolean
+  disabled?: boolean
+  showCheck?: boolean
+  "data-slot": string
+}
+
+/** Only the old and new active rows rerender during keyboard navigation. */
+function PickerOptionInner<T>({
+  item,
+  getLabel,
+  onSelect,
+  onHighlight,
+  showCheck,
+  ...props
+}: PickerOptionProps<T>) {
+  return (
+    <ListboxOption
+      {...props}
+      className={showCheck ? "pr-8" : "pr-3"}
+      onMouseEnter={() => onHighlight(props.index)}
+      onClick={() => onSelect(item)}
+    >
+      <span className="truncate">{getLabel(item)}</span>
+      {showCheck && props.selected ? (
+        <CheckIcon className="pointer-events-none absolute right-2 size-3.5" />
+      ) : null}
+    </ListboxOption>
+  )
+}
+
+export const PickerOption = React.memo(
+  PickerOptionInner
+) as typeof PickerOptionInner
 
 /**
  * The "No results" status. It sits outside the listbox, which may own only

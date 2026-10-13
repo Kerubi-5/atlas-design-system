@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { CheckIcon, ChevronDownIcon } from "lucide-react"
+import { ChevronDownIcon } from "lucide-react"
 
 import { Button } from "./button.js"
 import { Input } from "./input.js"
@@ -11,7 +11,12 @@ import {
   handleListboxKey,
   listboxOptionId,
 } from "./internal/listbox-navigation.js"
-import { ListboxEmptyStatus, ListboxOption } from "./internal/listbox-option.js"
+import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
+import {
+  createSearchIndex,
+  filterSearchIndex,
+  normalizeSearchQuery,
+} from "./internal/search.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn, onInputChange } from "./utils.js"
 
@@ -72,6 +77,7 @@ type ComboboxProps = {
 >
 
 const CREATE_OPTION_KEY = "__atlas-combobox-create"
+const getOptionLabel = (option: ComboboxOption) => option.label
 
 /**
  * Trimmed query, or `null` when there is nothing to create.
@@ -95,7 +101,7 @@ function defaultCreateLabel(value: string) {
  */
 function resolveCreateValue(
   query: string,
-  options: ComboboxOption[],
+  existingValues: Set<string>,
   normalize: (query: string) => string | null
 ) {
   const created = normalize(query)
@@ -103,12 +109,7 @@ function resolveCreateValue(
   const value = created.trim()
   if (!value) return null
   const needle = foldSearchText(value)
-  const exists = options.some(
-    (option) =>
-      foldSearchText(option.value) === needle ||
-      foldSearchText(option.label) === needle
-  )
-  return exists ? null : value
+  return existingValues.has(needle) ? null : value
 }
 
 /**
@@ -155,19 +156,35 @@ export function Combobox({
     return [...options, { value, label: value }]
   }, [creatable, options, value])
   const selected = resolvedOptions.find((option) => option.value === value)
+  const searchIndex = React.useMemo(
+    () => createSearchIndex(resolvedOptions, getOptionLabel),
+    [resolvedOptions]
+  )
+  const existingValues = React.useMemo(
+    () =>
+      new Set(
+        creatable
+          ? searchIndex.flatMap(({ item, label }) => [
+              foldSearchText(item.value),
+              label,
+            ])
+          : []
+      ),
+    [creatable, searchIndex]
+  )
   const filtered = React.useMemo(() => {
-    const needle = foldSearchText(query.trim())
+    const needle = normalizeSearchQuery(query)
     if (!needle) return resolvedOptions
-    return resolvedOptions.filter((option) =>
-      foldSearchText(option.label).includes(needle)
-    )
-  }, [resolvedOptions, query])
-  const createValue = creatable
-    ? resolveCreateValue(query, resolvedOptions, normalizeCreateValue)
-    : null
-  const createOption = createValue
-    ? { value: createValue, label: createLabel(createValue) }
-    : null
+    return filterSearchIndex(searchIndex, needle)
+  }, [resolvedOptions, searchIndex, query])
+  const createOption = React.useMemo(() => {
+    const createValue = creatable
+      ? resolveCreateValue(query, existingValues, normalizeCreateValue)
+      : null
+    return createValue
+      ? { value: createValue, label: createLabel(createValue) }
+      : null
+  }, [creatable, query, existingValues, normalizeCreateValue, createLabel])
   const list = createOption ? [...filtered, createOption] : filtered
 
   const onOpenChange = (next: boolean) => {
@@ -199,11 +216,14 @@ export function Combobox({
   // Closing from here does not go through Radix's onOpenChange, so clear the
   // query too. A stale query would filter the next open while the highlight
   // is computed against the full list, and Enter would pick the wrong option.
-  const selectValue = (next: string) => {
-    onValueChange(next)
-    setOpen(false)
-    setQuery("")
-  }
+  const selectOption = React.useCallback(
+    (option: ComboboxOption) => {
+      onValueChange(option.value)
+      setOpen(false)
+      setQuery("")
+    },
+    [onValueChange]
+  )
 
   const activeOption = list[highlight]
   const empty = list.length === 0
@@ -223,7 +243,7 @@ export function Combobox({
       setHighlight,
       onEnter: (index) => {
         const option = list[index]
-        if (option) selectValue(option.value)
+        if (option) selectOption(option)
       },
     })
   }
@@ -297,22 +317,19 @@ export function Combobox({
             const isCreate = createOption != null && option === createOption
             const isSelected = option.value === value && !isCreate
             return (
-              <ListboxOption
+              <PickerOption
                 key={isCreate ? CREATE_OPTION_KEY : option.value}
                 data-slot="combobox-option"
                 listId={listId}
                 index={index}
                 active={index === highlight}
                 selected={isSelected}
-                className="pr-8"
-                onMouseEnter={() => setHighlight(index)}
-                onClick={() => selectValue(option.value)}
-              >
-                <span className="truncate">{option.label}</span>
-                {isSelected ? (
-                  <CheckIcon className="pointer-events-none absolute right-2 size-3.5" />
-                ) : null}
-              </ListboxOption>
+                showCheck
+                item={option}
+                getLabel={getOptionLabel}
+                onHighlight={setHighlight}
+                onSelect={selectOption}
+              />
             )
           })}
         </ul>

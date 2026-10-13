@@ -9,7 +9,13 @@ import {
   handleListboxKey,
   listboxOptionId,
 } from "./internal/listbox-navigation.js"
-import { ListboxEmptyStatus, ListboxOption } from "./internal/listbox-option.js"
+import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
+import {
+  createSearchIndex,
+  filterSearchIndex,
+  matchesSearchLabel,
+  normalizeSearchQuery,
+} from "./internal/search.js"
 import { cn } from "./utils.js"
 
 export { foldSearchText }
@@ -22,9 +28,9 @@ export function defaultSearchFilter<T>(
   query: string,
   getLabel: (item: T) => string
 ) {
-  const needle = foldSearchText(query.trim())
+  const needle = normalizeSearchQuery(query)
   if (!needle) return true
-  return foldSearchText(getLabel(item)).includes(needle)
+  return matchesSearchLabel(foldSearchText(getLabel(item)), needle)
 }
 
 export type SearchPickerProps<T> = {
@@ -75,18 +81,16 @@ function SearchPicker<T>({
   const normalizedItems = React.useMemo(
     () =>
       filter === defaultSearchFilter
-        ? items.map((item) => [item, foldSearchText(getLabel(item))] as const)
+        ? createSearchIndex(items, getLabel)
         : null,
     [filter, getLabel, items]
   )
   const foldedQuery =
-    filter === defaultSearchFilter ? foldSearchText(query.trim()) : ""
+    filter === defaultSearchFilter ? normalizeSearchQuery(query) : ""
   const filtered = React.useMemo(() => {
     if (normalizedItems) {
       if (!foldedQuery) return items
-      return normalizedItems
-        .filter(([, label]) => label.includes(foldedQuery))
-        .map(([item]) => item)
+      return filterSearchIndex(normalizedItems, foldedQuery)
     }
     return items.filter((item) => filter(item, query, getLabel))
   }, [items, filter, foldedQuery, getLabel, normalizedItems, query])
@@ -95,6 +99,11 @@ function SearchPicker<T>({
     const index = filtered.findIndex((item) => getValue(item) === value)
     return index >= 0 ? index : 0
   }, [filtered, getValue, value])
+
+  const rows = React.useMemo(
+    () => filtered.map((item) => ({ item, value: getValue(item) })),
+    [filtered, getValue]
+  )
 
   const [highlight, setHighlight] = React.useState(selectedIndex)
 
@@ -116,10 +125,13 @@ function SearchPicker<T>({
   const active = filtered[highlight]
   const empty = filtered.length === 0
 
-  const selectItem = (item: T) => {
-    onSelect(item)
-    setQuery("")
-  }
+  const selectItem = React.useCallback(
+    (item: T) => {
+      onSelect(item)
+      setQuery("")
+    },
+    [onSelect]
+  )
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const handled = handleListboxKey(event, {
@@ -172,25 +184,21 @@ function SearchPicker<T>({
             : cn("max-h-60 overflow-y-auto", listFrame, listClassName)
         }
       >
-        {filtered.map((item, index) => {
-          const itemValue = getValue(item)
-          return (
-            <ListboxOption
-              key={itemValue}
-              data-slot="search-picker-option"
-              listId={listId}
-              index={index}
-              active={index === highlight}
-              selected={itemValue === value}
-              disabled={disabled}
-              className="pr-3"
-              onMouseEnter={() => setHighlight(index)}
-              onClick={() => selectItem(item)}
-            >
-              <span className="truncate">{getLabel(item)}</span>
-            </ListboxOption>
-          )
-        })}
+        {rows.map(({ item, value: itemValue }, index) => (
+          <PickerOption
+            key={itemValue}
+            data-slot="search-picker-option"
+            listId={listId}
+            index={index}
+            active={index === highlight}
+            selected={itemValue === value}
+            disabled={disabled}
+            item={item}
+            getLabel={getLabel}
+            onHighlight={setHighlight}
+            onSelect={selectItem}
+          />
+        ))}
       </ul>
       <ListboxEmptyStatus
         data-slot="search-picker-empty"

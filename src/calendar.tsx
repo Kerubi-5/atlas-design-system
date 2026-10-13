@@ -4,6 +4,10 @@ import * as React from "react"
 import {
   DayPicker,
   getDefaultClassNames,
+  useDayPicker,
+  type ChevronProps,
+  type RootProps,
+  type WeekNumberProps,
   type DayButton,
   type Locale,
 } from "react-day-picker"
@@ -29,6 +33,51 @@ const chevronIcons = {
   right: ChevronRightIcon,
   up: ChevronUpIcon,
   down: ChevronDownIcon,
+}
+
+function CalendarRoot({ className, rootRef, ...props }: RootProps) {
+  return (
+    <div
+      data-slot="calendar"
+      ref={rootRef}
+      className={cn(className)}
+      {...props}
+    />
+  )
+}
+
+function CalendarChevron({
+  className,
+  orientation = "down",
+  ...props
+}: ChevronProps) {
+  const Icon = chevronIcons[orientation]
+  return <Icon className={cn("size-4", className)} {...props} />
+}
+
+function CalendarDayAdapter(props: React.ComponentProps<typeof DayButton>) {
+  const {
+    dayPickerProps: { locale },
+  } = useDayPicker()
+  return <CalendarDayButton locale={locale} {...props} />
+}
+
+function CalendarWeekNumber({ children, ...props }: WeekNumberProps) {
+  return (
+    <td {...props}>
+      <div className="flex size-(--cell-size) items-center justify-center text-center">
+        {children}
+      </div>
+    </td>
+  )
+}
+
+// Stable component types keep the calendar DOM and focus on parent updates.
+const calendarComponents = {
+  Root: CalendarRoot,
+  Chevron: CalendarChevron,
+  DayButton: CalendarDayAdapter,
+  WeekNumber: CalendarWeekNumber,
 }
 
 function Calendar({
@@ -169,32 +218,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        Root: ({ className, rootRef, ...props }) => {
-          return (
-            <div
-              data-slot="calendar"
-              ref={rootRef}
-              className={cn(className)}
-              {...props}
-            />
-          )
-        },
-        Chevron: ({ className, orientation = "down", ...props }) => {
-          const Icon = chevronIcons[orientation]
-          return <Icon className={cn("size-4", className)} {...props} />
-        },
-        DayButton: ({ ...props }) => (
-          <CalendarDayButton locale={locale} {...props} />
-        ),
-        WeekNumber: ({ children, ...props }) => {
-          return (
-            <td {...props}>
-              <div className="flex size-(--cell-size) items-center justify-center text-center">
-                {children}
-              </div>
-            </td>
-          )
-        },
+        ...calendarComponents,
         ...components,
       }}
       {...props}
