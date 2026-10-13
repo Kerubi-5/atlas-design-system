@@ -2,17 +2,29 @@ import { cva } from "class-variance-authority"
 
 import { disabledState, focusRing, selectedState } from "./styles.js"
 
+/**
+ * Tab row. `TabsList` and `TabsNav` pass `orientation`, which picks plain
+ * size classes so a consumer `className` (`h-9`) replaces them. Called
+ * without it (`auto`), the row reads the orientation from the `group/tabs`
+ * root instead, as it always has for apps building their own list.
+ */
 const tabsListVariants = cva(
-  'group/tabs-list inline-flex w-max min-w-full items-stretch justify-start p-0 text-muted-foreground group-data-[orientation="horizontal"]/tabs:h-11 group-data-[orientation="vertical"]/tabs:h-fit group-data-[orientation="vertical"]/tabs:flex-col',
+  "group/tabs-list inline-flex w-max min-w-full items-stretch justify-start p-0 text-muted-foreground",
   {
     variants: {
       variant: {
         default: "bg-muted",
         line: "gap-1 bg-transparent",
       },
+      orientation: {
+        auto: 'group-data-[orientation="horizontal"]/tabs:h-11 group-data-[orientation="vertical"]/tabs:h-fit group-data-[orientation="vertical"]/tabs:flex-col',
+        horizontal: "h-11",
+        vertical: "h-fit flex-col",
+      },
     },
     defaultVariants: {
       variant: "default",
+      orientation: "auto",
     },
   }
 )
@@ -24,19 +36,29 @@ const tabsListVariants = cva(
  * on an overflow box without this height makes `scrollHeight` 4px taller
  * than `clientHeight` (48 vs 44) and a vertical scrollbar appears if
  * `overflow-y` is not hidden. Line variant adds `pb-2` for the underline
- * (`h-14` = 44px + 4px + 8px).
+ * (`h-14` = 44px + 4px + 8px). A block, so it fills its parent without
+ * `w-full`. `theme.css` hides the scrollbar and draws the edge fades.
  */
 const tabsScrollerVariants = cva(
-  "relative box-border w-full min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden",
+  "relative box-border min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1",
   {
     variants: {
       variant: {
-        default: 'group-data-[orientation="horizontal"]/tabs:h-13',
-        line: 'group-data-[orientation="horizontal"]/tabs:h-14 pb-2',
+        default: "",
+        line: "pb-2",
+      },
+      orientation: {
+        horizontal: "",
+        vertical: "",
       },
     },
+    compoundVariants: [
+      { variant: "default", orientation: "horizontal", className: "h-13" },
+      { variant: "line", orientation: "horizontal", className: "h-14" },
+    ],
     defaultVariants: {
       variant: "default",
+      orientation: "horizontal",
     },
   }
 )

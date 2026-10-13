@@ -18,6 +18,12 @@ type Props = {
   label: string
   onValueChange: (value: string) => void
   placeholder?: string
+  /** Forwarded to the select trigger. */
+  className?: string
+  /** Classes for the field wrapper (label, trigger, and error). */
+  fieldClassName?: string
+  /** Forwarded to the select's option list (`SelectContent`). */
+  contentClassName?: string
   children: ReactNode
 }
 
@@ -28,22 +34,31 @@ export function FormSelectField({
   label,
   onValueChange,
   placeholder,
+  className,
+  fieldClassName,
+  contentClassName,
   children,
 }: Props) {
   const errorText = metaErrorText(meta)
   const id = useId()
 
   return (
-    <FormFieldShell id={id} label={label} errorText={errorText}>
+    <FormFieldShell
+      id={id}
+      label={label}
+      errorText={errorText}
+      className={fieldClassName}
+    >
       <Select value={value} onValueChange={onValueChange}>
         <SelectTrigger
           id={id}
+          className={className}
           aria-invalid={invalidWhen(errorText)}
           aria-describedby={describedBy(id, errorText)}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>{children}</SelectContent>
+        <SelectContent className={contentClassName}>{children}</SelectContent>
       </Select>
     </FormFieldShell>
   )

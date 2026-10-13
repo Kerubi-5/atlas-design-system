@@ -10,11 +10,26 @@ import {
 
 import { cn } from "./utils.js"
 import { Button, buttonVariants } from "./button.js"
+import { ariaDisabledState } from "./internal/styles.js"
 import {
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  ChevronDownIcon,
+  ChevronUpIcon,
 } from "lucide-react"
+
+/** Previous / next month buttons share one look. */
+const navButtonClassName = cn(
+  "size-(--cell-size) p-0 select-none",
+  ariaDisabledState
+)
+
+const chevronIcons = {
+  left: ChevronLeftIcon,
+  right: ChevronRightIcon,
+  up: ChevronUpIcon,
+  down: ChevronDownIcon,
+}
 
 function Calendar({
   className,
@@ -31,6 +46,10 @@ function Calendar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
 }) {
   const defaultClassNames = getDefaultClassNames()
+  const navButton = cn(
+    buttonVariants({ variant: buttonVariant }),
+    navButtonClassName
+  )
 
   return (
     <DayPicker
@@ -76,16 +95,8 @@ function Calendar({
           "absolute inset-x-0 top-0 flex w-full items-center justify-between gap-1",
           defaultClassNames.nav
         ),
-        button_previous: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
-          defaultClassNames.button_previous
-        ),
-        button_next: cn(
-          buttonVariants({ variant: buttonVariant }),
-          "size-(--cell-size) p-0 select-none aria-disabled:opacity-50",
-          defaultClassNames.button_next
-        ),
+        button_previous: cn(navButton, defaultClassNames.button_previous),
+        button_next: cn(navButton, defaultClassNames.button_next),
         month_caption: cn(
           "flex h-(--cell-size) w-full items-center justify-center px-(--cell-size)",
           defaultClassNames.month_caption
@@ -168,25 +179,9 @@ function Calendar({
             />
           )
         },
-        Chevron: ({ className, orientation, ...props }) => {
-          if (orientation === "left") {
-            return (
-              <ChevronLeftIcon className={cn("size-4", className)} {...props} />
-            )
-          }
-
-          if (orientation === "right") {
-            return (
-              <ChevronRightIcon
-                className={cn("size-4", className)}
-                {...props}
-              />
-            )
-          }
-
-          return (
-            <ChevronDownIcon className={cn("size-4", className)} {...props} />
-          )
+        Chevron: ({ className, orientation = "down", ...props }) => {
+          const Icon = chevronIcons[orientation]
+          return <Icon className={cn("size-4", className)} {...props} />
         },
         DayButton: ({ ...props }) => (
           <CalendarDayButton locale={locale} {...props} />

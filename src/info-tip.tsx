@@ -11,7 +11,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "./popover.js"
-import { focusRing } from "./internal/styles.js"
+import { focusRing, hitArea44 } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export type InfoTipLayout = "box" | "inline"
@@ -33,7 +33,12 @@ export type InfoTipProps = {
   className?: string
   /** Classes for the panel, e.g. its width. Defaults to `w-72`. */
   contentClassName?: string
-}
+} & Omit<
+  React.ComponentProps<"button">,
+  // `title` names the panel; the pointer and click handlers run the
+  // hover-open logic.
+  "title" | "children" | "type" | "onMouseEnter" | "onMouseLeave" | "onClick"
+>
 
 /**
  * True when a mouse can hover. Touch and coarse pointers must use click;
@@ -60,6 +65,7 @@ function InfoTip({
   icon,
   className,
   contentClassName,
+  ...props
 }: InfoTipProps) {
   const [open, setOpen] = React.useState(false)
   const closeTimer = React.useRef<number | null>(null)
@@ -106,6 +112,7 @@ function InfoTip({
     >
       <PopoverTrigger asChild>
         <button
+          {...props}
           type="button"
           aria-label={label}
           data-slot="info-tip-trigger"
@@ -113,9 +120,7 @@ function InfoTip({
           className={cn(
             focusRing,
             "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground hover:text-selected-foreground focus-visible:text-selected-foreground",
-            inline
-              ? "size-5 align-middle after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
-              : "size-11",
+            inline ? cn("size-5 align-middle", hitArea44) : "size-11",
             className
           )}
           onMouseEnter={openFromHover}

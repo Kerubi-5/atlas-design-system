@@ -166,11 +166,7 @@
   --border: oklch(1 0 0 / 10%);
   --input: oklch(0.52 0 0);
   --ring: oklch(0.75 0.14 293);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
+  /* --chart-1..5 are the same in both themes; :root sets them. */
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.606 0.25 292.717);
@@ -234,58 +230,19 @@
   }
 
   /*
-   * Horizontal scroll shadows: edge fades stay pinned (`scroll`) while
-   * matching covers ride with the content (`local`), so a clipped column
-   * like LICENSE is visible as overflow instead of looking truncated.
+   * Horizontal scroll shadows for tables and tab rows: edge fades stay
+   * pinned (`scroll`) while matching covers ride with the content (`local`),
+   * so a clipped column or label is visible as overflow instead of looking
+   * truncated. `--scroll-fade` is the cover color; `--scroll-fill` is the
+   * fifth layer, the fill behind the content (transparent for tables; the
+   * muted list for tabs, whose list stays transparent so the fades show).
    */
-  [data-slot="table-container"] {
-    --table-scroll-fade: var(--background);
-    background:
-      linear-gradient(to right, var(--table-scroll-fade) 40%, transparent),
-      linear-gradient(to left, var(--table-scroll-fade) 40%, transparent),
-      linear-gradient(
-        to right,
-        color-mix(in oklch, var(--foreground) 16%, transparent),
-        transparent 80%
-      ),
-      linear-gradient(
-        to left,
-        color-mix(in oklch, var(--foreground) 16%, transparent),
-        transparent 80%
-      );
-    background-repeat: no-repeat;
-    background-size:
-      1.5rem 100%,
-      1.5rem 100%,
-      0.75rem 100%,
-      0.75rem 100%;
-    background-position:
-      left center,
-      right center,
-      left center,
-      right center;
-    background-attachment: local, local, scroll, scroll;
-  }
-
-  /* Covers match the card face so the fade does not flash the page background. */
-  [data-slot="card"] [data-slot="table-container"] {
-    --table-scroll-fade: var(--card);
-  }
-
-  /*
-   * Tab row overflow: same pinned-shadow / local-cover trick as tables.
-   * Covers match the muted list so a clipped label reads as overflow.
-   * The fifth layer is the list fill — the list itself stays transparent
-   * so the fades show through. Scrollbars stay hidden; the fade is the cue.
-   */
+  [data-slot="table-container"],
   [data-slot="tabs-scroller"] {
-    --tabs-scroll-fade: var(--muted);
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-padding-inline: 1rem;
+    --scroll-fill: transparent;
     background:
-      linear-gradient(to right, var(--tabs-scroll-fade) 40%, transparent),
-      linear-gradient(to left, var(--tabs-scroll-fade) 40%, transparent),
+      linear-gradient(to right, var(--scroll-fade) 40%, transparent),
+      linear-gradient(to left, var(--scroll-fade) 40%, transparent),
       linear-gradient(
         to right,
         color-mix(in oklch, var(--foreground) 16%, transparent),
@@ -296,7 +253,7 @@
         color-mix(in oklch, var(--foreground) 16%, transparent),
         transparent 80%
       ),
-      var(--tabs-scroll-fade);
+      var(--scroll-fill);
     background-repeat: no-repeat;
     background-size:
       1.5rem 100%,
@@ -311,6 +268,26 @@
       right center,
       center;
     background-attachment: local, local, scroll, scroll, scroll;
+  }
+
+  [data-slot="table-container"] {
+    --table-scroll-fade: var(--background);
+    --scroll-fade: var(--table-scroll-fade);
+  }
+
+  /* Covers match the card face so the fade does not flash the page background. */
+  [data-slot="card"] [data-slot="table-container"] {
+    --table-scroll-fade: var(--card);
+  }
+
+  /* Tab rows hide their scrollbar; the fade is the cue. */
+  [data-slot="tabs-scroller"] {
+    --tabs-scroll-fade: var(--muted);
+    --scroll-fade: var(--tabs-scroll-fade);
+    --scroll-fill: var(--tabs-scroll-fade);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-padding-inline: 1rem;
   }
 
   [data-slot="tabs-scroller"]::-webkit-scrollbar {

@@ -2,7 +2,8 @@
 
 ## 0.11.0 - 2026-10-12
 
-Minor: bug and accessibility fixes from the 1.0 audit. Two defaults change:
+Minor: bug and accessibility fixes from the 1.0 audit, less duplicated code,
+and every part of every component styleable by apps. Defaults that change:
 
 - `ThemeProvider` no longer turns on the `d` dark/light shortcut by default.
   A single-key shortcut fires by accident for speech-input users, and WCAG
@@ -10,9 +11,40 @@ Minor: bug and accessibility fixes from the 1.0 audit. Two defaults change:
   it, ideally with a setting that turns it off again.
 - The outline `Button` border uses `border-input` (3.6:1 against the page)
   instead of `border-border` (1.3:1).
+- `Pagination` no longer centers or stretches itself; add
+  `className="justify-center"` for the old layout.
+- `Field` stops forcing its children to full width (`*:w-full`). Controls
+  still fill through the flex column, but a child's own width class now wins,
+  so `FieldLabel` and a `ToggleGroup` keep their `w-fit`. `Field` and `Alert`
+  drop their root `w-full`.
+- A vertical `Tabs` list sizes to its tabs instead of filling the row.
+- `Table` drops `min-w-full` from the `<table>`, so `className="w-auto"`
+  sizes it to its columns.
+- `className` now replaces `Avatar` size, `Separator` thickness, `TabsList`
+  and `SelectTrigger` height, and a `Badge` icon's size: they were `data-*`
+  variants or `!` classes that a plain class could not override.
+- The built-in `Dialog` close button's slot is `dialog-close-button` (it
+  shared `dialog-close` with your own `DialogClose`).
+- `Combobox` search ignores accents ("nino" finds "Niño"), and its options
+  use the same 10px icon gap as menu and select items. `SelectSeparator` is
+  solid `bg-border` like the menu separator.
 
 New:
 
+- Part props and slots so apps can style what sits inside a component:
+  `DialogContent` `overlayClassName` and `closeButtonClassName`,
+  `TooltipContent` `arrowClassName`, `Combobox` `contentClassName`, date
+  picker `contentClassName` and `calendarProps` (type
+  `DatePickerCalendarProps`), `fieldClassName` on every `form/*` field (plus
+  `className` on the control, `FormSelectField` `contentClassName` and
+  `FormMarkdownField` `previewClassName`), `Table` `containerClassName`,
+  `TabsList` and `TabsNav` `scrollerClassName`, `TabsNav` `listClassName`,
+  `SortableTableHead` `buttonClassName`, `AccordionTrigger`
+  `headerClassName`, `Progress` `indicatorClassName`, and `className` on
+  `FieldError`, `FormFeedbackField`, `ErrorFallback` and `TableBodySkeleton`.
+  `Combobox`, `SearchPicker`, `InfoTip`, `StatTile`, `ColorLegend`,
+  `EmptyPanel`, `Meter` and `Slider` pass other props through. COMPONENTS.md
+  lists every part prop and `data-slot` under "Styling parts".
 - `PaginationLink`, `PaginationPrevious` and `PaginationNext` take
   `disabled` for a page that does not exist, such as Previous on page 1.
   It drops the `href`, dims the link and announces it as disabled.
@@ -20,6 +52,13 @@ New:
 - `DatePickerButton` and `DateTimePickerButton` forward `aria-labelledby`
   and `aria-describedby` to the trigger; the trigger text has the id
   `${id}-value`. `FieldError` takes an `id`.
+
+Internal: the two date pickers share one trigger, popover and Clear footer;
+overlays, menu rows, menu labels, hit areas and control sizes share class
+strings in `src/internal/` (and `test/dry.test.ts` fails when they are
+retyped); `Combobox` and `SearchPicker` share their option, empty-state and
+keyboard code; the table and tab scroll shadows share one `theme.css` rule;
+and the dark `--chart-*` tokens that repeated the light ones are gone.
 
 Fixed:
 

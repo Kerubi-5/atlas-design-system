@@ -37,6 +37,9 @@ export function FormMarkdownField({
   placeholder = "Markdown supported",
   rows = 5,
   showError = true,
+  className,
+  fieldClassName,
+  previewClassName,
 }: {
   field: TextFieldApi
   /**
@@ -48,6 +51,12 @@ export function FormMarkdownField({
   placeholder?: string
   rows?: number
   showError?: boolean
+  /** Forwarded to the Write textarea. */
+  className?: string
+  /** Classes for the field wrapper (label row, body, and error). */
+  fieldClassName?: string
+  /** Classes for the Preview surface, e.g. a taller `min-h-40`. */
+  previewClassName?: string
 }) {
   const [mode, setMode] = useState<Mode>("write")
   const onChange = onInputChange(field.handleChange)
@@ -64,6 +73,7 @@ export function FormMarkdownField({
       label={label}
       errorText={errorText}
       labelFor={mode === "write"}
+      className={fieldClassName}
       labelAction={
         <ToggleGroup
           type="single"
@@ -93,11 +103,16 @@ export function FormMarkdownField({
           onBlur={field.handleBlur}
           placeholder={placeholder}
           rows={rows}
+          className={className}
           aria-invalid={invalidWhen(errorText)}
           aria-describedby={describedBy(id, errorText)}
         />
       ) : (
-        <div className={cn(fieldSurface, "min-h-16")} aria-live="polite">
+        <div
+          data-slot="form-markdown-preview"
+          className={cn(fieldSurface, "min-h-16", previewClassName)}
+          aria-live="polite"
+        >
           {trimmed ? (
             <Suspense fallback={<Spinner aria-label="Loading preview" />}>
               <Markdown content={trimmed} />

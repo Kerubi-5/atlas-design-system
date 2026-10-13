@@ -13,22 +13,33 @@ import {
 import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
 import { cn } from "./utils.js"
 
+type Orientation = "horizontal" | "vertical"
+
+/**
+ * The root's orientation, so the list can pick plain size classes (`h-11`)
+ * that a consumer `className` replaces, instead of `group-data-*` variants
+ * that would beat it.
+ */
+const TabsOrientationContext = React.createContext<Orientation>("horizontal")
+
 function Tabs({
   className,
   orientation = "horizontal",
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.Root>) {
   return (
-    <TabsPrimitive.Root
-      data-slot="tabs"
-      data-orientation={orientation}
-      orientation={orientation}
-      className={cn(
-        'group/tabs flex gap-2 data-[orientation="horizontal"]:flex-col',
-        className
-      )}
-      {...props}
-    />
+    <TabsOrientationContext.Provider value={orientation}>
+      <TabsPrimitive.Root
+        data-slot="tabs"
+        data-orientation={orientation}
+        orientation={orientation}
+        className={cn(
+          'group/tabs flex gap-2 data-[orientation="horizontal"]:flex-col',
+          className
+        )}
+        {...props}
+      />
+    </TabsOrientationContext.Provider>
   )
 }
 
@@ -42,9 +53,13 @@ function Tabs({
  */
 function TabsScroller({
   variant = "default",
+  orientation = "horizontal",
+  className,
   children,
 }: {
   variant?: "default" | "line"
+  orientation?: Orientation
+  className?: string
   children: React.ReactNode
 }) {
   const ref = React.useRef<HTMLDivElement>(null)
@@ -74,26 +89,43 @@ function TabsScroller({
       data-slot="tabs-scroller"
       data-variant={variant}
       tabIndex={overflowing ? 0 : undefined}
-      className={cn(focusRing, tabsScrollerVariants({ variant }))}
+      className={cn(
+        focusRing,
+        tabsScrollerVariants({ variant, orientation }),
+        className
+      )}
     >
       {children}
     </div>
   )
 }
 
+/**
+ * The tab row inside its scroller. `className` styles the list (its `h-11`
+ * height, fill, gap); `scrollerClassName` styles the scroller around it
+ * (`h-13` with `p-1` for the active border and focus ring).
+ */
 function TabsList({
   className,
+  scrollerClassName,
   variant = "default",
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
-  VariantProps<typeof tabsListVariants>) {
+  Omit<VariantProps<typeof tabsListVariants>, "orientation"> & {
+    scrollerClassName?: string
+  }) {
+  const orientation = React.useContext(TabsOrientationContext)
   return (
-    <TabsScroller variant={variant ?? "default"}>
+    <TabsScroller
+      variant={variant ?? "default"}
+      orientation={orientation}
+      className={scrollerClassName}
+    >
       <TabsPrimitive.List
         data-slot="tabs-list"
         data-variant={variant}
         className={cn(
-          tabsListVariants({ variant }),
+          tabsListVariants({ variant, orientation }),
           // The scroller owns the muted fill so edge fades show through.
           variant === "default" && "bg-transparent",
           className
@@ -142,13 +174,20 @@ function TabsContent({
  * for active borders and focus rings counted in the scroller height (so the
  * list cannot overflow on y), an edge fade while it overflows, and the
  * active link scrolled into view on mount. Do not wrap it in
- * `overflow-x-auto`.
+ * `overflow-x-auto`. `scrollerClassName` styles that scroller and
+ * `listClassName` the row of links inside it.
  */
 function TabsNav({
   className,
+  scrollerClassName,
+  listClassName,
   children,
   ...props
-}: React.ComponentProps<"nav"> & { "aria-label": string }) {
+}: React.ComponentProps<"nav"> & {
+  "aria-label": string
+  scrollerClassName?: string
+  listClassName?: string
+}) {
   return (
     <nav
       data-slot="tabs-nav"
@@ -156,11 +195,15 @@ function TabsNav({
       className={cn("group/tabs min-w-0 max-w-full", className)}
       {...props}
     >
-      <TabsScroller>
+      <TabsScroller className={scrollerClassName}>
         <div
           data-slot="tabs-list"
           data-variant="default"
-          className={cn(tabsListVariants(), "bg-transparent")}
+          className={cn(
+            tabsListVariants({ orientation: "horizontal" }),
+            "bg-transparent",
+            listClassName
+          )}
         >
           {children}
         </div>

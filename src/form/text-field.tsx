@@ -36,6 +36,8 @@ export function FormTextField({
   autoComplete,
   required,
   minLength,
+  className,
+  fieldClassName,
 }: {
   field: TextFieldApi
   /**
@@ -65,6 +67,10 @@ export function FormTextField({
   autoComplete?: string
   required?: boolean
   minLength?: number
+  /** Forwarded to the input or textarea. */
+  className?: string
+  /** Classes for the field wrapper (label, hint, control, and error). */
+  fieldClassName?: string
 }) {
   const onChange = onInputChange(field.handleChange)
   const errorText = showError ? metaErrorText(field.state.meta) : undefined
@@ -78,14 +84,24 @@ export function FormTextField({
     autoComplete,
     required,
     minLength,
+    className,
     "aria-invalid": invalidWhen(errorText),
     "aria-describedby": describedBy(id, errorText, descriptionId),
   }
 
   return (
-    <FormFieldShell id={id} label={label} errorText={errorText}>
+    <FormFieldShell
+      id={id}
+      label={label}
+      errorText={errorText}
+      className={fieldClassName}
+    >
       {description ? (
-        <p id={descriptionId} className="text-xs text-muted-foreground">
+        <p
+          id={descriptionId}
+          data-slot="form-field-description"
+          className="text-xs text-muted-foreground"
+        >
           {description}
         </p>
       ) : null}

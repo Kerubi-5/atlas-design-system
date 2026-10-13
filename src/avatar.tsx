@@ -5,7 +5,13 @@ import { Avatar as AvatarPrimitive } from "radix-ui"
 
 import { cn } from "./utils.js"
 
-/** Person or workspace image with initials while loading or on error. Round by design. */
+const avatarSizes = { sm: "size-6", default: "size-8", lg: "size-10" }
+
+/**
+ * Person or workspace image with initials while loading or on error. Round
+ * by design. `size` picks a plain size class, so `className="size-12"`
+ * replaces it.
+ */
 function Avatar({
   className,
   size = "default",
@@ -18,7 +24,8 @@ function Avatar({
       data-slot="avatar"
       data-size={size}
       className={cn(
-        "relative flex shrink-0 overflow-hidden rounded-full select-none data-[size=default]:size-8 data-[size=lg]:size-10 data-[size=sm]:size-6",
+        "relative flex shrink-0 overflow-hidden rounded-full select-none",
+        avatarSizes[size],
         className
       )}
       {...props}

@@ -6,19 +6,21 @@ import {
 } from "lucide-react"
 
 import { buttonVariants } from "./button.js"
-import { selectedState } from "./internal/styles.js"
+import { ariaDisabledState, selectedState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
  * Page links for long lists and tables. Links are plain anchors so the page
  * lives in the URL; pass `onClick` with `href` for client-side routing.
+ * The nav is a plain flex row: place it with `className` (`justify-center`,
+ * `justify-end`, `mx-auto`) to suit the layout.
  */
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
     <nav
       aria-label="Pagination"
       data-slot="pagination"
-      className={cn("mx-auto flex w-full justify-center", className)}
+      className={cn("flex", className)}
       {...props}
     />
   )
@@ -74,7 +76,8 @@ function PaginationLink({
           size: size === "icon" ? "icon-sm" : "sm",
         }),
         selectedState.current,
-        "font-medium tracking-normal normal-case tabular-nums aria-disabled:pointer-events-none aria-disabled:opacity-50",
+        ariaDisabledState,
+        "font-medium tracking-normal normal-case tabular-nums",
         className
       )}
       {...props}

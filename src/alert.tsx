@@ -9,7 +9,7 @@ import { cn } from "./utils.js"
  * (the destructive tint is too faint for text in light mode).
  */
 const alertVariants = cva(
-  "relative grid w-full grid-cols-[0_1fr] items-start gap-y-1 rounded-none border bg-card px-4 py-3 text-sm text-card-foreground has-[>svg]:grid-cols-[--spacing(4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5",
+  "relative grid grid-cols-[0_1fr] items-start gap-y-1 rounded-none border bg-card px-4 py-3 text-sm text-card-foreground has-[>svg]:grid-cols-[--spacing(4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5",
   {
     variants: {
       variant: {

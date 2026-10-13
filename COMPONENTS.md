@@ -96,6 +96,34 @@ changelog calls out every change: `accordion`, `alert`, `avatar`,
 `markdown`, `meter`, `pagination`, `progress`, `radio-group`, `search-picker`,
 `slider`, `spinner`, `stat-tile`, `switch`, `tooltip`.
 
+## Styling parts
+
+Every component takes `className` for its root and passes other HTML props
+through to it. Where a part sits inside a component, a prop names it, and
+each part carries a `data-slot` for parent selectors such as
+`*:data-[slot=stat-tile-value]:text-2xl`.
+
+| Component                                          | Part props                                                                                                                               | Slots                                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DialogContent`                                    | `overlayClassName`, `closeButtonClassName`                                                                                               | `dialog-close-button` (the built-in X; your own `DialogClose` keeps `dialog-close`)                                       |
+| `SelectTrigger`                                    | a `className` height replaces `size`                                                                                                     | `select-icon`, `select-viewport`, `select-item-indicator`                                                                 |
+| `TooltipContent`                                   | `arrowClassName`                                                                                                                         | `tooltip-arrow`                                                                                                           |
+| `Combobox`                                         | `contentClassName` (panel, default trigger width), `listClassName`; button props go to trigger                                           | `combobox-search`, `combobox-list`, `combobox-option`                                                                     |
+| `SearchPicker`                                     | `listClassName`; div props go to the root                                                                                                | `search-picker-option`, `search-picker-empty`                                                                             |
+| `InfoTip`                                          | `contentClassName`; button props go to the trigger                                                                                       |                                                                                                                           |
+| `DatePickerButton`, `DateTimePickerButton`         | `contentClassName`, `calendarProps` (disabled days, `startMonth`, `endMonth`, `weekStartsOn`, `locale`)                                  | `date-picker-value`, `date-picker-footer`, `date-time-picker-time`                                                        |
+| `form/*` fields                                    | `fieldClassName` (wrapper); `className` styles the control; `FormSelectField` `contentClassName`; `FormMarkdownField` `previewClassName` | `form-field`, `form-field-header`, `form-field-description`, `form-field-error`, `form-feedback`, `form-markdown-preview` |
+| `Table`                                            | `containerClassName` (the scroll box, e.g. `max-h-96 overflow-y-auto`); `className` styles the `<table>`                                 |                                                                                                                           |
+| `TabsList`, `TabsNav`                              | `scrollerClassName`; `TabsNav` `listClassName`; a list `className` height replaces `h-11`                                                | `tabs-scroller`                                                                                                           |
+| `SortableTableHead`                                | `buttonClassName`                                                                                                                        | `sortable-table-head-button`                                                                                              |
+| `AccordionTrigger`, `AccordionContent`             | `headerClassName`; `AccordionContent` `className` styles the inner box                                                                   | `accordion-header`, `accordion-content-inner`                                                                             |
+| `Progress`                                         | `indicatorClassName`                                                                                                                     | `progress-indicator`                                                                                                      |
+| `Meter`                                            | `fillClassName`                                                                                                                          | `meter-fill`, `meter-marker`                                                                                              |
+| `StatTile`                                         |                                                                                                                                          | `stat-tile-label`, `stat-tile-value`, `stat-tile-sub`                                                                     |
+| `ColorLegend`                                      |                                                                                                                                          | `color-legend-title`, `-list`, `-item`, `-swatch`, `-range`, `-label`, `-caption`                                         |
+| `RadioGroupItem`                                   |                                                                                                                                          | `radio-group-dot`                                                                                                         |
+| `EmptyPanel`, `ErrorFallback`, `TableBodySkeleton` | `className`                                                                                                                              | `empty-panel`, `error-boundary`                                                                                           |
+
 ## Forms
 
 `TextFieldApi` is a structural interface, with no form library dependency:

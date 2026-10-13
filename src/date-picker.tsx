@@ -2,19 +2,16 @@
 
 import * as React from "react"
 import { format, isSameDay, parseISO } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 import type { DateRange } from "react-day-picker"
 
-import { Button } from "./button.js"
-import {
-  PICKER_COLLISION_PADDING,
-  pickerContentClassName,
-  pickerTriggerClassName,
-} from "./internal/form-control.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
-import { LazyCalendar, preloadCalendar } from "./lazy-calendar.js"
-import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
-import { cn } from "./utils.js"
+import { LazyCalendar } from "./lazy-calendar.js"
+import {
+  PickerClearFooter,
+  PickerShell,
+  type PickerCalendarProps,
+  type PickerTriggerProps,
+} from "./picker-shell.js"
 
 export type { DateRange }
 
@@ -67,31 +64,15 @@ export function formatLocalDate(date: Date): string {
   return format(date, "yyyy-MM-dd")
 }
 
-type DatePickerSharedProps = {
-  id?: string
-  placeholder?: string
-  disabled?: boolean
-  className?: string
-  "aria-invalid"?: boolean
-  /**
-   * Forwarded to the trigger. To name it from a visible label while still
-   * reading the picked date, list the label's id and then `${id}-value`
-   * (the trigger text). A `<label for>` alone names the button by the label
-   * and drops the date; it can stay for click-to-open.
-   */
-  "aria-labelledby"?: string
-  /** Forwarded to the trigger, e.g. the id of a hint or error text. */
-  "aria-describedby"?: string
+export type { PickerCalendarProps as DatePickerCalendarProps }
+
+type DatePickerSharedProps = PickerTriggerProps & {
   /**
    * Visible months in the popover calendar. Defaults to 1 in single mode.
    * In range mode, defaults to 1 below the `md` breakpoint and 2 at `md`
    * and above so two stacked months do not open off-screen on mobile.
    */
   numberOfMonths?: number
-  /** Popover side. Defaults to `bottom`; Radix still flips on collision. */
-  side?: React.ComponentProps<typeof PopoverContent>["side"]
-  /** Month shown when the popover opens; falls back to the selected date. */
-  defaultMonth?: Date
 }
 
 export type DatePickerSingleProps = DatePickerSharedProps & {
@@ -122,108 +103,29 @@ function formatRangeTriggerLabel(
   return `${format(from, "PPP")} – ${format(to, "PPP")}`
 }
 
-/** Shared trigger + auto-sized popover chrome for single and range modes. */
-function DatePickerShell({
-  id,
-  disabled,
-  ariaInvalid,
-  ariaLabelledBy,
-  ariaDescribedBy,
-  className,
-  empty,
-  label,
-  dialogLabel,
-  open,
-  onOpenChange,
-  side,
-  children,
-}: {
-  id?: string
-  disabled?: boolean
-  ariaInvalid?: boolean
-  ariaLabelledBy?: string
-  ariaDescribedBy?: string
-  className?: string
-  empty: boolean
-  label: string
-  /** Accessible name of the popover dialog. */
-  dialogLabel: string
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  side?: React.ComponentProps<typeof PopoverContent>["side"]
-  children: React.ReactNode
-}) {
-  return (
-    <Popover open={open} onOpenChange={onOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          type="button"
-          variant="outline"
-          disabled={disabled}
-          aria-invalid={ariaInvalid}
-          aria-labelledby={ariaLabelledBy}
-          aria-describedby={ariaDescribedBy}
-          data-empty={empty}
-          className={cn(pickerTriggerClassName, className)}
-          onPointerEnter={preloadCalendar}
-          onFocus={preloadCalendar}
-        >
-          <CalendarIcon data-icon="inline-start" />
-          {/* `${id}-value` lets a form field name the trigger "label, value". */}
-          <span id={id ? `${id}-value` : undefined}>{label}</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        side={side}
-        collisionPadding={PICKER_COLLISION_PADDING}
-        aria-label={dialogLabel}
-        // The calendar's `autoFocus` puts focus on the selected day (or
-        // today) once it loads, as the APG date picker dialog does; Radix
-        // focusing the popover first would leave it on the container.
-        onOpenAutoFocus={(event) => event.preventDefault()}
-        className={cn("w-auto", pickerContentClassName)}
-      >
-        {children}
-      </PopoverContent>
-    </Popover>
-  )
-}
-
 function DatePickerSingleButton({
-  id,
   value,
   onChange,
   placeholder = "Pick a date",
-  disabled,
-  className,
-  "aria-invalid": ariaInvalid,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
   numberOfMonths,
-  side,
   defaultMonth,
+  calendarProps,
+  ...shell
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
   const date = toDate(value)
 
   return (
-    <DatePickerShell
-      id={id}
-      disabled={disabled}
-      ariaInvalid={ariaInvalid}
-      ariaLabelledBy={ariaLabelledBy}
-      ariaDescribedBy={ariaDescribedBy}
-      className={className}
+    <PickerShell
+      {...shell}
       empty={!date}
       label={date ? format(date, "PPP") : placeholder}
       dialogLabel="Choose date"
       open={open}
       onOpenChange={setOpen}
-      side={side}
     >
       <LazyCalendar
+        {...calendarProps}
         mode="single"
         autoFocus
         selected={date}
@@ -234,23 +136,18 @@ function DatePickerSingleButton({
           setOpen(false)
         }}
       />
-    </DatePickerShell>
+    </PickerShell>
   )
 }
 
 function DatePickerRangeButton({
-  id,
   value,
   onChange,
   placeholder = "Pick a date range",
-  disabled,
-  className,
-  "aria-invalid": ariaInvalid,
-  "aria-labelledby": ariaLabelledBy,
-  "aria-describedby": ariaDescribedBy,
   numberOfMonths,
-  side,
   defaultMonth,
+  calendarProps,
+  ...shell
 }: DatePickerRangeProps) {
   const [open, setOpen] = React.useState(false)
   const mdUp = useMediaQuery(MD_MEDIA_QUERY)
@@ -269,21 +166,16 @@ function DatePickerRangeButton({
   }
 
   return (
-    <DatePickerShell
-      id={id}
-      disabled={disabled}
-      ariaInvalid={ariaInvalid}
-      ariaLabelledBy={ariaLabelledBy}
-      ariaDescribedBy={ariaDescribedBy}
-      className={className}
+    <PickerShell
+      {...shell}
       empty={!from}
       label={formatRangeTriggerLabel(from, to, placeholder)}
       dialogLabel="Choose dates"
       open={open}
       onOpenChange={onOpenChange}
-      side={side}
     >
       <LazyCalendar
+        {...calendarProps}
         mode="range"
         autoFocus
         selected={selected}
@@ -300,21 +192,14 @@ function DatePickerRangeButton({
           }
         }}
       />
-      <div className="flex justify-end border-t p-2">
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          disabled={!from && !to}
-          onClick={() => {
-            onChange(undefined)
-            setOpen(false)
-          }}
-        >
-          Clear
-        </Button>
-      </div>
-    </DatePickerShell>
+      <PickerClearFooter
+        disabled={!from && !to}
+        onClear={() => {
+          onChange(undefined)
+          setOpen(false)
+        }}
+      />
+    </PickerShell>
   )
 }
 
@@ -324,8 +209,10 @@ function DatePickerRangeButton({
  * `yyyy-MM-dd` and emits `Date | undefined`. `mode="range"` accepts
  * `{ from, to }` and emits `DateRange | undefined`. Range mode shows one
  * month below `md` and two at `md+` unless `numberOfMonths` is set. The
- * popover clamps to the viewport (`side` is overridable). Square corners
- * follow the shared shape rules.
+ * popover clamps to the viewport (`side` is overridable). `className` styles
+ * the trigger, `contentClassName` the popover, and `calendarProps` reaches
+ * Day Picker (disabled days, `startMonth`, `weekStartsOn`, `locale`). Square
+ * corners follow the shared shape rules.
  */
 export function DatePickerButton(props: DatePickerButtonProps) {
   if (props.mode === "range") {

@@ -71,3 +71,39 @@ export const optionState = {
   /** The chosen value in lists that track selection in state. */
   selected: "bg-selected text-selected-foreground",
 }
+
+/** `aria-disabled` (links and cells that cannot be `disabled`): dimmed, with no hover or click. */
+export const ariaDisabledState =
+  "aria-disabled:pointer-events-none aria-disabled:opacity-50"
+
+/**
+ * Larger click target for a small choice control (checkbox, radio, switch):
+ * an invisible `::after` 12px wider each side and 8px taller each side. The
+ * control needs `relative`.
+ */
+export const choiceHitArea = "after:absolute after:-inset-x-3 after:-inset-y-2"
+
+/**
+ * 44×44px invisible `::after` centred on a small control (slider thumb,
+ * icon trigger), the WCAG 2.5.5 target size. The control needs `relative`.
+ */
+export const hitArea44 =
+  "after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
+
+/**
+ * Height and horizontal padding for text controls, shared by Button and
+ * Toggle so a toolbar of both lines up. Padding tightens on the icon side.
+ */
+export const controlSize = {
+  default:
+    "h-10 px-6 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
+  sm: "h-9 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
+  lg: "h-11 px-8 has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5",
+}
+
+/**
+ * Uppercase muted label used on tiles, legends, and thin section chrome.
+ * Re-exported publicly from `atlas-react-kit/stat-tile`.
+ */
+export const sectionLabel =
+  "text-xs font-semibold tracking-widest text-muted-foreground uppercase"

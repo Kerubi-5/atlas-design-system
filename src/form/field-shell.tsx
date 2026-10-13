@@ -1,6 +1,8 @@
 import type { ReactNode } from "react"
 
+import { pickerValueId } from "../internal/form-control.js"
 import { Label } from "../label.js"
+import { cn } from "../utils.js"
 
 import {
   FieldError,
@@ -49,10 +51,24 @@ export function describedBy(
 }
 
 /**
+ * Trigger ARIA for the date and date-time fields: invalid while there is
+ * error text, named "label, value" (a `<label for>` alone would hide the
+ * picked value), and described by the error.
+ */
+export function pickerFieldAria(id: string, errorText: string | undefined) {
+  return {
+    "aria-invalid": invalidWhen(errorText),
+    "aria-labelledby": `${labelIdFor(id)} ${pickerValueId(id)}`,
+    "aria-describedby": describedBy(id, errorText),
+  }
+}
+
+/**
  * Label, control, and error text stacked with the kit's field spacing.
  * `labelAction` sits on the label's row (the Markdown field's mode toggle).
  * Set `labelFor` to false when the control is not rendered (Markdown
  * preview), so the label does not point at a missing element.
+ * `className` styles the wrapper (`data-slot="form-field"`), e.g. a width.
  */
 export function FormFieldShell({
   id,
@@ -60,6 +76,7 @@ export function FormFieldShell({
   labelAction,
   errorText,
   labelFor = true,
+  className,
   children,
 }: {
   id: string
@@ -67,6 +84,7 @@ export function FormFieldShell({
   labelAction?: ReactNode
   errorText: string | undefined
   labelFor?: boolean
+  className?: string
   children: ReactNode
 }) {
   const labelNode = (
@@ -75,9 +93,15 @@ export function FormFieldShell({
     </Label>
   )
   return (
-    <div className="flex flex-col gap-1.5">
+    <div
+      data-slot="form-field"
+      className={cn("flex flex-col gap-1.5", className)}
+    >
       {labelAction ? (
-        <div className="flex items-center justify-between gap-2">
+        <div
+          data-slot="form-field-header"
+          className="flex items-center justify-between gap-2"
+        >
           {labelNode}
           {labelAction}
         </div>

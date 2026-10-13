@@ -54,3 +54,52 @@ export function isComposingKey(event: {
 }) {
   return event.nativeEvent.isComposing || event.keyCode === 229
 }
+
+/**
+ * Shared keydown for a search input that drives a listbox: navigation keys
+ * move the highlight, Enter picks the highlighted index. Returns `true` when
+ * the key is handled (or an IME is composing, when every key belongs to the
+ * IME), so the caller can stop; `false` leaves the key to the caller (for
+ * example SearchPicker's Escape).
+ */
+export function handleListboxKey(
+  event: {
+    key: string
+    keyCode: number
+    nativeEvent: KeyboardEvent
+    preventDefault: () => void
+  },
+  {
+    highlight,
+    length,
+    setHighlight,
+    onEnter,
+  }: {
+    highlight: number
+    length: number
+    setHighlight: (index: number) => void
+    onEnter: (index: number) => void
+  }
+): boolean {
+  if (isComposingKey(event)) return true
+  const next = moveListboxHighlight(event.key, highlight, length)
+  if (next !== undefined) {
+    event.preventDefault()
+    setHighlight(next)
+    return true
+  }
+  if (event.key === "Enter") {
+    event.preventDefault()
+    onEnter(highlight)
+    return true
+  }
+  return false
+}
+
+/**
+ * Case-fold and strip combining marks so "nino" matches "Niño". Shared by
+ * Combobox and SearchPicker (which re-exports it).
+ */
+export function foldSearchText(value: string) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
+}

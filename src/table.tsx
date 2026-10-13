@@ -12,8 +12,16 @@ import { cn } from "./utils.js"
  * While it overflows, the scroller joins the tab order so keyboard users can
  * scroll it with the arrow keys (WCAG 2.1.1).
  * Cell padding is `px-2` below `sm` and the original `p-3` from `sm` up.
+ *
+ * `className` styles the `<table>` (`w-full` by default; `w-auto` sizes it
+ * to its columns). `containerClassName` styles the scroller, for a height
+ * cap (`max-h-96 overflow-y-auto`) or a border.
  */
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  className,
+  containerClassName,
+  ...props
+}: React.ComponentProps<"table"> & { containerClassName?: string }) {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const scrollable = useHorizontalOverflow(containerRef)
 
@@ -24,12 +32,13 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
       tabIndex={scrollable ? 0 : undefined}
       className={cn(
         focusRing,
-        "relative w-full min-w-0 max-w-full overflow-x-auto overscroll-x-contain"
+        "relative min-w-0 max-w-full overflow-x-auto overscroll-x-contain",
+        containerClassName
       )}
     >
       <table
         data-slot="table"
-        className={cn("w-full min-w-full caption-bottom text-sm", className)}
+        className={cn("w-full caption-bottom text-sm", className)}
         {...props}
       />
     </div>
