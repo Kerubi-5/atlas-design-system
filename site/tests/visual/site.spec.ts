@@ -62,3 +62,34 @@ test("links to the old Sonner page land on the Toast page", async ({
   await page.goto("/?path=/story/components-sonner--playground")
   await expect(page).toHaveURL(/path=\/story\/feedback-toast--playground$/)
 })
+
+test("unknown URLs show the branded not-found page with a link home", async ({
+  page,
+}) => {
+  const response = await page.goto("/zzz-nope")
+  expect(response?.status()).toBe(404)
+  await expect(
+    page.getByRole("heading", { name: "Page not found" })
+  ).toBeVisible()
+  await expect(
+    page.getByRole("link", { name: /Atlas React Kit home/ })
+  ).toHaveAttribute("href", "/")
+})
+
+test("unknown story and docs ids show the branded not-found page", async ({
+  page,
+}) => {
+  for (const path of ["/story/nope--nope", "/docs/nope--docs", "/docs/nope"]) {
+    await page.goto(`/?path=${path}`)
+    await expect(
+      page.getByRole("heading", { name: "Page not found" })
+    ).toBeVisible()
+    await expect(page.getByText(path)).toBeVisible()
+    await expect(
+      page.getByRole("link", { name: /Atlas React Kit home/ })
+    ).toHaveAttribute("href", "/")
+  }
+  // Known pages still load in Storybook.
+  await page.goto("/?path=/docs/docs-readme--docs")
+  await expect(page.locator("#storybook-preview-iframe")).toBeVisible()
+})

@@ -296,8 +296,44 @@ test("hosting serves Storybook from the site root without an SPA fallback", asyn
   // where its relative assets resolved to more index.html (blank page).
   // Unknown paths should 404 instead.
   assert.equal(config.rewrites, undefined)
+  // Old /docs/* links are redirected one by one; any other /docs/ path is a
+  // 404 (dist/404.html), not a silent jump to the README.
+  assert.equal(
+    config.redirects.find((redirect) => redirect.source.includes(":path")),
+    undefined
+  )
+  const notFound = await fs.readFile(path.join(output, "404.html"), "utf8")
+  assert.match(notFound, /Page not found/)
+  assert.match(notFound, /<a href="\/"/)
   await fs.access(path.join(output, "iframe.html"))
   await fs.access(path.join(output, "index.json"))
+})
+
+test("the 404 page uses the theme.css color tokens", async () => {
+  const theme = await fs.readFile(path.join(repoRoot, "theme.css"), "utf8")
+  const page = await fs.readFile(path.join(siteRoot, "public/404.html"), "utf8")
+  /** `--name: value` pairs in the first `selector { … }` block of `css`. */
+  const block = (css, selector) => {
+    const start = css.indexOf(`${selector} {`)
+    assert.ok(start >= 0, `${selector} block`)
+    const body = css.slice(start, css.indexOf("}", start))
+    return new Map(
+      [...body.matchAll(/(--[\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2]])
+    )
+  }
+  for (const selector of [":root", ".dark"]) {
+    const kit = block(theme, selector)
+    const used = block(page, selector)
+    assert.ok(used.size > 0, `404.html sets ${selector} tokens`)
+    for (const [name, value] of used) {
+      // --ring is var(--primary) in light theme.css; the page inlines it.
+      const expected =
+        kit.get(name) === "var(--primary)"
+          ? kit.get("--primary")
+          : kit.get(name)
+      assert.equal(value, expected, `404.html ${selector} ${name}`)
+    }
+  }
 })
 
 test("redirects and doc cross-links point at indexed entries", async () => {

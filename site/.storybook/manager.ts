@@ -58,18 +58,29 @@ if (typeof document !== "undefined") {
  * groups such as `Forms/<Name>`, which changed their ids. Send old links
  * (`?path=/story/components-button--variants`, `.../tokens--theme`) to the
  * same page in its group, looked up in the story index. Renamed pages
- * (`Feedback/Sonner` is now `Feedback/Toast`) are mapped first.
+ * (`Feedback/Sonner` is now `Feedback/Toast`) are mapped first. Ids that
+ * match no page land on the 404 page.
  */
 const renamedPages: Array<[RegExp, string]> = [
   [/^(?:components-|feedback-)?sonner--/, "feedback-toast--"],
 ]
 
+/**
+ * An id that is neither in the index nor a moved page would show Storybook's
+ * "Couldn't find story" error. Show the site's branded 404 page instead, in
+ * the theme the link asked for.
+ */
+function showNotFound(storyPath: string, globals: string) {
+  const theme = /(?:^|;)theme:(dark|light)(?:;|$)/.exec(globals)?.[1]
+  const query = new URLSearchParams({ path: storyPath })
+  if (theme) query.set("theme", theme)
+  window.location.replace(`./404.html?${query}`)
+}
+
 async function redirectMovedPage() {
   const params = new URLSearchParams(window.location.search)
-  const match = /^\/(docs|story)\/([a-z0-9-]+--[a-z0-9-]+)$/.exec(
-    params.get("path") ?? ""
-  )
-  const [, kind, oldId] = match ?? []
+  const storyPath = params.get("path") ?? ""
+  const [, kind, oldId] = /^\/(docs|story)\/([^/]+)$/.exec(storyPath) ?? []
   if (!kind || !oldId) return
   const response = await fetch("./index.json")
   if (!response.ok) return
@@ -92,7 +103,10 @@ async function redirectMovedPage() {
     Object.values(entries).find(
       (entry) => entry.id === `${slug(entry.title.split("/")[0] ?? "")}-${rest}`
     )
-  if (!moved) return
+  if (!moved) {
+    showNotFound(storyPath, params.get("globals") ?? "")
+    return
+  }
   window.location.replace(
     window.location.href.replace(/([?&]path=)[^&#]*/, `$1/${kind}/${moved.id}`)
   )

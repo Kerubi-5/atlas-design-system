@@ -1,10 +1,9 @@
-import { Meta, Markdown } from "@storybook/addon-docs/blocks"
+import { Meta } from "@storybook/addon-docs/blocks"
 
+import { DocsMarkdown } from "../../src/docs-blocks.js"
 import { rewriteDocLinks } from "../../src/lib/docs.js"
 import designRules from "../../../DESIGN_RULES.md?raw"
 
 <Meta title="Docs/Design rules" />
 
-<div className="markdown">
-  <Markdown>{rewriteDocLinks(designRules)}</Markdown>
-</div>
+<DocsMarkdown>{rewriteDocLinks(designRules)}</DocsMarkdown>

@@ -57,10 +57,13 @@ function useComputedValues(vars: CssVar[], probe: Probe) {
 }
 
 function TokenTable({
+  label,
   vars,
   swatch,
   probe = "theme",
 }: {
+  /** Names the scroll region for screen readers, e.g. "Color tokens". */
+  label: string
   vars: CssVar[]
   swatch?: boolean
   probe?: Probe
@@ -68,7 +71,13 @@ function TokenTable({
   const { probeRef, values: computed } = useComputedValues(vars, probe)
 
   return (
-    <div className="overflow-x-auto ring-1 ring-border">
+    // Focusable so keyboard users can scroll the table at narrow widths.
+    <div
+      role="region"
+      aria-label={label}
+      tabIndex={0}
+      className="overflow-x-auto ring-1 ring-border focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+    >
       <span
         ref={probeRef}
         aria-hidden="true"
@@ -131,7 +140,7 @@ export function TokensPage() {
         <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
           Color
         </h2>
-        <TokenTable vars={tokens.colors} swatch />
+        <TokenTable label="Color tokens" vars={tokens.colors} swatch />
       </section>
 
       <section className="grid gap-4">
@@ -143,7 +152,11 @@ export function TokensPage() {
           under <code className="bg-muted px-1">.dark</code> whatever the
           toolbar theme. The live swatches above already switch with the theme.
         </p>
-        <TokenTable vars={tokens.darkColors} probe="dark" />
+        <TokenTable
+          label="Dark color values"
+          vars={tokens.darkColors}
+          probe="dark"
+        />
       </section>
 
       <section className="grid gap-4">
@@ -154,7 +167,9 @@ export function TokensPage() {
           <code className="bg-muted px-1">font-heading</code> uses the
           configured sans font. IBM Plex Sans is supplied by this site.
         </p>
-        {tokens.type.length > 0 ? <TokenTable vars={tokens.type} /> : null}
+        {tokens.type.length > 0 ? (
+          <TokenTable label="Type tokens" vars={tokens.type} />
+        ) : null}
         <div className="grid gap-4">
           {typeSamples.map((sample) => (
             <div
@@ -181,7 +196,11 @@ export function TokensPage() {
           <code className="bg-muted px-1">px-3</code>, card{" "}
           <code className="bg-muted px-1">--card-p</code>).
         </p>
-        <TokenTable vars={tokens.spacing} probe="radius" />
+        <TokenTable
+          label="Radius tokens"
+          vars={tokens.spacing}
+          probe="radius"
+        />
         <div className="flex flex-wrap items-end gap-4">
           {spacingScale.map((step) => (
             <div key={step} className="grid justify-items-center gap-2">

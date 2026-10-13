@@ -3,10 +3,8 @@ import type { Preview, ReactRenderer } from "@storybook/react-vite"
 import {
   Controls,
   Description,
-  DocsContainer,
   type DocsContainerProps,
   Heading,
-  Markdown,
   Primary,
   Stories,
   Subtitle,
@@ -27,6 +25,11 @@ const atlasViewports = {
 
 import { ThemeProvider } from "../../src/theme-provider.js"
 import { Toaster } from "../../src/toast.js"
+import {
+  DocsMarkdown,
+  KitDocsContainer,
+  ScrollRegion,
+} from "../src/docs-blocks.js"
 import { beta, usage } from "../src/lib/usage.js"
 import "../src/styles.css"
 
@@ -43,9 +46,7 @@ function UsageBlock() {
   return (
     <>
       <Heading>Usage</Heading>
-      <div className="markdown">
-        <Markdown>{status + guidance}</Markdown>
-      </div>
+      <DocsMarkdown>{status + guidance}</DocsMarkdown>
     </>
   )
 }
@@ -59,7 +60,9 @@ function DocsPage() {
       <Description />
       <UsageBlock />
       <Primary />
-      <Controls />
+      <ScrollRegion label="Props">
+        <Controls />
+      </ScrollRegion>
       <Stories />
     </>
   )
@@ -99,10 +102,10 @@ const preview: Preview = {
         children,
         ...props
       }: PropsWithChildren<DocsContainerProps>) => (
-        <DocsContainer {...props}>
+        <KitDocsContainer {...props}>
           {children}
           <Toaster />
-        </DocsContainer>
+        </KitDocsContainer>
       ),
     },
   },
