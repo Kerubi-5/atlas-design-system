@@ -14,6 +14,8 @@
 
 .markdown {
   display: grid;
+  /* minmax(0, …) lets wide code and tables scroll instead of widening the page. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 1rem;
   font-size: 0.875rem;
   line-height: 1.7;
@@ -53,7 +55,8 @@
 }
 
 .markdown a {
-  color: var(--primary);
+  /* The kit's link color (as in Markdown): AA on the page in both themes. */
+  color: var(--selected-foreground);
   text-decoration: underline;
   text-underline-offset: 4px;
 }
@@ -73,6 +76,15 @@
   background: var(--muted);
   padding: 1rem;
   border: 1px solid var(--border);
+}
+
+/*
+ * Long inline code in prose wraps instead of widening the page at phone
+ * width. Code in table cells stays whole; the table scrolls in its region.
+ */
+.markdown :is(p, li, blockquote) > code {
+  white-space: normal;
+  overflow-wrap: anywhere;
 }
 
 .markdown pre code {
@@ -135,5 +147,38 @@
  */
 .sbdocs.sbdocs-wrapper
   :is(h1, h2, h3, h4, h5, h6, .sbdocs-title, .sbdocs-subtitle) {
+  color: var(--foreground);
+}
+
+/*
+ * Wide docs content (props tables, markdown tables, code) scrolls inside its
+ * own focusable container (ScrollRegion in docs-blocks.tsx), never the page.
+ */
+.docs-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.docs-scroll:focus-visible,
+.markdown pre:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/*
+ * Storybook draws the unselected half of a boolean control at half the text
+ * color's opacity, which fails AA contrast in both themes. Use the kit's
+ * muted text token instead; the selected half keeps the foreground color.
+ */
+.sbdocs.sbdocs-wrapper label:has(> input[type="checkbox"]) > span {
+  color: var(--muted-foreground);
+}
+
+.sbdocs.sbdocs-wrapper
+  label:has(> input[type="checkbox"])
+  > :is(
+    input:checked ~ span:last-of-type,
+    input:not(:checked) ~ span:first-of-type
+  ) {
   color: var(--foreground);
 }

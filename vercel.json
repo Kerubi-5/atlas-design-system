@@ -24,7 +24,17 @@
       "permanent": true
     },
     {
-      "source": "/docs/:path*",
+      "source": "/docs",
+      "destination": "/?path=/docs/docs-readme--docs",
+      "permanent": true
+    },
+    {
+      "source": "/docs/",
+      "destination": "/?path=/docs/docs-readme--docs",
+      "permanent": true
+    },
+    {
+      "source": "/docs/readme",
       "destination": "/?path=/docs/docs-readme--docs",
       "permanent": true
     }

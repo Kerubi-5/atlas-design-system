@@ -37,7 +37,13 @@ export function serve(root = distDir, port = 0) {
       })
       response.end(body)
     } catch {
-      response.writeHead(404).end()
+      // Like Vercel, answer unknown paths with the site's 404 page.
+      const notFound = await fs
+        .readFile(path.join(root, "404.html"))
+        .catch(() => null)
+      response
+        .writeHead(404, notFound ? { "content-type": "text/html" } : {})
+        .end(notFound ?? undefined)
     }
   })
   return new Promise((resolve) => {
