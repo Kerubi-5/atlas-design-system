@@ -121,6 +121,18 @@ flex row; add `w-full` to stretch it there. `Tooltip` keeps a `max-w-xs` reading
 `min-h-16` starting height, and toasts their 356px width; override the first
 two with `className`.
 
+Parents do not force sizes on their children. A vertical `Field` stretches
+its controls through the flex column, so a control's own width class (such
+as `w-32`) wins; `Field`, `Alert`, and `Pagination` set no width of their
+own. `FieldGroup` keeps `w-full` because its inline-size container has no
+intrinsic width. Size classes that `className` should be able to replace are
+plain classes picked from props (`Avatar` `size`, `Separator` orientation,
+`SelectTrigger` `size`, tab orientation), never `data-*` variants, which sort
+after plain classes and would win. Every part an app may want to style is
+reachable: through `className` on the part, a named `*ClassName` prop when the
+part sits inside a component (listed in COMPONENTS.md under "Styling parts"),
+or its `data-slot`.
+
 `Input`, `SelectTrigger`, `DatePickerButton`, `DateTimePickerButton`, and
 `Combobox` share form-control chrome: 40px height, `px-3`,
 `text-base md:text-sm`, `border-input`, and `shadow-xs`. Do not restyle those

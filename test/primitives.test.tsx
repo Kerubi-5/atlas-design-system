@@ -113,10 +113,12 @@ describe("Skeletons", () => {
         <TableBodySkeleton columns={3} rows={2} />
       </Table>
     )
-    const rows = screen.getAllByRole("row")
+    // Rows are hidden from screen readers (the body is aria-busy), so query
+    // the DOM rather than the accessibility tree.
+    const rows = document.querySelectorAll("tbody tr")
     expect(rows).toHaveLength(2)
     for (const row of rows) {
-      expect(within(row).getAllByRole("cell")).toHaveLength(3)
+      expect(row.querySelectorAll("td")).toHaveLength(3)
     }
     expect(document.querySelectorAll("[data-slot=skeleton]")).toHaveLength(6)
   })

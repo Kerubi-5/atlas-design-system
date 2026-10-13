@@ -93,7 +93,7 @@ describe("ThemeProvider", () => {
   it("toggles light and dark with the d shortcut", async () => {
     const user = createUser()
     render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
+      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
         <ThemeProbe />
       </ThemeProvider>
     )
@@ -112,7 +112,7 @@ describe("ThemeProvider", () => {
   it("does not toggle while typing in an input", async () => {
     const user = createUser()
     render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
+      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
         <label htmlFor="title">Title</label>
         <input id="title" />
         <ThemeProbe />
@@ -131,7 +131,7 @@ describe("ThemeProvider", () => {
   it("does not toggle while typing in a textarea", async () => {
     const user = createUser()
     render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
+      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
         <label htmlFor="notes">Notes</label>
         <textarea id="notes" />
         <ThemeProbe />
@@ -167,7 +167,7 @@ describe("ThemeProvider", () => {
 
     const user = createUser()
     render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
+      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
         <MonthSelect />
         <ThemeProbe />
       </ThemeProvider>
@@ -187,7 +187,7 @@ describe("ThemeProvider", () => {
   it("does not toggle when a focused control already handled the key", async () => {
     const user = createUser()
     render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
+      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
         <button
           type="button"
           onKeyDown={(event) => {
@@ -206,14 +206,11 @@ describe("ThemeProvider", () => {
     expect(themeOutput()).toHaveTextContent(/light:light/)
   })
 
-  it("ignores the shortcut when enableShortcut is false", async () => {
+  it("leaves the d shortcut off unless the app turns it on", async () => {
+    // A single-key shortcut needs a user-facing off switch (WCAG 2.1.4).
     const user = createUser()
     render(
-      <ThemeProvider
-        defaultTheme="light"
-        enableSystem={false}
-        enableShortcut={false}
-      >
+      <ThemeProvider defaultTheme="light" enableSystem={false}>
         <ThemeProbe />
       </ThemeProvider>
     )

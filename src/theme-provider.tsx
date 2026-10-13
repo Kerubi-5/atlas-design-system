@@ -35,7 +35,8 @@ export type ThemeProviderProps = NextThemesProviderProps & {
   /**
    * When true, pressing `d` toggles dark/light unless focus is in an editable
    * field or a widget with letter typeahead (such as `Select`). Defaults to
-   * true.
+   * false: a single-key shortcut fires by accident for speech-input users, so
+   * an app that turns it on should also let people switch it off (WCAG 2.1.4).
    */
   enableShortcut?: boolean
 }
@@ -77,7 +78,7 @@ function ThemeProvider({
   defaultTheme = "system",
   enableSystem = true,
   disableTransitionOnChange = true,
-  enableShortcut = true,
+  enableShortcut = false,
   ...props
 }: ThemeProviderProps) {
   return (

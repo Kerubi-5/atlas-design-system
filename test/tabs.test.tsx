@@ -64,15 +64,11 @@ function expectScrollerFitsList(
   const listClasses = list?.className.split(/\s+/) ?? []
   expect(scrollerClasses).toContain("p-1")
   expect(scrollerClasses).toContain("box-border")
-  expect(listClasses).toContain(
-    'group-data-[orientation="horizontal"]/tabs:h-11'
-  )
+  // Plain classes chosen from the orientation, so a consumer `className`
+  // such as `h-9` replaces them (a `group-data-[...]:h-11` variant would win).
+  expect(listClasses).toContain("h-11")
   const line = scrollerClasses.includes("pb-2")
-  expect(scrollerClasses).toContain(
-    line
-      ? 'group-data-[orientation="horizontal"]/tabs:h-14'
-      : 'group-data-[orientation="horizontal"]/tabs:h-13'
-  )
+  expect(scrollerClasses).toContain(line ? "h-14" : "h-13")
   if (scroller instanceof HTMLElement) {
     const previous = scroller.style.overflowY
     scroller.style.overflowY = "auto"

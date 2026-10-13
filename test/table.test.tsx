@@ -41,7 +41,8 @@ describe("Table overflow", () => {
     expect(container?.className.split(/\s+/)).toContain("min-w-0")
     expect(container?.className.split(/\s+/)).toContain("max-w-full")
     expect(container?.className.split(/\s+/)).toContain("overscroll-x-contain")
-    expect(table.className.split(/\s+/)).toContain("min-w-full")
+    // w-full fills the scroller; min-w-full was redundant and blocked w-auto.
+    expect(table.className.split(/\s+/)).toContain("w-full")
   })
 
   it("uses compact padding below sm and the original density from sm up", () => {

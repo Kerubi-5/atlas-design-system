@@ -11,7 +11,7 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "./popover.js"
-import { focusRing } from "./internal/styles.js"
+import { focusRing, hitArea44 } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export type InfoTipLayout = "box" | "inline"
@@ -33,7 +33,12 @@ export type InfoTipProps = {
   className?: string
   /** Classes for the panel, e.g. its width. Defaults to `w-72`. */
   contentClassName?: string
-}
+} & Omit<
+  React.ComponentProps<"button">,
+  // `title` names the panel; the pointer and click handlers run the
+  // hover-open logic.
+  "title" | "children" | "type" | "onMouseEnter" | "onMouseLeave" | "onClick"
+>
 
 /**
  * True when a mouse can hover. Touch and coarse pointers must use click;
@@ -60,10 +65,14 @@ function InfoTip({
   icon,
   className,
   contentClassName,
+  ...props
 }: InfoTipProps) {
   const [open, setOpen] = React.useState(false)
   const closeTimer = React.useRef<number | null>(null)
-  const hoverOpened = React.useRef(false)
+  // How the panel last opened. A hover-open leaves focus where it was and
+  // closes when the pointer leaves; a click (or keyboard) open pins it.
+  const openedBy = React.useRef<"hover" | "click" | null>(null)
+  const titleId = React.useId()
   const inline = layout === "inline"
 
   const cancelClose = () => {
@@ -76,12 +85,13 @@ function InfoTip({
   const openFromHover = () => {
     if (!canHoverOpen()) return
     cancelClose()
-    hoverOpened.current = true
+    if (open) return
+    openedBy.current = "hover"
     setOpen(true)
   }
 
   const closeFromHover = () => {
-    if (!canHoverOpen() || !hoverOpened.current) return
+    if (!canHoverOpen() || openedBy.current !== "hover") return
     cancelClose()
     // Leave a beat so the pointer can travel from the glyph into the panel.
     closeTimer.current = window.setTimeout(() => setOpen(false), 120)
@@ -93,19 +103,16 @@ function InfoTip({
     <Popover
       open={open}
       onOpenChange={(next) => {
-        // Hover already opened the panel; the following click should pin
-        // it, not toggle it closed (Playwright and real mice both hover
-        // before they click).
-        if (hoverOpened.current && open && !next) {
-          hoverOpened.current = false
-          return
-        }
-        hoverOpened.current = false
+        // Escape and outside clicks close however the panel opened. Keep
+        // `openedBy` on close so onCloseAutoFocus can read it.
+        cancelClose()
+        if (next) openedBy.current = "click"
         setOpen(next)
       }}
     >
       <PopoverTrigger asChild>
         <button
+          {...props}
           type="button"
           aria-label={label}
           data-slot="info-tip-trigger"
@@ -113,13 +120,21 @@ function InfoTip({
           className={cn(
             focusRing,
             "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground hover:text-selected-foreground focus-visible:text-selected-foreground",
-            inline
-              ? "size-5 align-middle after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
-              : "size-11",
+            inline ? cn("size-5 align-middle", hitArea44) : "size-11",
             className
           )}
           onMouseEnter={openFromHover}
           onMouseLeave={closeFromHover}
+          onClick={(event) => {
+            // Hover already opened the panel; this click pins it instead of
+            // toggling it closed (Playwright and real mice both hover before
+            // they click). Preventing default skips Radix's toggle.
+            if (open && openedBy.current === "hover") {
+              event.preventDefault()
+              cancelClose()
+              openedBy.current = "click"
+            }
+          }}
         >
           {icon ?? (
             <CircleHelpIcon
@@ -134,12 +149,22 @@ function InfoTip({
         side={side}
         align={align}
         className={cn("w-72", contentClassName)}
+        aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : label}
+        // A pointer passing over the glyph must not take focus from where
+        // the user is typing, nor hand it to the trigger on close.
+        onOpenAutoFocus={(event) => {
+          if (openedBy.current === "hover") event.preventDefault()
+        }}
+        onCloseAutoFocus={(event) => {
+          if (openedBy.current === "hover") event.preventDefault()
+        }}
         onMouseEnter={openFromHover}
         onMouseLeave={closeFromHover}
       >
         <PopoverHeader>
           <div className="flex items-start justify-between gap-2">
-            {title ? <PopoverTitle>{title}</PopoverTitle> : null}
+            {title ? <PopoverTitle id={titleId}>{title}</PopoverTitle> : null}
             {badge}
           </div>
           {description ? (

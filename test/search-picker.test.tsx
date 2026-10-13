@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react"
 import { Profiler, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
@@ -140,6 +141,38 @@ describe("SearchPicker", () => {
     expect(onSelect).toHaveBeenLastCalledWith({ id: "4", name: "East" })
   })
 
+  it("keeps options out of the Tab order", async () => {
+    const user = createUser()
+    render(
+      <div>
+        <PickerHarness />
+        <button type="button">Next field</button>
+      </div>
+    )
+    for (const option of screen.getAllByRole("option")) {
+      expect(option).toHaveAttribute("tabindex", "-1")
+    }
+    await user.click(getCombobox())
+    await user.tab()
+    expect(screen.getByRole("button", { name: "Next field" })).toHaveFocus()
+  })
+
+  it("does not select on Enter while an IME is composing", () => {
+    const onSelect = vi.fn()
+    render(<PickerHarness onSelect={onSelect} />)
+
+    fireEvent.keyDown(getCombobox(), {
+      key: "Enter",
+      keyCode: 229,
+      isComposing: true,
+    })
+    fireEvent.keyDown(getCombobox(), { key: "Enter", isComposing: true })
+    expect(onSelect).not.toHaveBeenCalled()
+
+    fireEvent.keyDown(getCombobox(), { key: "Enter" })
+    expect(onSelect).toHaveBeenCalledWith({ id: "2", name: "North" })
+  })
+
   it("Escape clears the query, then blurs", async () => {
     const user = createUser()
     render(<PickerHarness />)
@@ -158,8 +191,14 @@ describe("SearchPicker", () => {
     const { rerender } = render(<PickerHarness />)
 
     await user.type(getCombobox(), "zzz")
-    expect(screen.getByText("No places")).toBeInTheDocument()
+    expect(screen.getByText("No places")).toBeVisible()
     expect(screen.queryByRole("option")).not.toBeInTheDocument()
+    // Announced from a status region outside the listbox, which may own
+    // only options; the empty listbox keeps its name for aria-controls.
+    expect(screen.getByRole("status")).toHaveTextContent("No places")
+    expect(
+      screen.getByRole("listbox", { name: "Place" }).children
+    ).toHaveLength(0)
 
     rerender(<PickerHarness disabled />)
     expect(getCombobox()).toBeDisabled()

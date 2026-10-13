@@ -4,18 +4,32 @@ import * as React from "react"
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
+import {
+  menuLabel,
+  optionIcon,
+  optionRow,
+  overlayFadeZoom,
+  overlaySideSlide,
+  overlaySurface,
+} from "./internal/overlay-styles.js"
 import { dataDisabledState, optionState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
-/** Item highlight and selected chrome shared with `SelectItem`. */
+/** Menu row: the shared option row with menu padding and the inset slot. */
 const menuItemClassName = cn(
+  optionRow,
   optionState.focus,
   dataDisabledState,
-  "relative flex cursor-default items-center gap-2.5 rounded-none px-3 py-2 text-sm outline-hidden select-none data-inset:pl-9 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5"
+  optionIcon,
+  "pr-3 data-inset:pl-9"
 )
 
-const menuContentClassName =
-  "z-50 overflow-x-hidden overflow-y-auto rounded-none bg-popover p-1 text-popover-foreground shadow-md ring-1 ring-foreground/10 duration-100 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95"
+const menuContentClassName = cn(
+  overlaySurface,
+  overlaySideSlide,
+  overlayFadeZoom,
+  "z-50 overflow-x-hidden overflow-y-auto p-1"
+)
 
 /** Action menu for commands (row actions, overflow menus). Use `Select` to pick a value. */
 function DropdownMenu({
@@ -166,10 +180,7 @@ function DropdownMenuLabel({
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
       data-inset={inset || undefined}
-      className={cn(
-        "px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase data-inset:pl-9",
-        className
-      )}
+      className={cn(menuLabel, "data-inset:pl-9", className)}
       {...props}
     />
   )

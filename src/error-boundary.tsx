@@ -3,28 +3,38 @@
 import { Component, type ErrorInfo, type ReactNode } from "react"
 
 import { Button } from "./button.js"
+import { EmptyPanel } from "./empty-panel.js"
+import { cn } from "./utils.js"
 
 type ErrorFallbackProps = {
   /** User-facing recovery copy. */
   message?: string
   onRetry?: () => void
   onReload?: () => void
+  className?: string
 }
 
 /**
- * Presentational recovery UI used by `ErrorBoundary`. Exported so the markup
- * can be tested without throwing during render.
+ * Presentational recovery UI used by `ErrorBoundary`: a large `EmptyPanel`
+ * with the message and recovery buttons. Exported so the markup can be
+ * tested without throwing during render.
  */
 export function ErrorFallback({
   message = "Something went wrong.",
   onRetry,
   onReload,
+  className,
 }: ErrorFallbackProps) {
   return (
-    <div
+    <EmptyPanel
       role="alert"
       data-slot="error-boundary"
-      className="flex flex-col items-center gap-4 rounded-none border border-dashed bg-muted/30 px-4 py-8 text-center"
+      size="lg"
+      // The panel's muted text is for its message; the buttons keep their own.
+      className={cn(
+        "flex flex-col items-center gap-4 text-foreground",
+        className
+      )}
     >
       <p className="text-sm text-muted-foreground">{message}</p>
       <div className="flex flex-wrap items-center justify-center gap-2">
@@ -39,7 +49,7 @@ export function ErrorFallback({
           </Button>
         ) : null}
       </div>
-    </div>
+    </EmptyPanel>
   )
 }
 

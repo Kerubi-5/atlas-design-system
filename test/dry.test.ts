@@ -5,11 +5,16 @@ import { fileURLToPath } from "node:url"
 import { describe, expect, it } from "vitest"
 
 import {
+  ariaDisabledState,
+  choiceHitArea,
+  controlSize,
   disabledState,
   fieldSurface,
   focusRing,
+  hitArea44,
   invalidState,
   optionState,
+  sectionLabel,
   selectedState,
 } from "../src/internal/styles.js"
 
@@ -29,7 +34,7 @@ const components = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
 const retyped: Array<[string, RegExp, string]> = [
   [
     "focus ring",
-    /focus-visible:(?:border-ring|ring-ring|ring-2)\b/,
+    /(?<![\w-])focus-visible:(?:border-ring|ring-ring|ring-2)\b/,
     "focusRing",
   ],
   ["invalid state", /aria-invalid:(?:border|ring)-destructive/, "invalidState"],
@@ -45,6 +50,45 @@ const retyped: Array<[string, RegExp, string]> = [
     "selectedState",
   ],
   ["option highlight bar", /inset_2px_0_0_var\(--color-ring\)/, "optionState"],
+  ["aria-disabled state", /aria-disabled:opacity-50/, "ariaDisabledState"],
+  ["choice hit area", /after:-inset-x-3 after:-inset-y-2/, "choiceHitArea"],
+  ["44px hit area", /after:size-11/, "hitArea44"],
+  [
+    "control size padding",
+    /has-data-\[icon=inline-end\]:pr-[345] has-data-\[icon=inline-start\]:pl-[345]/,
+    "controlSize",
+  ],
+  [
+    "section label",
+    /text-xs font-semibold tracking-widest text-muted-foreground uppercase/,
+    "sectionLabel",
+  ],
+  ["clamp", /Math\.min\([^()]*Math\.max\(/, "clamp from internal/math"],
+  [
+    "overlay surface",
+    /bg-popover text-popover-foreground shadow-md ring-1/,
+    "overlaySurface",
+  ],
+  [
+    "overlay side slide",
+    /data-\[side=bottom\]:slide-in-from-top-2/,
+    "overlaySideSlide",
+  ],
+  [
+    "overlay fade",
+    /data-(?:open|\[state=open\]):animate-in data-(?:open|\[state=open\]):fade-in-0/,
+    "overlayFade or overlayFadeZoom",
+  ],
+  [
+    "option row",
+    /cursor-default items-center gap-2(?:\.5)? rounded-none py-2/,
+    "optionRow",
+  ],
+  [
+    "menu label",
+    /text-xs font-semibold tracking-wider text-muted-foreground uppercase/,
+    "menuLabel",
+  ],
 ]
 
 describe("shared state classes", () => {
@@ -72,5 +116,13 @@ describe("shared state classes", () => {
     }
     expect(optionState.focus).toContain("--color-ring")
     expect(optionState.active).toContain("--color-ring")
+    expect(ariaDisabledState).toContain("aria-disabled:pointer-events-none")
+    expect(ariaDisabledState).toContain("aria-disabled:opacity-50")
+    expect(choiceHitArea).toContain("after:absolute")
+    expect(hitArea44).toContain("after:size-11")
+    for (const size of Object.values(controlSize)) {
+      expect(size).toMatch(/^h-\d+ px-\d+ /)
+    }
+    expect(sectionLabel).toContain("tracking-widest")
   })
 })

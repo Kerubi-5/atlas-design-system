@@ -52,8 +52,9 @@ describe("form-control trigger chrome", () => {
     ]) {
       expect(selectTrigger.className.split(/\s+/)).toContain(token)
     }
-    expect(selectTrigger.className.split(/\s+/)).toContain(
-      "data-[size=default]:h-10"
+    // 40px default height, as a plain class or a size variant.
+    expect(selectTrigger.className).toMatch(
+      /(?:^|\s)(?:data-\[size=default\]:)?h-10(?:\s|$)/
     )
   })
 

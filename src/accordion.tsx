@@ -27,13 +27,20 @@ function AccordionItem({
   )
 }
 
+/** `headerClassName` styles the heading wrapper (`data-slot="accordion-header"`). */
 function AccordionTrigger({
   className,
+  headerClassName,
   children,
   ...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  headerClassName?: string
+}) {
   return (
-    <AccordionPrimitive.Header className="flex">
+    <AccordionPrimitive.Header
+      data-slot="accordion-header"
+      className={cn("flex", headerClassName)}
+    >
       <AccordionPrimitive.Trigger
         data-slot="accordion-trigger"
         className={cn(
@@ -51,6 +58,10 @@ function AccordionTrigger({
   )
 }
 
+/**
+ * `className` styles the padded inner box (`data-slot="accordion-content-inner"`);
+ * the outer region animates height and clips.
+ */
 function AccordionContent({
   className,
   children,
@@ -62,7 +73,12 @@ function AccordionContent({
       className="overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
       {...props}
     >
-      <div className={cn("pt-0 pb-4", className)}>{children}</div>
+      <div
+        data-slot="accordion-content-inner"
+        className={cn("pt-0 pb-4", className)}
+      >
+        {children}
+      </div>
     </AccordionPrimitive.Content>
   )
 }

@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 
 import { TableHead } from "./table.js"
+import { cn } from "./utils.js"
 
 export type SortDirection = "asc" | "desc"
 
@@ -16,6 +17,8 @@ type SortableTableHeadProps = ComponentProps<typeof TableHead> & {
   sorted?: boolean
   direction?: SortDirection
   onClick?: () => void
+  /** Classes for the inner sort button (`data-slot="sortable-table-head-button"`). */
+  buttonClassName?: string
 }
 
 /**
@@ -28,6 +31,7 @@ export function SortableTableHead({
   direction = "asc",
   onClick,
   className,
+  buttonClassName,
   ...props
 }: SortableTableHeadProps) {
   const ariaSort = sorted
@@ -41,7 +45,11 @@ export function SortableTableHead({
       <button
         type="button"
         onClick={onClick}
-        className="inline-flex items-center gap-1 rounded-none hover:text-foreground"
+        data-slot="sortable-table-head-button"
+        className={cn(
+          "inline-flex items-center gap-1 rounded-none hover:text-foreground",
+          buttonClassName
+        )}
       >
         {children}
         {sorted ? (
@@ -52,7 +60,7 @@ export function SortableTableHead({
           )
         ) : (
           <ChevronsUpDownIcon
-            className="size-3.5 opacity-40"
+            className="size-3.5 text-muted-foreground"
             aria-hidden="true"
           />
         )}

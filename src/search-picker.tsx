@@ -5,19 +5,14 @@ import * as React from "react"
 import { Input } from "./input.js"
 import { Label } from "./label.js"
 import {
+  foldSearchText,
+  handleListboxKey,
   listboxOptionId,
-  moveListboxHighlight,
-  scrollOptionIntoView,
 } from "./internal/listbox-navigation.js"
-import { listboxEmpty, optionState } from "./internal/styles.js"
+import { ListboxEmptyStatus, ListboxOption } from "./internal/listbox-option.js"
 import { cn } from "./utils.js"
 
-/**
- * Case-fold and strip combining marks so "nino" matches "Niño".
- */
-export function foldSearchText(value: string) {
-  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
-}
+export { foldSearchText }
 
 /**
  * Default SearchPicker filter: the folded label includes the folded query.
@@ -47,7 +42,10 @@ export type SearchPickerProps<T> = {
   className?: string
   /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
   listClassName?: string
-}
+} & Omit<React.ComponentProps<"div">, "children" | "onSelect" | "defaultValue">
+
+/** Frame shared by the listbox and the empty state that replaces it. */
+const listFrame = "border border-input bg-background"
 
 /**
  * Always-visible combobox: a labelled input and a listbox. Unlike Combobox,
@@ -68,6 +66,7 @@ function SearchPicker<T>({
   disabled,
   className,
   listClassName,
+  ...props
 }: SearchPickerProps<T>) {
   const [query, setQuery] = React.useState("")
   const listId = React.useId()
@@ -115,6 +114,7 @@ function SearchPicker<T>({
   }
 
   const active = filtered[highlight]
+  const empty = filtered.length === 0
 
   const selectItem = (item: T) => {
     onSelect(item)
@@ -122,34 +122,29 @@ function SearchPicker<T>({
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    const nextHighlight = moveListboxHighlight(
-      event.key,
+    const handled = handleListboxKey(event, {
       highlight,
-      filtered.length
-    )
-    if (nextHighlight !== undefined) {
-      event.preventDefault()
-      setHighlight(nextHighlight)
+      length: filtered.length,
+      setHighlight,
+      onEnter: (index) => {
+        const item = filtered[index]
+        if (item) selectItem(item)
+      },
+    })
+    if (handled || event.key !== "Escape") return
+    event.preventDefault()
+    if (query) {
+      setQuery("")
       return
     }
-    if (event.key === "Enter") {
-      event.preventDefault()
-      if (active) selectItem(active)
-    }
-    if (event.key === "Escape") {
-      event.preventDefault()
-      if (query) {
-        setQuery("")
-        return
-      }
-      event.currentTarget.blur()
-    }
+    event.currentTarget.blur()
   }
 
   return (
     <div
       data-slot="search-picker"
       className={cn("flex flex-col gap-1.5", className)}
+      {...props}
     >
       <Label htmlFor={inputId}>{label}</Label>
       <Input
@@ -171,45 +166,39 @@ function SearchPicker<T>({
         id={listId}
         role="listbox"
         aria-label={listLabel ?? label}
-        className={cn(
-          "max-h-60 overflow-y-auto border border-input bg-background",
-          listClassName
-        )}
+        className={
+          empty
+            ? "sr-only"
+            : cn("max-h-60 overflow-y-auto", listFrame, listClassName)
+        }
       >
-        {filtered.length === 0 ? (
-          <li className={listboxEmpty}>{emptyText}</li>
-        ) : (
-          filtered.map((item, index) => {
-            const itemValue = getValue(item)
-            const isSelected = itemValue === value
-            const isActive = index === highlight
-            return (
-              <li key={itemValue} role="none">
-                <button
-                  ref={isActive ? scrollOptionIntoView : undefined}
-                  id={listboxOptionId(listId, index)}
-                  type="button"
-                  role="option"
-                  aria-selected={isSelected}
-                  disabled={disabled}
-                  className={cn(
-                    "relative flex w-full cursor-default items-center rounded-none py-2 pr-3 pl-3 text-left text-sm outline-hidden select-none",
-                    isSelected && optionState.selected,
-                    isActive && optionState.active,
-                    isActive &&
-                      !isSelected &&
-                      "bg-accent text-accent-foreground"
-                  )}
-                  onMouseEnter={() => setHighlight(index)}
-                  onClick={() => selectItem(item)}
-                >
-                  <span className="truncate">{getLabel(item)}</span>
-                </button>
-              </li>
-            )
-          })
-        )}
+        {filtered.map((item, index) => {
+          const itemValue = getValue(item)
+          return (
+            <ListboxOption
+              key={itemValue}
+              data-slot="search-picker-option"
+              listId={listId}
+              index={index}
+              active={index === highlight}
+              selected={itemValue === value}
+              disabled={disabled}
+              className="pr-3"
+              onMouseEnter={() => setHighlight(index)}
+              onClick={() => selectItem(item)}
+            >
+              <span className="truncate">{getLabel(item)}</span>
+            </ListboxOption>
+          )
+        })}
       </ul>
+      <ListboxEmptyStatus
+        data-slot="search-picker-empty"
+        empty={empty}
+        className={listFrame}
+      >
+        {emptyText}
+      </ListboxEmptyStatus>
     </div>
   )
 }

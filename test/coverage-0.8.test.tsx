@@ -40,6 +40,7 @@ describe("FormSelectField", () => {
     )
     const trigger = screen.getByRole("combobox", { name: "Plan" })
     expect(trigger).not.toHaveAttribute("aria-invalid")
+    expect(trigger).not.toHaveAttribute("aria-describedby")
     expect(trigger).toHaveTextContent("Pick a plan")
     expect(screen.queryByRole("alert")).toBeNull()
 
@@ -69,10 +70,10 @@ describe("FormSelectField", () => {
         <SelectItem value="free">Free</SelectItem>
       </FormSelectField>
     )
-    expect(screen.getByRole("combobox", { name: "Plan" })).toHaveAttribute(
-      "aria-invalid",
-      "true"
-    )
+    const trigger = screen.getByRole("combobox", { name: "Plan" })
+    expect(trigger).toHaveAttribute("aria-invalid", "true")
+    // WCAG 1.3.1 / 3.3.1: the error is the trigger's description.
+    expect(trigger).toHaveAccessibleDescription("Choose a plan")
     expect(screen.getByRole("alert")).toHaveTextContent("Choose a plan")
   })
 })

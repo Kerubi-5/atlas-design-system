@@ -37,11 +37,11 @@ theme from `next-themes`, so toast consumers install that too.
 | `button`                      | `Button`, `buttonVariants`, `quietButtonInteraction`; `variant`, `size`, `asChild`; outline/ghost hover is brand purple + selected wash, not muted grey                                                                                                                                                                                                                                  |
 | `badge`                       | `Badge`, `badgeVariants`; `variant`, `tone`, `asChild`                                                                                                                                                                                                                                                                                                                                   |
 | `calendar`                    | `Calendar`, `CalendarDayButton`; React Day Picker props and `buttonVariant`                                                                                                                                                                                                                                                                                                              |
-| `card`                        | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`; root uses `min-h-min shrink-0` so flex columns do not collapse it, and `min-w-0` so nested tables scroll; `CardContent className="px-0"` overrides padding without `!`                                                                                         |
+| `card`                        | `Card`, `CardHeader`, `CardTitle`, `CardDescription`, `CardAction`, `CardContent`, `CardFooter`; `Card` supports `flush`; `CardTitle as="h2"` (up to `h4`) makes it a section heading; root uses `min-h-min shrink-0` so flex columns do not collapse it, and `min-w-0` so nested tables scroll; `CardContent className="px-0"` overrides padding without `!`                            |
 | `checkbox`                    | `Checkbox`                                                                                                                                                                                                                                                                                                                                                                               |
 | `color-legend`                | `ColorLegend`; `title`, `items` as `{ color, range?, label }[]`, optional `caption`, `children`, `aria-label`, `className` (overlay chrome). No attribution.                                                                                                                                                                                                                             |
 | `combobox`                    | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text, `creatable`, `normalizeCreateValue` (query → value or `null`), `createLabel`; trigger matches Input/SelectTrigger chrome; keyboard highlight scrolls into view; create is a listbox option selected with Enter                                                        |
-| `date-picker`                 | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`) and `side`                                                                                           |
+| `date-picker`                 | `DatePickerButton`, `toDate`, `formatLocalDate`, `DateRange`; `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`), `side`, `aria-labelledby`, and `aria-describedby`                                                   |
 | `date-time-picker`            | `DateTimePickerButton`, `resolveTimeStep`, `DEFAULT_TIME_STEP`; controlled `value` is `Date` or `null`; `onChange` emits `Date \                                                                                                                                                                                                                                                         |
 | `dialog`                      | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton`                                                                                                                                                                                                                                                       |
 | `dropdown-menu`               | `DropdownMenu` family (trigger, content, item, checkbox/radio items, label, separator, shortcut, sub menus); item `variant="destructive"` and `inset`; for commands, not values                                                                                                                                                                                                          |
@@ -52,7 +52,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `input`, `textarea`, `label`  | `Input`, `Textarea`, `Label`                                                                                                                                                                                                                                                                                                                                                             |
 | `markdown`                    | `Markdown`, `MarkdownContent`; `content`, optional `className`. GFM via `react-markdown` + `remark-gfm` in this subpath only. Sanitized (no raw HTML; http/https/mailto/#/`/` URLs). Token styles, no typography plugin.                                                                                                                                                                 |
 | `meter`                       | `Meter`; `value`, `max`, optional `min` (default 0), `fillClassName`, `markers` as `{ position, className? }[]`, required `aria-label`, `className`. `role="meter"`. Not `Progress`.                                                                                                                                                                                                     |
-| `pagination`                  | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink` (`isActive` sets `aria-current`, the selected wash, and a selected border), `PaginationPrevious`, `PaginationNext`, `PaginationEllipsis`                                                                                                                                                                           |
+| `pagination`                  | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink` (`isActive` sets `aria-current`, the selected wash, and a selected border; `disabled` drops the `href` for a page that does not exist, such as Previous on page 1), `PaginationPrevious`, `PaginationNext` (custom text becomes the link name), `PaginationEllipsis`                                               |
 | `popover`                     | `Popover`, trigger, anchor, content, header, title, description                                                                                                                                                                                                                                                                                                                          |
 | `progress`                    | `Progress`; Radix props, `value` 0–100; label it with `aria-label` or `aria-labelledby`. For a value against a scale with ticks, use `Meter`.                                                                                                                                                                                                                                            |
 | `radio-group`                 | `RadioGroup`, `RadioGroupItem`; short visible lists; arrow keys move the selection; round dots                                                                                                                                                                                                                                                                                           |
@@ -77,7 +77,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `form/select-field`           | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta` and placeholder; select item children                                                                                                                                                                                                                                                                              |
 | `form/date-picker-field`      | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta`, placeholder, and `className` (forwarded to the trigger)                                                                                                                                                                                                                                                       |
 | `form/date-time-picker-field` | `FormDateTimePickerField`; `value` is `Date` or `null`; `onValueChange` emits `Date \                                                                                                                                                                                                                                                                                                    |
-| `form/field-error`            | `FieldError`, `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                                        |
+| `form/field-error`            | `FieldError` (optional `id`), `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                        |
 | `form/feedback-field`         | `FormFeedbackField`; nullable `message`                                                                                                                                                                                                                                                                                                                                                  |
 | `next/tabs-nav-link`          | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                                                                                                                                                                                                                                                                        |
 | `utils`                       | `cn`, `onInputChange`                                                                                                                                                                                                                                                                                                                                                                    |
@@ -95,6 +95,34 @@ changelog calls out every change: `accordion`, `alert`, `avatar`,
 `breadcrumb`, `color-legend`, `date-time-picker`, `dropdown-menu`, `info-tip`,
 `markdown`, `meter`, `pagination`, `progress`, `radio-group`, `search-picker`,
 `slider`, `spinner`, `stat-tile`, `switch`, `tooltip`.
+
+## Styling parts
+
+Every component takes `className` for its root and passes other HTML props
+through to it. Where a part sits inside a component, a prop names it, and
+each part carries a `data-slot` for parent selectors such as
+`*:data-[slot=stat-tile-value]:text-2xl`.
+
+| Component                                          | Part props                                                                                                                               | Slots                                                                                                                     |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `DialogContent`                                    | `overlayClassName`, `closeButtonClassName`                                                                                               | `dialog-close-button` (the built-in X; your own `DialogClose` keeps `dialog-close`)                                       |
+| `SelectTrigger`                                    | a `className` height replaces `size`                                                                                                     | `select-icon`, `select-viewport`, `select-item-indicator`                                                                 |
+| `TooltipContent`                                   | `arrowClassName`                                                                                                                         | `tooltip-arrow`                                                                                                           |
+| `Combobox`                                         | `contentClassName` (panel, default trigger width), `listClassName`; button props go to trigger                                           | `combobox-search`, `combobox-list`, `combobox-option`                                                                     |
+| `SearchPicker`                                     | `listClassName`; div props go to the root                                                                                                | `search-picker-option`, `search-picker-empty`                                                                             |
+| `InfoTip`                                          | `contentClassName`; button props go to the trigger                                                                                       |                                                                                                                           |
+| `DatePickerButton`, `DateTimePickerButton`         | `contentClassName`, `calendarProps` (disabled days, `startMonth`, `endMonth`, `weekStartsOn`, `locale`)                                  | `date-picker-value`, `date-picker-footer`, `date-time-picker-time`                                                        |
+| `form/*` fields                                    | `fieldClassName` (wrapper); `className` styles the control; `FormSelectField` `contentClassName`; `FormMarkdownField` `previewClassName` | `form-field`, `form-field-header`, `form-field-description`, `form-field-error`, `form-feedback`, `form-markdown-preview` |
+| `Table`                                            | `containerClassName` (the scroll box, e.g. `max-h-96 overflow-y-auto`); `className` styles the `<table>`                                 |                                                                                                                           |
+| `TabsList`, `TabsNav`                              | `scrollerClassName`; `TabsNav` `listClassName`; a list `className` height replaces `h-11`                                                | `tabs-scroller`                                                                                                           |
+| `SortableTableHead`                                | `buttonClassName`                                                                                                                        | `sortable-table-head-button`                                                                                              |
+| `AccordionTrigger`, `AccordionContent`             | `headerClassName`; `AccordionContent` `className` styles the inner box                                                                   | `accordion-header`, `accordion-content-inner`                                                                             |
+| `Progress`                                         | `indicatorClassName`                                                                                                                     | `progress-indicator`                                                                                                      |
+| `Meter`                                            | `fillClassName`                                                                                                                          | `meter-fill`, `meter-marker`                                                                                              |
+| `StatTile`                                         |                                                                                                                                          | `stat-tile-label`, `stat-tile-value`, `stat-tile-sub`                                                                     |
+| `ColorLegend`                                      |                                                                                                                                          | `color-legend-title`, `-list`, `-item`, `-swatch`, `-range`, `-label`, `-caption`                                         |
+| `RadioGroupItem`                                   |                                                                                                                                          | `radio-group-dot`                                                                                                         |
+| `EmptyPanel`, `ErrorFallback`, `TableBodySkeleton` | `className`                                                                                                                              | `empty-panel`, `error-boundary`                                                                                           |
 
 ## Forms
 
@@ -120,7 +148,12 @@ for a Write / Preview GFM body. `FormSelectField`, `FormDatePickerField`, and
 `FormDatePickerField` takes a `Date` or `yyyy-MM-dd` string and calls
 `onValueChange` with `Date | undefined`. `FormDateTimePickerField` takes a
 `Date` or `null` and calls `onValueChange` with `Date | null`. `FieldError`
-accepts either `message` or pre-resolved `text`.
+accepts either `message` or pre-resolved `text`, and an `id` to point the
+control's `aria-describedby` at. Every `form/*` field does that for you: the
+error text (and `FormTextField`'s `description`) is the control's accessible
+description. The date fields label their trigger with `aria-labelledby` (the
+label, then the trigger) rather than `<label for>`, so the picked date is
+part of its name.
 
 `DatePickerButton` is single-day by default. For a from/to range, set
 `mode="range"`; `value` is `{ from, to }` (each side `Date` or `yyyy-MM-dd`)
@@ -130,6 +163,12 @@ one month below `md` and two months at `md+` unless `numberOfMonths` is set,
 clamps to the viewport with collision padding and scroll, stays `w-auto` so
 it does not collapse to the default popover width, and includes a Clear
 action. Pass `side` to prefer a placement; Radix still flips on collision.
+The popover is a dialog named "Choose date" ("Choose dates" in range mode),
+and focus moves to the selected day, or today, when it opens. Pass
+`aria-labelledby` and `aria-describedby` to name and describe the trigger;
+to keep the date in its name, list the label's id and then `${id}-value`,
+the trigger text's id (a `<label for>` alone names the button by the label
+only).
 `FormDatePickerField` forwards `className` to that trigger.
 
 `DateTimePickerButton` is the date-and-time control. `value` is a `Date` or
@@ -139,7 +178,9 @@ pair (24-hour, stepped by `timeStep`, default 15), and Clear. Picking a day
 keeps the popover open so the time can be set; the time selects stay
 disabled until a day is chosen. The panel is `w-auto`, sized by the
 calendar, and clamped to the viewport so it stays on-screen at 390px. Pass
-`side` to prefer a placement. `FormDateTimePickerField` forwards `className`
+`side` to prefer a placement. Like `DatePickerButton`, the popover is a
+named dialog ("Choose date and time") that focuses the selected day or
+today, and the trigger takes `aria-labelledby` and `aria-describedby`. `FormDateTimePickerField` forwards `className`
 and `timeStep` to that control.
 
 Outline and ghost `Button` hover uses `border-selected-foreground`,
@@ -205,8 +246,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ```
 
 `ThemeProvider` is a client component and does not import Next.js. It stores the
-choice under `atlas-theme` unless `storageKey` is set. Pass `enableShortcut={false}`
-to disable the `d` dark/light toggle.
+choice under `atlas-theme` unless `storageKey` is set. The `d` dark/light toggle
+is off by default; pass `enableShortcut` to turn it on, and give people a setting
+to turn it off again, since a single-key shortcut can fire by accident (WCAG 2.1.4).
 
 ## URL navigation in Next.js
 

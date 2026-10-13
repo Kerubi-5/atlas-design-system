@@ -38,6 +38,12 @@ function FieldLegend({
   )
 }
 
+/**
+ * Stack of fields and the `@container/field-group` that responsive fields
+ * query. It keeps `w-full`: an inline-size container has no intrinsic
+ * width, so without it the group collapses to zero in a flex row or any
+ * shrink-to-fit parent. Override with `className` (`w-auto`, `max-w-md`).
+ */
 function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
@@ -51,16 +57,23 @@ function FieldGroup({ className, ...props }: React.ComponentProps<"div">) {
   )
 }
 
+/**
+ * Vertical (and responsive, below `@md`) fields are a flex column, so
+ * children stretch to the field's width by default (`align-items: stretch`)
+ * while a child's own width class (`w-32`, `w-fit`) still wins. The field
+ * itself sets no width: it fills a block or column parent and sizes to its
+ * content in a row.
+ */
 const fieldVariants = cva(
-  "group/field flex w-full gap-3 data-[invalid=true]:text-destructive",
+  "group/field flex gap-3 data-[invalid=true]:text-destructive",
   {
     variants: {
       orientation: {
-        vertical: "flex-col *:w-full [&>.sr-only]:w-auto",
+        vertical: "flex-col",
         horizontal:
           "flex-row items-center has-[>[data-slot=field-content]]:items-start *:data-[slot=field-label]:flex-auto has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
         responsive:
-          "flex-col *:w-full @md/field-group:flex-row @md/field-group:items-center @md/field-group:*:w-auto @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto [&>.sr-only]:w-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
+          "flex-col @md/field-group:flex-row @md/field-group:items-center @md/field-group:has-[>[data-slot=field-content]]:items-start @md/field-group:*:data-[slot=field-label]:flex-auto @md/field-group:has-[>[data-slot=field-content]]:[&>[role=checkbox],[role=radio]]:mt-px",
       },
     },
     defaultVariants: {

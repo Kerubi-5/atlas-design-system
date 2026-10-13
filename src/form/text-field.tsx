@@ -5,7 +5,12 @@ import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
 
 import type { FieldMetaState } from "./field-error.js"
-import { FormFieldShell, invalidWhen, metaErrorText } from "./field-shell.js"
+import {
+  describedBy,
+  FormFieldShell,
+  invalidWhen,
+  metaErrorText,
+} from "./field-shell.js"
 
 export type TextFieldApi = {
   name: string
@@ -31,6 +36,8 @@ export function FormTextField({
   autoComplete,
   required,
   minLength,
+  className,
+  fieldClassName,
 }: {
   field: TextFieldApi
   /**
@@ -60,9 +67,14 @@ export function FormTextField({
   autoComplete?: string
   required?: boolean
   minLength?: number
+  /** Forwarded to the input or textarea. */
+  className?: string
+  /** Classes for the field wrapper (label, hint, control, and error). */
+  fieldClassName?: string
 }) {
   const onChange = onInputChange(field.handleChange)
   const errorText = showError ? metaErrorText(field.state.meta) : undefined
+  const descriptionId = description ? `${id}-description` : undefined
   const controlProps = {
     id,
     value: field.state.value,
@@ -72,13 +84,26 @@ export function FormTextField({
     autoComplete,
     required,
     minLength,
+    className,
     "aria-invalid": invalidWhen(errorText),
+    "aria-describedby": describedBy(id, errorText, descriptionId),
   }
 
   return (
-    <FormFieldShell id={id} label={label} errorText={errorText}>
+    <FormFieldShell
+      id={id}
+      label={label}
+      errorText={errorText}
+      className={fieldClassName}
+    >
       {description ? (
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p
+          id={descriptionId}
+          data-slot="form-field-description"
+          className="text-xs text-muted-foreground"
+        >
+          {description}
+        </p>
       ) : null}
       {multiline ? (
         <Textarea {...controlProps} rows={rows} />

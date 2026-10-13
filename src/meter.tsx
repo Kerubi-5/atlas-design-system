@@ -1,3 +1,6 @@
+import type * as React from "react"
+
+import { clamp } from "./internal/math.js"
 import { cn } from "./utils.js"
 
 export type MeterMarker = {
@@ -6,7 +9,10 @@ export type MeterMarker = {
   className?: string
 }
 
-export type MeterProps = {
+export type MeterProps = Omit<
+  React.ComponentProps<"div">,
+  "children" | "role" | "aria-label"
+> & {
   value: number
   min?: number
   max: number
@@ -30,20 +36,24 @@ function Meter({
   markers,
   "aria-label": ariaLabel,
   className,
+  ...props
 }: MeterProps) {
   const span = max - min
+  // A NaN reading (missing data upstream) draws and announces as empty.
+  const current = Number.isFinite(value) ? value : min
   const toPercent = (amount: number) => {
     if (span === 0) return 0
-    return Math.min(100, Math.max(0, ((amount - min) / span) * 100))
+    return clamp(((amount - min) / span) * 100, 0, 100)
   }
 
   return (
     <div
+      {...props}
       role="meter"
       data-slot="meter"
       aria-valuemin={min}
       aria-valuemax={max}
-      aria-valuenow={Math.min(max, Math.max(min, value))}
+      aria-valuenow={clamp(current, min, max)}
       aria-label={ariaLabel}
       className={cn(
         "relative h-1.5 w-full overflow-hidden bg-muted",
@@ -53,7 +63,7 @@ function Meter({
       <div
         data-slot="meter-fill"
         className={cn("h-full", fillClassName)}
-        style={{ width: `${toPercent(value)}%` }}
+        style={{ width: `${toPercent(current)}%` }}
       />
       {markers?.map((marker) => (
         <div

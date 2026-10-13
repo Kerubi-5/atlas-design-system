@@ -5,6 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Toggle as TogglePrimitive } from "radix-ui"
 
 import {
+  controlSize,
   disabledState,
   focusRing,
   invalidState,
@@ -35,10 +36,9 @@ const toggleVariants = cva(
         outline: "border border-input bg-transparent",
       },
       size: {
-        default:
-          "h-10 min-w-10 px-6 has-data-[icon=inline-end]:pr-4 has-data-[icon=inline-start]:pl-4",
-        sm: "h-9 min-w-9 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
-        lg: "h-11 min-w-11 px-8 has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5",
+        default: `${controlSize.default} min-w-10`,
+        sm: `${controlSize.sm} min-w-9`,
+        lg: `${controlSize.lg} min-w-11`,
       },
     },
     defaultVariants: {

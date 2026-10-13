@@ -21,3 +21,11 @@ export const pickerContentClassName =
 
 /** Gutter used when a calendar popover collides with the viewport. */
 export const PICKER_COLLISION_PADDING = 16
+
+/**
+ * Id of a picker trigger's value text. A form field lists it after the label
+ * id in `aria-labelledby` so the trigger reads "label, value".
+ */
+export function pickerValueId(id: string) {
+  return `${id}-value`
+}

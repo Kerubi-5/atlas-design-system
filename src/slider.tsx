@@ -1,11 +1,15 @@
 "use client"
 
+import type * as React from "react"
 import { Slider as SliderPrimitive } from "radix-ui"
 
-import { dataDisabledState, focusRing } from "./internal/styles.js"
+import { dataDisabledState, focusRing, hitArea44 } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
-export type SliderProps = {
+export type SliderProps = Omit<
+  React.ComponentProps<typeof SliderPrimitive.Root>,
+  "value" | "defaultValue" | "onValueChange" | "onValueCommit" | "children"
+> & {
   value: number
   onValueChange: (value: number) => void
   onValueCommit?: (value: number) => void
@@ -13,6 +17,7 @@ export type SliderProps = {
   max?: number
   step?: number
   disabled?: boolean
+  /** Goes on the thumb, so a `<Label htmlFor>` names the slider. */
   id?: string
   name?: string
   className?: string
@@ -22,7 +27,9 @@ export type SliderProps = {
 
 /**
  * Single-thumb range on Radix Slider. Square track and thumb, primary fill,
- * solid focus ring, 44px thumb hit area. Pair with a visible `Label`.
+ * solid focus ring, 44px thumb hit area. Pair with a visible `Label`. Other
+ * props (`orientation`, `inverted`, `data-*`) go to the Radix root; `id`
+ * and the accessible name go to the thumb.
  */
 function Slider({
   value,
@@ -31,21 +38,19 @@ function Slider({
   min = 0,
   max = 100,
   step = 1,
-  disabled,
   id,
-  name,
   className,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
+  ...props
 }: SliderProps) {
   return (
     <SliderPrimitive.Root
       data-slot="slider"
-      name={name}
+      {...props}
       min={min}
       max={max}
       step={step}
-      disabled={disabled}
       value={[value]}
       onValueChange={(next) => {
         const amount = next[0]
@@ -77,7 +82,8 @@ function Slider({
         data-slot="slider-thumb"
         className={cn(
           focusRing,
-          "relative block size-4 shrink-0 rounded-none border border-primary bg-background shadow-xs after:absolute after:top-1/2 after:left-1/2 after:size-11 after:-translate-x-1/2 after:-translate-y-1/2"
+          hitArea44,
+          "relative block size-4 shrink-0 rounded-none border border-primary bg-background shadow-xs"
         )}
       />
     </SliderPrimitive.Root>

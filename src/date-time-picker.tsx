@@ -2,16 +2,13 @@
 
 import * as React from "react"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
 
-import { Button } from "./button.js"
+import { LazyCalendar } from "./lazy-calendar.js"
 import {
-  PICKER_COLLISION_PADDING,
-  pickerContentClassName,
-  pickerTriggerClassName,
-} from "./internal/form-control.js"
-import { LazyCalendar, preloadCalendar } from "./lazy-calendar.js"
-import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
+  PickerClearFooter,
+  PickerShell,
+  type PickerTriggerProps,
+} from "./picker-shell.js"
 import {
   Select,
   SelectContent,
@@ -19,12 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./select.js"
-import { cn } from "./utils.js"
 
 /** Default clock increment, in minutes. Must divide 60. */
 export const DEFAULT_TIME_STEP = 15
 
-export type DateTimePickerButtonProps = {
+export type DateTimePickerButtonProps = PickerTriggerProps & {
   /** Controlled instant. `null` or omitted is empty. */
   value?: Date | null
   onChange: (date: Date | null) => void
@@ -33,15 +29,6 @@ export type DateTimePickerButtonProps = {
    * Values that do not divide 60 fall back to 15 so the list stays even.
    */
   timeStep?: number
-  id?: string
-  placeholder?: string
-  disabled?: boolean
-  className?: string
-  "aria-invalid"?: boolean
-  /** Popover side. Defaults to `bottom`; Radix still flips on collision. */
-  side?: React.ComponentProps<typeof PopoverContent>["side"]
-  /** Month shown when the popover opens; falls back to the selected date. */
-  defaultMonth?: Date
 }
 
 /**
@@ -112,150 +99,127 @@ function preventDismissForPortaledSelect(event: {
  * chrome as Input, SelectTrigger, and DatePickerButton). `value` is a `Date`
  * or `null`. Picking a day keeps the popover open so the time can be set;
  * Clear emits `null`. One month only, clamped to the viewport, so the panel
- * stays on-screen at a 390px width.
+ * stays on-screen at a 390px width. `className` styles the trigger,
+ * `contentClassName` the popover, and `calendarProps` reaches Day Picker.
  */
 export function DateTimePickerButton({
-  id,
   value,
   onChange,
   timeStep,
   placeholder = "Pick a date and time",
-  disabled,
-  className,
-  "aria-invalid": ariaInvalid,
-  side,
   defaultMonth,
+  calendarProps,
+  ...shell
 }: DateTimePickerButtonProps) {
   const [open, setOpen] = React.useState(false)
   const date = value ?? null
   const step = resolveTimeStep(timeStep)
   const empty = date == null
-  const label = date ? format(date, "PPP p") : placeholder
   const hourId = React.useId()
   const minuteId = React.useId()
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          id={id}
-          type="button"
-          variant="outline"
-          disabled={disabled}
-          aria-invalid={ariaInvalid}
-          data-empty={empty}
-          className={cn(pickerTriggerClassName, className)}
-          onPointerEnter={preloadCalendar}
-          onFocus={preloadCalendar}
-        >
-          <CalendarIcon data-icon="inline-start" />
-          {label}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        align="start"
-        side={side}
-        collisionPadding={PICKER_COLLISION_PADDING}
-        onInteractOutside={preventDismissForPortaledSelect}
-        className={cn("w-auto min-w-0", pickerContentClassName)}
-      >
-        <LazyCalendar
-          mode="single"
-          selected={date ?? undefined}
-          defaultMonth={defaultMonth ?? date ?? undefined}
-          onSelect={(next) => {
-            // Re-clicking a selected day would clear it; require Clear instead
-            // so a time already set is not dropped by an accidental second tap.
-            if (!next) return
-            onChange(
-              combineDateAndTime(
-                next,
-                date?.getHours() ?? 0,
-                date?.getMinutes() ?? 0
-              )
+    <PickerShell
+      {...shell}
+      empty={empty}
+      label={date ? format(date, "PPP p") : placeholder}
+      dialogLabel="Choose date and time"
+      open={open}
+      onOpenChange={setOpen}
+      onInteractOutside={preventDismissForPortaledSelect}
+    >
+      <LazyCalendar
+        {...calendarProps}
+        mode="single"
+        autoFocus
+        selected={date ?? undefined}
+        defaultMonth={defaultMonth ?? date ?? undefined}
+        onSelect={(next) => {
+          // Re-clicking a selected day would clear it; require Clear instead
+          // so a time already set is not dropped by an accidental second tap.
+          if (!next) return
+          onChange(
+            combineDateAndTime(
+              next,
+              date?.getHours() ?? 0,
+              date?.getMinutes() ?? 0
             )
-          }}
-        />
-        <div
-          role="group"
-          aria-label="Time"
-          className="flex min-w-0 flex-col gap-2 border-t p-3"
-        >
-          <p className="text-xs font-semibold tracking-wide uppercase">Time</p>
-          <div className="flex min-w-0 items-center gap-2">
-            <Select
-              value={date ? padTimePart(date.getHours()) : undefined}
-              onValueChange={(nextHour) => {
-                if (!date) return
-                onChange(
-                  combineDateAndTime(date, Number(nextHour), date.getMinutes())
-                )
-              }}
-              disabled={empty}
-            >
-              <SelectTrigger
-                id={hourId}
-                aria-label="Hour"
-                className="min-w-0 flex-1"
-              >
-                <SelectValue placeholder="––" />
-              </SelectTrigger>
-              <SelectContent>
-                {HOUR_OPTIONS.map((hour) => (
-                  <SelectItem key={hour} value={hour}>
-                    {hour}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <span className="text-muted-foreground" aria-hidden="true">
-              :
-            </span>
-            <Select
-              value={date ? padTimePart(date.getMinutes()) : undefined}
-              onValueChange={(nextMinute) => {
-                if (!date) return
-                onChange(
-                  combineDateAndTime(date, date.getHours(), Number(nextMinute))
-                )
-              }}
-              disabled={empty}
-            >
-              <SelectTrigger
-                id={minuteId}
-                aria-label="Minute"
-                className="min-w-0 flex-1"
-              >
-                <SelectValue placeholder="––" />
-              </SelectTrigger>
-              <SelectContent>
-                {minuteOptions(step, date?.getMinutes()).map((minute) => {
-                  const value = padTimePart(minute)
-                  return (
-                    <SelectItem key={value} value={value}>
-                      {value}
-                    </SelectItem>
-                  )
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-        <div className="flex justify-end border-t p-2">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            disabled={empty}
-            onClick={() => {
-              onChange(null)
-              setOpen(false)
+          )
+        }}
+      />
+      <div
+        role="group"
+        aria-label="Time"
+        data-slot="date-time-picker-time"
+        className="flex min-w-0 flex-col gap-2 border-t p-3"
+      >
+        <p className="text-xs font-semibold tracking-wide uppercase">Time</p>
+        <div className="flex min-w-0 items-center gap-2">
+          <Select
+            value={date ? padTimePart(date.getHours()) : undefined}
+            onValueChange={(nextHour) => {
+              if (!date) return
+              onChange(
+                combineDateAndTime(date, Number(nextHour), date.getMinutes())
+              )
             }}
+            disabled={empty}
           >
-            Clear
-          </Button>
+            <SelectTrigger
+              id={hourId}
+              aria-label="Hour"
+              className="min-w-0 flex-1"
+            >
+              <SelectValue placeholder="––" />
+            </SelectTrigger>
+            <SelectContent>
+              {HOUR_OPTIONS.map((hour) => (
+                <SelectItem key={hour} value={hour}>
+                  {hour}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span className="text-muted-foreground" aria-hidden="true">
+            :
+          </span>
+          <Select
+            value={date ? padTimePart(date.getMinutes()) : undefined}
+            onValueChange={(nextMinute) => {
+              if (!date) return
+              onChange(
+                combineDateAndTime(date, date.getHours(), Number(nextMinute))
+              )
+            }}
+            disabled={empty}
+          >
+            <SelectTrigger
+              id={minuteId}
+              aria-label="Minute"
+              className="min-w-0 flex-1"
+            >
+              <SelectValue placeholder="––" />
+            </SelectTrigger>
+            <SelectContent>
+              {minuteOptions(step, date?.getMinutes()).map((minute) => {
+                const value = padTimePart(minute)
+                return (
+                  <SelectItem key={value} value={value}>
+                    {value}
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
         </div>
-      </PopoverContent>
-    </Popover>
+      </div>
+      <PickerClearFooter
+        disabled={empty}
+        onClear={() => {
+          onChange(null)
+          setOpen(false)
+        }}
+      />
+    </PickerShell>
   )
 }

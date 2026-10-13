@@ -1,3 +1,4 @@
+import { fireEvent } from "@testing-library/react"
 import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
@@ -125,6 +126,88 @@ describe("Combobox", () => {
     await user.type(search, "zzzz")
     expect(screen.queryByRole("option")).not.toBeInTheDocument()
     expect(screen.getByText("No currencies")).toBeVisible()
+    // Announced from a status region outside the listbox, which may own
+    // only options (role=none wrappers are transparent).
+    expect(screen.getByRole("status")).toHaveTextContent("No currencies")
+    for (const child of Array.from(screen.getByRole("listbox").children)) {
+      expect(child).toHaveAttribute("role", "none")
+    }
+  })
+
+  it("names the listbox and the search field", async () => {
+    const user = createUser()
+    render(
+      <Combobox
+        aria-label="Currency"
+        options={options}
+        onValueChange={vi.fn()}
+      />
+    )
+    await user.click(screen.getByRole("combobox", { name: "Currency" }))
+    expect(await screen.findByRole("listbox")).toHaveAccessibleName("Currency")
+    expect(screen.getByRole("textbox", { name: "Search" })).toBeVisible()
+  })
+
+  it("names the listbox from the <label> for the trigger", async () => {
+    const user = createUser()
+    render(
+      <div>
+        <label htmlFor="currency">Currency</label>
+        <Combobox id="currency" options={options} onValueChange={vi.fn()} />
+      </div>
+    )
+    await openCombobox(user)
+    expect(screen.getByRole("listbox")).toHaveAccessibleName("Currency")
+  })
+
+  it.each(["{ArrowDown}", "{ArrowUp}", "{Alt>}{ArrowDown}{/Alt}"])(
+    "opens from the focused trigger with %s",
+    async (keys) => {
+      const user = createUser()
+      render(<ComboboxHarness />)
+      await user.tab()
+      expect(getCombobox()).toHaveFocus()
+
+      await user.keyboard(keys)
+      await waitFor(() => {
+        expect(screen.getByRole("listbox")).toBeInTheDocument()
+      })
+      expect(getCombobox()).toHaveAttribute("aria-expanded", "true")
+    }
+  )
+
+  it("keeps options out of the Tab order and marks the highlighted one", async () => {
+    const user = createUser()
+    render(<ComboboxHarness />)
+    await openCombobox(user)
+    const search = screen.getByPlaceholderText("Search")
+    await waitFor(() => expect(search).toHaveFocus())
+
+    for (const option of screen.getAllByRole("option")) {
+      expect(option).toHaveAttribute("tabindex", "-1")
+    }
+    const highlighted = screen.getByRole("option", { name: "US Dollar" })
+    expect(highlighted.className).toMatch(/bg-accent/)
+    expect(highlighted.className).toMatch(/shadow-\[inset_2px/)
+
+    await user.tab()
+    expect(document.activeElement).not.toHaveAttribute("role", "option")
+  })
+
+  it("does not select on Enter while an IME is composing", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn()
+    render(<ComboboxHarness onValueChange={onValueChange} />)
+    await openCombobox(user)
+
+    const search = screen.getByPlaceholderText("Search")
+    fireEvent.keyDown(search, { key: "Enter", keyCode: 229, isComposing: true })
+    fireEvent.keyDown(search, { key: "Enter", isComposing: true })
+    expect(onValueChange).not.toHaveBeenCalled()
+    expect(screen.getByRole("listbox")).toBeInTheDocument()
+
+    fireEvent.keyDown(search, { key: "Enter" })
+    expect(onValueChange).toHaveBeenCalledWith("usd")
   })
 
   it("moves the highlight with arrows, Home, and End, then selects with Enter", async () => {
