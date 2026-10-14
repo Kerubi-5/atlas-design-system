@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.11.2 - 2026-10-14
+
+Patch: Card accessibility and visible keyboard focus. The public API is unchanged.
+
+- `Card` only applies accessible names when given a region or landmark role;
+  ordinary cards no longer expose prohibited naming attributes.
+- Controls separate their solid keyboard focus ring from filled backgrounds
+  with a 2px gap, keeping the ring visible on primary buttons in both themes.
+
 ## 0.11.1 - 2026-10-14
 
 Patch: calendar keyboard focus and picker rendering. The public API is

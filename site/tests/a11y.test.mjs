@@ -212,7 +212,10 @@ test("every story passes WCAG 2.2 AA checks in light and dark", async () => {
   const server = await serve()
   const baseUrl = `http://127.0.0.1:${server.address().port}`
   const browser = await chromium.launch()
-  const context = await browser.newContext({ reducedMotion: "reduce" })
+  const context = await browser.newContext({
+    reducedMotion: "reduce",
+    viewport: { width: 1280, height: 900 },
+  })
 
   const jobs = stories.flatMap((entry) =>
     THEMES.map((theme) => () => auditStory(context, baseUrl, entry, theme))
@@ -247,7 +250,10 @@ test("open overlays pass WCAG 2.2 AA checks in light and dark", async () => {
   const server = await serve()
   const baseUrl = `http://127.0.0.1:${server.address().port}`
   const browser = await chromium.launch()
-  const context = await browser.newContext({ reducedMotion: "reduce" })
+  const context = await browser.newContext({
+    reducedMotion: "reduce",
+    viewport: { width: 1280, height: 900 },
+  })
   const problems = []
   try {
     for (const overlay of OVERLAYS) {
@@ -272,4 +278,46 @@ test("open overlays pass WCAG 2.2 AA checks in light and dark", async () => {
     [],
     `${problems.length} accessibility violations:\n${problems.join("\n")}`
   )
+})
+
+test("audited controls pass WCAG 2.2 AA at 390px in both themes", async () => {
+  const index = JSON.parse(
+    await fs.readFile(path.join(distDir, "index.json"), "utf8")
+  )
+  const affected =
+    /^(actions-button|overlays-info-tip|layout-card|navigation-tabs|forms-combobox|forms-search-picker|forms-calendar|overlays-dialog|feedback-toast)--/
+  const stories = Object.values(index.entries).filter(
+    (entry) => entry.type === "story" && affected.test(entry.id)
+  )
+  assert.ok(stories.length > 0)
+  const server = await serve()
+  const baseUrl = `http://127.0.0.1:${server.address().port}`
+  const browser = await chromium.launch()
+  const context = await browser.newContext({
+    reducedMotion: "reduce",
+    viewport: { width: 390, height: 844 },
+  })
+  const problems = []
+  try {
+    for (const entry of stories) {
+      for (const theme of THEMES)
+        problems.push(...(await auditStory(context, baseUrl, entry, theme)))
+    }
+    for (const overlay of OVERLAYS.filter(([id]) => affected.test(id))) {
+      for (const theme of THEMES)
+        problems.push(
+          ...(await auditStory(
+            context,
+            baseUrl,
+            index.entries[overlay[0]],
+            theme,
+            overlay
+          ))
+        )
+    }
+  } finally {
+    await browser.close()
+    server.close()
+  }
+  assert.deepEqual(problems, [], problems.join("\n"))
 })
