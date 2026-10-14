@@ -14,15 +14,33 @@ function Card({
   className,
   size = "default",
   flush = false,
+  role,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
   ...props
 }: React.ComponentProps<"div"> & {
   size?: "default" | "sm"
   flush?: boolean
 }) {
+  const canName =
+    role &&
+    [
+      "region",
+      "main",
+      "navigation",
+      "complementary",
+      "banner",
+      "contentinfo",
+      "form",
+      "search",
+    ].includes(role)
   return (
     <div
       data-slot="card"
       data-size={size}
+      role={role}
+      aria-label={canName ? ariaLabel : undefined}
+      aria-labelledby={canName ? ariaLabelledBy : undefined}
       className={cn(
         "group/card flex min-h-min min-w-0 shrink-0 flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
         size === "sm"

@@ -94,6 +94,35 @@ describe("Input and Label", () => {
 })
 
 describe("Card", () => {
+  it("only names cards with a region or landmark role", () => {
+    const { rerender } = render(
+      <Card aria-label="Budget" aria-labelledby="budget-title">
+        Body
+      </Card>
+    )
+    const card = screen.getByText("Body")
+    expect(card).not.toHaveAttribute("aria-label")
+    expect(card).not.toHaveAttribute("aria-labelledby")
+    rerender(
+      <Card role="region" aria-label="Budget">
+        Body
+      </Card>
+    )
+    expect(screen.getByRole("region", { name: "Budget" })).toBe(card)
+    rerender(
+      <Card role="main" aria-labelledby="budget-title">
+        <h1 id="budget-title">Budget</h1>
+      </Card>
+    )
+    expect(screen.getByRole("main", { name: "Budget" })).toBe(card)
+    rerender(
+      <Card role="generic" aria-label="Budget">
+        Body
+      </Card>
+    )
+    expect(card).not.toHaveAttribute("aria-label")
+  })
+
   it("renders composed sections and size or flush attributes", () => {
     const { rerender } = render(
       <Card>

@@ -7,9 +7,9 @@
  * one of these by hand.
  */
 
-/** Keyboard focus: a ring-colored border plus a solid 2px ring (WCAG 1.4.11). */
+/** Keyboard focus: a solid 2px ring separated from filled controls (WCAG 1.4.11). */
 export const focusRing =
-  "outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring"
+  "outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 
 /** `aria-invalid`: destructive border and a soft glow; the error text carries the message. */
 export const invalidState =
