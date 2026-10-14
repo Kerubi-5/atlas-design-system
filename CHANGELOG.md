@@ -1,11 +1,16 @@
 # Changelog
 
-## Unreleased
+## 0.11.1 - 2026-10-14
 
-- Keep calendar DOM nodes and keyboard focus through parent renders with stable
-  adapters in `src/calendar.tsx`.
-- Share the indexed search path in `src/internal/search.ts` and memoized picker
-  rows in `src/internal/listbox-option.tsx`; cache Combobox creation checks.
+Patch: calendar keyboard focus and picker rendering. The public API is
+unchanged.
+
+- `Calendar` keeps month-navigation keyboard focus when its parent
+  re-renders. Those controls used to be recreated on every parent update,
+  which dropped focus out of the grid.
+- `Combobox` and `SearchPicker` highlight and filter long lists without
+  re-rendering every row. Combobox creation checks are cached until the
+  query or options change.
 
 ## 0.11.0 - 2026-10-12
 
