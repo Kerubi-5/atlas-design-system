@@ -18,6 +18,7 @@ const skipExports = new Set([
   "./COMPONENTS.md",
   // Helpers and the Next adapter are not mountable Storybook canvases.
   "./utils",
+  "./next/nav-link",
   "./next/tabs-nav-link",
 ])
 

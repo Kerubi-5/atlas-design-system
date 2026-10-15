@@ -5,6 +5,7 @@ const controls = [
   ["overlays-info-tip--layouts", "[data-slot=info-tip-trigger]"],
   ["navigation-tabs--composition", "[data-slot=tabs-trigger]"],
   ["navigation-tabs--nav", "[data-slot=tabs-list] a"],
+  ["navigation-nav-link--shell", "[data-slot=nav-link]"],
   ["forms-combobox--playground", "[role=combobox]"],
   ["forms-search-picker--example", "input"],
   ["forms-calendar--single-day", "[data-slot=button]:not(:disabled)"],

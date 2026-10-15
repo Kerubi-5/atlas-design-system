@@ -140,7 +140,10 @@ triggers as outline buttons in application code.
 
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
-Next adapter provides `TabsNavLink` with this behavior. `TabsNav` and `TabsList`
+Next adapter provides `TabsNavLink` with this behavior. App-shell destinations
+(Calendar, Tasks, Settings) use `NavLink` from `nav-link`: a pill with `active`
+from the app, not tabs. Pass `asChild` for a router link, or use the optional
+Next adapter `next/nav-link`. `TabsNav` and `TabsList`
 scroll overflowing labels inside themselves (`overflow-x-auto overflow-y-hidden`,
 with padding for the active border and focus ring counted in the scroller
 height, and an edge fade like `Table`). Do not wrap them in another

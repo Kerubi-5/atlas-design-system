@@ -26,7 +26,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `markdown`, `form/markdown-field`                                                                      | `npm i react-markdown@^10.1.0 remark-gfm@^4.0.1` |
 | `theme-provider`                                                                                       | `npm i next-themes@^0.4.6`                       |
 | `toast`                                                                                                | `npm i sonner@^2.0.7 next-themes@^0.4.6`         |
-| `next/tabs-nav-link`                                                                                   | `npm i next@^16.0.0`                             |
+| `next/nav-link`, `next/tabs-nav-link`                                                                  | `npm i next@^16.0.0`                             |
 
 | Subpath                       | Main exports and options                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -52,6 +52,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `input`, `textarea`, `label`  | `Input`, `Textarea`, `Label`; `Label` `required` shows a visible marker (set `required` on the control too)                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `markdown`                    | `Markdown`, `MarkdownContent`; `content`, optional `className`. GFM via `react-markdown` + `remark-gfm` in this subpath only. Sanitized (no raw HTML; http/https/mailto/#/`/` URLs). Token styles, no typography plugin.                                                                                                                                                                                                                                                                                     |
 | `meter`                       | `Meter`; `value`, `max`, optional `min` (default 0), `fillClassName`, `markers` as `{ position, className? }[]`, required `aria-label`, `className`. `role="meter"`. Not `Progress`.                                                                                                                                                                                                                                                                                                                         |
+| `nav-link`                    | `NavLink`, `navLinkVariants`; required `active` boolean, `asChild` for router links. Pill chrome: inactive `text-muted-foreground` + `hover:bg-accent`, active selected wash. No router.                                                                                                                                                                                                                                                                                                                     |
 | `pagination`                  | `Pagination`, `PaginationContent`, `PaginationItem`, `PaginationLink` (`isActive` sets `aria-current`, the selected wash, and a selected border; `disabled` drops the `href` for a page that does not exist, such as Previous on page 1), `PaginationPrevious`, `PaginationNext` (custom text becomes the link name), `PaginationEllipsis`                                                                                                                                                                   |
 | `popover`                     | `Popover`, trigger, anchor, content, header, title, description                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | `progress`                    | `Progress`; Radix props, `value` 0–100; label it with `aria-label` or `aria-labelledby`. For a value against a scale with ticks, use `Meter`.                                                                                                                                                                                                                                                                                                                                                                |
@@ -79,6 +80,7 @@ theme from `next-themes`, so toast consumers install that too.
 | `form/date-time-picker-field` | `FormDateTimePickerField`; `value` is `Date` or `null`; `onValueChange` emits `Date` or `null`; optional `meta`, placeholder, `timeStep`, `required`, `minDate` / `maxDate`, and `className` (forwarded to the trigger)                                                                                                                                                                                                                                                                                      |
 | `form/field-error`            | `FieldError` (optional `id`), `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `form/feedback-field`         | `FormFeedbackField`; nullable `message`                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `next/nav-link`               | `NavLink`; Next Link props and required `active` boolean; same pill as `nav-link`; requires Next.js 16                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `next/tabs-nav-link`          | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `utils`                       | `cn`, `onInputChange`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `theme.css`                   | Tailwind 4 theme; installation in [README](./README.md)                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
@@ -93,8 +95,8 @@ a deprecation notice first, removal in a later minor release.
 **Beta** components may still change shape in a minor release; the
 changelog calls out every change: `accordion`, `alert`, `avatar`,
 `breadcrumb`, `color-legend`, `date-time-picker`, `dropdown-menu`, `info-tip`,
-`markdown`, `meter`, `pagination`, `progress`, `radio-group`, `search-picker`,
-`slider`, `spinner`, `stat-tile`, `switch`, `tooltip`.
+`markdown`, `meter`, `nav-link`, `pagination`, `progress`, `radio-group`,
+`search-picker`, `slider`, `spinner`, `stat-tile`, `switch`, `tooltip`.
 
 ## Styling parts
 
@@ -262,6 +264,50 @@ choice under `atlas-theme` unless `storageKey` is set. The `d` dark/light toggle
 is off by default; pass `enableShortcut` to turn it on, and give people a setting
 to turn it off again, since a single-key shortcut can fire by accident (WCAG 2.1.4).
 
+## App shell navigation
+
+Pill links for top-level destinations (Calendar, Tasks, Settings). Pass
+`active` from the route; the kit does not read the URL. Wrap a router link
+with `asChild`, or use the optional Next adapter.
+
+```tsx
+import Link from "next/link"
+import { NavLink } from "atlas-react-kit/nav-link"
+
+export function AppNav({ pathname }: { pathname: string }) {
+  return (
+    <nav aria-label="App" className="flex items-center gap-1">
+      <NavLink asChild active={pathname === "/calendar"}>
+        <Link href="/calendar">Calendar</Link>
+      </NavLink>
+      <NavLink asChild active={pathname === "/tasks"}>
+        <Link href="/tasks">Tasks</Link>
+      </NavLink>
+    </nav>
+  )
+}
+```
+
+```tsx
+import { NavLink } from "atlas-react-kit/next/nav-link"
+
+export function AppNav({ pathname }: { pathname: string }) {
+  return (
+    <nav aria-label="App" className="flex items-center gap-1">
+      <NavLink href="/calendar" active={pathname === "/calendar"}>
+        Calendar
+      </NavLink>
+      <NavLink href="/tasks" active={pathname === "/tasks"}>
+        Tasks
+      </NavLink>
+    </nav>
+  )
+}
+```
+
+In-page view switches that still belong in the URL use `TabsNav`, not
+`NavLink`.
+
 ## URL navigation in Next.js
 
 ```tsx
@@ -309,5 +355,5 @@ export function ViewSwitcher({ view }: { view: string }) {
 ```
 
 Hook-driven controls and form handlers declare their client boundary; presentational
-modules such as `button`, `badge`, `card`, and `skeleton` can be composed from
+modules such as `button`, `badge`, `card`, `nav-link`, and `skeleton` can be composed from
 React Server Components. Pass interactive callbacks from client components.
