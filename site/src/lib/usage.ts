@@ -4,24 +4,17 @@
  */
 export const beta = new Set([
   "Accordion",
-  "Alert",
   "Avatar",
   "Breadcrumb",
   "Color legend",
   "Date time picker",
   "Dropdown menu",
   "Info tip",
-  "Markdown",
-  "Meter",
   "Pagination",
-  "Progress",
   "Radio group",
   "Search picker",
-  "Slider",
   "Spinner",
-  "Stat tile",
   "Switch",
-  "Tooltip",
 ])
 
 /**

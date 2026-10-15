@@ -91,10 +91,9 @@ through the deprecation policy in
 a deprecation notice first, removal in a later minor release.
 
 **Beta** components may still change shape in a minor release; the
-changelog calls out every change: `accordion`, `alert`, `avatar`,
-`breadcrumb`, `color-legend`, `date-time-picker`, `dropdown-menu`, `info-tip`,
-`markdown`, `meter`, `pagination`, `progress`, `radio-group`, `search-picker`,
-`slider`, `spinner`, `stat-tile`, `switch`, `tooltip`.
+changelog calls out every change: `accordion`, `avatar`, `breadcrumb`,
+`color-legend`, `date-time-picker`, `dropdown-menu`, `info-tip`,
+`pagination`, `radio-group`, `search-picker`, `spinner`, `switch`.
 
 ## Styling parts
 

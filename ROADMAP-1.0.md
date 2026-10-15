@@ -30,6 +30,8 @@ For every component in the [current beta list](./COMPONENTS.md#status), decide
 whether to promote it or keep it beta in 1.0.
 
 - [ ] Promote each one that apps have used for a release without API change.
+      Done for `alert`, `markdown`, `meter`, `progress`, `slider`,
+      `stat-tile`, and `tooltip`; the rest still need a decision.
 - [ ] Anything still beta at 1.0 is documented as exempt from semver.
 
 ### Support policy

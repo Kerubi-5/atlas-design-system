@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- `alert`, `markdown`, `meter`, `progress`, `slider`, `stat-tile`, and
+  `tooltip` are stable. KairOS has used each one across releases, and their
+  0.11 and 0.12 changes were additive. From now on, changes to them follow
+  the deprecation policy in CONTRIBUTING.md. Nothing changes in the code.
+
 ## 0.12.0 - 2026-10-15
 
 Minor: date limits, a visible required marker, and toast stacks that meet
