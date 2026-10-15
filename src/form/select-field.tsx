@@ -18,6 +18,8 @@ type Props = {
   label: string
   onValueChange: (value: string) => void
   placeholder?: string
+  /** Requires a value (native form validation) and marks the label. */
+  required?: boolean
   /** Forwarded to the select trigger. */
   className?: string
   /** Classes for the field wrapper (label, trigger, and error). */
@@ -34,6 +36,7 @@ export function FormSelectField({
   label,
   onValueChange,
   placeholder,
+  required,
   className,
   fieldClassName,
   contentClassName,
@@ -47,12 +50,14 @@ export function FormSelectField({
       id={id}
       label={label}
       errorText={errorText}
+      required={required}
       className={fieldClassName}
     >
-      <Select value={value} onValueChange={onValueChange}>
+      <Select value={value} onValueChange={onValueChange} required={required}>
         <SelectTrigger
           id={id}
           className={className}
+          aria-required={required || undefined}
           aria-invalid={invalidWhen(errorText)}
           aria-describedby={describedBy(id, errorText)}
         >

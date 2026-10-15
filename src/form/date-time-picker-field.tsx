@@ -2,7 +2,7 @@
 
 import { useId } from "react"
 
-import type { DatePickerCalendarProps } from "../date-picker.js"
+import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import { DateTimePickerButton } from "../date-time-picker.js"
 
 import type { FieldMetaState } from "./field-error.js"
@@ -19,6 +19,12 @@ type Props = {
   meta?: FieldMetaState
   placeholder?: string
   disabled?: boolean
+  /** Marks the label and adds "Required" to the trigger's description. */
+  required?: boolean
+  /** Earliest day that can be picked; earlier days are disabled. */
+  minDate?: DateLike
+  /** Latest day that can be picked; later days are disabled. */
+  maxDate?: DateLike
   /** Minute increment forwarded to the picker. */
   timeStep?: number
   /** Forwarded to the date-time picker trigger. */
@@ -36,6 +42,7 @@ export function FormDateTimePickerField({
   onValueChange,
   label,
   meta,
+  required,
   fieldClassName,
   ...picker
 }: Props) {
@@ -47,13 +54,14 @@ export function FormDateTimePickerField({
       id={id}
       label={label}
       errorText={errorText}
+      required={required}
       className={fieldClassName}
     >
       <DateTimePickerButton
         {...picker}
         id={id}
         onChange={onValueChange}
-        {...pickerFieldAria(id, errorText)}
+        {...pickerFieldAria(id, errorText, required)}
       />
     </FormFieldShell>
   )

@@ -36,6 +36,14 @@ export function errorIdFor(id: string) {
 }
 
 /**
+ * Id of the hidden "Required" text `FormFieldShell` renders for a required
+ * control `id`, for controls that cannot carry `required` themselves.
+ */
+export function requiredIdFor(id: string) {
+  return `${id}-required`
+}
+
+/**
  * `aria-describedby` for the control: the given hint ids, plus the error
  * text while there is one, or `undefined` when there is nothing to read.
  */
@@ -53,13 +61,22 @@ export function describedBy(
 /**
  * Trigger ARIA for the date and date-time fields: invalid while there is
  * error text, named "label, value" (a `<label for>` alone would hide the
- * picked value), and described by the error.
+ * picked value), and described by "Required" (a button cannot take
+ * `aria-required`) and the error.
  */
-export function pickerFieldAria(id: string, errorText: string | undefined) {
+export function pickerFieldAria(
+  id: string,
+  errorText: string | undefined,
+  required?: boolean
+) {
   return {
     "aria-invalid": invalidWhen(errorText),
     "aria-labelledby": `${labelIdFor(id)} ${pickerValueId(id)}`,
-    "aria-describedby": describedBy(id, errorText),
+    "aria-describedby": describedBy(
+      id,
+      errorText,
+      required ? requiredIdFor(id) : undefined
+    ),
   }
 }
 
@@ -69,6 +86,7 @@ export function pickerFieldAria(id: string, errorText: string | undefined) {
  * Set `labelFor` to false when the control is not rendered (Markdown
  * preview), so the label does not point at a missing element.
  * `className` styles the wrapper (`data-slot="form-field"`), e.g. a width.
+ * `required` marks the label; the control still sets its own `required`.
  */
 export function FormFieldShell({
   id,
@@ -76,6 +94,7 @@ export function FormFieldShell({
   labelAction,
   errorText,
   labelFor = true,
+  required,
   className,
   children,
 }: {
@@ -84,11 +103,16 @@ export function FormFieldShell({
   labelAction?: ReactNode
   errorText: string | undefined
   labelFor?: boolean
+  required?: boolean
   className?: string
   children: ReactNode
 }) {
   const labelNode = (
-    <Label id={labelIdFor(id)} htmlFor={labelFor ? id : undefined}>
+    <Label
+      id={labelIdFor(id)}
+      htmlFor={labelFor ? id : undefined}
+      required={required}
+    >
       {label}
     </Label>
   )
@@ -109,6 +133,11 @@ export function FormFieldShell({
         labelNode
       )}
       {children}
+      {required ? (
+        <span id={requiredIdFor(id)} hidden>
+          Required
+        </span>
+      ) : null}
       <FieldError id={errorIdFor(id)} text={errorText} />
     </div>
   )

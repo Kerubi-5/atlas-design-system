@@ -37,6 +37,7 @@ export function FormMarkdownField({
   placeholder = "Markdown supported",
   rows = 5,
   showError = true,
+  required,
   className,
   fieldClassName,
   previewClassName,
@@ -51,6 +52,8 @@ export function FormMarkdownField({
   placeholder?: string
   rows?: number
   showError?: boolean
+  /** Sets `required` on the Write textarea and marks the label. */
+  required?: boolean
   /** Forwarded to the Write textarea. */
   className?: string
   /** Classes for the field wrapper (label row, body, and error). */
@@ -73,6 +76,7 @@ export function FormMarkdownField({
       label={label}
       errorText={errorText}
       labelFor={mode === "write"}
+      required={required}
       className={fieldClassName}
       labelAction={
         <ToggleGroup
@@ -103,6 +107,7 @@ export function FormMarkdownField({
           onBlur={field.handleBlur}
           placeholder={placeholder}
           rows={rows}
+          required={required}
           className={className}
           aria-invalid={invalidWhen(errorText)}
           aria-describedby={describedBy(id, errorText)}

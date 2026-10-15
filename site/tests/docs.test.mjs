@@ -24,15 +24,6 @@ const THEMES = ["light", "dark"]
 const WIDTHS = [1280, 390]
 const CONCURRENCY = 4
 
-/**
- * Known component findings outside the docs chrome, skipped here so this
- * gate covers the docs site itself. On the Toast page every story's toasts
- * collapse into one docs-wide stack, where the close buttons of the toasts
- * behind sit closer than 24px to the front one (a Toaster issue, tracked
- * separately from the docs-site fixes).
- */
-const KNOWN = { "feedback-toast--docs": ["target-size"] }
-
 async function settle(page) {
   await page.addStyleTag({
     content:
@@ -99,7 +90,6 @@ async function auditDocs(context, baseUrl, entry, theme, width) {
       )
     }
     for (const violation of await runAxe(page)) {
-      if (KNOWN[entry.id]?.includes(violation.id)) continue
       problems.push(
         `${label}: ${violation.id} (${violation.help}) at ${violation.targets.slice(0, 3).join(", ")}`
       )

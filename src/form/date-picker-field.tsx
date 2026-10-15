@@ -22,6 +22,12 @@ type Props = {
   meta?: FieldMetaState
   placeholder?: string
   disabled?: boolean
+  /** Marks the label and adds "Required" to the trigger's description. */
+  required?: boolean
+  /** Earliest day that can be picked; earlier days are disabled. */
+  minDate?: DateLike
+  /** Latest day that can be picked; later days are disabled. */
+  maxDate?: DateLike
   /** Forwarded to the date picker trigger. */
   className?: string
   /** Classes for the field wrapper (label, trigger, and error). */
@@ -37,6 +43,7 @@ export function FormDatePickerField({
   onValueChange,
   label,
   meta,
+  required,
   fieldClassName,
   ...picker
 }: Props) {
@@ -48,13 +55,14 @@ export function FormDatePickerField({
       id={id}
       label={label}
       errorText={errorText}
+      required={required}
       className={fieldClassName}
     >
       <DatePickerButton
         {...picker}
         id={id}
         onChange={onValueChange}
-        {...pickerFieldAria(id, errorText)}
+        {...pickerFieldAria(id, errorText, required)}
       />
     </FormFieldShell>
   )

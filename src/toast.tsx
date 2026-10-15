@@ -1,6 +1,6 @@
 "use client"
 
-import type { ReactNode } from "react"
+import { useState, type FocusEvent, type ReactNode } from "react"
 import {
   CircleAlertIcon,
   CircleCheckIcon,
@@ -135,13 +135,19 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * is the badge itself; the X is 12px. `overflow-visible` on the toast and
  * toaster keeps stacked badges from being clipped.
  *
+ * Stacking: while the stack is collapsed, every part of the toasts behind
+ * the front one is `invisible`. Their badges would otherwise peek out above
+ * the front toast, closer together than the 24px target spacing, and their
+ * buttons would stay in the tab order unseen. Hovering or focusing the stack
+ * expands it (see `Toaster`), which shows them again.
+ *
  * Padding is asymmetric: `pl-4` matches Alert; `pr-6` clears the badge
  * (about 16px of it sits inside the border). Icon-to-text is `gap-x-2.5`
  * so the status icon and copy read as one unit.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast:
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-6 text-sm text-popover-foreground shadow-md",
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-6 text-sm text-popover-foreground shadow-md data-[expanded=false]:data-[front=false]:*:invisible",
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
   // falls back to the title's width, so a one-word toast stays compact.
@@ -182,7 +188,9 @@ const icons: SonnerProps["icons"] = {
 
 /**
  * Mount one near the app root, and show toasts with `toast()` from this
- * module. Only the props declared here reach the library.
+ * module. Only the props declared here reach the library. The stack
+ * expands while keyboard focus is inside it, as it does on hover, so every
+ * toast's buttons are visible and reachable.
  */
 const Toaster = ({
   position,
@@ -192,19 +200,32 @@ const Toaster = ({
   duration,
 }: ToasterProps) => {
   const { theme = "system" } = useTheme()
+  const [focusWithin, setFocusWithin] = useState(false)
+  const onBlur = (event: FocusEvent<HTMLDivElement>) => {
+    if (!event.currentTarget.contains(event.relatedTarget)) {
+      setFocusWithin(false)
+    }
+  }
 
   return (
-    <Sonner
-      theme={theme as SonnerProps["theme"]}
-      className="toaster group overflow-visible"
-      position={position}
-      closeButton={closeButton}
-      expand={expand}
-      visibleToasts={visibleToasts}
-      duration={duration}
-      icons={icons}
-      toastOptions={{ unstyled: true, classNames }}
-    />
+    <div
+      data-slot="toaster"
+      className="contents"
+      onFocus={() => setFocusWithin(true)}
+      onBlur={onBlur}
+    >
+      <Sonner
+        theme={theme as SonnerProps["theme"]}
+        className="toaster group overflow-visible"
+        position={position}
+        closeButton={closeButton}
+        expand={expand || focusWithin}
+        visibleToasts={visibleToasts}
+        duration={duration}
+        icons={icons}
+        toastOptions={{ unstyled: true, classNames }}
+      />
+    </div>
   )
 }
 

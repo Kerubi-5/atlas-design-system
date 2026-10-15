@@ -7,6 +7,7 @@ import { LazyCalendar } from "./lazy-calendar.js"
 import {
   PickerClearFooter,
   PickerShell,
+  limitCalendarProps,
   type PickerTriggerProps,
 } from "./picker-shell.js"
 import {
@@ -109,6 +110,8 @@ export function DateTimePickerButton({
   placeholder = "Pick a date and time",
   defaultMonth,
   calendarProps,
+  minDate,
+  maxDate,
   ...shell
 }: DateTimePickerButtonProps) {
   const [open, setOpen] = React.useState(false)
@@ -129,7 +132,7 @@ export function DateTimePickerButton({
       onInteractOutside={preventDismissForPortaledSelect}
     >
       <LazyCalendar
-        {...calendarProps}
+        {...limitCalendarProps(calendarProps, minDate, maxDate)}
         mode="single"
         autoFocus
         selected={date ?? undefined}
