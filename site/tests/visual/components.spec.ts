@@ -142,6 +142,7 @@ const toastVariantIds = toastVariantStories.map((story) => story.id)
 
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([
+  "navigation-nav-link--shell",
   "examples-fields--trigger-alignment",
   "forms-date-time-picker--playground",
   "forms-date-picker--range-reference",

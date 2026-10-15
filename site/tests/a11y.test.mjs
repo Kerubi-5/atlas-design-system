@@ -290,7 +290,7 @@ test("audited controls pass WCAG 2.2 AA at 390px in both themes", async () => {
     await fs.readFile(path.join(distDir, "index.json"), "utf8")
   )
   const affected =
-    /^(actions-button|overlays-info-tip|layout-card|navigation-tabs|forms-combobox|forms-search-picker|forms-calendar|forms-date-picker|forms-date-time-picker|overlays-dialog|feedback-toast)--/
+    /^(actions-button|overlays-info-tip|layout-card|navigation-tabs|navigation-nav-link|forms-combobox|forms-search-picker|forms-calendar|forms-date-picker|forms-date-time-picker|overlays-dialog|feedback-toast)--/
   const stories = Object.values(index.entries).filter(
     (entry) => entry.type === "story" && affected.test(entry.id)
   )
