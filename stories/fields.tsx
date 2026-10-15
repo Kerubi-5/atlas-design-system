@@ -72,7 +72,12 @@ export function FormHelpersStory() {
 
   return (
     <div className="grid max-w-md gap-4">
-      <FormTextField field={name} label="Name" description="Shown on exports" />
+      <FormTextField
+        field={name}
+        label="Name"
+        description="Shown on exports"
+        required
+      />
       <FormMarkdownField field={notes} label="Notes" rows={4} />
       <FormSelectField
         label="Currency"
@@ -86,6 +91,7 @@ export function FormHelpersStory() {
         label="As of"
         value={date}
         onValueChange={setDate}
+        required
         placeholder="Pick a date"
       />
       <FormDateTimePickerField

@@ -5,10 +5,28 @@ import { Label as LabelPrimitive } from "radix-ui"
 
 import { cn } from "./utils.js"
 
+type LabelProps = React.ComponentProps<typeof LabelPrimitive.Root> & {
+  /**
+   * Shows a visible required marker after the text. The marker is hidden
+   * from assistive tech, so set `required` (or `aria-required`) on the
+   * control too; screen readers announce it from there.
+   */
+  required?: boolean
+  /** Classes for the required marker (`data-slot="label-required"`). */
+  requiredClassName?: string
+}
+
+/**
+ * Form label. `required` adds a visible marker; style it with
+ * `requiredClassName` or the `label-required` slot.
+ */
 function Label({
   className,
+  required,
+  requiredClassName,
+  children,
   ...props
-}: React.ComponentProps<typeof LabelPrimitive.Root>) {
+}: LabelProps) {
   return (
     <LabelPrimitive.Root
       data-slot="label"
@@ -17,8 +35,20 @@ function Label({
         className
       )}
       {...props}
-    />
+    >
+      {children}
+      {required ? (
+        <span
+          data-slot="label-required"
+          aria-hidden="true"
+          className={cn("-ml-1.5 text-destructive", requiredClassName)}
+        >
+          *
+        </span>
+      ) : null}
+    </LabelPrimitive.Root>
   )
 }
 
 export { Label }
+export type { LabelProps }

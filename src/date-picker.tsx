@@ -1,62 +1,28 @@
 "use client"
 
 import * as React from "react"
-import { format, isSameDay, parseISO } from "date-fns"
+import { format, isSameDay } from "date-fns"
 import type { DateRange } from "react-day-picker"
 
+import { toDate, type DateLike } from "./internal/date-like.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
 import { LazyCalendar } from "./lazy-calendar.js"
 import {
   PickerClearFooter,
   PickerShell,
+  limitCalendarProps,
   type PickerCalendarProps,
   type PickerTriggerProps,
 } from "./picker-shell.js"
 
 export type { DateRange }
-
-export type DateLike = Date | string | number | null | undefined
+export type { DateLike }
+export { toDate }
 
 /** From/to value for `DatePickerButton` in range mode; each side is `DateLike`. */
 export type DatePickerRangeValue = {
   from?: DateLike
   to?: DateLike
-}
-
-/**
- * Coerce a date-like value to a local `Date`.
- * Plain calendar dates (`yyyy-MM-dd`) parse as local midnight so they do not
- * shift when the runtime timezone is behind UTC.
- */
-export function toDate(value: DateLike): Date | undefined {
-  if (value == null || value === "") return undefined
-  if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? undefined : value
-  }
-  if (typeof value === "number") {
-    const date = new Date(value)
-    return Number.isNaN(date.getTime()) ? undefined : date
-  }
-
-  const trimmed = value.trim()
-  const ymd = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed)
-  if (ymd) {
-    const year = Number(ymd[1])
-    const month = Number(ymd[2])
-    const day = Number(ymd[3])
-    const date = new Date(year, month - 1, day)
-    if (
-      date.getFullYear() !== year ||
-      date.getMonth() !== month - 1 ||
-      date.getDate() !== day
-    ) {
-      return undefined
-    }
-    return date
-  }
-
-  const parsed = parseISO(trimmed)
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed
 }
 
 /** Format a Date as a timezone-safe calendar date (`yyyy-MM-dd`). */
@@ -110,6 +76,8 @@ function DatePickerSingleButton({
   numberOfMonths,
   defaultMonth,
   calendarProps,
+  minDate,
+  maxDate,
   ...shell
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
@@ -125,7 +93,7 @@ function DatePickerSingleButton({
       onOpenChange={setOpen}
     >
       <LazyCalendar
-        {...calendarProps}
+        {...limitCalendarProps(calendarProps, minDate, maxDate)}
         mode="single"
         autoFocus
         selected={date}
@@ -147,6 +115,8 @@ function DatePickerRangeButton({
   numberOfMonths,
   defaultMonth,
   calendarProps,
+  minDate,
+  maxDate,
   ...shell
 }: DatePickerRangeProps) {
   const [open, setOpen] = React.useState(false)
@@ -175,7 +145,7 @@ function DatePickerRangeButton({
       onOpenChange={onOpenChange}
     >
       <LazyCalendar
-        {...calendarProps}
+        {...limitCalendarProps(calendarProps, minDate, maxDate)}
         mode="range"
         autoFocus
         selected={selected}

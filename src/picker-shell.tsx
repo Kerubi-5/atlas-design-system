@@ -2,9 +2,10 @@
 
 import * as React from "react"
 import { CalendarIcon } from "lucide-react"
-import type { PropsBase } from "react-day-picker"
+import type { Matcher, PropsBase } from "react-day-picker"
 
 import { Button } from "./button.js"
+import { toDate, type DateLike } from "./internal/date-like.js"
 import {
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
@@ -53,13 +54,54 @@ export type PickerTriggerProps = {
   side?: React.ComponentProps<typeof PopoverContent>["side"]
   /** Month shown when the popover opens; falls back to the selected date. */
   defaultMonth?: Date
+  /**
+   * Earliest day that can be picked. Earlier days are disabled and the
+   * calendar does not page before its month.
+   */
+  minDate?: DateLike
+  /**
+   * Latest day that can be picked. Later days are disabled and the calendar
+   * does not page past its month.
+   */
+  maxDate?: DateLike
   /** Day Picker options passed through to the calendar. */
   calendarProps?: PickerCalendarProps
 }
 
+/**
+ * `calendarProps` with `minDate` / `maxDate` applied: days outside them join
+ * any `disabled` matchers, and they bound paging unless `startMonth` /
+ * `endMonth` are set.
+ */
+export function limitCalendarProps(
+  calendarProps: PickerCalendarProps | undefined,
+  minDate: DateLike,
+  maxDate: DateLike
+): PickerCalendarProps | undefined {
+  const min = toDate(minDate)
+  const max = toDate(maxDate)
+  if (!min && !max) return calendarProps
+  const disabled = calendarProps?.disabled
+  const matchers: Matcher[] = [
+    ...(disabled === undefined
+      ? []
+      : Array.isArray(disabled)
+        ? disabled
+        : [disabled]),
+    ...(min ? [{ before: min }] : []),
+    ...(max ? [{ after: max }] : []),
+  ]
+  return {
+    ...calendarProps,
+    disabled: matchers,
+    startMonth: calendarProps?.startMonth ?? min,
+    endMonth: calendarProps?.endMonth ?? max,
+  }
+}
+
 type PickerShellProps = Omit<
   PickerTriggerProps,
-  "placeholder" | "defaultMonth" | "calendarProps"
+  "placeholder" | "defaultMonth" | "calendarProps" | "minDate" | "maxDate"
 > & {
   /** Muted trigger text while nothing is picked. */
   empty: boolean

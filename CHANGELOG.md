@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.12.0 - 2026-10-15
+
+Minor: date limits, a visible required marker, and toast stacks that meet
+the 24px target size. Every change is additive; existing props keep their
+behavior.
+
+- `DatePickerButton`, `DateTimePickerButton`, `FormDatePickerField`, and
+  `FormDateTimePickerField` take `minDate` and `maxDate` (`Date` or
+  `yyyy-MM-dd`). Days outside them are disabled, alongside any
+  `calendarProps.disabled`, and month paging stops there unless
+  `calendarProps` sets `startMonth` / `endMonth`.
+- `Label` (and so `FieldLabel`) takes `required`, which draws a visible `*`
+  hidden from screen readers, and `requiredClassName` for its styling
+  (`data-slot="label-required"`). `FormTextField`, `FormMarkdownField`,
+  `FormSelectField`, and both date fields take `required`: the label is
+  marked and the control is required (`required` on inputs and the textarea,
+  `aria-required` on the select trigger, a "Required" description on the
+  date triggers, which are buttons).
+- `Toaster` expands its stack while keyboard focus is inside it, as it does
+  on hover, and hides the parts of collapsed toasts behind the front one.
+  Their close badges used to peek out above the front toast, closer together
+  than WCAG 2.5.8 allows, and their buttons stayed in the tab order unseen.
+- `DateLike` and `toDate` now live in an internal module; `date-picker`
+  still exports both.
+
 ## 0.11.2 - 2026-10-14
 
 Patch: Card accessibility and visible keyboard focus. The public API is unchanged.

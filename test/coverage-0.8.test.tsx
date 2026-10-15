@@ -126,10 +126,14 @@ describe("FormMarkdownField", () => {
 })
 
 describe("toast action and cancel buttons", () => {
-  afterEach(() => {
+  // Wait for Sonner's unmount timers, so none fires after jsdom is torn down.
+  afterEach(async () => {
     act(() => {
       toast.dismiss()
     })
+    await waitFor(() =>
+      expect(document.querySelector("[data-sonner-toast]")).toBeNull()
+    )
   })
 
   it("calls the kit callbacks when action and cancel are clicked", async () => {

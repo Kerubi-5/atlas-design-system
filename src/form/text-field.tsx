@@ -65,6 +65,7 @@ export function FormTextField({
   /** When true (default), shows meta.errors and aria-invalid styling. */
   showError?: boolean
   autoComplete?: string
+  /** Sets `required` on the control and marks the label. */
   required?: boolean
   minLength?: number
   /** Forwarded to the input or textarea. */
@@ -94,6 +95,7 @@ export function FormTextField({
       id={id}
       label={label}
       errorText={errorText}
+      required={required}
       className={fieldClassName}
     >
       {description ? (

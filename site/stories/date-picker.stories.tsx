@@ -10,6 +10,8 @@ type Args = {
   placeholder: string
   disabled: boolean
   numberOfMonths: number
+  minDate?: string
+  maxDate?: string
 }
 const meta = {
   title: "Forms/Date picker",
@@ -27,6 +29,14 @@ const meta = {
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
     numberOfMonths: { control: { type: "number", min: 1, max: 3 } },
+    minDate: {
+      control: "text",
+      description: "Earliest day that can be picked (yyyy-MM-dd)",
+    },
+    maxDate: {
+      control: "text",
+      description: "Latest day that can be picked (yyyy-MM-dd)",
+    },
   },
   render: function Render(args) {
     const [, updateArgs] = useArgs()
@@ -50,6 +60,17 @@ type Story = StoryObj<typeof meta>
 export const Playground: Story = {}
 export const Empty: Story = { args: { value: "" } }
 export const Disabled: Story = { args: { disabled: true } }
+export const Limited: Story = {
+  args: { minDate: "2026-10-05", maxDate: "2026-10-23" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`minDate` and `maxDate` disable the days outside them and stop the month paging there.",
+      },
+    },
+  },
+}
 export const RangeReference: Story = {
   render: () => <DatePickerRangeStory />,
   parameters: {
