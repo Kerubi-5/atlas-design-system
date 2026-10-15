@@ -1,4 +1,4 @@
-import { act } from "react"
+import { act } from "@testing-library/react"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { DatePickerButton } from "../src/date-picker.js"
@@ -259,10 +259,14 @@ describe("visible required marker", () => {
 })
 
 describe("stacked toasts", () => {
-  afterEach(() => {
+  // Wait for Sonner's unmount timers, so none fires after jsdom is torn down.
+  afterEach(async () => {
     act(() => {
       toast.dismiss()
     })
+    await waitFor(() =>
+      expect(document.querySelector("[data-sonner-toast]")).toBeNull()
+    )
   })
 
   it("expands the stack while keyboard focus is inside it", async () => {
