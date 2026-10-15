@@ -23,6 +23,7 @@ const featureEntries = new Set([
   "form/date-time-picker-field",
   "form/markdown-field",
   "markdown",
+  "next/nav-link",
   "next/tabs-nav-link",
   "theme-provider",
   "toast",
@@ -113,11 +114,11 @@ describe("published modules", () => {
       [
         "--input-type=module",
         "-e",
-        'import { TabsNavLink } from "./dist/next/tabs-nav-link.js"; console.log(typeof TabsNavLink)',
+        'import { NavLink } from "./dist/next/nav-link.js"; import { TabsNavLink } from "./dist/next/tabs-nav-link.js"; console.log(typeof NavLink, typeof TabsNavLink)',
       ],
       { cwd: root }
     )
-    expect(stdout.trim()).toBe("function")
+    expect(stdout.trim()).toBe("function function")
   })
 
   it("publishes only kit artifacts, not the docs site or stories", () => {
@@ -260,6 +261,7 @@ describe("published modules", () => {
       "form/markdown-field",
       "form/select-field",
       "form/text-field",
+      "next/nav-link",
       "next/tabs-nav-link",
     ]) {
       const source = await readFile(resolve(root, `dist/${name}.js`), "utf8")
@@ -281,8 +283,11 @@ describe("published modules", () => {
   it("imports generic component modules without the framework adapter", async () => {
     const button = await import("../dist/button.js")
     const tabs = await import("../dist/tabs.js")
+    const navLink = await import("../dist/nav-link.js")
     expect(typeof button.Button).toBe("function")
     expect(typeof tabs.TabsNav).toBe("function")
     expect(tabs).not.toHaveProperty("TabsNavLink")
+    expect(typeof navLink.NavLink).toBe("function")
+    expect(typeof navLink.navLinkVariants).toBe("function")
   })
 })

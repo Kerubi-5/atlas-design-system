@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+Minor: additive shell `NavLink`. Existing exports are unchanged.
+
+- New: `NavLink` and `navLinkVariants` (`atlas-react-kit/nav-link`), a
+  pill-style app-shell link. Pass `active` from the app; the kit has no
+  router. `asChild` wraps a router `Link` (same Slot pattern as
+  `BreadcrumbLink`). Active uses the shared selected chrome (`bg-selected`,
+  `text-selected-foreground`, `border-selected-foreground`); inactive is
+  `text-muted-foreground` with `hover:bg-accent`.
+- New: optional Next adapter `atlas-react-kit/next/nav-link` (Next.js 16),
+  the same shape as `TabsNavLink`: Next `Link` props plus required `active`.
+- KairOS follow-up (separate PR): replace `components/app/nav-link.tsx`
+  after this ships.
+
 ## 0.12.0 - 2026-10-15
 
 Minor: date limits, a visible required marker, and toast stacks that meet

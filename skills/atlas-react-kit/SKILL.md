@@ -64,6 +64,7 @@ Import each component from its subpath, e.g.
 | Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                                          |
 | Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                            |
 | View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`                     |
+| App shell nav (Calendar, Tasks, Settings)       | `NavLink` from `nav-link` (`asChild` for a router link); Next: `next/nav-link`                                          |
 | Status chip (paid, pending, failed)             | `Badge variant="soft"` with `tone="success"`, `"warning"`, `"destructive"`, or `"neutral"`                              |
 | Data table                                      | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                                     |
 | Nothing to show yet                             | `EmptyPanel` from `empty-panel`                                                                                         |
