@@ -83,3 +83,33 @@ export const RangeReference: Story = {
     },
   },
 }
+export const NarrowRange: Story = {
+  render: () => (
+    <div className="w-64 max-w-full">
+      <DatePickerRangeStory />
+    </div>
+  ),
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: {
+        story:
+          "A full date range stays readable in a narrow sidebar or form column.",
+      },
+    },
+  },
+}
+export const Compact: Story = {
+  render: () => (
+    <DatePickerButton value="2026-10-09" onChange={() => {}} className="h-8" />
+  ),
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: {
+        story:
+          "Existing height utilities still size a compact one-line picker.",
+      },
+    },
+  },
+}

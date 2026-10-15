@@ -16,7 +16,6 @@ export { render, screen, waitFor, within }
 
 /** Classes a form-control trigger must share with Input / SelectTrigger. */
 export const formControlTriggerTokens = [
-  "h-10",
   "px-3",
   "text-base",
   "md:text-sm",

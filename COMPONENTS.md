@@ -203,8 +203,10 @@ draws the same marker; set `required` on the control yourself.
 `DatePickerButton` is single-day by default. For a from/to range, set
 `mode="range"`; `value` is `{ from, to }` (each side `Date` or `yyyy-MM-dd`)
 and `onChange` receives `DateRange | undefined`. The trigger uses the same
-form-control chrome as `Input` and `SelectTrigger`. The range popover shows
-one month below `md` and two months at `md+` unless `numberOfMonths` is set,
+form-control chrome as `Input` and `SelectTrigger`. Long picker values wrap
+inside narrow triggers; ordinary one-line values stay 40px tall, and consumer
+height classes still override that default. The range popover shows one
+month below `md` and two months at `md+` unless `numberOfMonths` is set,
 clamps to the viewport with collision padding and scroll, stays `w-auto` so
 it does not collapse to the default popover width, and includes a Clear
 action. Pass `side` to prefer a placement; Radix still flips on collision.

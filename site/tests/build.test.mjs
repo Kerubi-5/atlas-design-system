@@ -129,6 +129,7 @@ test("required interactive stories, tokens, and docs survive the static build", 
   }
   assert.equal(index.entries["foundations-tokens--theme"]?.type, "story")
   for (const docsId of [
+    "docs-start-here--docs",
     "docs-readme--docs",
     "docs-components--docs",
     "docs-design-rules--docs",
@@ -237,7 +238,7 @@ test("every component story sits in a sidebar group", async () => {
     path.join(siteRoot, ".storybook/preview.tsx"),
     "utf8"
   )
-  const order = /order: \[([\s\S]*?)\]/.exec(preview)?.[1] ?? ""
+  const order = /storySort: \{([\s\S]*?)\n\s*\},/.exec(preview)?.[1] ?? ""
   const groups = new Set([...order.matchAll(/"([^"]+)"/g)].map((m) => m[1]))
   assert.ok(groups.has("Forms"), "preview.tsx lists the sidebar groups")
   const storiesDir = path.join(siteRoot, "stories")
@@ -361,6 +362,15 @@ test("redirects and doc cross-links point at indexed entries", async () => {
     (match) => match[1]
   )
   assert.ok(targets.length >= 3, "docs.ts maps the markdown guides")
+  const startHere = await fs.readFile(
+    path.join(siteRoot, "stories/docs/start-here.mdx"),
+    "utf8"
+  )
+  targets.push(
+    ...[...startHere.matchAll(/\]\((\/(?:docs|story)\/[^)]+)\)/g)].map(
+      (match) => match[1]
+    )
+  )
   for (const target of targets) {
     assert.doesNotMatch(target, /\?path=/, `${target} is a bare story path`)
     const id = storyIdFromPath(target)

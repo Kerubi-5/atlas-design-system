@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+Readable picker values, dialog titles, and easier Storybook browsing.
+The public API is unchanged.
+
+- Date picker values wrap inside narrow triggers so a full selected range
+  stays visible; ordinary one-line controls remain 40px tall.
+- Dialog titles leave room for the built-in close button when it is shown.
+- Storybook uses one responsive canvas gutter and opens with a Start here
+  guide linking existing components and examples.
+
 ## 0.13.0 - 2026-10-16
 
 Minor: form errors wait until a field is touched or the form is submitted,
