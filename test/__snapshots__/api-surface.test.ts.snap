@@ -157,6 +157,13 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
   "./meter": [
     "Meter",
   ],
+  "./nav-link": [
+    "NavLink",
+    "navLinkVariants",
+  ],
+  "./next/nav-link": [
+    "NavLink",
+  ],
   "./next/tabs-nav-link": [
     "TabsNavLink",
   ],

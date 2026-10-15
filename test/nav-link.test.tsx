@@ -82,7 +82,9 @@ describe("NavLink", () => {
     expect(tasks.tagName).toBe("A")
     expect(tasks).toHaveAttribute("aria-current", "page")
     expect(tasks).toHaveAttribute("data-state", "active")
-    expect(tasks.className.split(/\s+/)).toContain("bg-selected")
+    expect(tasks.className.split(/\s+/)).toContain(
+      "data-[state=active]:bg-selected"
+    )
     expect(screen.getByRole("link", { name: "Calendar" })).toHaveAttribute(
       "data-state",
       "inactive"
@@ -93,12 +95,19 @@ describe("NavLink", () => {
 describe("next/nav-link", () => {
   it("is a Next Link with the same pill classes as the core export", () => {
     const nextHtml = renderToStaticMarkup(
-      <NextNavLink href="/calendar" active>
-        Calendar
-      </NextNavLink>
+      <>
+        <NextNavLink href="/calendar" active>
+          Calendar
+        </NextNavLink>
+        <NextNavLink href="/tasks" active={false}>
+          Tasks
+        </NextNavLink>
+      </>
     )
     expect(nextHtml).toMatch(/<a[^>]*href="\/calendar"/)
-    expect(nextHtml).toMatch(/aria-current="page"/)
+    expect(nextHtml).toMatch(/<a[^>]*href="\/tasks"/)
+    expect(nextHtml.match(/aria-current="page"/g)).toHaveLength(1)
+    expect(nextHtml).toMatch(/data-state="inactive"/)
     expect(linkClass(nextHtml, "Calendar")).toBe(navLinkVariants())
     expect(linkClass(nextHtml, "Calendar")).toBe(linkClass(html, "Calendar"))
   })

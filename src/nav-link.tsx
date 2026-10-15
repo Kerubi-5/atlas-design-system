@@ -14,7 +14,7 @@ import { cn } from "./utils.js"
 const navLinkVariants = cva([
   focusRing,
   selectedState.active,
-  "inline-flex items-center gap-1.5 rounded-none border border-transparent px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent data-[state=active]:font-medium data-[state=active]:hover:bg-selected",
+  "inline-flex items-center gap-1.5 rounded-none border border-transparent px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-accent data-[state=active]:font-medium",
 ])
 
 /**
