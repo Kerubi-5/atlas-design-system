@@ -112,6 +112,10 @@
       "types": "./dist/meter.d.ts",
       "default": "./dist/meter.js"
     },
+    "./nav-link": {
+      "types": "./dist/nav-link.d.ts",
+      "default": "./dist/nav-link.js"
+    },
     "./pagination": {
       "types": "./dist/pagination.d.ts",
       "default": "./dist/pagination.js"
@@ -227,6 +231,10 @@
     "./form/text-field": {
       "types": "./dist/form/text-field.d.ts",
       "default": "./dist/form/text-field.js"
+    },
+    "./next/nav-link": {
+      "types": "./dist/next/nav-link.d.ts",
+      "default": "./dist/next/nav-link.js"
     },
     "./next/tabs-nav-link": {
       "types": "./dist/next/tabs-nav-link.d.ts",

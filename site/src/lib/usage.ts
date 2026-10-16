@@ -10,6 +10,7 @@ export const beta = new Set([
   "Date time picker",
   "Dropdown menu",
   "Info tip",
+  "Nav link",
   "Pagination",
   "Radio group",
   "Search picker",
@@ -161,6 +162,12 @@ export const usage: Record<string, string> = {
 **Not for** a determinate job bar (use \`Progress\`) or an unknown wait (use \`Spinner\`).
 
 **Accessibility** It is \`role="meter"\` with \`aria-valuemin\`, \`aria-valuemax\`, and \`aria-valuenow\`. \`aria-label\` is required.`,
+  "Nav link": `
+**Use for** app-shell navigation: Calendar, Tasks, Settings. Pass \`active\` from the route; the kit has no router.
+
+**Not for** in-page view switches that belong in the URL as tabs (use \`TabsNav\` / \`TabsNavLink\`) or a hierarchy trail (use \`Breadcrumb\`).
+
+**Accessibility** The current item is \`aria-current="page"\`. Pass \`asChild\` to render a router link, or use \`next/nav-link\` in Next. Put the links in a labelled \`nav\`.`,
   Pagination: `
 **Use for** moving through pages of a long list or table where the page belongs in the URL.
 

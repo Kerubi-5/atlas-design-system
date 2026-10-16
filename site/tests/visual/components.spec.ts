@@ -92,6 +92,7 @@ const stories: Story[] = [
   { id: "navigation-tabs--nav-narrow" },
   { id: "navigation-tabs--nav-desktop" },
   { id: "navigation-tabs--overflow" },
+  { id: "navigation-nav-link--shell" },
   { id: "navigation-breadcrumb--collapsed" },
   { id: "navigation-pagination--with-ellipsis" },
   { id: "feedback-alert--tones" },
