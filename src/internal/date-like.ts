@@ -38,3 +38,28 @@ export function toDate(value: DateLike): Date | undefined {
   const parsed = parseISO(trimmed)
   return Number.isNaN(parsed.getTime()) ? undefined : parsed
 }
+
+/**
+ * A from/to pair of days. `to` is unset while a range is half picked. Same
+ * shape as Day Picker's, so either can be passed where the other is expected.
+ */
+export type DateRange = {
+  from: Date | undefined
+  to?: Date | undefined
+}
+
+/**
+ * Matches calendar days, for `disabled` and `hidden`: `true` for every day,
+ * one date or a list, a range, days `before` / `after` a date (both: the days
+ * outside them), weekdays (`0` is Sunday), or a predicate.
+ */
+export type DateMatcher =
+  | boolean
+  | Date
+  | Date[]
+  | DateRange
+  | { before: Date }
+  | { after: Date }
+  | { before: Date; after: Date }
+  | { dayOfWeek: number | number[] }
+  | ((date: Date) => boolean)

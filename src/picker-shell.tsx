@@ -2,10 +2,14 @@
 
 import * as React from "react"
 import { CalendarIcon } from "lucide-react"
-import type { Matcher, PropsBase } from "react-day-picker"
+import type { Locale } from "date-fns"
 
 import { Button } from "./button.js"
-import { toDate, type DateLike } from "./internal/date-like.js"
+import {
+  toDate,
+  type DateLike,
+  type DateMatcher,
+} from "./internal/date-like.js"
 import {
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
@@ -22,14 +26,36 @@ import { cn } from "./utils.js"
  */
 
 /**
- * Day Picker options for the picker's calendar: disabled matchers,
- * `startMonth` / `endMonth`, `weekStartsOn`, `locale`, `className`, and so on.
- * The picker owns the selection, focus, and month props.
+ * Options for the picker's calendar. The picker owns the selection, focus,
+ * and month props; these are the kit's own types, so a Day Picker upgrade
+ * does not change them.
  */
-export type PickerCalendarProps = Omit<
-  PropsBase,
-  "mode" | "required" | "autoFocus" | "defaultMonth" | "numberOfMonths"
->
+export type PickerCalendarProps = {
+  /** Days that cannot be picked. */
+  disabled?: DateMatcher | DateMatcher[]
+  /** Days left out of the grid. */
+  hidden?: DateMatcher | DateMatcher[]
+  /** Earliest month the calendar pages to. */
+  startMonth?: Date
+  /** Latest month the calendar pages to. */
+  endMonth?: Date
+  /** First day of the week, `0` (Sunday) to `6`. Defaults to the locale's. */
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6
+  /** A date-fns locale for month and weekday names. */
+  locale?: Locale
+  /** Show the leading and trailing days of the neighbouring months. Default `true`. */
+  showOutsideDays?: boolean
+  /** Always show six weeks, so the popover height does not change. */
+  fixedWeeks?: boolean
+  /** Show ISO or locale week numbers in a first column. */
+  showWeekNumber?: boolean
+  /** Month and year as text (`label`, default) or as dropdowns. */
+  captionLayout?: "label" | "dropdown" | "dropdown-months" | "dropdown-years"
+  /** The day marked as today. Defaults to the current date. */
+  today?: Date
+  /** Classes for the calendar root. */
+  className?: string
+}
 
 /** Props both pickers take for their trigger and popover. */
 export type PickerTriggerProps = {
@@ -82,7 +108,7 @@ export function limitCalendarProps(
   const max = toDate(maxDate)
   if (!min && !max) return calendarProps
   const disabled = calendarProps?.disabled
-  const matchers: Matcher[] = [
+  const matchers: DateMatcher[] = [
     ...(disabled === undefined
       ? []
       : Array.isArray(disabled)

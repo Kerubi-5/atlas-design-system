@@ -20,7 +20,11 @@ release history.
       `DESIGN_RULES.md`.
 - [ ] Confirm no third-party types leak through the public types (0.8.0 did
       this for toasts; check `calendar`/`date-picker` re-exports of
-      `react-day-picker` types and `radix-ui` prop types).
+      `react-day-picker` types and `radix-ui` prop types). Done for Day
+      Picker: the pickers and form fields use the kit's own `DateRange`,
+      `DateMatcher`, and calendar options, enforced by
+      `test/type-leaks.test.ts`; `Calendar` stays a documented Day Picker
+      wrapper. `radix-ui` prop types still to check.
 - [ ] Decide which CSS tokens and `data-slot` names in `theme.css` are public
       API, and list them in `DESIGN_RULES.md`.
 
@@ -29,10 +33,14 @@ release history.
 For every component in the [current beta list](./COMPONENTS.md#status), decide
 whether to promote it or keep it beta in 1.0.
 
-- [ ] Promote each one that apps have used for a release without API change.
-      Done for `alert`, `markdown`, `meter`, `progress`, `slider`,
-      `stat-tile`, and `tooltip`; the rest still need a decision.
-- [ ] Anything still beta at 1.0 is documented as exempt from semver.
+- [x] Promote each one that apps have used for a release without API change.
+      Promoted: `alert`, `markdown`, `meter`, `progress`, `slider`,
+      `stat-tile`, `tooltip` (KairOS), `date-time-picker` (KairOS),
+      `color-legend`, `info-tip`, `search-picker` (QCheck). Kept beta because
+      no app uses them yet: `accordion`, `avatar`, `breadcrumb`,
+      `dropdown-menu`, `pagination`, `radio-group`, `spinner`, `switch`, and
+      the new `nav-link`.
+- [x] Anything still beta at 1.0 is documented as exempt from semver.
 
 ### Support policy
 

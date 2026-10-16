@@ -2,9 +2,13 @@
 
 import * as React from "react"
 import { format, isSameDay } from "date-fns"
-import type { DateRange } from "react-day-picker"
 
-import { toDate, type DateLike } from "./internal/date-like.js"
+import {
+  toDate,
+  type DateLike,
+  type DateMatcher,
+  type DateRange,
+} from "./internal/date-like.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
 import { LazyCalendar } from "./lazy-calendar.js"
 import {
@@ -15,8 +19,7 @@ import {
   type PickerTriggerProps,
 } from "./picker-shell.js"
 
-export type { DateRange }
-export type { DateLike }
+export type { DateLike, DateMatcher, DateRange }
 export { toDate }
 
 /** From/to value for `DatePickerButton` in range mode; each side is `DateLike`. */
