@@ -8,6 +8,9 @@ Heading to 1.0? Start with [ROADMAP-1.0.md](./ROADMAP-1.0.md).
 
 ## Set up and check
 
+Working on the kit needs Node 22.12 or newer (Vitest 5). Apps that install
+the package only need Node 20.19.
+
 ```sh
 npm ci
 npm ci --prefix site

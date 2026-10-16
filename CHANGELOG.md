@@ -36,6 +36,8 @@ types in the picker API.
 - Build: compiled with TypeScript 7. Emitted JavaScript is identical; the
   declarations list string-literal union members in a different order, with
   no type change.
+- Tests run on Vitest 5 and `@vitest/coverage-v8` 5. Contributors need
+  Node 22.12 or newer; the package's own Node range is unchanged.
 
 ## 0.12.0 - 2026-10-15
 
