@@ -33,6 +33,9 @@ types in the picker API.
   `captionLayout`, `today`, and `className`. Other Day Picker props are no
   longer accepted there. No picker or form field type mentions
   `react-day-picker` any more; `Calendar` still takes Day Picker's props.
+- Build: compiled with TypeScript 7. Emitted JavaScript is identical; the
+  declarations list string-literal union members in a different order, with
+  no type change.
 
 ## 0.12.0 - 2026-10-15
 
