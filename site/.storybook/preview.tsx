@@ -71,7 +71,7 @@ function DocsPage() {
 const preview: Preview = {
   tags: ["autodocs"],
   parameters: {
-    layout: "padded",
+    layout: "fullscreen",
     controls: { expanded: true },
     viewport: { options: atlasViewports },
     options: {
@@ -80,6 +80,7 @@ const preview: Preview = {
       storySort: {
         order: [
           "Docs",
+          ["Start here", "README", "Components", "Design rules"],
           "Foundations",
           "Actions",
           "Forms",
@@ -121,7 +122,7 @@ const preview: Preview = {
         enableSystem={false}
         storageKey="atlas-storybook-theme"
       >
-        <div className="min-h-40 bg-background p-6 text-foreground">
+        <div className="min-h-40 bg-background p-4 text-foreground sm:p-6">
           <Story />
         </div>
         {context.viewMode === "docs" ||

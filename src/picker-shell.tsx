@@ -180,6 +180,7 @@ export function PickerShell({
           <CalendarIcon data-icon="inline-start" />
           <span
             data-slot="date-picker-value"
+            className="min-w-0 text-left whitespace-normal"
             id={id ? pickerValueId(id) : undefined}
           >
             {label}

@@ -11,9 +11,10 @@ export const formControlTriggerClassName =
 
 /**
  * Date and date-time picker trigger: the form-control chrome, start-aligned,
- * with muted text while empty (`data-empty`).
+ * with muted text while empty (`data-empty`). Intrinsic padding makes one
+ * line 40px tall while longer values wrap and consumer height classes work.
  */
-export const pickerTriggerClassName = `${formControlTriggerClassName} justify-start data-[empty=true]:text-muted-foreground`
+export const pickerTriggerClassName = `${formControlTriggerClassName} h-auto justify-start py-[calc((--spacing(10)_-_1lh_-_2px)/2)] data-[empty=true]:text-muted-foreground`
 
 /** Calendar popover body: fits the viewport height and scrolls inside it. */
 export const pickerContentClassName =

@@ -76,6 +76,9 @@ function DialogContent({
           overlaySurface,
           overlayFadeZoom,
           "fixed top-1/2 left-1/2 z-50 grid max-h-[90dvh] w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-6 overflow-y-auto p-6 text-sm outline-none",
+          showCloseButton
+            ? "[--dialog-close-gutter:--spacing(10)]"
+            : "[--dialog-close-gutter:0px]",
           className
         )}
         {...props}
@@ -138,7 +141,7 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-lg leading-none font-semibold tracking-wider uppercase",
+        "pr-[var(--dialog-close-gutter,0px)] font-heading text-lg leading-none font-semibold tracking-wider uppercase",
         className
       )}
       {...props}

@@ -79,6 +79,7 @@ const stories: Story[] = [
   { id: "forms-search-picker--example" },
   { id: "forms-calendar--single-day" },
   { id: "forms-date-picker--range-reference" },
+  { id: "forms-date-picker--narrow-range" },
   {
     id: "forms-date-time-picker--playground",
     open: async (page) => {
@@ -111,6 +112,7 @@ const stories: Story[] = [
   },
   ...toastVariantStories,
   { id: "overlays-dialog--playground", open: clickFirst("button", "dialog") },
+  { id: "overlays-dialog--long-title", open: clickFirst("button", "dialog") },
   { id: "overlays-popover--playground", open: clickFirst("button", "dialog") },
   {
     id: "overlays-tooltip--playground",
@@ -140,8 +142,12 @@ const toastVariantIds = toastVariantStories.map((story) => story.id)
 
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([
+  "navigation-nav-link--shell",
   "examples-fields--trigger-alignment",
   "forms-date-time-picker--playground",
+  "forms-date-picker--range-reference",
+  "forms-date-picker--narrow-range",
+  "overlays-dialog--long-title",
   "navigation-tabs--composition",
   "navigation-tabs--nav",
   "navigation-tabs--nav-desktop",

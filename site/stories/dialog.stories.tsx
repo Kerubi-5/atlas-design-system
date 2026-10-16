@@ -19,6 +19,7 @@ type Args = {
   description: string
   triggerLabel: string
   confirmLabel: string
+  showCloseButton: boolean
 }
 const meta = {
   title: "Overlays/Dialog",
@@ -29,6 +30,7 @@ const meta = {
       "This removes the file from the live list. You can restore it later.",
     triggerLabel: "Open dialog",
     confirmLabel: "Archive",
+    showCloseButton: true,
   },
   argTypes: {
     open: { control: "boolean" },
@@ -36,6 +38,7 @@ const meta = {
     description: { control: "text" },
     triggerLabel: { control: "text" },
     confirmLabel: { control: "text" },
+    showCloseButton: { control: "boolean" },
   },
   render: function Render(args) {
     const [, updateArgs] = useArgs()
@@ -46,7 +49,10 @@ const meta = {
             {args.triggerLabel}
           </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent
+          className="sm:max-w-md"
+          showCloseButton={args.showCloseButton}
+        >
           <DialogHeader>
             <DialogTitle>{args.title}</DialogTitle>
             <DialogDescription>{args.description}</DialogDescription>
@@ -69,6 +75,9 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Playground: Story = {}
+export const LongTitle: Story = {
+  args: { title: "Review quarterly accounts" },
+}
 export const Composition: Story = {
   render: () => <DialogStory />,
   parameters: { controls: { disable: true } },
