@@ -138,6 +138,16 @@ or its `data-slot`.
 `text-base md:text-sm`, `border-input`, and `shadow-xs`. Do not restyle those
 triggers as outline buttons in application code.
 
+`form/*` fields stack label, hint, control, and error with `gap-1.5`, and the
+error sits below the control. It takes no space until it shows, so a row of
+fields keeps its controls on one top edge only with `items-start`
+(`grid grid-cols-2 items-start gap-3`); the default `stretch` is fine for a
+single column. Wrap a control the kit does not ship (a combobox, a segmented
+picker) in `FormControlField` instead of `Field` and `FieldLabel`, whose
+`gap-3` spacing does not match. A field shows its error once
+`meta.isTouched` is true or `submitted` is set, never on a field the person
+has not reached yet.
+
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
 Next adapter provides `TabsNavLink` with this behavior. App-shell destinations

@@ -4,9 +4,10 @@ import { Input } from "../input.js"
 import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
 
-import type { FieldMetaState } from "./field-error.js"
+import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   describedBy,
+  descriptionIdFor,
   FormFieldShell,
   invalidWhen,
   metaErrorText,
@@ -32,13 +33,14 @@ export function FormTextField({
   multiline,
   rows = 3,
   inputType = "text",
-  showError = true,
+  showError,
+  submitted,
   autoComplete,
   required,
   minLength,
   className,
   fieldClassName,
-}: {
+}: ErrorTimingProps & {
   field: TextFieldApi
   /**
    * Control id the label points at. Defaults to `field.name`; pass a unique
@@ -62,8 +64,6 @@ export function FormTextField({
     | "datetime-local"
     | "time"
     | "number"
-  /** When true (default), shows meta.errors and aria-invalid styling. */
-  showError?: boolean
   autoComplete?: string
   /** Sets `required` on the control and marks the label. */
   required?: boolean
@@ -74,8 +74,8 @@ export function FormTextField({
   fieldClassName?: string
 }) {
   const onChange = onInputChange(field.handleChange)
-  const errorText = showError ? metaErrorText(field.state.meta) : undefined
-  const descriptionId = description ? `${id}-description` : undefined
+  const errorText = metaErrorText(field.state.meta, { submitted, showError })
+  const descriptionId = description ? descriptionIdFor(id) : undefined
   const controlProps = {
     id,
     value: field.state.value,
@@ -94,19 +94,11 @@ export function FormTextField({
     <FormFieldShell
       id={id}
       label={label}
+      description={description}
       errorText={errorText}
       required={required}
       className={fieldClassName}
     >
-      {description ? (
-        <p
-          id={descriptionId}
-          data-slot="form-field-description"
-          className="text-xs text-muted-foreground"
-        >
-          {description}
-        </p>
-      ) : null}
       {multiline ? (
         <Textarea {...controlProps} rows={rows} />
       ) : (

@@ -3,6 +3,7 @@ import {
   LabelInputTextareaStory,
   FieldStory,
   FormHelpersStory,
+  CustomControlFieldStory,
 } from "../../stories/fields.js"
 import { FormControlTriggersStory } from "../../stories/form-control-triggers.js"
 
@@ -26,4 +27,7 @@ export const FieldComposition: Story = { render: () => <FieldStory /> }
 export const FormHelpers: Story = { render: () => <FormHelpersStory /> }
 export const TriggerAlignment: Story = {
   render: () => <FormControlTriggersStory />,
+}
+export const CustomControlField: Story = {
+  render: () => <CustomControlFieldStory />,
 }

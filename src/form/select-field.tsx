@@ -4,7 +4,7 @@ import { type ReactNode, useId } from "react"
 
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
-import type { FieldMetaState } from "./field-error.js"
+import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   describedBy,
   FormFieldShell,
@@ -12,7 +12,7 @@ import {
   metaErrorText,
 } from "./field-shell.js"
 
-type Props = {
+type Props = ErrorTimingProps & {
   value: string | undefined
   meta?: FieldMetaState
   label: string
@@ -33,6 +33,8 @@ type Props = {
 export function FormSelectField({
   value,
   meta,
+  submitted,
+  showError,
   label,
   onValueChange,
   placeholder,
@@ -42,7 +44,7 @@ export function FormSelectField({
   contentClassName,
   children,
 }: Props) {
-  const errorText = metaErrorText(meta)
+  const errorText = metaErrorText(meta, { submitted, showError })
   const id = useId()
 
   return (

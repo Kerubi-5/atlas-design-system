@@ -73,12 +73,13 @@ theme from `next-themes`, so toast consumers install that too.
 | `toggle-group`                | `ToggleGroup`, `ToggleGroupItem`; `variant`, `size`. Items share `toggleVariants`, so single (radio) and multiple selections match a pressed `Toggle`                                                                                                                                                                                                                                                                                                                                                        |
 | `theme-provider`              | `ThemeProvider`, `useTheme`; optional `storageKey` (default `atlas-theme`), `enableShortcut` for the `d` toggle                                                                                                                                                                                                                                                                                                                                                                                              |
 | `tooltip`                     | `Tooltip`, `TooltipTrigger`, `TooltipContent`, `TooltipProvider`; opens on hover and focus; short labels only                                                                                                                                                                                                                                                                                                                                                                                                |
+| `form/control-field`          | `FormControlField`, type `FormControlProps`; `label`, optional `id`, `description`, `required`, `meta`, `submitted`, `showError`; `children` renders the control from `{ id, aria-invalid, aria-describedby, aria-required }`                                                                                                                                                                                                                                                                                |
 | `form/markdown-field`         | `FormMarkdownField`; `field` is `TextFieldApi`; `label`, optional `id`, `placeholder`, `rows`, `showError`, `required`. Write / preview; preview uses `Markdown`.                                                                                                                                                                                                                                                                                                                                            |
 | `form/text-field`             | `FormTextField`, type `TextFieldApi`; controlled field, label, multiline, description, input constraints; `required` also marks the label                                                                                                                                                                                                                                                                                                                                                                    |
 | `form/select-field`           | `FormSelectField`; `value`, `onValueChange`, `label`, optional `meta`, placeholder, and `required`; select item children                                                                                                                                                                                                                                                                                                                                                                                     |
 | `form/date-picker-field`      | `FormDatePickerField`; `value`, `onValueChange`, `label`, optional `meta`, placeholder, `required`, `minDate` / `maxDate`, and `className` (forwarded to the trigger)                                                                                                                                                                                                                                                                                                                                        |
 | `form/date-time-picker-field` | `FormDateTimePickerField`; `value` is `Date` or `null`; `onValueChange` emits `Date` or `null`; optional `meta`, placeholder, `timeStep`, `required`, `minDate` / `maxDate`, and `className` (forwarded to the trigger)                                                                                                                                                                                                                                                                                      |
-| `form/field-error`            | `FieldError` (optional `id`), `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `form/field-error`            | `FieldError` (optional `id`), `getFieldErrorMessage`; types `FieldErrorMessage`, `FieldMetaState`, `ErrorTimingProps`                                                                                                                                                                                                                                                                                                                                                                                        |
 | `form/feedback-field`         | `FormFeedbackField`; nullable `message`                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `next/nav-link`               | `NavLink`; Next Link props and required `active` boolean; same pill as `nav-link`; requires Next.js 16                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `next/tabs-nav-link`          | `TabsNavLink`; Next Link props and required `active` boolean; requires Next.js 16                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -114,7 +115,7 @@ each part carries a `data-slot` for parent selectors such as
 | `InfoTip`                                          | `contentClassName`; button props go to the trigger                                                                                                                                                                                                                      |                                                                                                                           |
 | `Label`, `FieldLabel`                              | `requiredClassName`                                                                                                                                                                                                                                                     | `label-required`                                                                                                          |
 | `DatePickerButton`, `DateTimePickerButton`         | `contentClassName`, `calendarProps` (`disabled` / `hidden` days, `startMonth`, `endMonth`, `weekStartsOn`, date-fns `locale`, `showOutsideDays`, `fixedWeeks`, `showWeekNumber`, `captionLayout`, `today`, `className`); `minDate` / `maxDate` add to its disabled days | `date-picker-value`, `date-picker-footer`, `date-time-picker-time`                                                        |
-| `form/*` fields                                    | `fieldClassName` (wrapper); `className` styles the control; `FormSelectField` `contentClassName`; `FormMarkdownField` `previewClassName`                                                                                                                                | `form-field`, `form-field-header`, `form-field-description`, `form-field-error`, `form-feedback`, `form-markdown-preview` |
+| `form/*` fields                                    | `fieldClassName` (wrapper); `className` styles the control (on `FormControlField`, the wrapper); `FormSelectField` `contentClassName`; `FormMarkdownField` `previewClassName`                                                                                           | `form-field`, `form-field-header`, `form-field-description`, `form-field-error`, `form-feedback`, `form-markdown-preview` |
 | `Table`                                            | `containerClassName` (the scroll box, e.g. `max-h-96 overflow-y-auto`); `className` styles the `<table>`                                                                                                                                                                |                                                                                                                           |
 | `TabsList`, `TabsNav`                              | `scrollerClassName`; `TabsNav` `listClassName`; a list `className` height replaces `h-11`                                                                                                                                                                               | `tabs-scroller`                                                                                                           |
 | `SortableTableHead`                                | `buttonClassName`                                                                                                                                                                                                                                                       | `sortable-table-head-button`                                                                                              |
@@ -135,7 +136,10 @@ type TextFieldApi = {
   name: string
   state: {
     value: string
-    meta: { errors: (string | { message?: string } | undefined)[] }
+    meta: {
+      errors: (string | { message?: string } | undefined)[]
+      isTouched?: boolean
+    }
   }
   handleChange: (value: string) => void
   handleBlur: () => void
@@ -156,6 +160,38 @@ error text (and `FormTextField`'s `description`) is the control's accessible
 description. The date fields label their trigger with `aria-labelledby` (the
 label, then the trigger) rather than `<label for>`, so the picked date is
 part of its name.
+
+Errors wait for the person. When `meta.isTouched` is `false`, a `form/*`
+field hides its error text and invalid styling until the field is touched or
+its `submitted` prop is set (TanStack Form:
+`form.state.submissionAttempts > 0`). Pass TanStack's `field.state.meta` as
+is and this works on its own; meta without `isTouched` shows errors as soon
+as they exist, as before. `showError={false}` always hides them. Every
+`form/*` field, `FormSelectField` and both date fields included, takes
+`submitted` and `showError`.
+
+`FormControlField` gives a control the kit does not ship the same label,
+required marker, hint, error, ids, and error timing. `children` is a
+function that receives the props to spread on the control:
+
+```tsx
+<div className="grid grid-cols-2 items-start gap-3">
+  <FormTextField field={amount} label="Amount" required />
+  <FormControlField label="Currency" meta={currency.state.meta}>
+    {(control) => (
+      <Combobox
+        {...control}
+        options={options}
+        value={value}
+        onValueChange={set}
+      />
+    )}
+  </FormControlField>
+</div>
+```
+
+Errors sit below the control and take no space until they show, so use
+`items-start` on a row of fields to keep the controls on one top edge.
 
 Set `required` on a `form/*` field to mark its label with a visible `*`.
 The marker is hidden from screen readers, which announce the control's own

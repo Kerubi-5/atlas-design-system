@@ -8,14 +8,14 @@ import {
   type DatePickerCalendarProps,
 } from "../date-picker.js"
 
-import type { FieldMetaState } from "./field-error.js"
+import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   FormFieldShell,
   metaErrorText,
   pickerFieldAria,
 } from "./field-shell.js"
 
-type Props = {
+type Props = ErrorTimingProps & {
   value: DateLike
   onValueChange: (date: Date | undefined) => void
   label: string
@@ -43,11 +43,13 @@ export function FormDatePickerField({
   onValueChange,
   label,
   meta,
+  submitted,
+  showError,
   required,
   fieldClassName,
   ...picker
 }: Props) {
-  const errorText = metaErrorText(meta)
+  const errorText = metaErrorText(meta, { submitted, showError })
   const id = useId()
 
   return (

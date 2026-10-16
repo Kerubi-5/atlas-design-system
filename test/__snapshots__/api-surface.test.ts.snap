@@ -117,6 +117,9 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
     "FieldSet",
     "FieldTitle",
   ],
+  "./form/control-field": [
+    "FormControlField",
+  ],
   "./form/date-picker-field": [
     "FormDatePickerField",
   ],
