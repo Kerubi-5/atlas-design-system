@@ -38,6 +38,8 @@ types in the picker API.
   no type change.
 - Tests run on Vitest 5 and `@vitest/coverage-v8` 5. Contributors need
   Node 22.12 or newer; the package's own Node range is unchanged.
+- The Next adapters (`next/nav-link`, `next/tabs-nav-link`) are built and
+  tested against Next 16.4. The `next` peer range stays `^16.0.0`.
 
 ## 0.12.0 - 2026-10-15
 
