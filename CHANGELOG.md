@@ -10,6 +10,13 @@ The public API is unchanged.
 - Dialog titles leave room for the built-in close button when it is shown.
 - Storybook uses one responsive canvas gutter and opens with a Start here
   guide linking existing components and examples.
+- `Combobox` no longer focuses its search field from a
+  `requestAnimationFrame` effect. Radix's popover focus already moves focus
+  to the search field, its first tabbable, on open.
+- The date picker's breakpoint check (`useMediaQuery`) uses React's
+  `useSyncExternalStore`. Hydration now matches the server render instead of
+  reading `matchMedia` in the first client render, which logged a hydration
+  mismatch on screens at or above `md`.
 
 ## 0.13.0 - 2026-10-16
 

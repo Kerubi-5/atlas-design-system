@@ -144,7 +144,6 @@ export function Combobox({
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
   const [highlight, setHighlight] = React.useState(0)
-  const inputRef = React.useRef<HTMLInputElement>(null)
   const listId = React.useId()
   const generatedId = React.useId()
   const triggerId = id ?? generatedId
@@ -201,12 +200,6 @@ export function Combobox({
     )
     setHighlight(selectedIndex >= 0 ? selectedIndex : 0)
   }
-
-  React.useEffect(() => {
-    if (!open) return
-    const frame = window.requestAnimationFrame(() => inputRef.current?.focus())
-    return () => window.cancelAnimationFrame(frame)
-  }, [open])
 
   const onQueryChange = onInputChange((next) => {
     setQuery(next)
@@ -284,7 +277,6 @@ export function Combobox({
       >
         <div data-slot="combobox-search" className="border-b p-2">
           <Input
-            ref={inputRef}
             value={query}
             onChange={onQueryChange}
             onKeyDown={onSearchKeyDown}

@@ -1,4 +1,6 @@
 import { act, renderHook } from "@testing-library/react"
+import { hydrateRoot, type Root } from "react-dom/client"
+import { renderToString } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
 import { FormMarkdownField } from "../src/form/markdown-field.js"
@@ -12,6 +14,7 @@ import {
   fakeTextField,
   render,
   screen,
+  stubMatchMedia,
   waitFor,
   within,
 } from "./helpers.js"
@@ -202,5 +205,27 @@ describe("useMediaQuery", () => {
     expect(result.current).toBe(true)
     unmount()
     expect(remove).toHaveBeenCalled()
+  })
+
+  // The server renders `defaultMatches`. Reading matchMedia in the first
+  // client render made hydration disagree with that markup on a wide screen.
+  it("hydrates with defaultMatches, then follows the real query", async () => {
+    const restore = stubMatchMedia(true)
+    function Probe() {
+      return <span>{String(useMediaQuery("(min-width: 768px)"))}</span>
+    }
+    const container = document.createElement("div")
+    container.innerHTML = renderToString(<Probe />).replace("true", "false")
+    document.body.append(container)
+    const onRecoverableError = vi.fn()
+    let root: Root | undefined
+    await act(async () => {
+      root = hydrateRoot(container, <Probe />, { onRecoverableError })
+    })
+    expect(onRecoverableError).not.toHaveBeenCalled()
+    expect(container.textContent).toBe("true")
+    act(() => root?.unmount())
+    container.remove()
+    restore()
   })
 })
