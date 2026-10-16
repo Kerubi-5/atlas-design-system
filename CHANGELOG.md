@@ -14,6 +14,10 @@ Minor: additive shell `NavLink`. Existing exports are unchanged.
   the same shape as `TabsNavLink`: Next `Link` props plus required `active`.
 - KairOS follow-up (separate PR): replace `components/app/nav-link.tsx`
   after this ships.
+- `alert`, `markdown`, `meter`, `progress`, `slider`, `stat-tile`, and
+  `tooltip` are stable. KairOS has used each one across releases, and their
+  0.11 and 0.12 changes were additive. From now on, changes to them follow
+  the deprecation policy in CONTRIBUTING.md. Nothing changes in the code.
 
 ## 0.12.0 - 2026-10-15
 
