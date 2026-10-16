@@ -9,10 +9,12 @@ import {
   FieldGroup,
   FieldLabel,
 } from "../src/field.js"
+import { Combobox } from "../src/combobox.js"
+import { FormControlField } from "../src/form/control-field.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import { FormMarkdownField } from "../src/form/markdown-field.js"
-import { FieldError } from "../src/form/field-error.js"
+import { FieldError, type FieldMetaState } from "../src/form/field-error.js"
 import { FormFeedbackField } from "../src/form/feedback-field.js"
 import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField, type TextFieldApi } from "../src/form/text-field.js"
@@ -21,11 +23,15 @@ import { SelectItem } from "../src/select.js"
 /**
  * Local TextFieldApi stand-in so form stories do not pull in a form library.
  */
-function useDemoField(name: string, initial = ""): TextFieldApi {
+function useDemoField(
+  name: string,
+  initial = "",
+  meta: FieldMetaState = { errors: [] }
+): TextFieldApi {
   const [value, setValue] = useState(initial)
   return {
     name,
-    state: { value, meta: { errors: [] } },
+    state: { value, meta },
     handleChange: setValue,
     handleBlur() {},
   }
@@ -102,6 +108,38 @@ export function FormHelpersStory() {
       />
       <FieldError message="This name is already taken." />
       <FormFeedbackField message="Could not save. Try again." />
+    </div>
+  )
+}
+
+/**
+ * A kit field and a custom control (`Combobox` in `FormControlField`) in one
+ * row. `items-start` keeps both controls on the same top edge when only one
+ * field shows an error, and the error takes no space until it appears.
+ */
+export function CustomControlFieldStory() {
+  const amount = useDemoField("amount", "12,5", {
+    errors: ["Enter a number"],
+    isTouched: true,
+  })
+  const [currency, setCurrency] = useState("usd")
+
+  return (
+    <div className="grid max-w-md grid-cols-2 items-start gap-3">
+      <FormTextField field={amount} label="Amount" required />
+      <FormControlField label="Currency" required>
+        {(control) => (
+          <Combobox
+            {...control}
+            options={[
+              { value: "usd", label: "US Dollar" },
+              { value: "eur", label: "Euro" },
+            ]}
+            value={currency}
+            onValueChange={setCurrency}
+          />
+        )}
+      </FormControlField>
     </div>
   )
 }

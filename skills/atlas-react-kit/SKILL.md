@@ -61,6 +61,7 @@ Import each component from its subpath, e.g.
 | One date, or a from/to range                    | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                       |
 | Date and time (not `datetime-local`)            | `DateTimePickerButton` from `date-time-picker`                                                                          |
 | Labelled field with error text                  | `FormTextField`, `FormSelectField`, `FormDatePickerField`, `FormDateTimePickerField`, `FormMarkdownField` from `form/*` |
+| Labelled custom control (combobox) in a form    | `FormControlField` from `form/control-field`                                                                            |
 | Form-level error (save failed)                  | `FormFeedbackField` from `form/feedback-field`                                                                          |
 | Content panels on one page                      | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                            |
 | View switch that changes the URL                | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`                     |

@@ -256,6 +256,7 @@ describe("published modules", () => {
       "toggle",
       "toggle-group",
       "tooltip",
+      "form/control-field",
       "form/date-picker-field",
       "form/date-time-picker-field",
       "form/markdown-field",

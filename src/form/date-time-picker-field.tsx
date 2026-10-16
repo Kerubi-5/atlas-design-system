@@ -5,14 +5,14 @@ import { useId } from "react"
 import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import { DateTimePickerButton } from "../date-time-picker.js"
 
-import type { FieldMetaState } from "./field-error.js"
+import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   FormFieldShell,
   metaErrorText,
   pickerFieldAria,
 } from "./field-shell.js"
 
-type Props = {
+type Props = ErrorTimingProps & {
   value: Date | null
   onValueChange: (date: Date | null) => void
   label: string
@@ -42,11 +42,13 @@ export function FormDateTimePickerField({
   onValueChange,
   label,
   meta,
+  submitted,
+  showError,
   required,
   fieldClassName,
   ...picker
 }: Props) {
-  const errorText = metaErrorText(meta)
+  const errorText = metaErrorText(meta, { submitted, showError })
   const id = useId()
 
   return (

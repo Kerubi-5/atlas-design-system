@@ -1,9 +1,32 @@
 # Changelog
 
-## Unreleased
+## 0.13.0 - 2026-10-16
 
-Minor: a shell `NavLink`, the beta decisions for 1.0, and the kit's own date
-types in the picker API.
+Minor: form errors wait until a field is touched or the form is submitted,
+a public `FormControlField` for custom controls, a shell `NavLink`, the beta
+decisions for 1.0, and the kit's own date types in the picker API.
+
+- Fixed: `form/*` fields showed `meta.errors[0]` on fields the person had
+  not reached yet, so an app validating the whole form on change flagged
+  every field at the first keystroke. `FieldMetaState` takes an optional
+  `isTouched` (TanStack Form's `field.state.meta` already has it), and
+  `FormTextField`, `FormMarkdownField`, `FormSelectField`,
+  `FormDatePickerField`, and `FormDateTimePickerField` take an optional
+  `submitted`. When `isTouched` is `false`, the error text, `aria-invalid`,
+  and the error in `aria-describedby` wait until the field is touched or
+  `submitted` is set. Meta without `isTouched` shows errors as before, and
+  `showError={false}` still hides them; the select and date fields now take
+  `showError` too.
+- New: `FormControlField` and type `FormControlProps`
+  (`atlas-react-kit/form/control-field`). It wraps a control the kit does not
+  ship (a combobox) in the same label, required marker, hint, error, ids, and
+  error timing as the other `form/*` fields: `children` receives `id`,
+  `aria-invalid`, `aria-describedby`, and `aria-required` to spread on the
+  control. `className` and other div props go to the wrapper.
+- New type `ErrorTimingProps` in `form/field-error`.
+- Docs: the error sits below the control and reserves no space; put a row of
+  fields in a grid with `items-start` so the controls share a top edge
+  (DESIGN_RULES.md, COMPONENTS.md "Forms").
 
 - New: `NavLink` and `navLinkVariants` (`atlas-react-kit/nav-link`), a
   pill-style app-shell link. Pass `active` from the app; the kit has no

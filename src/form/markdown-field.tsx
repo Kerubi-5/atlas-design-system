@@ -8,6 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
+import type { ErrorTimingProps } from "./field-error.js"
 import {
   describedBy,
   FormFieldShell,
@@ -36,12 +37,13 @@ export function FormMarkdownField({
   label,
   placeholder = "Markdown supported",
   rows = 5,
-  showError = true,
+  showError,
+  submitted,
   required,
   className,
   fieldClassName,
   previewClassName,
-}: {
+}: ErrorTimingProps & {
   field: TextFieldApi
   /**
    * Control id the label points at. Defaults to `field.name`; pass a unique
@@ -51,7 +53,6 @@ export function FormMarkdownField({
   label: string
   placeholder?: string
   rows?: number
-  showError?: boolean
   /** Sets `required` on the Write textarea and marks the label. */
   required?: boolean
   /** Forwarded to the Write textarea. */
@@ -63,7 +64,7 @@ export function FormMarkdownField({
 }) {
   const [mode, setMode] = useState<Mode>("write")
   const onChange = onInputChange(field.handleChange)
-  const errorText = showError ? metaErrorText(field.state.meta) : undefined
+  const errorText = metaErrorText(field.state.meta, { submitted, showError })
   const trimmed = field.state.value.trim()
 
   function handleModeChange(value: string) {
