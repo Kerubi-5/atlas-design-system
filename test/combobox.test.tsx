@@ -176,6 +176,22 @@ describe("Combobox", () => {
     }
   )
 
+  // Radix moves focus into the popover on open (onOpenAutoFocus) and the
+  // search field is its first tabbable, so focus needs no animation frame.
+  it("focuses the search field on open without waiting for a frame", async () => {
+    const frame = vi
+      .spyOn(window, "requestAnimationFrame")
+      .mockImplementation(() => 0)
+    try {
+      const user = createUser()
+      render(<ComboboxHarness />)
+      await openCombobox(user)
+      expect(screen.getByPlaceholderText("Search")).toHaveFocus()
+    } finally {
+      frame.mockRestore()
+    }
+  })
+
   it("keeps options out of the Tab order and marks the highlighted one", async () => {
     const user = createUser()
     render(<ComboboxHarness />)
