@@ -2,7 +2,8 @@
 
 ## Unreleased
 
-Minor: additive shell `NavLink`. Existing exports are unchanged.
+Minor: a shell `NavLink`, the beta decisions for 1.0, and the kit's own date
+types in the picker API.
 
 - New: `NavLink` and `navLinkVariants` (`atlas-react-kit/nav-link`), a
   pill-style app-shell link. Pass `active` from the app; the kit has no
@@ -18,6 +19,20 @@ Minor: additive shell `NavLink`. Existing exports are unchanged.
   `tooltip` are stable. KairOS has used each one across releases, and their
   0.11 and 0.12 changes were additive. From now on, changes to them follow
   the deprecation policy in CONTRIBUTING.md. Nothing changes in the code.
+- `date-time-picker` (used by KairOS) and `color-legend`, `info-tip`, and
+  `search-picker` (used by QCheck) are stable too. `accordion`, `avatar`,
+  `breadcrumb`, `dropdown-menu`, `nav-link`, `pagination`, `radio-group`,
+  `spinner`, and `switch` stay beta until an app uses them; beta components
+  are exempt from semver, before and after 1.0.
+- Changed: `DateRange` is now the kit's own type, with the same
+  `{ from, to }` shape as Day Picker's, so existing code keeps compiling.
+  `DatePickerCalendarProps` (the pickers' `calendarProps`) is now the kit's
+  own list of calendar options: `disabled` and `hidden` (as the new
+  `DateMatcher` type), `startMonth`, `endMonth`, `weekStartsOn`, a date-fns
+  `locale`, `showOutsideDays`, `fixedWeeks`, `showWeekNumber`,
+  `captionLayout`, `today`, and `className`. Other Day Picker props are no
+  longer accepted there. No picker or form field type mentions
+  `react-day-picker` any more; `Calendar` still takes Day Picker's props.
 
 ## 0.12.0 - 2026-10-15
 
