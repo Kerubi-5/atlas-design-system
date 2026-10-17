@@ -3,7 +3,8 @@
 ## Unreleased
 
 Readable picker values, dialog titles, and easier Storybook browsing.
-The public API is unchanged.
+The public API types are unchanged. The range picker's first click now
+emits an open-ended range (see Changed below).
 
 - Date picker values wrap inside narrow triggers so a full selected range
   stays visible; ordinary one-line controls remain 40px tall.
@@ -17,6 +18,12 @@ The public API is unchanged.
   `useSyncExternalStore`. Hydration now matches the server render instead of
   reading `matchMedia` in the first client render, which logged a hydration
   mismatch on screens at or above `md`.
+- Changed: the range date picker uses Day Picker's built-in `resetOnSelect`
+  instead of its own restart flag. A click on a complete range starts a new
+  one as before, but the start now reaches `onChange` as
+  `{ from, to: undefined }` instead of a same-day range, and a one-day range
+  takes a second click on the same day. Apps that treated one click as a
+  one-day range should wait for `to`.
 
 ## 0.13.0 - 2026-10-16
 

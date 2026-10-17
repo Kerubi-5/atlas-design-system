@@ -379,12 +379,13 @@ describe("DatePickerButton range mode", () => {
     await user.click(screen.getByRole("button", { name: /October 5/ }))
     expect(await screen.findAllByRole("grid")).toHaveLength(2)
 
-    // The first click restarts the range instead of extending Oct 5 – 10.
+    // The first click restarts the range instead of extending Oct 5 – 10
+    // (Day Picker's resetOnSelect): the clicked day is the new start.
     await user.click(getDayButton(new Date(2026, 9, 20)))
     expect(screen.getAllByRole("grid")).toHaveLength(2)
     const started = onChange.mock.calls.at(-1)?.[0]
     expect(started?.from?.getDate()).toBe(20)
-    expect(started?.to?.getDate()).toBe(20)
+    expect(started?.to).toBeUndefined()
 
     await user.click(getDayButton(new Date(2026, 9, 25)))
     await waitFor(() => {
@@ -396,6 +397,24 @@ describe("DatePickerButton range mode", () => {
     expect(
       screen.getByRole("button", { name: /October 20.*October 25/ })
     ).toBeInTheDocument()
+  })
+
+  it("makes a one-day range from two clicks on the same day", async () => {
+    const user = createUser()
+    const onChange = vi.fn<(range: DateRange | undefined) => void>()
+    render(<RangePickerHarness onChange={onChange} />)
+
+    await user.click(screen.getByRole("button", { name: "Export range" }))
+    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    expect(onChange.mock.calls.at(-1)?.[0]?.to).toBeUndefined()
+
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    const last = onChange.mock.calls.at(-1)?.[0]
+    expect(last?.from?.getDate()).toBe(5)
+    expect(last?.to?.getDate()).toBe(5)
+    // A same-day range keeps the popover open, as before.
+    expect(screen.getAllByRole("grid")).toHaveLength(2)
   })
 
   it("finishes an incomplete range on the next click", async () => {

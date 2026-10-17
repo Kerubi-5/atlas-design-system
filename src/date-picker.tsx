@@ -128,15 +128,6 @@ function DatePickerRangeButton({
   const from = toDate(value?.from)
   const to = toDate(value?.to)
   const selected: DateRange | undefined = from || to ? { from, to } : undefined
-  // Opening on a complete range means the next click starts a new one.
-  // Without this, Day Picker extends the old range and the popover closes
-  // on that first click, so a fresh range needs Clear first.
-  const restartRef = React.useRef(false)
-
-  const onOpenChange = (next: boolean) => {
-    if (next) restartRef.current = Boolean(from && to)
-    setOpen(next)
-  }
 
   return (
     <PickerShell
@@ -145,21 +136,21 @@ function DatePickerRangeButton({
       label={formatRangeTriggerLabel(from, to, placeholder)}
       dialogLabel="Choose dates"
       open={open}
-      onOpenChange={onOpenChange}
+      onOpenChange={setOpen}
     >
       <LazyCalendar
         {...limitCalendarProps(calendarProps, minDate, maxDate)}
         mode="range"
+        // A click on a complete range (or on none) starts a new one, so a
+        // fresh range never needs Clear first. The start emits `to: undefined`.
+        resetOnSelect
         autoFocus
         selected={selected}
         defaultMonth={defaultMonth ?? from ?? to}
         numberOfMonths={months}
-        onSelect={(next, day) => {
-          const range = restartRef.current ? { from: day, to: day } : next
-          restartRef.current = false
+        onSelect={(range) => {
           onChange(range)
-          // First click is a same-day range; keep the popover open so the
-          // user can set `to`. Close once the ends differ.
+          // Close once the ends differ; a start or a one-day range stays open.
           if (range?.from && range.to && !isSameDay(range.from, range.to)) {
             setOpen(false)
           }
