@@ -5,7 +5,7 @@ colors, and distinct selected states. 0.6.0 added generic pieces apps were
 keeping locally (`InfoTip`, `ColorLegend`, `SearchPicker`, `Markdown`,
 `StatTile`, `Meter`, `Slider`) plus the ToggleGroup selected-state fix.
 React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
-when using `next/nav-link` or `next/tabs-nav-link`.
+when using `next/nav-link`, `next/period-stepper`, or `next/tabs-nav-link`.
 
 ```sh
 npm install --save-exact atlas-react-kit@0.12.0
@@ -101,7 +101,7 @@ The public site is Storybook in `site/`. `npm run build --prefix site`
 typechecks the stories, builds Storybook into `site/dist`, then checks the
 static output. Vercel serves that directory; `/playground` and `/storybook`
 redirect to `/`. The site and Storybook dependencies are not part of the npm
-package. Optional feature libraries (markdown, dates, toasts, theme, Next) are
+package. Optional feature libraries (markdown, dates, toasts, theme, Next, dnd-kit) are
 peer dependencies and are required only when those entry points are imported.
 The package does not bundle React.
 
