@@ -8,6 +8,9 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- `remark-parse` is no longer a required peer dependency. Only the kit's
+  own docs-link check used it, so apps no longer install it for nothing.
+  The README's theme setup now says `ThemeProvider` needs `next-themes`.
 - Date picker values wrap inside narrow triggers so a full selected range
   stays visible; ordinary one-line controls remain 40px tall.
 - Dialog titles leave room for the built-in close button when it is shown.
