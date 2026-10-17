@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
+import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing, selectedState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
@@ -31,10 +32,11 @@ function NavLink({
   active,
   className,
   ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
-  active: boolean
-}) {
+}: React.ComponentProps<"a"> &
+  AsChildProps & {
+    /** This link is the current page: `aria-current="page"` and the selected chrome. */
+    active: boolean
+  }) {
   const Comp = asChild ? Slot.Root : "a"
 
   return (

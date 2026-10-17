@@ -19,6 +19,7 @@ function Progress({
   max = 100,
   ...props
 }: React.ComponentProps<typeof ProgressPrimitive.Root> & {
+  /** Classes for the fill, e.g. a status color. Defaults to `bg-primary`. */
   indicatorClassName?: string
 }) {
   const scale = Number.isFinite(max) && max > 0 ? max : 100

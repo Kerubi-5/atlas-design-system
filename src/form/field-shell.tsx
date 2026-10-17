@@ -1,5 +1,6 @@
 import type { ComponentProps, ReactNode } from "react"
 
+import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import { pickerValueId } from "../internal/form-control.js"
 import { Label } from "../label.js"
 import { cn } from "../utils.js"
@@ -9,6 +10,8 @@ import {
   FieldError,
   getFieldErrorMessage,
   type FieldMetaState,
+  type FormFieldBaseProps,
+  type FormFieldMetaProps,
 } from "./field-error.js"
 
 /**
@@ -75,6 +78,28 @@ export function describedBy(
 }
 
 /**
+ * Props the date and date-time fields share; each adds its own `value`,
+ * `onValueChange`, and `placeholder`.
+ */
+export type PickerFieldBaseProps = FormFieldBaseProps &
+  FormFieldMetaProps & {
+    /** Disables the trigger so no date can be picked. */
+    disabled?: boolean
+    /** Marks the label and adds "Required" to the trigger's description. */
+    required?: boolean
+    /** Earliest day that can be picked; earlier days are disabled. */
+    minDate?: DateLike
+    /** Latest day that can be picked; later days are disabled. */
+    maxDate?: DateLike
+    /** Forwarded to the picker trigger. */
+    className?: string
+    /** Forwarded to the picker popover. */
+    contentClassName?: string
+    /** Day Picker options forwarded to the calendar (disabled days, etc.). */
+    calendarProps?: DatePickerCalendarProps
+  }
+
+/**
  * Trigger ARIA for the date and date-time fields: invalid while there is
  * error text, named "label, value" (a `<label for>` alone would hide the
  * picked value), and described by "Required" (a button cannot take
@@ -120,12 +145,19 @@ export function FormFieldShell({
   children,
   ...props
 }: Omit<ComponentProps<"div">, "id" | "children"> & {
+  /** Id of the control; the label, hint, and error ids derive from it. */
   id: string
+  /** Visible label text. */
   label: string
+  /** Content on the label's row, after the label (e.g. a mode toggle). */
   labelAction?: ReactNode
+  /** Hint between the label and the control, with id `descriptionIdFor(id)`. */
   description?: ReactNode
+  /** Error text under the control; `undefined` shows none. */
   errorText: string | undefined
+  /** When false, the label does not point at the control. Default true. */
   labelFor?: boolean
+  /** Marks the label and renders the hidden "Required" text. */
   required?: boolean
   children: ReactNode
 }) {

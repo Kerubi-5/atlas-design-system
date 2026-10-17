@@ -8,14 +8,13 @@ import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
-import type { ErrorTimingProps } from "./field-error.js"
 import {
   describedBy,
   FormFieldShell,
   invalidWhen,
   metaErrorText,
 } from "./field-shell.js"
-import type { TextFieldApi } from "./text-field.js"
+import type { TextFieldBaseProps } from "./text-field.js"
 
 type Mode = "write" | "preview"
 
@@ -43,22 +42,11 @@ export function FormMarkdownField({
   className,
   fieldClassName,
   previewClassName,
-}: ErrorTimingProps & {
-  field: TextFieldApi
-  /**
-   * Control id the label points at. Defaults to `field.name`; pass a unique
-   * id when two forms on one page share a field name.
-   */
-  id?: string
-  label: string
+}: TextFieldBaseProps & {
+  /** Write textarea placeholder. Default "Markdown supported". */
   placeholder?: string
+  /** Write textarea rows. Default 5. */
   rows?: number
-  /** Sets `required` on the Write textarea and marks the label. */
-  required?: boolean
-  /** Forwarded to the Write textarea. */
-  className?: string
-  /** Classes for the field wrapper (label row, body, and error). */
-  fieldClassName?: string
   /** Classes for the Preview surface, e.g. a taller `min-h-40`. */
   previewClassName?: string
 }) {

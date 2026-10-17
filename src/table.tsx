@@ -21,7 +21,10 @@ function Table({
   className,
   containerClassName,
   ...props
-}: React.ComponentProps<"table"> & { containerClassName?: string }) {
+}: React.ComponentProps<"table"> & {
+  /** Classes for the scroller around the table, e.g. a height cap or border. */
+  containerClassName?: string
+}) {
   const containerRef = React.useRef<HTMLDivElement>(null)
   const scrollable = useHorizontalOverflow(containerRef)
 

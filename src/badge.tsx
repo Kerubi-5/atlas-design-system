@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
+import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing, invalidState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
@@ -67,7 +68,8 @@ function Badge({
   asChild = false,
   ...props
 }: React.ComponentProps<"span"> &
-  VariantProps<typeof badgeVariants> & { asChild?: boolean }) {
+  VariantProps<typeof badgeVariants> &
+  AsChildProps) {
   const Comp = asChild ? Slot.Root : "span"
 
   return (

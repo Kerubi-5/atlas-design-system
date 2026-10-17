@@ -4,7 +4,11 @@ import { type ReactNode, useId } from "react"
 
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 
-import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
+import type {
+  FormFieldBaseProps,
+  FormFieldDescriptionProps,
+  FormFieldMetaProps,
+} from "./field-error.js"
 import {
   describedBy,
   descriptionIdFor,
@@ -15,27 +19,30 @@ import {
 } from "./field-shell.js"
 
 export type ToggleGroupFieldOption<T extends string> = {
+  /** Value passed to `onValueChange` when this item is pressed. */
   value: T
+  /** Content of the toggle item. */
   label: ReactNode
 }
 
-type Props<T extends string> = ErrorTimingProps & {
-  label: string
-  description?: ReactNode
-  /** The selected option, or `""` for none yet. */
-  value: T | ""
-  /** Called with an option's value; pressing the active item keeps it. */
-  onValueChange: (value: T) => void
-  options: ToggleGroupFieldOption<T>[]
-  meta?: FieldMetaState
-  required?: boolean
-  disabled?: boolean
-  size?: "default" | "sm" | "lg"
-  /** Forwarded to the toggle group. */
-  className?: string
-  /** Classes for the field wrapper. */
-  fieldClassName?: string
-}
+type Props<T extends string> = FormFieldBaseProps &
+  FormFieldMetaProps &
+  FormFieldDescriptionProps & {
+    /** The selected option, or `""` for none yet. */
+    value: T | ""
+    /** Called with an option's value; pressing the active item keeps it. */
+    onValueChange: (value: T) => void
+    /** The items to choose from, in order. */
+    options: ToggleGroupFieldOption<T>[]
+    /** Marks the label. */
+    required?: boolean
+    /** Disables every item in the group. */
+    disabled?: boolean
+    /** Size of the toggle items. Default "sm". */
+    size?: "default" | "sm" | "lg"
+    /** Forwarded to the toggle group. */
+    className?: string
+  }
 
 /**
  * One choice from a few as a joined outline toggle group (a segmented

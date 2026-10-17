@@ -17,11 +17,15 @@ function PageHeader({
   children,
   ...props
 }: {
+  /** The page heading. */
   title: React.ReactNode
+  /** Muted hint under the title. */
   description?: React.ReactNode
+  /** Buttons or links on the right (stacked below on small screens). */
   actions?: React.ReactNode
   /** Heading level. Default `h1`. */
   titleAs?: "h1" | "h2" | "h3"
+  /** Classes for the heading. */
   titleClassName?: string
 } & Omit<React.ComponentProps<"header">, "title">) {
   return (

@@ -17,6 +17,7 @@ function Avatar({
   size = "default",
   ...props
 }: React.ComponentProps<typeof AvatarPrimitive.Root> & {
+  /** `sm` 24px, `default` 32px, `lg` 40px. Default `default`. */
   size?: "sm" | "default" | "lg"
 }) {
   return (

@@ -18,34 +18,43 @@ import {
   normalizeSearchQuery,
 } from "./internal/search.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
+import type { SearchPickerProps } from "./search-picker.js"
 import { cn, onInputChange } from "./utils.js"
 
 export type ComboboxOption = {
+  /** What `onValueChange` reports and `value` matches; unique in the list. */
   value: string
+  /** The visible text, on the trigger when selected and in the list. */
   label: string
 }
 
 type ComboboxProps = {
+  /** Every choice, in display order. */
   options: ComboboxOption[]
+  /** The selected option's value; the trigger shows its label. */
   value?: string
+  /** Called with the chosen (or created) value; the popover then closes. */
   onValueChange: (value: string) => void
+  /** Trigger text when nothing is selected. Default `"Select"`. */
   placeholder?: string
+  /** Placeholder and accessible name for the search input. Default `"Search"`. */
   searchPlaceholder?: string
-  emptyText?: string
+  /** Disables the trigger, so the list cannot open. */
   disabled?: boolean
+  /** Goes on the trigger, so a `<Label htmlFor>` names it. Generated when omitted. */
   id?: string
   /** Classes for the trigger, e.g. its width; the list matches it. */
   className?: string
-  /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
-  listClassName?: string
   /**
    * Classes for the popover panel, e.g. a width other than the trigger's.
    * Defaults to the trigger width.
    */
   contentClassName?: string
+  /** Marks the trigger invalid, drawing the error border. */
   "aria-invalid"?: boolean
   /** Name the trigger when there is no `<Label htmlFor={id}>`. */
   "aria-label"?: string
+  /** Id of the element that names the trigger and the list. */
   "aria-labelledby"?: string
   /**
    * Offer creating the current query when it is not already an option.
@@ -63,18 +72,23 @@ type ComboboxProps = {
    * `Create "{value}"`.
    */
   createLabel?: (value: string) => string
-} & Omit<
-  React.ComponentProps<"button">,
-  // Owned by the combobox: its value, its open state, and its ARIA wiring.
-  | "value"
-  | "defaultValue"
-  | "children"
-  | "type"
-  | "role"
-  | "aria-expanded"
-  | "aria-controls"
-  | "onKeyDown"
->
+} & Pick<
+  // Same list text and sizing as SearchPicker, documented there.
+  SearchPickerProps<ComboboxOption>,
+  "emptyText" | "listClassName"
+> &
+  Omit<
+    React.ComponentProps<"button">,
+    // Owned by the combobox: its value, its open state, and its ARIA wiring.
+    | "value"
+    | "defaultValue"
+    | "children"
+    | "type"
+    | "role"
+    | "aria-expanded"
+    | "aria-controls"
+    | "onKeyDown"
+  >
 
 const CREATE_OPTION_KEY = "__atlas-combobox-create"
 const getOptionLabel = (option: ComboboxOption) => option.label

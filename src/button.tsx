@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
+import type { AsChildProps } from "./internal/as-child.js"
 import {
   controlSize,
   disabledState,
@@ -67,9 +68,8 @@ function Button({
   asChild = false,
   ...props
 }: React.ComponentProps<"button"> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-  }) {
+  VariantProps<typeof buttonVariants> &
+  AsChildProps) {
   const Comp = asChild ? Slot.Root : "button"
 
   return (

@@ -62,6 +62,7 @@ function SelectTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Trigger> & {
+  /** Trigger height: `default` (`h-10`) or `sm` (`h-9`). Default `default`. */
   size?: "sm" | "default"
 }) {
   return (

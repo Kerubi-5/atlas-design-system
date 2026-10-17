@@ -1,10 +1,14 @@
 "use client"
 
-import { type ComponentProps, type ReactNode, useId } from "react"
+import { type ComponentProps, useId } from "react"
 
 import { Combobox } from "../combobox.js"
 
-import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
+import type {
+  FormFieldBaseProps,
+  FormFieldDescriptionProps,
+  FormFieldMetaProps,
+} from "./field-error.js"
 import {
   describedBy,
   descriptionIdFor,
@@ -13,18 +17,15 @@ import {
   metaErrorText,
 } from "./field-shell.js"
 
-type Props = ErrorTimingProps &
+type Props = FormFieldBaseProps &
+  FormFieldMetaProps &
+  FormFieldDescriptionProps &
   Omit<
     ComponentProps<typeof Combobox>,
     "id" | "aria-invalid" | "aria-describedby" | "aria-required"
   > & {
-    label: string
-    description?: ReactNode
-    meta?: FieldMetaState
     /** Marks the label and passes `aria-required` to the trigger. */
     required?: boolean
-    /** Classes for the field wrapper; `className` styles the trigger. */
-    fieldClassName?: string
   }
 
 /**

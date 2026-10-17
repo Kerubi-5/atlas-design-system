@@ -41,9 +41,13 @@ import { cn } from "./utils.js"
  * color) draws a status dot; `badge` is trailing header meta such as a total.
  */
 export type KanbanColumn = {
+  /** Matches what `getColumnId` returns for the column's cards. */
   id: string
+  /** Header text. */
   label: string
+  /** Any CSS color; draws a status dot before the label. No dot when omitted. */
   color?: string
+  /** Trailing header meta under the card count, such as a total. */
   badge?: React.ReactNode
   /** Replaces the board's `emptyLabel` for this column. */
   emptyLabel?: string
@@ -54,13 +58,18 @@ export type KanbanColumn = {
  * column edge). Feed them to a fractional-index helper to store the order.
  */
 export type KanbanDropTarget = {
+  /** `position` of the card above the drop slot; `undefined` at the top. */
   beforePosition: number | undefined
+  /** `position` of the card below the drop slot; `undefined` at the bottom. */
   afterPosition: number | undefined
 }
 
 export type KanbanBoardProps<T extends { id: string; position: number }> = {
+  /** The board's columns, in display order. */
   columns: KanbanColumn[]
+  /** Every card, in display order; sort by `position` first. A card whose column id is unknown is not shown. */
   items: T[]
+  /** The id of the column a card belongs in. */
   getColumnId: (item: T) => string
   /** Every drop that changes a column or the order, including same-column reorders. */
   onMove: (item: T, toColumnId: string, target: KanbanDropTarget) => void
@@ -74,11 +83,17 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   onCardClick?: (item: T) => void
   /** Skeleton cards on a first load with no items; dims the board on a refetch. */
   isLoading?: boolean
+  /** Text in a column with no cards. Default `"Drop here"`. */
   emptyLabel?: string
+  /** Text on the Finish zone. Default `"Finish"`. */
   completeLabel?: string
+  /** Text on the Remove zone. Default `"Remove"`. */
   deleteLabel?: string
+  /** Classes for the horizontal scroller that holds the columns. */
   scrollerClassName?: string
+  /** Classes for every column, e.g. its width. */
   columnClassName?: string
+  /** Classes for every card, including the one under the pointer while dragging. */
   cardClassName?: string
 } & Omit<React.ComponentProps<"div">, "children">
 
@@ -651,7 +666,9 @@ function KanbanSkeleton({
   columnClassName,
   ...props
 }: {
+  /** How many placeholder columns to draw. Default 4. */
   columnCount?: number
+  /** Classes for every placeholder column, e.g. to match the board's width. */
   columnClassName?: string
 } & Omit<React.ComponentProps<"div">, "children">) {
   return (

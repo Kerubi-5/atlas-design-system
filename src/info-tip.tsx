@@ -19,15 +19,24 @@ export type InfoTipLayout = "box" | "inline"
 export type InfoTipProps = {
   /** Required name for the icon button (the glyph has no visible text). */
   label: string
+  /** Panel heading; also names the panel. Without it the panel uses `label`. */
   title?: string
+  /** Muted text under the title. */
   description?: React.ReactNode
   /** Extra body after the title and description. */
   children?: React.ReactNode
-  /** `inline` keeps the surrounding line height; the 44px hit area overflows. */
+  /**
+   * `inline` keeps the surrounding line height; the 44px hit area overflows.
+   * Default `box`.
+   */
   layout?: InfoTipLayout
+  /** Panel side. Default `top`; Radix still flips on collision. */
   side?: React.ComponentProps<typeof PopoverContent>["side"]
+  /** Panel alignment against the trigger. Default `center`. */
   align?: React.ComponentProps<typeof PopoverContent>["align"]
+  /** Shown beside the title, e.g. a `Badge`. */
   badge?: React.ReactNode
+  /** Replaces the default question-mark glyph. */
   icon?: React.ReactNode
   /** Classes for the trigger button. */
   className?: string

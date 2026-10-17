@@ -30,7 +30,9 @@ type ToastId = string | number
 
 /** A button in a toast. Clicking it runs `onClick`, then closes the toast. */
 interface ToastAction {
+  /** The button's text. */
   label: string
+  /** Runs when the button is clicked, before the toast closes. */
   onClick: () => void
 }
 
@@ -51,9 +53,13 @@ interface ToastOptions {
 type ShowToast = (message: ReactNode, options?: ToastOptions) => ToastId
 
 type Toast = ShowToast & {
+  /** A toast with a check icon and a success-toned title and border. */
   success: ShowToast
+  /** A toast with an info icon. */
   info: ShowToast
+  /** A toast with an alert icon and a warning-toned title and border. */
   warning: ShowToast
+  /** A toast with an alert icon and a destructive-toned title and border. */
   error: ShowToast
   /** A spinner toast that stays until it is replaced (same `id`) or dismissed. */
   loading: ShowToast
@@ -74,7 +80,7 @@ interface ToasterProps {
   position?: ToastPosition
   /** A labelled close button on every toast. Default `true`. */
   closeButton?: boolean
-  /** Keep the stack expanded instead of collapsed behind the newest toast. */
+  /** Keep the stack expanded instead of collapsed behind the newest toast. Default `false`. */
   expand?: boolean
   /** How many toasts show at once. Default 3. */
   visibleToasts?: number

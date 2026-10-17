@@ -6,6 +6,7 @@ import { cn } from "./utils.js"
 export type MeterMarker = {
   /** Same scale as `value` / `min` / `max` (not a 0–1 fraction). */
   position: number
+  /** Classes for the tick, e.g. its color. */
   className?: string
 }
 
@@ -13,13 +14,19 @@ export type MeterProps = Omit<
   React.ComponentProps<"div">,
   "children" | "role" | "aria-label"
 > & {
+  /** Current reading. Clamped to `min`–`max`; a non-finite value shows as empty. */
   value: number
+  /** Start of the scale. Default `0`. */
   min?: number
+  /** End of the scale. */
   max: number
   /** App-owned fill (status, pace). Defaults to primary. */
   fillClassName?: string
+  /** Thin ticks drawn over the track, e.g. a cap or a typical value. */
   markers?: MeterMarker[]
+  /** Required accessible name; the meter has no visible label. */
   "aria-label": string
+  /** Classes for the track. */
   className?: string
 }
 

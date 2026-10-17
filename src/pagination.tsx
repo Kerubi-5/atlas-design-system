@@ -44,7 +44,9 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 }
 
 type PaginationLinkProps = {
+  /** This link is the current page: `aria-current="page"` and the selected wash. */
   isActive?: boolean
+  /** `icon` (default) is a square page number; `default` fits text such as Previous. */
   size?: "default" | "icon"
   /**
    * No page to go to, such as Previous on the first page. Renders without

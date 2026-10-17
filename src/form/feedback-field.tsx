@@ -5,7 +5,9 @@ export function FormFeedbackField({
   message,
   className,
 }: {
+  /** Error text to show; `null` or empty renders nothing. */
   message: string | null
+  /** Classes for the message paragraph. */
   className?: string
 }) {
   if (!message) return null

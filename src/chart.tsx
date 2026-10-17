@@ -13,10 +13,15 @@ import { cn } from "./utils.js"
  * app; these pieces keep every chart's axis, readout, and keyboard use alike.
  */
 
+/** Space around the plot, in viewBox units, for axis labels. */
 export type ChartPadding = {
+  /** Above the plot. Default 10. */
   top: number
+  /** Right of the plot. Default 12. */
   right: number
+  /** Below the baseline, for x labels. Default 20. */
   bottom: number
+  /** Left of the plot, for y labels. Default 40. */
   left: number
 }
 
@@ -30,15 +35,23 @@ const defaultPadding: ChartPadding = {
 
 /** A chart's viewBox and the plot box inside it, in viewBox units. */
 export type ChartFrame = {
+  /** The whole chart's width. */
   width: number
+  /** The whole chart's height. */
   height: number
+  /** The `viewBox` attribute for the chart's `<svg>`. */
   viewBox: string
-  /** Plot edges: `left`/`right` on x, `top` and `bottom` (the baseline) on y. */
+  /** The plot's left edge on x. */
   left: number
+  /** The plot's right edge on x. */
   right: number
+  /** The plot's top edge on y. */
   top: number
+  /** The plot's bottom edge on y: the baseline, where 0 sits. */
   bottom: number
+  /** `right - left`. */
   plotWidth: number
+  /** `bottom - top`. */
   plotHeight: number
 }
 
@@ -52,7 +65,12 @@ export function chartFrame(
   {
     width = 640,
     padding,
-  }: { width?: number; padding?: Partial<ChartPadding> } = {}
+  }: {
+    /** The chart's width in viewBox units. Default 640. */
+    width?: number
+    /** Overrides for any side of the default padding. */
+    padding?: Partial<ChartPadding>
+  } = {}
 ): ChartFrame {
   const pad = { ...defaultPadding, ...padding }
   const plotWidth = width - pad.left - pad.right
@@ -142,7 +160,18 @@ export function compactNumber(n: number): string {
   return String(Math.round(n))
 }
 
-type IndexRange = { min: number; max: number }
+type IndexRange = {
+  /** The first data index the plot can pick. */
+  min: number
+  /** The last data index the plot can pick; may stop short of the axis end. */
+  max: number
+}
+
+/** The index range plus how many intervals the plot's width spans. */
+type PlotSteps = IndexRange & {
+  /** Intervals across the plot width (data points minus one on a full axis). */
+  steps: number
+}
 
 /**
  * Data index at viewBox x `viewX`. The plot spans `steps` intervals from
@@ -152,7 +181,7 @@ type IndexRange = { min: number; max: number }
 export function indexAtPlotX(
   viewX: number,
   frame: ChartFrame,
-  { steps, min, max }: IndexRange & { steps: number }
+  { steps, min, max }: PlotSteps
 ): number {
   const index =
     Math.round(((viewX - frame.left) / frame.plotWidth) * steps) + min
@@ -179,11 +208,9 @@ export function useChartScrub({
   steps,
   min,
   max,
-}: {
+}: PlotSteps & {
+  /** The chart's frame, for mapping pointer x onto the plot. */
   frame: ChartFrame
-  steps: number
-  min: number
-  max: number
 }) {
   const svgRef = React.useRef<SVGSVGElement>(null)
   const [index, setIndex] = React.useState<number | null>(null)
@@ -225,9 +252,13 @@ export function ChartYAxisGrid({
   tickCount = 4,
   format = compactNumber,
 }: {
+  /** The chart's frame; lines span the plot, labels sit in the left padding. */
   frame: ChartFrame
+  /** The largest data value; the axis tops out at `niceCeil(yMax)`. */
   yMax: number
+  /** How many even steps from 0 to the top. Default 4. */
   tickCount?: number
+  /** Label text for a tick value. Default `compactNumber`. */
   format?: (value: number) => string
 }) {
   const ticks = niceTicks(yMax, tickCount)
@@ -272,7 +303,9 @@ export function ChartTooltip({
   children,
   ...props
 }: {
+  /** The point's x, in percent of the chart box's width. */
   xPct: number
+  /** The point's y, in percent of the chart box's height; capped at 60. */
   yPct: number
 } & React.ComponentProps<"div">) {
   const flip = xPct > 55
@@ -296,6 +329,16 @@ export function ChartTooltip({
       {children}
     </div>
   )
+}
+
+/** A series' line key, shared by tooltip rows and legend keys. */
+type SeriesKeyProps = {
+  /** The series name. */
+  label: React.ReactNode
+  /** The series stroke, e.g. `stroke-primary`. */
+  swatchClassName: string
+  /** Draws the swatch dashed, for a dashed series line. */
+  dashed?: boolean
 }
 
 function SeriesSwatch({
@@ -330,12 +373,9 @@ export function ChartTooltipRow({
   value,
   swatchClassName,
   dashed,
-}: {
-  label: React.ReactNode
+}: SeriesKeyProps & {
+  /** The series' value at the point, shown first in bold. */
   value: React.ReactNode
-  /** The series stroke, e.g. `stroke-primary`. */
-  swatchClassName: string
-  dashed?: boolean
 }) {
   return (
     <div
@@ -377,11 +417,8 @@ export function ChartLegendKey({
   swatchClassName,
   dashed,
   className,
-}: {
-  label: React.ReactNode
-  /** The series stroke, e.g. `stroke-primary`. */
-  swatchClassName: string
-  dashed?: boolean
+}: SeriesKeyProps & {
+  /** Classes for the key's wrapper. */
   className?: string
 }) {
   return (

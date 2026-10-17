@@ -24,7 +24,9 @@ export { toDate }
 
 /** From/to value for `DatePickerButton` in range mode; each side is `DateLike`. */
 export type DatePickerRangeValue = {
+  /** First day of the range. */
   from?: DateLike
+  /** Last day of the range; missing while only the start is picked. */
   to?: DateLike
 }
 
@@ -45,7 +47,9 @@ type DatePickerSharedProps = PickerTriggerProps & {
 }
 
 export type DatePickerSingleProps = DatePickerSharedProps & {
+  /** Pick one day. Default `"single"`. */
   mode?: "single"
+  /** Controlled day, as a `Date` or `yyyy-MM-dd`. Omitted is empty. */
   value?: DateLike
   /** Called with the picked day, or `undefined` on Clear. */
   onValueChange?: (date: Date | undefined) => void
@@ -54,7 +58,9 @@ export type DatePickerSingleProps = DatePickerSharedProps & {
 }
 
 export type DatePickerRangeProps = DatePickerSharedProps & {
+  /** Pick a from/to range of days. */
   mode: "range"
+  /** Controlled range; each side is a `Date` or `yyyy-MM-dd`. Omitted is empty. */
   value?: DatePickerRangeValue
   /** Called on every range click, or with `undefined` on Clear. */
   onValueChange?: (range: DateRange | undefined) => void

@@ -7,10 +7,13 @@ import { EmptyPanel } from "./empty-panel.js"
 import { cn } from "./utils.js"
 
 type ErrorFallbackProps = {
-  /** User-facing recovery copy. */
+  /** User-facing recovery copy. Default "Something went wrong.". */
   message?: string
+  /** Shows a "Try again" button that calls this. Hidden when omitted. */
   onRetry?: () => void
+  /** Shows a "Reload" button that calls this. Hidden when omitted. */
   onReload?: () => void
+  /** Classes for the panel. */
   className?: string
 }
 
@@ -54,9 +57,11 @@ export function ErrorFallback({
 }
 
 type ErrorBoundaryProps = {
+  /** Content to render until it throws. */
   children: ReactNode
   /** Overrides the default recovery message. */
   message?: string
+  /** Called with the caught error and its component stack, e.g. to log it. */
   onError?: (error: Error, info: ErrorInfo) => void
 }
 

@@ -8,6 +8,10 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Every prop the kit declares now has a doc comment, so editors and
+  agents show what it does and its default. Props that several components
+  share (form field labels, error timing, picker options, `asChild`) are
+  typed and documented once. Prop types are unchanged.
 - Deprecated: `DatePickerButton` and `DateTimePickerButton` take
   `onValueChange`, like every other controlled component; `onChange` still
   works until 2.0. `EmptyPanel` `size` is `sm | default | lg`; `md` still
