@@ -17,13 +17,12 @@ release history.
       not after 1.0. Reviewed at 0.13: keep all 66 entries. `next/nav-link`
       and `next/tabs-nav-link` share one contract but style different
       shells, so both stay.
-- [ ] Review prop names for consistency across components (`onValueChange`
+- [x] Review prop names for consistency across components (`onValueChange`
       vs `onChange`, `size` scales, `variant` names). Record decisions in
-      `DESIGN_RULES.md`. Conventions are recorded there. Two stable
-      exceptions need a decision: `DatePickerButton` and
-      `DateTimePickerButton` take `onChange` where seven components take
-      `onValueChange`, and `EmptyPanel` `size` runs `sm | md | lg` where
-      the rest use `sm | default | lg`.
+      `DESIGN_RULES.md`. Conventions are recorded there. The two stable
+      exceptions were renamed with deprecated aliases (#58):
+      `DatePickerButton` and `DateTimePickerButton` take `onValueChange`,
+      and `EmptyPanel` `size` is `sm | default | lg`.
 - [x] Confirm no third-party types leak through the public types (0.8.0 did
       this for toasts; check `calendar`/`date-picker` re-exports of
       `react-day-picker` types and `radix-ui` prop types). Done for Day
