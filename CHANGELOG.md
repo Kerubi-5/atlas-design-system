@@ -8,6 +8,10 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Faster `KanbanBoard`: scrolling no longer re-renders every card (300
+  cards over 20 scroll events: 6,000 `renderCard` calls before, 0 now), and
+  changing one item re-renders only that card when `renderCard` keeps its
+  identity (300 calls before, 1 now).
 - Every prop the kit declares now has a doc comment, so editors and
   agents show what it does and its default. Props that several components
   share (form field labels, error timing, picker options, `asChild`) are
