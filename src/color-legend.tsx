@@ -6,7 +6,9 @@ import { cn } from "./utils.js"
 export type ColorLegendItem = {
   /** CSS color from the app (map bins, status scales). The kit does not own it. */
   color: string
+  /** Value range for the swatch, such as `0–10`, shown before the label. */
   range?: string
+  /** What the color means. */
   label: string
 }
 
@@ -14,11 +16,17 @@ export type ColorLegendProps = Omit<
   React.ComponentProps<"figure">,
   "children" | "title"
 > & {
+  /** Heading above the list, drawn as the figure's caption. */
   title?: string
+  /** One row per color, in display order. */
   items: ColorLegendItem[]
+  /** A small muted note under the list, such as the data source. */
   caption?: React.ReactNode
+  /** Extra content after the caption. */
   children?: React.ReactNode
+  /** Names the legend when there is no `title`. */
   "aria-label"?: string
+  /** Classes for the figure, e.g. overlay position and card fill. */
   className?: string
 }
 

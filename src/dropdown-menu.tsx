@@ -31,6 +31,12 @@ const menuContentClassName = cn(
   "z-50 overflow-x-hidden overflow-y-auto p-1"
 )
 
+/** Props for menu rows that can line up with checkbox and radio items. */
+type MenuInsetProps = {
+  /** Indent the row to line up with checkbox and radio item text. */
+  inset?: boolean
+}
+
 /** Action menu for commands (row actions, overflow menus). Use `Select` to pick a value. */
 function DropdownMenu({
   ...props
@@ -95,10 +101,11 @@ function DropdownMenuItem({
   inset,
   variant = "default",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
-  inset?: boolean
-  variant?: "default" | "destructive"
-}) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Item> &
+  MenuInsetProps & {
+    /** `destructive` colors the row for a dangerous action. Default `default`. */
+    variant?: "default" | "destructive"
+  }) {
   return (
     <DropdownMenuPrimitive.Item
       data-slot="dropdown-menu-item"
@@ -173,9 +180,7 @@ function DropdownMenuLabel({
   className,
   inset,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & {
-  inset?: boolean
-}) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.Label> & MenuInsetProps) {
   return (
     <DropdownMenuPrimitive.Label
       data-slot="dropdown-menu-label"
@@ -226,9 +231,8 @@ function DropdownMenuSubTrigger({
   inset,
   children,
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> & {
-  inset?: boolean
-}) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.SubTrigger> &
+  MenuInsetProps) {
   return (
     <DropdownMenuPrimitive.SubTrigger
       data-slot="dropdown-menu-sub-trigger"

@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode, useId } from "react"
+import { useId } from "react"
 
 import { Checkbox } from "../checkbox.js"
 import {
@@ -14,9 +14,10 @@ import {
 import { cn } from "../utils.js"
 
 import {
-  type ErrorTimingProps,
   FieldError,
-  type FieldMetaState,
+  type FormFieldBaseProps,
+  type FormFieldDescriptionProps,
+  type FormFieldMetaProps,
 } from "./field-error.js"
 import {
   describedBy,
@@ -26,24 +27,26 @@ import {
   metaErrorText,
 } from "./field-shell.js"
 
-type CheckboxFieldProps = ErrorTimingProps & {
-  checked: boolean
-  onCheckedChange: (checked: boolean) => void
-  onBlur?: () => void
-  label: string
-  /** Hint under the label, read with the checkbox. */
-  description?: ReactNode
-  id?: string
-  meta?: FieldMetaState
-  required?: boolean
-  disabled?: boolean
-  /** Checkbox before the label (default) or after the label and hint. */
-  controlPosition?: "start" | "end"
-  /** Forwarded to the checkbox. */
-  className?: string
-  /** Classes for the field wrapper. */
-  fieldClassName?: string
-}
+type CheckboxFieldProps = FormFieldBaseProps &
+  FormFieldMetaProps &
+  FormFieldDescriptionProps & {
+    /** Whether the box is checked. */
+    checked: boolean
+    /** Called with the new checked state when the person toggles the box. */
+    onCheckedChange: (checked: boolean) => void
+    /** Called when the checkbox loses focus; pass the field's blur handler. */
+    onBlur?: () => void
+    /** Checkbox id the label points at. Defaults to a generated id. */
+    id?: string
+    /** Sets `required` on the checkbox and marks the label. */
+    required?: boolean
+    /** Disables the checkbox. */
+    disabled?: boolean
+    /** Checkbox before the label (default) or after the label and hint. */
+    controlPosition?: "start" | "end"
+    /** Forwarded to the checkbox. */
+    className?: string
+  }
 
 /**
  * One boolean as a labelled checkbox, with an optional hint and the same
@@ -115,25 +118,26 @@ export function FormCheckboxField({
 }
 
 export type CheckboxGroupOption<T extends string | number> = {
+  /** Value added to the group's `value` while this box is checked. */
   value: T
+  /** Text shown next to the box. */
   label: string
 }
 
-type CheckboxGroupFieldProps<T extends string | number> = ErrorTimingProps & {
-  /** The group's legend. */
-  label: string
-  description?: ReactNode
-  options: CheckboxGroupOption<T>[]
-  value: T[]
-  /** The checked values, in `options` order. */
-  onValueChange: (value: T[]) => void
-  meta?: FieldMetaState
-  disabled?: boolean
-  /** Layout of the options, e.g. a grid. Defaults to a wrapping row. */
-  className?: string
-  /** Classes for the fieldset. */
-  fieldClassName?: string
-}
+type CheckboxGroupFieldProps<T extends string | number> = FormFieldBaseProps &
+  FormFieldMetaProps &
+  FormFieldDescriptionProps & {
+    /** The boxes to show, in order. */
+    options: CheckboxGroupOption<T>[]
+    /** The checked values. */
+    value: T[]
+    /** Called with the checked values, in `options` order. */
+    onValueChange: (value: T[]) => void
+    /** Disables every checkbox in the group. */
+    disabled?: boolean
+    /** Layout of the options, e.g. a grid. Defaults to a wrapping row. */
+    className?: string
+  }
 
 /** Several values from a short list, as a labelled set of checkboxes. */
 export function FormCheckboxGroupField<T extends string | number>({

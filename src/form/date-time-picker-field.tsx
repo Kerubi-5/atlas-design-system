@@ -2,39 +2,24 @@
 
 import { useId } from "react"
 
-import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import { DateTimePickerButton } from "../date-time-picker.js"
 
-import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   FormFieldShell,
   metaErrorText,
   pickerFieldAria,
+  type PickerFieldBaseProps,
 } from "./field-shell.js"
 
-type Props = ErrorTimingProps & {
+type Props = PickerFieldBaseProps & {
+  /** The picked instant, or `null` when empty. */
   value: Date | null
+  /** Called with the picked instant, or `null` on Clear. */
   onValueChange: (date: Date | null) => void
-  label: string
-  meta?: FieldMetaState
+  /** Trigger text while nothing is picked. Default "Pick a date and time". */
   placeholder?: string
-  disabled?: boolean
-  /** Marks the label and adds "Required" to the trigger's description. */
-  required?: boolean
-  /** Earliest day that can be picked; earlier days are disabled. */
-  minDate?: DateLike
-  /** Latest day that can be picked; later days are disabled. */
-  maxDate?: DateLike
-  /** Minute increment forwarded to the picker. */
+  /** Minute increment for the time selects (1, 5, 15, 30, or 60). Default 15. */
   timeStep?: number
-  /** Forwarded to the date-time picker trigger. */
-  className?: string
-  /** Classes for the field wrapper (label, trigger, and error). */
-  fieldClassName?: string
-  /** Forwarded to the date-time picker popover. */
-  contentClassName?: string
-  /** Day Picker options forwarded to the calendar (disabled days, etc.). */
-  calendarProps?: DatePickerCalendarProps
 }
 
 /** Date-time picker with built-in field error text and invalid styling. */

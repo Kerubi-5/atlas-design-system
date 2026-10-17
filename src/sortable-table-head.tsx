@@ -15,7 +15,9 @@ export type SortDirection = "asc" | "desc"
 type SortableTableHeadProps = ComponentProps<typeof TableHead> & {
   /** Whether this column is the active sort key. */
   sorted?: boolean
+  /** Sort order shown while `sorted`. Default `asc`. */
   direction?: SortDirection
+  /** Called when the header button is pressed, e.g. to toggle the sort. */
   onClick?: () => void
   /** Classes for the inner sort button (`data-slot="sortable-table-head-button"`). */
   buttonClassName?: string

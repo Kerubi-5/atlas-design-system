@@ -2,6 +2,7 @@ import * as React from "react"
 import { Slot } from "radix-ui"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
+import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
@@ -41,9 +42,7 @@ function BreadcrumbLink({
   asChild,
   className,
   ...props
-}: React.ComponentProps<"a"> & {
-  asChild?: boolean
-}) {
+}: React.ComponentProps<"a"> & AsChildProps) {
   const Comp = asChild ? Slot.Root : "a"
 
   return (

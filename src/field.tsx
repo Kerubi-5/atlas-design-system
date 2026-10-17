@@ -24,7 +24,10 @@ function FieldLegend({
   className,
   variant = "legend",
   ...props
-}: React.ComponentProps<"legend"> & { variant?: "legend" | "label" }) {
+}: React.ComponentProps<"legend"> & {
+  /** `label` styles the legend like a field label. Default `legend`. */
+  variant?: "legend" | "label"
+}) {
   return (
     <legend
       data-slot="field-legend"
@@ -161,6 +164,7 @@ function FieldSeparator({
   className,
   ...props
 }: React.ComponentProps<"div"> & {
+  /** Optional text shown in a gap in the middle of the line, e.g. "Or". */
   children?: React.ReactNode
 }) {
   return (
@@ -192,6 +196,7 @@ function FieldError({
   errors,
   ...props
 }: React.ComponentProps<"div"> & {
+  /** Errors to list, deduplicated by message; `children` replaces them. */
   errors?: Array<{ message?: string } | undefined>
 }) {
   const content = useMemo(() => {

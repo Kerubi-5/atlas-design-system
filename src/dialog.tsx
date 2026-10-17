@@ -61,6 +61,7 @@ function DialogContent({
   closeButtonClassName,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Content> & {
+  /** Show the X close button in the top-right corner. Default `true`. */
   showCloseButton?: boolean
   /** Classes for the backdrop, e.g. a darker scrim. */
   overlayClassName?: string

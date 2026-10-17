@@ -6,10 +6,13 @@ type Props = React.ComponentProps<"div"> & {
   children: React.ReactNode
   /**
    * `sm` is tighter padding for compact widgets; `default` is standard form
-   * empty states. `md` is a deprecated alias of `default`, kept until 2.0.
+   * empty states; `lg` is roomier, for page-level states. `md` is a
+   * deprecated alias of `default`, kept until 2.0. Default `default`.
    */
   size?: "sm" | "default" | "lg" | "md"
+  /** Tinted muted background. Default `true`. */
   muted?: boolean
+  /** Classes for the root `div`. */
   className?: string
 }
 

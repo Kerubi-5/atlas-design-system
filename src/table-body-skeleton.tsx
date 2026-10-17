@@ -2,7 +2,9 @@ import { Skeleton } from "./skeleton.js"
 import { TableBody, TableCell, TableRow } from "./table.js"
 
 type Props = {
+  /** Placeholder cells per row; match the table's column count. */
   columns: number
+  /** Placeholder rows. Default `5`. */
   rows?: number
   /** Classes for the `tbody`. */
   className?: string

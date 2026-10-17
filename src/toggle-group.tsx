@@ -7,11 +7,19 @@ import { ToggleGroup as ToggleGroupPrimitive } from "radix-ui"
 import { cn } from "./utils.js"
 import { toggleVariants } from "./toggle.js"
 
+/** Layout props a `ToggleGroup` shares with its items. */
+type ToggleGroupLayoutProps = {
+  /**
+   * Gap between items, in spacing units. `0` joins them into one segmented
+   * control. Default `2`.
+   */
+  spacing?: number
+  /** Lay items out in a row or a column. Default `horizontal`. */
+  orientation?: "horizontal" | "vertical"
+}
+
 const ToggleGroupContext = React.createContext<
-  VariantProps<typeof toggleVariants> & {
-    spacing?: number
-    orientation?: "horizontal" | "vertical"
-  }
+  VariantProps<typeof toggleVariants> & ToggleGroupLayoutProps
 >({
   size: "default",
   variant: "default",
@@ -28,10 +36,8 @@ function ToggleGroup({
   children,
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
-  VariantProps<typeof toggleVariants> & {
-    spacing?: number
-    orientation?: "horizontal" | "vertical"
-  }) {
+  VariantProps<typeof toggleVariants> &
+  ToggleGroupLayoutProps) {
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"

@@ -107,7 +107,9 @@ const markdownComponents: Components = {
 }
 
 export type MarkdownProps = {
+  /** Markdown source to render. Raw HTML is dropped and unsafe URLs are removed. */
   content: string
+  /** Classes for the `article` wrapper. */
   className?: string
 }
 

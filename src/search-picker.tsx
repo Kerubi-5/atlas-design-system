@@ -34,17 +34,29 @@ export function defaultSearchFilter<T>(
 }
 
 export type SearchPickerProps<T> = {
+  /** Every choice, in display order. */
   items: T[]
+  /** A unique, stable value for an item; matched against `value`. */
   getValue: (item: T) => string
+  /** The item's visible text, also what the default filter searches. */
   getLabel: (item: T) => string
+  /** Whether an item matches the query. Default `defaultSearchFilter` (label contains query, ignoring case and accents). */
   filter?: (item: T, query: string, getLabel: (item: T) => string) => boolean
+  /** The selected item's value, marked in the list. */
   value?: string
+  /** Called with the item picked by click or Enter; the query then clears. */
   onSelect: (item: T) => void
+  /** Visible label for the search input. */
   label: string
+  /** Placeholder for the search input. Default `"Search"`. */
   placeholder?: string
+  /** Text shown when nothing matches the query. Default `"No results"`. */
   emptyText?: string
+  /** Accessible name for the listbox. Defaults to `label`. */
   listLabel?: string
+  /** Disables the input and every option. */
   disabled?: boolean
+  /** Classes for the wrapper, e.g. its width. */
   className?: string
   /** Classes for the listbox, e.g. its height. Defaults to `max-h-60`. */
   listClassName?: string

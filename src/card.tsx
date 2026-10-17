@@ -19,7 +19,9 @@ function Card({
   "aria-labelledby": ariaLabelledBy,
   ...props
 }: React.ComponentProps<"div"> & {
+  /** `sm` tightens padding and gaps. Default `default`. */
   size?: "default" | "sm"
+  /** Remove the padding so lists and tables run edge to edge. Default `false`. */
   flush?: boolean
 }) {
   const canName =
@@ -71,7 +73,10 @@ function CardTitle({
   as: Component = "div",
   className,
   ...props
-}: React.ComponentProps<"div"> & { as?: "div" | "h1" | "h2" | "h3" | "h4" }) {
+}: React.ComponentProps<"div"> & {
+  /** Element to render, e.g. a heading level for the outline. Default `div`. */
+  as?: "div" | "h1" | "h2" | "h3" | "h4"
+}) {
   return (
     <Component
       data-slot="card-title"

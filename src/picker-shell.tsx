@@ -59,13 +59,20 @@ export type PickerCalendarProps = {
 
 /** Props both pickers take for their trigger and popover. */
 export type PickerTriggerProps = {
+  /** Id of the trigger button; the trigger text gets `${id}-value`. */
   id?: string
+  /**
+   * Trigger text while nothing is picked. Defaults to "Pick a date", "Pick a
+   * date range", or "Pick a date and time" depending on the picker.
+   */
   placeholder?: string
+  /** Disable the trigger so the popover cannot open. */
   disabled?: boolean
   /** Classes for the trigger button. */
   className?: string
   /** Classes for the popover content, e.g. a width such as `w-80`. */
   contentClassName?: string
+  /** Mark the trigger invalid, e.g. when its field has an error. */
   "aria-invalid"?: boolean
   /**
    * Forwarded to the trigger. To name it from a visible label while still
@@ -135,8 +142,11 @@ type PickerShellProps = Omit<
   label: string
   /** Accessible name of the popover dialog. */
   dialogLabel: string
+  /** Whether the popover is open. */
   open: boolean
+  /** Called when the popover opens or closes. */
   onOpenChange: (open: boolean) => void
+  /** Called on a pointer down or focus outside the popover; can prevent the dismiss. */
   onInteractOutside?: React.ComponentProps<
     typeof PopoverContent
   >["onInteractOutside"]
@@ -214,7 +224,9 @@ export function PickerClearFooter({
   disabled,
   onClear,
 }: {
+  /** Disable the Clear button, e.g. while nothing is picked. */
   disabled: boolean
+  /** Called when Clear is pressed. */
   onClear: () => void
 }) {
   return (

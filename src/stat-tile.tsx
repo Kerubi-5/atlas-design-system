@@ -16,10 +16,15 @@ export type StatTileProps = Omit<
   React.ComponentProps<"div">,
   "children" | "title"
 > & {
+  /** Small uppercase label above the figure. */
   label: string
+  /** The big figure, already formatted. */
   value: string
+  /** Muted line under the figure; hidden when empty. */
   sub?: React.ReactNode
+  /** Extra content between the figure and `sub`, e.g. a `Meter`. */
   children?: React.ReactNode
+  /** Classes for the root `div`. */
   className?: string
 }
 

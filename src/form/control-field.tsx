@@ -2,7 +2,11 @@
 
 import { type ComponentProps, type ReactNode, useId } from "react"
 
-import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
+import type {
+  FormFieldBaseProps,
+  FormFieldDescriptionProps,
+  FormFieldMetaProps,
+} from "./field-error.js"
 import {
   describedBy,
   descriptionIdFor,
@@ -13,23 +17,24 @@ import {
 
 /** Props `FormControlField` hands its control: spread them onto it. */
 export type FormControlProps = {
+  /** Id the label points at. */
   id: string
+  /** `true` while the field shows error text. */
   "aria-invalid": true | undefined
+  /** Ids of the hint and the error text, when shown. */
   "aria-describedby": string | undefined
+  /** `true` when the field is `required`. */
   "aria-required": true | undefined
 }
 
-type Props = ErrorTimingProps &
+type Props = Omit<FormFieldBaseProps, "fieldClassName"> &
+  FormFieldMetaProps &
+  FormFieldDescriptionProps &
   Omit<ComponentProps<"div">, "id" | "children"> & {
     /** Control id the label points at. Defaults to a generated id. */
     id?: string
-    label: string
-    /** Hint between the label and the control, read with the control. */
-    description?: ReactNode
     /** Marks the label and passes `aria-required` to the control. */
     required?: boolean
-    /** Error meta, the same shape the other `form/*` fields take. */
-    meta?: FieldMetaState
     /** Renders the control from the id and ARIA props it should carry. */
     children: (control: FormControlProps) => ReactNode
   }

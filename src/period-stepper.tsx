@@ -11,6 +11,7 @@ type PeriodStepperFrameProps = {
   label: React.ReactNode
   /** What one step moves ("month", "week"), for the button names. */
   stepLabel: string
+  /** Classes for the range heading. */
   labelClassName?: string
 } & Omit<React.ComponentProps<"div">, "children">
 
@@ -27,6 +28,7 @@ function PeriodStepperFrame({
   control,
   ...props
 }: PeriodStepperFrameProps & {
+  /** Renders the element for each step; return `null` for "today" to drop it. */
   control: (
     step: "previous" | "today" | "next",
     content: React.ReactNode
@@ -82,8 +84,11 @@ function PeriodStepper({
   onNext,
   ...props
 }: PeriodStepperFrameProps & {
+  /** Called when Previous is pressed. */
   onPrevious: () => void
+  /** Called when Today is pressed. Leave out to drop the Today button. */
   onToday?: () => void
+  /** Called when Next is pressed. */
   onNext: () => void
 }) {
   const handlers = { previous: onPrevious, today: onToday, next: onNext }

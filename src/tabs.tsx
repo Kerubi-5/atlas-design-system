@@ -22,6 +22,12 @@ type Orientation = "horizontal" | "vertical"
  */
 const TabsOrientationContext = React.createContext<Orientation>("horizontal")
 
+/** Props `TabsList` and `TabsNav` share for the scroller around their row. */
+type TabsScrollerClassNameProps = {
+  /** Classes for the scroller around the tab row (`h-13` with `p-1` by default). */
+  scrollerClassName?: string
+}
+
 function Tabs({
   className,
   orientation = "horizontal",
@@ -57,8 +63,11 @@ function TabsScroller({
   className,
   children,
 }: {
+  /** Matches the list's variant so the scroller fill fits. Default `default`. */
   variant?: "default" | "line"
+  /** Matches the root's orientation. Default `horizontal`. */
   orientation?: Orientation
+  /** Classes for the scroller. */
   className?: string
   children: React.ReactNode
 }) {
@@ -111,9 +120,8 @@ function TabsList({
   variant = "default",
   ...props
 }: React.ComponentProps<typeof TabsPrimitive.List> &
-  Omit<VariantProps<typeof tabsListVariants>, "orientation"> & {
-    scrollerClassName?: string
-  }) {
+  Omit<VariantProps<typeof tabsListVariants>, "orientation"> &
+  TabsScrollerClassNameProps) {
   const orientation = React.useContext(TabsOrientationContext)
   return (
     <TabsScroller
@@ -183,11 +191,13 @@ function TabsNav({
   listClassName,
   children,
   ...props
-}: React.ComponentProps<"nav"> & {
-  "aria-label": string
-  scrollerClassName?: string
-  listClassName?: string
-}) {
+}: React.ComponentProps<"nav"> &
+  TabsScrollerClassNameProps & {
+    /** Required accessible name for the nav landmark. */
+    "aria-label": string
+    /** Classes for the row of links inside the scroller. */
+    listClassName?: string
+  }) {
   return (
     <nav
       data-slot="tabs-nav"

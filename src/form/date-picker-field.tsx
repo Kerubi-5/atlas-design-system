@@ -2,40 +2,22 @@
 
 import { useId } from "react"
 
-import {
-  DatePickerButton,
-  type DateLike,
-  type DatePickerCalendarProps,
-} from "../date-picker.js"
+import { DatePickerButton, type DateLike } from "../date-picker.js"
 
-import type { ErrorTimingProps, FieldMetaState } from "./field-error.js"
 import {
   FormFieldShell,
   metaErrorText,
   pickerFieldAria,
+  type PickerFieldBaseProps,
 } from "./field-shell.js"
 
-type Props = ErrorTimingProps & {
+type Props = PickerFieldBaseProps & {
+  /** The picked day, as a `Date` or `yyyy-MM-dd`; empty when unset. */
   value: DateLike
+  /** Called with the picked day, or `undefined` when cleared. */
   onValueChange: (date: Date | undefined) => void
-  label: string
-  meta?: FieldMetaState
+  /** Trigger text while no day is picked. Default "Pick a date". */
   placeholder?: string
-  disabled?: boolean
-  /** Marks the label and adds "Required" to the trigger's description. */
-  required?: boolean
-  /** Earliest day that can be picked; earlier days are disabled. */
-  minDate?: DateLike
-  /** Latest day that can be picked; later days are disabled. */
-  maxDate?: DateLike
-  /** Forwarded to the date picker trigger. */
-  className?: string
-  /** Classes for the field wrapper (label, trigger, and error). */
-  fieldClassName?: string
-  /** Forwarded to the date picker popover. */
-  contentClassName?: string
-  /** Day Picker options forwarded to the calendar (disabled days, etc.). */
-  calendarProps?: DatePickerCalendarProps
 }
 
 /** Date picker with built-in field error text and invalid styling. */

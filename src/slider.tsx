@@ -10,18 +10,29 @@ export type SliderProps = Omit<
   React.ComponentProps<typeof SliderPrimitive.Root>,
   "value" | "defaultValue" | "onValueChange" | "onValueCommit" | "children"
 > & {
+  /** The current value; the slider is always controlled. */
   value: number
+  /** Called with the new value on every move while dragging or on a key press. */
   onValueChange: (value: number) => void
+  /** Called with the final value when a drag ends or a key press settles. */
   onValueCommit?: (value: number) => void
+  /** The lowest value. Default 0. */
   min?: number
+  /** The highest value. Default 100. */
   max?: number
+  /** The amount each move snaps to. Default 1. */
   step?: number
+  /** Dims the slider and ignores pointer and keyboard input. */
   disabled?: boolean
   /** Goes on the thumb, so a `<Label htmlFor>` names the slider. */
   id?: string
+  /** Form field name, so the value submits with a surrounding `<form>`. */
   name?: string
+  /** Classes for the root, e.g. its width. */
   className?: string
+  /** Names the slider when there is no `<Label htmlFor={id}>`. Goes on the thumb. */
   "aria-label"?: string
+  /** Id of the element that names the slider. Goes on the thumb. */
   "aria-labelledby"?: string
 }
 

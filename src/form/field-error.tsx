@@ -1,8 +1,11 @@
+import type { ReactNode } from "react"
+
 import { cn } from "../utils.js"
 
 export type FieldErrorMessage = string | { message?: string } | undefined
 
 export type FieldMetaState = {
+  /** Validation errors for the field; the `form/*` fields show the first. */
   errors: FieldErrorMessage[]
   /**
    * Whether the person has changed or left the field (TanStack Form's
@@ -25,6 +28,35 @@ export type ErrorTimingProps = {
   showError?: boolean
 }
 
+/**
+ * Props every labelled `form/*` field shares: the error timing, the label,
+ * and the classes for the field wrapper.
+ */
+export type FormFieldBaseProps = ErrorTimingProps & {
+  /** Visible label text (the legend, for a checkbox group). */
+  label: string
+  /**
+   * Classes for the field wrapper (`data-slot="form-field"`: label, hint,
+   * control, and error), e.g. a width.
+   */
+  fieldClassName?: string
+}
+
+/** Error meta for the `form/*` fields that are not bound to a `field` API. */
+export type FormFieldMetaProps = {
+  /**
+   * The field's meta (TanStack Form's `field.state.meta`); its first error
+   * shows under the control. Leave it out for no error text.
+   */
+  meta?: FieldMetaState
+}
+
+/** The optional hint the `form/*` fields render under the label. */
+export type FormFieldDescriptionProps = {
+  /** Hint between the label and the control, read with the control. */
+  description?: ReactNode
+}
+
 /** First TanStack Form error message for a field, if any. */
 export function getFieldErrorMessage(
   message: FieldErrorMessage
@@ -41,8 +73,11 @@ export function FieldError({
 }: {
   /** Point the control's `aria-describedby` here so the error is read with it. */
   id?: string
+  /** Error to show, as TanStack Form reports it; ignored when `text` is set. */
   message?: FieldErrorMessage
+  /** Error text to show as is; takes precedence over `message`. */
   text?: string
+  /** Classes for the error paragraph. */
   className?: string
 }) {
   const resolved = text ?? getFieldErrorMessage(message)

@@ -34,6 +34,7 @@ function AccordionTrigger({
   children,
   ...props
 }: React.ComponentProps<typeof AccordionPrimitive.Trigger> & {
+  /** Classes for the heading wrapper around the trigger. */
   headerClassName?: string
 }) {
   return (
