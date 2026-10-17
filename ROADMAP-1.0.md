@@ -70,7 +70,10 @@ whether to promote it or keep it beta in 1.0.
 ### Dogfooding
 
 - [x] At least one Atlas app on the latest 0.x for a full release cycle
-      with no kit-caused breaking changes. Confirmed by Kim on 2026-10-17.
+      with no kit-caused breaking changes. KairOS has run 0.13.0 since
+      2026-10-16 (five PRs since, none fixing the kit). On the 1.0.0 build its
+      typecheck, lint, 784 tests and build pass, and 11 screens render the
+      same pixels as on 0.13.0 in light and dark (checked 2026-10-17).
 
 ## Release process
 
