@@ -47,13 +47,19 @@ type DatePickerSharedProps = PickerTriggerProps & {
 export type DatePickerSingleProps = DatePickerSharedProps & {
   mode?: "single"
   value?: DateLike
-  onChange: (date: Date | undefined) => void
+  /** Called with the picked day, or `undefined` on Clear. */
+  onValueChange?: (date: Date | undefined) => void
+  /** @deprecated Use `onValueChange`; `onChange` keeps working until 2.0. */
+  onChange?: (date: Date | undefined) => void
 }
 
 export type DatePickerRangeProps = DatePickerSharedProps & {
   mode: "range"
   value?: DatePickerRangeValue
-  onChange: (range: DateRange | undefined) => void
+  /** Called on every range click, or with `undefined` on Clear. */
+  onValueChange?: (range: DateRange | undefined) => void
+  /** @deprecated Use `onValueChange`; `onChange` keeps working until 2.0. */
+  onChange?: (range: DateRange | undefined) => void
 }
 
 export type DatePickerButtonProps = DatePickerSingleProps | DatePickerRangeProps
@@ -74,6 +80,7 @@ function formatRangeTriggerLabel(
 
 function DatePickerSingleButton({
   value,
+  onValueChange,
   onChange,
   placeholder = "Pick a date",
   numberOfMonths,
@@ -84,6 +91,7 @@ function DatePickerSingleButton({
   ...shell
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
+  const emit = onValueChange ?? onChange
   const date = toDate(value)
 
   return (
@@ -103,7 +111,7 @@ function DatePickerSingleButton({
         defaultMonth={defaultMonth ?? date}
         numberOfMonths={numberOfMonths}
         onSelect={(next) => {
-          onChange(next)
+          emit?.(next)
           setOpen(false)
         }}
       />
@@ -113,6 +121,7 @@ function DatePickerSingleButton({
 
 function DatePickerRangeButton({
   value,
+  onValueChange,
   onChange,
   placeholder = "Pick a date range",
   numberOfMonths,
@@ -123,6 +132,7 @@ function DatePickerRangeButton({
   ...shell
 }: DatePickerRangeProps) {
   const [open, setOpen] = React.useState(false)
+  const emit = onValueChange ?? onChange
   const mdUp = useMediaQuery(MD_MEDIA_QUERY)
   const months = numberOfMonths ?? (mdUp ? 2 : 1)
   const from = toDate(value?.from)
@@ -149,7 +159,7 @@ function DatePickerRangeButton({
         defaultMonth={defaultMonth ?? from ?? to}
         numberOfMonths={months}
         onSelect={(range) => {
-          onChange(range)
+          emit?.(range)
           // Close once the ends differ; a start or a one-day range stays open.
           if (range?.from && range.to && !isSameDay(range.from, range.to)) {
             setOpen(false)
@@ -159,7 +169,7 @@ function DatePickerRangeButton({
       <PickerClearFooter
         disabled={!from && !to}
         onClear={() => {
-          onChange(undefined)
+          emit?.(undefined)
           setOpen(false)
         }}
       />

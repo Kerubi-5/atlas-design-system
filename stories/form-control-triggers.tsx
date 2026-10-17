@@ -33,10 +33,10 @@ export function FormControlTriggersStory() {
           <SelectItem value="eur">Euro</SelectItem>
         </SelectContent>
       </Select>
-      <DatePickerButton value="2026-10-09" onChange={() => {}} />
+      <DatePickerButton value="2026-10-09" onValueChange={() => {}} />
       <DateTimePickerButton
         value={new Date(2026, 9, 10, 14, 30)}
-        onChange={() => {}}
+        onValueChange={() => {}}
       />
       <Combobox
         options={formControlOptions}

@@ -8,6 +8,11 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Deprecated: `DatePickerButton` and `DateTimePickerButton` take
+  `onValueChange`, like every other controlled component; `onChange` still
+  works until 2.0. `EmptyPanel` `size` is `sm | default | lg`; `md` still
+  works as an alias of `default` until 2.0. The form fields and examples use
+  the new names.
 - `remark-parse` is no longer a required peer dependency. Only the kit's
   own docs-link check used it, so apps no longer install it for nothing.
   The README's theme setup now says `ThemeProvider` needs `next-themes`.

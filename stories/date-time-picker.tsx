@@ -5,7 +5,7 @@ export function DateTimePickerStory() {
   return (
     <DateTimePickerButton
       value={new Date(2026, 9, 10, 14, 30)}
-      onChange={() => {}}
+      onValueChange={() => {}}
       timeStep={15}
       placeholder="Pick a date and time"
     />

@@ -47,7 +47,7 @@ const meta = {
         <DatePickerButton
           {...args}
           id={id}
-          onChange={(date) =>
+          onValueChange={(date) =>
             updateArgs({ value: date ? formatLocalDate(date) : "" })
           }
         />
@@ -101,7 +101,11 @@ export const NarrowRange: Story = {
 }
 export const Compact: Story = {
   render: () => (
-    <DatePickerButton value="2026-10-09" onChange={() => {}} className="h-8" />
+    <DatePickerButton
+      value="2026-10-09"
+      onValueChange={() => {}}
+      className="h-8"
+    />
   ),
   parameters: {
     controls: { disable: true },
