@@ -13,6 +13,9 @@ open-ended range (see Changed below).
   works until 2.0. `EmptyPanel` `size` is `sm | default | lg`; `md` still
   works as an alias of `default` until 2.0. The form fields and examples use
   the new names.
+- `remark-parse` is no longer a required peer dependency. Only the kit's
+  own docs-link check used it, so apps no longer install it for nothing.
+  The README's theme setup now says `ThemeProvider` needs `next-themes`.
 - Date picker values wrap inside narrow triggers so a full selected range
   stays visible; ordinary one-line controls remain 40px tall.
 - Dialog titles leave room for the built-in close button when it is shown.

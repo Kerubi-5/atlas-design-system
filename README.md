@@ -42,8 +42,9 @@ this example assumes it is one directory below the project root.
 ```
 
 The theme includes animations and shared light/dark tokens. Wrap the tree with
-`ThemeProvider` from `atlas-react-kit/theme-provider`, or set the `dark` class
-on an ancestor to activate dark colors. Supply your own font configuration;
+`ThemeProvider` from `atlas-react-kit/theme-provider` (install
+`next-themes@^0.4.6` first), or set the `dark` class on an ancestor to activate
+dark colors. Supply your own font configuration;
 `font-heading` uses the configured sans font. Application-specific tokens stay
 with the application.
 
