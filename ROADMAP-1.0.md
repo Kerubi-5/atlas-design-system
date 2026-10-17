@@ -1,32 +1,41 @@
 # Road to 1.0
 
-Handoff for whoever (person or AI agent) takes atlas-react-kit from 0.9 to
+Handoff for whoever (person or AI agent) takes atlas-react-kit from 0.x to
 1.0. Read the [contribution guide](./CONTRIBUTING.md), [design rules](./DESIGN_RULES.md),
 and [component guide](./COMPONENTS.md). Do not bump to 1.0.0 until every box
 below is checked.
 
-The 0.9.x release line is current. See the [changelog](./CHANGELOG.md) for
+The 0.x release line is current. See the [changelog](./CHANGELOG.md) for
 release history.
 
 ## Exit criteria for 1.0
 
 ### API freeze
 
-- [ ] Review every entry point in `package.json` `exports`. For each, decide
-      keep, rename, or remove. Do renames now (0.9) with a deprecated alias,
-      not after 1.0.
+- [x] Review every entry point in `package.json` `exports`. For each, decide
+      keep, rename, or remove. Do renames now (0.x) with a deprecated alias,
+      not after 1.0. Reviewed at 0.13: keep all 66 entries. `next/nav-link`
+      and `next/tabs-nav-link` share one contract but style different
+      shells, so both stay.
 - [ ] Review prop names for consistency across components (`onValueChange`
       vs `onChange`, `size` scales, `variant` names). Record decisions in
-      `DESIGN_RULES.md`.
-- [ ] Confirm no third-party types leak through the public types (0.8.0 did
+      `DESIGN_RULES.md`. Conventions are recorded there. Two stable
+      exceptions need a decision: `DatePickerButton` and
+      `DateTimePickerButton` take `onChange` where seven components take
+      `onValueChange`, and `EmptyPanel` `size` runs `sm | md | lg` where
+      the rest use `sm | default | lg`.
+- [x] Confirm no third-party types leak through the public types (0.8.0 did
       this for toasts; check `calendar`/`date-picker` re-exports of
       `react-day-picker` types and `radix-ui` prop types). Done for Day
       Picker: the pickers and form fields use the kit's own `DateRange`,
       `DateMatcher`, and calendar options, enforced by
       `test/type-leaks.test.ts`; `Calendar` stays a documented Day Picker
-      wrapper. `radix-ui` prop types still to check.
-- [ ] Decide which CSS tokens and `data-slot` names in `theme.css` are public
-      API, and list them in `DESIGN_RULES.md`.
+      wrapper. Radix-based components pass through their primitive's props
+      on purpose (they are Radix wrappers, like `Calendar` is for Day
+      Picker); `CONTRIBUTING.md` says a `radix-ui` major is a kit major.
+- [x] Decide which CSS tokens and `data-slot` names in `theme.css` are public
+      API, and list them in `DESIGN_RULES.md`. Listed under "Public tokens
+      and slots".
 
 ### Beta components
 
@@ -46,9 +55,9 @@ whether to promote it or keep it beta in 1.0.
 
 - [x] Write the supported ranges into `README.md`: React 19, Next 16
       (optional), Tailwind 4, Node >= 20.19.
-- [ ] Define what counts as breaking after 1.0: export names, prop names and
+- [x] Define what counts as breaking after 1.0: export names, prop names and
       types, default prop values, public tokens, documented `data-*` hooks.
-      Visual-only changes are minor.
+      Visual-only changes are minor. Written into `CONTRIBUTING.md`.
 
 ### Quality
 
@@ -61,7 +70,7 @@ whether to promote it or keep it beta in 1.0.
 
 ### Dogfooding
 
-- [ ] At least one Atlas app on the latest 0.9.x for a full release cycle
+- [ ] At least one Atlas app on the latest 0.x for a full release cycle
       with no kit-caused breaking changes.
 
 ## Release process
