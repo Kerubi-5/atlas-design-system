@@ -24,7 +24,10 @@ export const DEFAULT_TIME_STEP = 15
 export type DateTimePickerButtonProps = PickerTriggerProps & {
   /** Controlled instant. `null` or omitted is empty. */
   value?: Date | null
-  onChange: (date: Date | null) => void
+  /** Called with the picked instant, or `null` on Clear. */
+  onValueChange?: (date: Date | null) => void
+  /** @deprecated Use `onValueChange`; `onChange` keeps working until 2.0. */
+  onChange?: (date: Date | null) => void
   /**
    * Minute increment for the time selects (1, 5, 15, 30, or 60).
    * Values that do not divide 60 fall back to 15 so the list stays even.
@@ -105,6 +108,7 @@ function preventDismissForPortaledSelect(event: {
  */
 export function DateTimePickerButton({
   value,
+  onValueChange,
   onChange,
   timeStep,
   placeholder = "Pick a date and time",
@@ -115,6 +119,7 @@ export function DateTimePickerButton({
   ...shell
 }: DateTimePickerButtonProps) {
   const [open, setOpen] = React.useState(false)
+  const emit = onValueChange ?? onChange
   const date = value ?? null
   const step = resolveTimeStep(timeStep)
   const empty = date == null
@@ -141,7 +146,7 @@ export function DateTimePickerButton({
           // Re-clicking a selected day would clear it; require Clear instead
           // so a time already set is not dropped by an accidental second tap.
           if (!next) return
-          onChange(
+          emit?.(
             combineDateAndTime(
               next,
               date?.getHours() ?? 0,
@@ -162,7 +167,7 @@ export function DateTimePickerButton({
             value={date ? padTimePart(date.getHours()) : undefined}
             onValueChange={(nextHour) => {
               if (!date) return
-              onChange(
+              emit?.(
                 combineDateAndTime(date, Number(nextHour), date.getMinutes())
               )
             }}
@@ -190,7 +195,7 @@ export function DateTimePickerButton({
             value={date ? padTimePart(date.getMinutes()) : undefined}
             onValueChange={(nextMinute) => {
               if (!date) return
-              onChange(
+              emit?.(
                 combineDateAndTime(date, date.getHours(), Number(nextMinute))
               )
             }}
@@ -219,7 +224,7 @@ export function DateTimePickerButton({
       <PickerClearFooter
         disabled={empty}
         onClear={() => {
-          onChange(null)
+          emit?.(null)
           setOpen(false)
         }}
       />

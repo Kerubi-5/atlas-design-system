@@ -45,7 +45,7 @@ const meta = {
           placeholder={args.placeholder}
           disabled={args.disabled}
           timeStep={args.timeStep}
-          onChange={(next) =>
+          onValueChange={(next) =>
             updateArgs({
               value: next ? format(next, "yyyy-MM-dd'T'HH:mm") : "",
             })

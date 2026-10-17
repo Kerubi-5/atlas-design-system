@@ -63,7 +63,7 @@ export function FormDatePickerField({
       <DatePickerButton
         {...picker}
         id={id}
-        onChange={onValueChange}
+        onValueChange={onValueChange}
         {...pickerFieldAria(id, errorText, required)}
       />
     </FormFieldShell>

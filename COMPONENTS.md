@@ -44,10 +44,10 @@ theme from `next-themes`, so toast consumers install that too.
 | `color-legend`                | `ColorLegend`; `title`, `items` as `{ color, range?, label }[]`, optional `caption`, `children`, `aria-label`, `className` (overlay chrome). No attribution.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | `combobox`                    | `Combobox`; `options` as `{ value, label }[]`, `value`, `onValueChange`; optional placeholder, search, empty text, `creatable`, `normalizeCreateValue` (query → value or `null`), `createLabel`; trigger matches Input/SelectTrigger chrome; keyboard highlight scrolls into view; create is a listbox option selected with Enter                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | `date-picker`                 | `DatePickerButton`, `toDate`, `formatLocalDate`, and the kit's own `DateRange`, `DateMatcher`, `DateLike`, and `DatePickerCalendarProps` types (no Day Picker types); `mode` `"single"` (default) or `"range"`; single `value` is `Date` or `yyyy-MM-dd`; range `value` is `{ from, to }`; trigger matches Input chrome; optional `numberOfMonths` (range default 1 below `md`, 2 at `md+`), `minDate` / `maxDate` (days outside are disabled), `side`, `aria-labelledby`, and `aria-describedby`                                                                                                                                                                                                                                                                                                                      |
-| `date-time-picker`            | `DateTimePickerButton`, `resolveTimeStep`, `DEFAULT_TIME_STEP`; controlled `value` is `Date` or `null`; `onChange` emits `Date \                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `date-time-picker`            | `DateTimePickerButton`, `resolveTimeStep`, `DEFAULT_TIME_STEP`; controlled `value` is `Date` or `null`; `onValueChange` emits `Date \                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | `dialog`                      | `Dialog`, trigger, portal, overlay, content, close, header, footer, title, description; `DialogContent` supports `showCloseButton`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `dropdown-menu`               | `DropdownMenu` family (trigger, content, item, checkbox/radio items, label, separator, shortcut, sub menus); item `variant="destructive"` and `inset`; for commands, not values                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `empty-panel`                 | `EmptyPanel`; required `children`; optional `size`, `muted`, `className`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `empty-panel`                 | `EmptyPanel`; required `children`; optional `size` (`sm`, `default`, `lg`), `muted`, `className`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `error-boundary`              | `ErrorBoundary`, `ErrorFallback`; optional `message`; retry resets, reload refreshes the page                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `field`                       | Field, label, legend, description, group, set, title, content, separator, error; `Field` supports `orientation`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `info-tip`                    | `InfoTip`, `InlineTip`; required `label` (aria-label); `title`, `description`, `children`, `layout` `box` \| `inline`, `side`, `align`, `badge`, `icon`, `className`. Popover, 20px glyph, 44px hit. Hover opens only on a fine pointer. Not a Tooltip.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
@@ -217,7 +217,7 @@ draws the same marker; set `required` on the control yourself.
 
 `DatePickerButton` is single-day by default. For a from/to range, set
 `mode="range"`; `value` is `{ from, to }` (each side `Date` or `yyyy-MM-dd`)
-and `onChange` receives `DateRange | undefined`. The trigger uses the same
+and `onValueChange` receives `DateRange | undefined`. The trigger uses the same
 form-control chrome as `Input` and `SelectTrigger`. Long picker values wrap
 inside narrow triggers; ordinary one-line values stay 40px tall, and consumer
 height classes still override that default. The range popover shows one
@@ -237,8 +237,11 @@ the trigger text's id (a `<label for>` alone names the button by the label
 only).
 `FormDatePickerField` forwards `className` to that trigger.
 
+Both pickers took `onChange` before 0.14; it still works as a deprecated
+alias until 2.0.
+
 `DateTimePickerButton` is the date-and-time control. `value` is a `Date` or
-`null`; `onChange` receives `Date | null`. The trigger matches the same
+`null`; `onValueChange` receives `Date | null`. The trigger matches the same
 form-control chrome. The popover is one month, a labelled Hour and Minute
 pair (24-hour, stepped by `timeStep`, default 15), and Clear. Picking a day
 keeps the popover open so the time can be set; the time selects stay
@@ -259,15 +262,15 @@ import { DateTimePickerButton } from "atlas-react-kit/date-time-picker"
 
 export function EventStarts({
   value,
-  onChange,
+  onValueChange,
 }: {
   value: Date | null
-  onChange: (date: Date | null) => void
+  onValueChange: (date: Date | null) => void
 }) {
   return (
     <DateTimePickerButton
       value={value}
-      onChange={onChange}
+      onValueChange={onValueChange}
       timeStep={15}
       placeholder="Pick a date and time"
     />
@@ -280,16 +283,16 @@ import { DatePickerButton, type DateRange } from "atlas-react-kit/date-picker"
 
 export function ExportRange({
   value,
-  onChange,
+  onValueChange,
 }: {
   value: DateRange | undefined
-  onChange: (range: DateRange | undefined) => void
+  onValueChange: (range: DateRange | undefined) => void
 }) {
   return (
     <DatePickerButton
       mode="range"
       value={value}
-      onChange={onChange}
+      onValueChange={onValueChange}
       numberOfMonths={2}
       placeholder="Export range"
     />

@@ -8,6 +8,11 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Deprecated: `DatePickerButton` and `DateTimePickerButton` take
+  `onValueChange`, like every other controlled component; `onChange` still
+  works until 2.0. `EmptyPanel` `size` is `sm | default | lg`; `md` still
+  works as an alias of `default` until 2.0. The form fields and examples use
+  the new names.
 - Date picker values wrap inside narrow triggers so a full selected range
   stays visible; ordinary one-line controls remain 40px tall.
 - Dialog titles leave room for the built-in close button when it is shown.

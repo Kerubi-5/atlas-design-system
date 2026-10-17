@@ -6,7 +6,7 @@ export function DatePickerRangeStory() {
     <DatePickerButton
       mode="range"
       value={{ from: "2026-10-05", to: "2026-10-20" }}
-      onChange={() => {}}
+      onValueChange={() => {}}
       placeholder="Export range"
     />
   )
