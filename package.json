@@ -52,6 +52,10 @@
       "types": "./dist/card.d.ts",
       "default": "./dist/card.js"
     },
+    "./chart": {
+      "types": "./dist/chart.d.ts",
+      "default": "./dist/chart.js"
+    },
     "./checkbox": {
       "types": "./dist/checkbox.d.ts",
       "default": "./dist/checkbox.js"
@@ -120,9 +124,17 @@
       "types": "./dist/nav-link.d.ts",
       "default": "./dist/nav-link.js"
     },
+    "./page-header": {
+      "types": "./dist/page-header.d.ts",
+      "default": "./dist/page-header.js"
+    },
     "./pagination": {
       "types": "./dist/pagination.d.ts",
       "default": "./dist/pagination.js"
+    },
+    "./period-stepper": {
+      "types": "./dist/period-stepper.d.ts",
+      "default": "./dist/period-stepper.js"
     },
     "./popover": {
       "types": "./dist/popover.d.ts",
@@ -151,6 +163,10 @@
     "./skeleton": {
       "types": "./dist/skeleton.d.ts",
       "default": "./dist/skeleton.js"
+    },
+    "./skip-link": {
+      "types": "./dist/skip-link.d.ts",
+      "default": "./dist/skip-link.js"
     },
     "./slider": {
       "types": "./dist/slider.d.ts",
@@ -208,6 +224,14 @@
       "types": "./dist/tooltip.d.ts",
       "default": "./dist/tooltip.js"
     },
+    "./form/checkbox-field": {
+      "types": "./dist/form/checkbox-field.d.ts",
+      "default": "./dist/form/checkbox-field.js"
+    },
+    "./form/combobox-field": {
+      "types": "./dist/form/combobox-field.d.ts",
+      "default": "./dist/form/combobox-field.js"
+    },
     "./form/control-field": {
       "types": "./dist/form/control-field.d.ts",
       "default": "./dist/form/control-field.js"
@@ -220,13 +244,13 @@
       "types": "./dist/form/date-time-picker-field.d.ts",
       "default": "./dist/form/date-time-picker-field.js"
     },
-    "./form/field-error": {
-      "types": "./dist/form/field-error.d.ts",
-      "default": "./dist/form/field-error.js"
-    },
     "./form/feedback-field": {
       "types": "./dist/form/feedback-field.d.ts",
       "default": "./dist/form/feedback-field.js"
+    },
+    "./form/field-error": {
+      "types": "./dist/form/field-error.d.ts",
+      "default": "./dist/form/field-error.js"
     },
     "./form/markdown-field": {
       "types": "./dist/form/markdown-field.d.ts",
@@ -240,9 +264,17 @@
       "types": "./dist/form/text-field.d.ts",
       "default": "./dist/form/text-field.js"
     },
+    "./form/toggle-group-field": {
+      "types": "./dist/form/toggle-group-field.d.ts",
+      "default": "./dist/form/toggle-group-field.js"
+    },
     "./next/nav-link": {
       "types": "./dist/next/nav-link.d.ts",
       "default": "./dist/next/nav-link.js"
+    },
+    "./next/period-stepper": {
+      "types": "./dist/next/period-stepper.d.ts",
+      "default": "./dist/next/period-stepper.js"
     },
     "./next/tabs-nav-link": {
       "types": "./dist/next/tabs-nav-link.d.ts",

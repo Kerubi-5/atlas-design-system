@@ -6,11 +6,15 @@ export const beta = new Set([
   "Accordion",
   "Avatar",
   "Breadcrumb",
+  "Chart",
   "Dropdown menu",
   "Kanban",
   "Nav link",
+  "Page header",
   "Pagination",
+  "Period stepper",
   "Radio group",
+  "Skip link",
   "Spinner",
   "Switch",
 ])
@@ -69,6 +73,18 @@ export const usage: Record<string, string> = {
 **Not for** every section of a page; too many cards turn a layout into boxes.
 
 **Accessibility** Use a real heading inside when the card starts a section (\`CardTitle as="h1"\` or your own heading).`,
+  Chart: `
+**Use for** small SVG charts you draw yourself: \`chartFrame\` sets the plot box, \`ChartYAxisGrid\` the axis, \`useChartScrub\` the crosshair, and \`ChartTooltip\` / \`ChartLegend\` the readout.
+
+**Not for** dashboards that need zoom, brushing, or many chart types (use a charting library).
+
+**Accessibility** Give the \`<svg>\` \`role="img"\`, a summary \`aria-label\`, and \`tabIndex={0}\`; arrow keys step the crosshair and the tooltip is a live status.`,
+  "Choice fields": `
+**Use for** form choices with the kit's label, hint, and error timing: \`FormCheckboxField\` for one boolean, \`FormCheckboxGroupField\` for several values, \`FormToggleGroupField\` for one of a few, \`FormComboboxField\` for one of many.
+
+**Not for** a choice that acts at once outside a form, such as a view filter (use \`ToggleGroup\` directly).
+
+**Accessibility** Groups are named by their label or legend, and errors are read with the control.`,
   Checkbox: `
 **Use for** on/off choices submitted with a form, and multi-select lists.
 
@@ -171,6 +187,12 @@ export const usage: Record<string, string> = {
 **Not for** in-page view switches that belong in the URL as tabs (use \`TabsNav\` / \`TabsNavLink\`) or a hierarchy trail (use \`Breadcrumb\`).
 
 **Accessibility** The current item is \`aria-current="page"\`. Pass \`asChild\` to render a router link, or use \`next/nav-link\` in Next. Put the links in a labelled \`nav\`.`,
+  "Page header": `
+**Use for** the title row at the top of a page: the \`h1\`, a one-line hint, and page actions. Pair with \`PeriodStepper\` for dated pages and \`SkipLink\` in the app shell.
+
+**Not for** section headings inside a page (use a heading or \`CardTitle as="h2"\`).
+
+**Accessibility** One \`h1\` per page; the stepper's range is announced when it changes, and the skip link is the first thing a keyboard user reaches.`,
   Pagination: `
 **Use for** moving through pages of a long list or table where the page belongs in the URL.
 

@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-A drag-and-drop kanban board, readable picker values, dialog titles, and
-easier Storybook browsing. The new `kanban` entry is the only API addition;
-existing types are unchanged. The range picker's first click now emits an
+Pieces apps were building by hand: a kanban board, chart basics, three
+form fields, and page layout parts, plus readable picker values, dialog
+titles, and easier Storybook browsing. Every change to the API is an
+addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
 - Date picker values wrap inside narrow triggers so a full selected range
@@ -25,6 +26,18 @@ open-ended range (see Changed below).
   column change or reorder, plus optional Finish / Remove drop zones.
   `@dnd-kit/react` and `@dnd-kit/dom` are new optional peers, needed only
   for this entry.
+- New beta `chart` entry: `chartFrame`, axis math (`niceCeil`,
+  `niceTicks`, `scaleLinear`, `linePath`, `roundedTopBarPath`,
+  `compactNumber`), `useChartScrub` for a pointer and arrow-key crosshair,
+  `ChartYAxisGrid`, `ChartTooltip`, `ChartTooltipRow`, `ChartLegend`, and
+  `ChartLegendKey`. Apps draw their own series in SVG on top.
+- New form fields: `form/checkbox-field` (`FormCheckboxField`,
+  `FormCheckboxGroupField`), `form/toggle-group-field`
+  (`FormToggleGroupField`), and `form/combobox-field` (`FormComboboxField`),
+  with the same label, hint, and error timing as the other `form/*` fields.
+- New beta layout parts: `PageHeader` (`page-header`), `PeriodStepper`
+  (`period-stepper`, and `next/period-stepper` for URL periods), and
+  `SkipLink` (`skip-link`).
 - Changed: the range date picker uses Day Picker's built-in `resetOnSelect`
   instead of its own restart flag. A click on a complete range starts a new
   one as before, but the start now reaches `onChange` as
