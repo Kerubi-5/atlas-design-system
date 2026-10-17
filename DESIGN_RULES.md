@@ -59,8 +59,8 @@ in COMPONENTS.md.
 - `variant="default"` is the plain look; other variants name what they mean
   (`outline`, `ghost`, `destructive`).
 
-Exceptions waiting on a decision before 1.0 are listed in
-[ROADMAP-1.0.md](./ROADMAP-1.0.md).
+Deprecated aliases (`onChange` on the date pickers, `EmptyPanel`
+`size="md"`) keep working until 2.0.
 
 ## Accessibility
 
