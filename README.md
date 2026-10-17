@@ -101,7 +101,7 @@ The public site is Storybook in `site/`. `npm run build --prefix site`
 typechecks the stories, builds Storybook into `site/dist`, then checks the
 static output. Vercel serves that directory; `/playground` and `/storybook`
 redirect to `/`. The site and Storybook dependencies are not part of the npm
-package. Optional feature libraries (markdown, dates, toasts, theme, Next) are
+package. Optional feature libraries (markdown, dates, toasts, theme, Next, dnd-kit) are
 peer dependencies and are required only when those entry points are imported.
 The package does not bundle React.
 

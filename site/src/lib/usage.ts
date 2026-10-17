@@ -7,6 +7,7 @@ export const beta = new Set([
   "Avatar",
   "Breadcrumb",
   "Dropdown menu",
+  "Kanban",
   "Nav link",
   "Pagination",
   "Radio group",
@@ -146,6 +147,12 @@ export const usage: Record<string, string> = {
 **Not for** headings or general text.
 
 **Accessibility** Connect with \`htmlFor\` (or wrap the control) so clicking the label focuses the control.`,
+  Kanban: `
+**Use for** items that move through stages people drag between: a sales pipeline, a task board. Your store owns the items; \`onMove\` gets the drop's neighbour positions to save the order.
+
+**Not for** a sortable list with one column (use a list or \`Table\`) or picking a single status (use \`Select\`).
+
+**Accessibility** Cards drag by a labelled grip so the card body stays a normal button. Give the board an \`aria-label\`; scroll buttons appear when columns are off-screen.`,
   Markdown: `
 **Use for** rendering GitHub-flavoured Markdown the app already stores as a string.
 

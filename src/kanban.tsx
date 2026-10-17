@@ -1,0 +1,673 @@
+"use client"
+
+import * as React from "react"
+import {
+  DragDropProvider,
+  DragOverlay,
+  useDragOperation,
+  useDroppable,
+  type DragEndEvent,
+  type DragOverEvent,
+} from "@dnd-kit/react"
+import { isSortable, useSortable } from "@dnd-kit/react/sortable"
+import {
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  GripVertical,
+  Trash2,
+  type LucideIcon,
+} from "lucide-react"
+
+import { Button } from "./button.js"
+import {
+  KANBAN_COMPLETE_ID,
+  KANBAN_DELETE_ID,
+  buildKanbanGroups,
+  kanbanOverflowEdges,
+  kanbanScrollBy,
+  resolveKanbanDrop,
+  type KanbanOverflowEdges,
+} from "./internal/kanban-layout.js"
+import {
+  configureCardSortablePlugins,
+  configureKanbanPlugins,
+} from "./internal/kanban-plugins.js"
+import { Skeleton } from "./skeleton.js"
+import { cn } from "./utils.js"
+
+/**
+ * One board column. Columns render in the order given. `color` (any CSS
+ * color) draws a status dot; `badge` is trailing header meta such as a total.
+ */
+export type KanbanColumn = {
+  id: string
+  label: string
+  color?: string
+  badge?: React.ReactNode
+  /** Replaces the board's `emptyLabel` for this column. */
+  emptyLabel?: string
+}
+
+/**
+ * Positions of the cards on either side of the drop slot (`undefined` at a
+ * column edge). Feed them to a fractional-index helper to store the order.
+ */
+export type KanbanDropTarget = {
+  beforePosition: number | undefined
+  afterPosition: number | undefined
+}
+
+export type KanbanBoardProps<T extends { id: string; position: number }> = {
+  columns: KanbanColumn[]
+  items: T[]
+  getColumnId: (item: T) => string
+  /** Every drop that changes a column or the order, including same-column reorders. */
+  onMove: (item: T, toColumnId: string, target: KanbanDropTarget) => void
+  /** Shows a Finish zone while dragging. */
+  onComplete?: (itemId: string) => void
+  /** Shows a Remove zone while dragging. */
+  onDelete?: (itemId: string) => void
+  /** Card body; the board adds the grip, chrome, and sorting. */
+  renderCard: (item: T) => React.ReactNode
+  /** Makes the card body a button. */
+  onCardClick?: (item: T) => void
+  /** Skeleton cards on a first load with no items; dims the board on a refetch. */
+  isLoading?: boolean
+  emptyLabel?: string
+  completeLabel?: string
+  deleteLabel?: string
+  scrollerClassName?: string
+  columnClassName?: string
+  cardClassName?: string
+} & Omit<React.ComponentProps<"div">, "children">
+
+/** Column droppables lose to cards, so a drop lands between cards. */
+const COLUMN_DROP_PRIORITY = 1
+/** Rail zones beat columns when both are under the pointer. */
+const ACTION_ZONE_PRIORITY = 10
+
+const columnSize = "w-72 min-w-72 min-h-[min(70vh,32rem)]"
+
+/**
+ * Drag-and-drop board built on dnd-kit. The consumer owns `items` and maps
+ * each to a column; the board derives its layout from them, so an optimistic
+ * cache update is the only state. Cards drag by their grip, the body stays
+ * clickable, and off-screen columns get edge fades and scroll buttons.
+ */
+function KanbanBoard<T extends { id: string; position: number }>({
+  columns,
+  items,
+  getColumnId,
+  onMove,
+  onComplete,
+  onDelete,
+  renderCard,
+  onCardClick,
+  isLoading = false,
+  emptyLabel = "Drop here",
+  completeLabel = "Finish",
+  deleteLabel = "Remove",
+  className,
+  scrollerClassName,
+  columnClassName,
+  cardClassName,
+  ...props
+}: KanbanBoardProps<T>) {
+  const scrollerRef = React.useRef<HTMLDivElement>(null)
+  const overflow = useOverflowEdges(scrollerRef, columns.length, items.length)
+
+  const itemById = React.useMemo(
+    () => new Map(items.map((item) => [item.id, item])),
+    [items]
+  )
+  const groups = React.useMemo(
+    () => buildKanbanGroups(columns, items, getColumnId),
+    [columns, items, getColumnId]
+  )
+
+  const showSkeletons = isLoading && items.length === 0
+  const dimmed = isLoading && !showSkeletons
+
+  const handleDragOver = React.useCallback((event: DragOverEvent) => {
+    // Layout comes from `items`; stop dnd-kit moving cards between groups.
+    event.preventDefault()
+  }, [])
+
+  const handleDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      if (event.canceled) return
+      const { source, target } = event.operation
+      if (!source || !isSortable(source)) return
+      const drop = resolveKanbanDrop(
+        {
+          itemId: String(source.id),
+          targetId: target ? String(target.id) : null,
+          targetGroup:
+            target && isSortable(target) && target.group != null
+              ? String(target.group)
+              : null,
+          initialGroup:
+            source.initialGroup != null ? String(source.initialGroup) : null,
+          currentGroup: source.group != null ? String(source.group) : null,
+          index: typeof source.index === "number" ? source.index : undefined,
+        },
+        groups
+      )
+      if (!drop) return
+      if (drop.kind === "complete") return onComplete?.(drop.itemId)
+      if (drop.kind === "delete") return onDelete?.(drop.itemId)
+      const item = itemById.get(drop.itemId)
+      if (!item) return
+      onMove(item, drop.toColumnId, {
+        beforePosition: drop.beforeId
+          ? itemById.get(drop.beforeId)?.position
+          : undefined,
+        afterPosition: drop.afterId
+          ? itemById.get(drop.afterId)?.position
+          : undefined,
+      })
+    },
+    [groups, itemById, onComplete, onDelete, onMove]
+  )
+
+  const scrollToStart = React.useCallback(
+    () => kanbanScrollBy(scrollerRef.current, -1),
+    []
+  )
+  const scrollToEnd = React.useCallback(
+    () => kanbanScrollBy(scrollerRef.current, 1),
+    []
+  )
+
+  const renderOverlay = React.useCallback(
+    (source: { id: string | number } | null) => {
+      const item = source ? itemById.get(String(source.id)) : undefined
+      if (!item) return null
+      return (
+        <div
+          data-slot="kanban-drag-overlay"
+          className={cn(
+            cardChrome,
+            "shadow-lg ring-2 ring-ring/30",
+            cardClassName
+          )}
+        >
+          <div className={cn(handleChrome, "cursor-grabbing")}>
+            <GripVertical className="size-4" aria-hidden />
+          </div>
+          <div className="min-w-0 flex-1 p-3">{renderCard(item)}</div>
+        </div>
+      )
+    },
+    [cardClassName, itemById, renderCard]
+  )
+
+  // `min-w-0` lets a flex or grid parent shrink the board so the scroller,
+  // not the page, overflows.
+  return (
+    <div
+      data-slot="kanban-board"
+      className={cn("min-w-0", className)}
+      {...props}
+    >
+      <DragDropProvider
+        plugins={configureKanbanPlugins}
+        onDragOver={handleDragOver}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="relative min-w-0">
+          <div
+            ref={scrollerRef}
+            data-slot="kanban-scroller"
+            data-loading={dimmed || undefined}
+            data-overflow-start={overflow.start || undefined}
+            data-overflow-end={overflow.end || undefined}
+            onScroll={overflow.measure}
+            className={cn(
+              "flex min-w-0 gap-4 overflow-x-auto pb-2",
+              // AutoScroller scrolls in small steps near the edge; mandatory
+              // snap would pull each one back, so it is off mid-drag.
+              "snap-x snap-mandatory scroll-px-2 has-data-dragging:snap-none",
+              "data-loading:opacity-60",
+              scrollerClassName
+            )}
+          >
+            {columns.map((column) => {
+              const ids = groups[column.id] ?? []
+              return (
+                <KanbanColumnView
+                  key={column.id}
+                  column={column}
+                  count={showSkeletons ? 0 : ids.length}
+                  emptyLabel={column.emptyLabel ?? emptyLabel}
+                  loading={showSkeletons}
+                  className={columnClassName}
+                >
+                  {ids.map((id, index) => {
+                    const item = itemById.get(id)
+                    if (!item) return null
+                    return (
+                      <KanbanCardView
+                        key={id}
+                        item={item}
+                        index={index}
+                        column={column.id}
+                        onCardClick={onCardClick}
+                        className={cardClassName}
+                      >
+                        {renderCard(item)}
+                      </KanbanCardView>
+                    )
+                  })}
+                </KanbanColumnView>
+              )
+            })}
+          </div>
+          <OverflowFade side="start" visible={overflow.start} />
+          <OverflowFade side="end" visible={overflow.end} />
+          {overflow.start ? (
+            <ScrollButton side="start" onClick={scrollToStart} />
+          ) : null}
+          {overflow.end ? (
+            <ScrollButton side="end" onClick={scrollToEnd} />
+          ) : null}
+          {overflow.start || overflow.end ? (
+            <p className="sr-only">
+              More columns available. Scroll horizontally to see them.
+            </p>
+          ) : null}
+        </div>
+        {onComplete || onDelete ? (
+          <ActionRail
+            completeLabel={onComplete ? completeLabel : null}
+            deleteLabel={onDelete ? deleteLabel : null}
+          />
+        ) : null}
+        <DragOverlay dropAnimation={null}>{renderOverlay}</DragOverlay>
+      </DragDropProvider>
+    </div>
+  )
+}
+
+function useOverflowEdges(
+  ref: React.RefObject<HTMLDivElement | null>,
+  columnCount: number,
+  itemCount: number
+) {
+  const [edges, setEdges] = React.useState<KanbanOverflowEdges>({
+    start: false,
+    end: false,
+  })
+
+  const measure = React.useCallback(() => {
+    const element = ref.current
+    if (!element) return
+    setEdges(
+      kanbanOverflowEdges(
+        element.scrollLeft,
+        element.clientWidth,
+        element.scrollWidth
+      )
+    )
+  }, [ref])
+
+  React.useLayoutEffect(() => {
+    const element = ref.current
+    if (!element || typeof ResizeObserver === "undefined") return
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(element)
+    for (const child of element.children) observer.observe(child)
+    return () => observer.disconnect()
+  }, [columnCount, itemCount, measure, ref])
+
+  return { ...edges, measure }
+}
+
+function KanbanColumnView({
+  column,
+  count,
+  emptyLabel,
+  loading,
+  className,
+  children,
+}: {
+  column: KanbanColumn
+  count: number
+  emptyLabel: string
+  loading: boolean
+  className?: string
+  children: React.ReactNode
+}) {
+  const { ref, isDropTarget } = useDroppable({
+    id: column.id,
+    type: "column",
+    accept: "item",
+    collisionPriority: COLUMN_DROP_PRIORITY,
+  })
+  const empty = count === 0
+
+  return (
+    <div
+      ref={ref}
+      data-slot="kanban-column"
+      data-drop-target={isDropTarget || undefined}
+      className={cn(
+        "flex shrink-0 snap-start flex-col gap-3 p-3",
+        "bg-muted/40 ring-1 ring-foreground/5",
+        "data-drop-target:bg-muted/60 data-drop-target:ring-2 data-drop-target:ring-ring/60",
+        columnSize,
+        className
+      )}
+    >
+      <header
+        data-slot="kanban-column-header"
+        className="flex items-start justify-between gap-2"
+      >
+        <span className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase">
+          {column.color ? (
+            <span
+              aria-hidden
+              className="size-2 shrink-0 rounded-full"
+              style={{ backgroundColor: column.color }}
+            />
+          ) : null}
+          <span className="leading-tight">{column.label}</span>
+        </span>
+        <span className="flex shrink-0 flex-col items-end gap-0.5 text-muted-foreground tabular-nums">
+          <span className="text-xs">{count}</span>
+          {column.badge ? (
+            <span className="text-[10px] font-medium">{column.badge}</span>
+          ) : null}
+        </span>
+      </header>
+      <div className="flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto pr-1">
+        {loading ? (
+          <>
+            <Skeleton className="h-20" />
+            <Skeleton className="h-16" />
+          </>
+        ) : (
+          <>
+            {children}
+            <p
+              data-slot="kanban-column-empty"
+              aria-hidden={!empty}
+              className={cn(
+                "border border-dashed px-3 py-6 text-center text-xs text-muted-foreground",
+                !empty && "hidden"
+              )}
+            >
+              {emptyLabel}
+            </p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const cardChrome = cn("flex border border-border bg-card text-card-foreground")
+
+const handleChrome = cn(
+  "flex shrink-0 items-center self-stretch border-r border-border",
+  "bg-muted/30 px-1.5 text-muted-foreground"
+)
+
+function stopClick(event: React.MouseEvent) {
+  event.stopPropagation()
+}
+
+function KanbanCardView<T extends { id: string }>({
+  item,
+  index,
+  column,
+  onCardClick,
+  className,
+  children,
+}: {
+  item: T
+  index: number
+  column: string
+  onCardClick?: (item: T) => void
+  className?: string
+  children: React.ReactNode
+}) {
+  const { handleRef, ref, isDragging } = useSortable({
+    id: item.id,
+    index,
+    type: "item",
+    accept: "item",
+    group: column,
+    transition: null,
+    plugins: configureCardSortablePlugins,
+  })
+
+  return (
+    <div
+      ref={ref}
+      data-slot="kanban-card"
+      data-dragging={isDragging || undefined}
+      className={cn(
+        cardChrome,
+        "shadow-sm transition-[box-shadow,opacity,border-color]",
+        // The overlay moves; the source keeps its slot.
+        "data-dragging:pointer-events-none data-dragging:invisible",
+        // One ring on the card for the grip and the body alike.
+        "has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-background",
+        onCardClick && "hover:border-foreground/15",
+        className
+      )}
+    >
+      <button
+        type="button"
+        ref={handleRef}
+        data-slot="kanban-card-handle"
+        aria-label="Drag to move"
+        onClick={stopClick}
+        className={cn(
+          handleChrome,
+          "cursor-grab outline-none hover:bg-muted/50 active:cursor-grabbing"
+        )}
+      >
+        <GripVertical className="size-4" aria-hidden />
+      </button>
+      {onCardClick ? (
+        <button
+          type="button"
+          data-slot="kanban-card-body"
+          onClick={() => onCardClick(item)}
+          className="min-w-0 flex-1 cursor-pointer p-3 text-left outline-none hover:bg-muted/20"
+        >
+          {children}
+        </button>
+      ) : (
+        <div data-slot="kanban-card-body" className="min-w-0 flex-1 p-3">
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/**
+ * Finish / Remove zones under the board while a card drags. Not sticky: a
+ * sticky rail overlapping tall columns stole their drops.
+ */
+function ActionRail({
+  completeLabel,
+  deleteLabel,
+}: {
+  completeLabel: string | null
+  deleteLabel: string | null
+}) {
+  const dragging = useDragOperation().source != null
+  return (
+    <div
+      data-slot="kanban-action-rail"
+      aria-hidden={!dragging}
+      className={cn(
+        "relative z-20 -mx-1 mt-3 flex flex-col gap-2 bg-background px-1 pb-1 sm:flex-row",
+        !dragging && "pointer-events-none"
+      )}
+    >
+      {completeLabel != null ? (
+        <ActionZone
+          id={KANBAN_COMPLETE_ID}
+          label={completeLabel}
+          regionLabel="Drop here to finish"
+          icon={CheckCircle2}
+          tone="success"
+          visible={dragging}
+        />
+      ) : null}
+      {deleteLabel != null ? (
+        <ActionZone
+          id={KANBAN_DELETE_ID}
+          label={deleteLabel}
+          regionLabel="Drop here to remove"
+          icon={Trash2}
+          tone="destructive"
+          visible={dragging}
+        />
+      ) : null}
+    </div>
+  )
+}
+
+const zoneTone = {
+  success: {
+    idle: "border-success/60 bg-success/10 text-success",
+    active: "border-success bg-success/25 text-success ring-2 ring-success/40",
+  },
+  destructive: {
+    idle: "border-destructive/60 bg-destructive/10 text-destructive",
+    active:
+      "border-destructive bg-destructive/25 text-destructive ring-2 ring-destructive/40",
+  },
+} as const
+
+function ActionZone({
+  id,
+  label,
+  regionLabel,
+  icon: Icon,
+  tone,
+  visible,
+}: {
+  id: string
+  label: string
+  regionLabel: string
+  icon: LucideIcon
+  tone: keyof typeof zoneTone
+  visible: boolean
+}) {
+  const { ref, isDropTarget } = useDroppable({
+    id,
+    type: "column",
+    accept: "item",
+    collisionPriority: ACTION_ZONE_PRIORITY,
+    disabled: !visible,
+  })
+
+  // A ring, not a scale, marks the target: scale clips in overflow parents.
+  return (
+    <div
+      ref={ref}
+      role="region"
+      aria-label={regionLabel}
+      aria-hidden={!visible}
+      data-slot="kanban-action-zone"
+      data-drop-target={isDropTarget || undefined}
+      className={cn(
+        "relative z-10 flex flex-1 items-center justify-center gap-2 border-2 border-dashed p-3",
+        "text-sm font-medium transition-[box-shadow,border-color,background-color,color] duration-150",
+        visible ? "opacity-100" : "pointer-events-none opacity-0",
+        isDropTarget ? zoneTone[tone].active : zoneTone[tone].idle
+      )}
+    >
+      <Icon className="size-4 shrink-0" aria-hidden />
+      {label}
+    </div>
+  )
+}
+
+function ScrollButton({
+  side,
+  onClick,
+}: {
+  side: "start" | "end"
+  onClick: () => void
+}) {
+  const Icon = side === "start" ? ChevronLeft : ChevronRight
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="icon-sm"
+      data-slot="kanban-scroll-button"
+      aria-label={
+        side === "start" ? "Show previous columns" : "Show next columns"
+      }
+      onClick={onClick}
+      className={cn(
+        "absolute top-1/2 z-20 -translate-y-1/2",
+        side === "start" ? "left-1" : "right-1"
+      )}
+    >
+      <Icon />
+    </Button>
+  )
+}
+
+function OverflowFade({
+  side,
+  visible,
+}: {
+  side: "start" | "end"
+  visible: boolean
+}) {
+  return (
+    <div
+      aria-hidden
+      data-slot="kanban-overflow-fade"
+      data-side={side}
+      className={cn(
+        "pointer-events-none absolute inset-y-0 z-10 w-10 to-transparent transition-opacity",
+        side === "start"
+          ? "left-0 bg-gradient-to-r from-background"
+          : "right-0 bg-gradient-to-l from-background",
+        visible ? "opacity-100" : "opacity-0"
+      )}
+    />
+  )
+}
+
+/** Board-shaped placeholder for a route `loading` file. */
+function KanbanSkeleton({
+  columnCount = 4,
+  className,
+  columnClassName,
+  ...props
+}: {
+  columnCount?: number
+  columnClassName?: string
+} & Omit<React.ComponentProps<"div">, "children">) {
+  return (
+    <div
+      data-slot="kanban-skeleton"
+      className={cn("flex gap-4 overflow-hidden", className)}
+      {...props}
+    >
+      {Array.from({ length: columnCount }, (_, index) => (
+        <Skeleton
+          key={index}
+          className={cn("shrink-0", columnSize, columnClassName)}
+        />
+      ))}
+    </div>
+  )
+}
+
+export { KanbanBoard, KanbanSkeleton }

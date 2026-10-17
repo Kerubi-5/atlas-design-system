@@ -2,9 +2,10 @@
 
 ## Unreleased
 
-Readable picker values, dialog titles, and easier Storybook browsing.
-The public API types are unchanged. The range picker's first click now
-emits an open-ended range (see Changed below).
+A drag-and-drop kanban board, readable picker values, dialog titles, and
+easier Storybook browsing. The new `kanban` entry is the only API addition;
+existing types are unchanged. The range picker's first click now emits an
+open-ended range (see Changed below).
 
 - Date picker values wrap inside narrow triggers so a full selected range
   stays visible; ordinary one-line controls remain 40px tall.
@@ -18,6 +19,12 @@ emits an open-ended range (see Changed below).
   `useSyncExternalStore`. Hydration now matches the server render instead of
   reading `matchMedia` in the first client render, which logged a hydration
   mismatch on screens at or above `md`.
+- New beta `kanban` entry: `KanbanBoard` and `KanbanSkeleton`, a
+  drag-and-drop board on dnd-kit (moved from KairOS). The consumer owns the
+  items and gets one `onMove` with the neighbours' positions for every
+  column change or reorder, plus optional Finish / Remove drop zones.
+  `@dnd-kit/react` and `@dnd-kit/dom` are new optional peers, needed only
+  for this entry.
 - Changed: the range date picker uses Day Picker's built-in `resetOnSelect`
   instead of its own restart flag. A click on a complete range starts a new
   one as before, but the start now reaches `onChange` as

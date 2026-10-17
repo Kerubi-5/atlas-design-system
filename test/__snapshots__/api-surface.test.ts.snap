@@ -149,6 +149,10 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
   "./input": [
     "Input",
   ],
+  "./kanban": [
+    "KanbanBoard",
+    "KanbanSkeleton",
+  ],
   "./label": [
     "Label",
   ],
