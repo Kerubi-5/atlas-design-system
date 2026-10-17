@@ -105,6 +105,14 @@ README install snippet. Merging that to `main` publishes to npm through the
 release workflow (OIDC trusted publishing) after check, test, and pack
 pass. Versions already on npm are skipped.
 
+From 1.0, a **major** release is needed for any breaking change to a
+stable component. Breaking means removing or renaming an export, a prop, a
+public token, or a documented `data-slot`; narrowing a prop's type; or
+changing a default prop value. Visual-only changes (spacing, color values
+within a token, animation) are minor. Beta components stay exempt, as above.
+Radix-based components pass through their primitive's props, so a `radix-ui`
+major upgrade ships as a kit major.
+
 ## Deprecations
 
 1. Mark the export or prop `@deprecated` in its JSDoc with the replacement.

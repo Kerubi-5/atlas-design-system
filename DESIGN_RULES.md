@@ -32,6 +32,36 @@ its own soft tint in both themes. Status tones have no paired foreground token;
 avoid placing text on solid status fills. Application-specific identity colors
 belong to the application.
 
+### Public tokens and slots
+
+These are public API from 1.0, so apps may use them and a rename or removal
+is a breaking change:
+
+- Color tokens and their `--color-*` utilities: `background`, `foreground`,
+  `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `selected`
+  (each with its `-foreground` pair where one exists), `destructive`,
+  `success`, `warning`, `border`, `input`, `ring`, `chart-1` to `chart-5`,
+  and the `sidebar` set.
+- `--radius` and the `--radius-*` scale, and `--font-heading`.
+- Every `data-slot` listed under "Styling parts" in
+  [COMPONENTS.md](./COMPONENTS.md#styling-parts).
+
+Everything else in `theme.css` is internal and may change in a minor
+release: the scroll-shadow variables (`--scroll-fade`, `--scroll-fill`,
+`--table-scroll-fade`, `--tabs-scroll-fade`) and any `data-slot` not listed
+in COMPONENTS.md.
+
+### Prop names
+
+- A controlled value is `value` with `onValueChange`; open state is `open`
+  with `onOpenChange`; a checked state is `checked` with `onCheckedChange`.
+- Sizes run `sm`, `default`, `lg`; `Button` adds `xs` and `icon-*` sizes.
+- `variant="default"` is the plain look; other variants name what they mean
+  (`outline`, `ghost`, `destructive`).
+
+Exceptions waiting on a decision before 1.0 are listed in
+[ROADMAP-1.0.md](./ROADMAP-1.0.md).
+
 ## Accessibility
 
 The target is WCAG 2.2 AA. CI runs axe-core's WCAG 2.2 A and AA rules against
