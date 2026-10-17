@@ -1,14 +1,14 @@
 # Atlas React Kit
 
 Shared React components and a Tailwind theme with square corners, semantic
-colors, and distinct selected states. 0.6.0 added generic pieces apps were
-keeping locally (`InfoTip`, `ColorLegend`, `SearchPicker`, `Markdown`,
-`StatTile`, `Meter`, `Slider`) plus the ToggleGroup selected-state fix.
+colors, and distinct selected states. From 1.0 the API is stable: breaking
+changes to stable components only ship in a major release (see
+[CONTRIBUTING.md](./CONTRIBUTING.md#versions-and-releases)).
 React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
 when using `next/nav-link`, `next/period-stepper`, or `next/tabs-nav-link`.
 
 ```sh
-npm install --save-exact atlas-react-kit@0.12.0
+npm install --save-exact atlas-react-kit@1.0.0
 ```
 
 Import components by subpath:
@@ -129,7 +129,7 @@ artifact with the package owner's npm login:
 ```sh
 mkdir -p release-artifacts
 npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-0.12.0.tgz --access public
+npm publish ./release-artifacts/atlas-react-kit-1.0.0.tgz --access public
 ```
 
 Pin an exact package version in consuming applications. Roll back an upgrade by

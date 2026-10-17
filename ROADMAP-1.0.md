@@ -64,13 +64,13 @@ whether to promote it or keep it beta in 1.0.
 - [x] Deferred major upgrades, each in its own PR with screenshots checked:
       TypeScript 7 (#47), `@vitest/coverage-v8` 5 with Vitest 5 (#49),
       `next` 16.4 dev dependency.
-- [ ] Every component page has a usage entry and a screenshot (already
-      enforced; confirm still green).
+- [x] Every component page has a usage entry and a screenshot (already
+      enforced; confirm still green). The site job in CI enforces it.
 
 ### Dogfooding
 
-- [ ] At least one Atlas app on the latest 0.x for a full release cycle
-      with no kit-caused breaking changes.
+- [x] At least one Atlas app on the latest 0.x for a full release cycle
+      with no kit-caused breaking changes. Confirmed by Kim on 2026-10-17.
 
 ## Release process
 

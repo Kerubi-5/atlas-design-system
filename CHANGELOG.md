@@ -1,6 +1,11 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 - 2026-10-17
+
+The first stable release. The public API (exports, props, public tokens and
+documented slots) now follows the breaking-change rules in CONTRIBUTING.md:
+breaking changes to stable components need a major release. Beta components
+are exempt. Apps on 0.13 can upgrade without code changes.
 
 Pieces apps were building by hand: a kanban board, chart basics, three
 form fields, and page layout parts, plus readable picker values, dialog
