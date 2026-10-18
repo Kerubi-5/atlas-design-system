@@ -10,11 +10,8 @@ import {
   type DateRange,
 } from "./internal/date-like.js"
 import { MD_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
-import { LazyCalendar } from "./lazy-calendar.js"
 import {
-  PickerClearFooter,
   PickerShell,
-  limitCalendarProps,
   type PickerCalendarProps,
   type PickerTriggerProps,
 } from "./picker-shell.js"
@@ -91,9 +88,6 @@ function DatePickerSingleButton({
   placeholder = "Pick a date",
   numberOfMonths,
   defaultMonth,
-  calendarProps,
-  minDate,
-  maxDate,
   ...shell
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
@@ -108,20 +102,17 @@ function DatePickerSingleButton({
       dialogLabel="Choose date"
       open={open}
       onOpenChange={setOpen}
-    >
-      <LazyCalendar
-        {...limitCalendarProps(calendarProps, minDate, maxDate)}
-        mode="single"
-        autoFocus
-        selected={date}
-        defaultMonth={defaultMonth ?? date}
-        numberOfMonths={numberOfMonths}
-        onSelect={(next) => {
+      defaultMonth={defaultMonth ?? date}
+      calendar={{
+        mode: "single",
+        selected: date,
+        numberOfMonths,
+        onSelect: (next) => {
           emit?.(next)
           setOpen(false)
-        }}
-      />
-    </PickerShell>
+        },
+      }}
+    />
   )
 }
 
@@ -132,9 +123,6 @@ function DatePickerRangeButton({
   placeholder = "Pick a date range",
   numberOfMonths,
   defaultMonth,
-  calendarProps,
-  minDate,
-  maxDate,
   ...shell
 }: DatePickerRangeProps) {
   const [open, setOpen] = React.useState(false)
@@ -153,33 +141,25 @@ function DatePickerRangeButton({
       dialogLabel="Choose dates"
       open={open}
       onOpenChange={setOpen}
-    >
-      <LazyCalendar
-        {...limitCalendarProps(calendarProps, minDate, maxDate)}
-        mode="range"
+      defaultMonth={defaultMonth ?? from ?? to}
+      calendar={{
+        mode: "range",
         // A click on a complete range (or on none) starts a new one, so a
         // fresh range never needs Clear first. The start emits `to: undefined`.
-        resetOnSelect
-        autoFocus
-        selected={selected}
-        defaultMonth={defaultMonth ?? from ?? to}
-        numberOfMonths={months}
-        onSelect={(range) => {
+        resetOnSelect: true,
+        selected,
+        numberOfMonths: months,
+        onSelect: (range) => {
           emit?.(range)
           // Close once the ends differ; a start or a one-day range stays open.
           if (range?.from && range.to && !isSameDay(range.from, range.to)) {
             setOpen(false)
           }
-        }}
-      />
-      <PickerClearFooter
-        disabled={!from && !to}
-        onClear={() => {
-          emit?.(undefined)
-          setOpen(false)
-        }}
-      />
-    </PickerShell>
+        },
+      }}
+      onClear={() => emit?.(undefined)}
+      clearDisabled={!from && !to}
+    />
   )
 }
 

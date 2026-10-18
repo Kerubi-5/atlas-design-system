@@ -3,13 +3,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 
-import { LazyCalendar } from "./lazy-calendar.js"
-import {
-  PickerClearFooter,
-  PickerShell,
-  limitCalendarProps,
-  type PickerTriggerProps,
-} from "./picker-shell.js"
+import { PickerShell, type PickerTriggerProps } from "./picker-shell.js"
 import {
   Select,
   SelectContent,
@@ -81,24 +75,6 @@ function minuteOptions(step: number, current?: number): number[] {
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, hour) => padTimePart(hour))
 
 /**
- * Keep the date-time popover open when a portaled Select option is clicked.
- * Select content renders outside the popover, so Radix would otherwise treat
- * that pointer down as an outside dismiss.
- */
-function preventDismissForPortaledSelect(event: {
-  target: EventTarget | null
-  preventDefault: () => void
-}) {
-  const target = event.target
-  if (
-    target instanceof Element &&
-    target.closest("[data-slot=select-content]")
-  ) {
-    event.preventDefault()
-  }
-}
-
-/**
  * Calendar plus hour/minute popover trigger styled as a form control (same
  * chrome as Input, SelectTrigger, and DatePickerButton). `value` is a `Date`
  * or `null`. Picking a day keeps the popover open so the time can be set;
@@ -113,9 +89,6 @@ export function DateTimePickerButton({
   timeStep,
   placeholder = "Pick a date and time",
   defaultMonth,
-  calendarProps,
-  minDate,
-  maxDate,
   ...shell
 }: DateTimePickerButtonProps) {
   const [open, setOpen] = React.useState(false)
@@ -134,15 +107,11 @@ export function DateTimePickerButton({
       dialogLabel="Choose date and time"
       open={open}
       onOpenChange={setOpen}
-      onInteractOutside={preventDismissForPortaledSelect}
-    >
-      <LazyCalendar
-        {...limitCalendarProps(calendarProps, minDate, maxDate)}
-        mode="single"
-        autoFocus
-        selected={date ?? undefined}
-        defaultMonth={defaultMonth ?? date ?? undefined}
-        onSelect={(next) => {
+      defaultMonth={defaultMonth ?? date ?? undefined}
+      calendar={{
+        mode: "single",
+        selected: date ?? undefined,
+        onSelect: (next) => {
           // Re-clicking a selected day would clear it; require Clear instead
           // so a time already set is not dropped by an accidental second tap.
           if (!next) return
@@ -153,8 +122,13 @@ export function DateTimePickerButton({
               date?.getMinutes() ?? 0
             )
           )
-        }}
-      />
+        },
+      }}
+      onClear={() => emit?.(null)}
+      clearDisabled={empty}
+    >
+      {/* The time selects portal out of the popover, but Radix counts them
+          as inside its React tree, so picking an option keeps it open. */}
       <div
         role="group"
         aria-label="Time"
@@ -221,13 +195,6 @@ export function DateTimePickerButton({
           </Select>
         </div>
       </div>
-      <PickerClearFooter
-        disabled={empty}
-        onClear={() => {
-          emit?.(null)
-          setOpen(false)
-        }}
-      />
     </PickerShell>
   )
 }

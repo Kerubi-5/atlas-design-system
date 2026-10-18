@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+Internal only; the public API and rendered markup are unchanged.
+
+- `DatePickerButton` and `DateTimePickerButton` now share their calendar
+  wiring (date limits, `calendarProps`, focus on the selected day) and the
+  Clear row, which closes the popover, through one internal picker shell.
+- `DateTimePickerButton` drops its hand-written guard that kept the popover
+  open when an hour or minute was picked. Radix already counts the portaled
+  time selects as inside the popover, so choosing an option keeps it open
+  with mouse, touch and keyboard (checked in Chromium).
+
 ## 1.0.0 - 2026-10-18
 
 The first stable release. The public API (exports, props, public tokens and
