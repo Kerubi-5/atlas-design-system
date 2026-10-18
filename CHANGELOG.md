@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.0.0 - 2026-10-17
+## 1.0.0 - 2026-10-18
 
 The first stable release. The public API (exports, props, public tokens and
 documented slots) now follows the breaking-change rules in CONTRIBUTING.md:

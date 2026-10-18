@@ -67,6 +67,26 @@ whether to promote it or keep it beta in 1.0.
 - [x] Every component page has a usage entry and a screenshot (already
       enforced; confirm still green). The site job in CI enforces it.
 
+### Quality audit (2026-10-17)
+
+- [x] WCAG 2.2 AA beyond axe: every story is checked for visible keyboard
+      focus in light, dark and forced colors, focus covered by other
+      content, reflow at 320px, and WCAG text spacing
+      (`site/tests/wcag-behavior.test.mjs`). It found 236 problems: focus
+      vanished in Windows High Contrast, tab panels had no focus ring, and a
+      toggle group overflowed at 320px. All fixed in #62.
+- [x] Overlays by keyboard: Escape closes each one and returns focus to its
+      trigger, date pickers focus the selected day, tooltips stay open on
+      hover, toasts use a polite live region. No changes needed.
+- [x] Render cost: `KanbanBoard` re-rendered every card on each scroll
+      event and on any one-card change; now 0 and 1 renders (#63, with
+      `test/render-performance.test.tsx`). Pickers already had render-count
+      tests.
+- [x] Bundle size, gzipped with React external: `button` 11 KB, `input`
+      9 KB, `dialog` 27 KB, `select` 44 KB, `date-picker` 42 KB (calendar
+      loads on first open); ten common entries together 60 KB. Most of it is
+      Radix, Floating UI and tailwind-merge, shared across entries.
+
 ### Dogfooding
 
 - [x] At least one Atlas app on the latest 0.x for a full release cycle
