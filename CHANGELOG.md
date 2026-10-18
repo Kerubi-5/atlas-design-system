@@ -13,6 +13,17 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Faster `KanbanBoard`: scrolling no longer re-renders every card (300
+  cards over 20 scroll events: 6,000 `renderCard` calls before, 0 now), and
+  changing one item re-renders only that card when `renderCard` keeps its
+  identity (300 calls before, 1 now).
+- Accessibility: keyboard focus now shows in Windows High Contrast and
+  other forced-colors modes, where the box-shadow focus ring disappeared on
+  every control. Focusable `TabsContent` panels show the focus ring. A
+  horizontal `ToggleGroup` wraps instead of pushing a 320px page sideways.
+  A new site test checks every story for visible focus (light, dark and
+  forced colors), focus covered by other content, 320px reflow, and WCAG
+  text spacing, alongside the existing axe checks.
 - Every prop the kit declares now has a doc comment, so editors and
   agents show what it does and its default. Props that several components
   share (form field labels, error timing, picker options, `asChild`) are
