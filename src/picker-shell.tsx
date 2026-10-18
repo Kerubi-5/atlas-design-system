@@ -16,13 +16,13 @@ import {
   pickerTriggerClassName,
   pickerValueId,
 } from "./internal/form-control.js"
-import { preloadCalendar } from "./lazy-calendar.js"
+import { LazyCalendar, preloadCalendar } from "./lazy-calendar.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import { cn } from "./utils.js"
 
 /**
- * Not a public entry. The trigger, popover, and Clear footer that
- * `DatePickerButton` and `DateTimePickerButton` share.
+ * Not a public entry. The trigger, popover, calendar wiring, and Clear row
+ * that `DatePickerButton` and `DateTimePickerButton` share.
  */
 
 /**
@@ -106,7 +106,7 @@ export type PickerTriggerProps = {
  * any `disabled` matchers, and they bound paging unless `startMonth` /
  * `endMonth` are set.
  */
-export function limitCalendarProps(
+function limitCalendarProps(
   calendarProps: PickerCalendarProps | undefined,
   minDate: DateLike,
   maxDate: DateLike
@@ -132,10 +132,7 @@ export function limitCalendarProps(
   }
 }
 
-type PickerShellProps = Omit<
-  PickerTriggerProps,
-  "placeholder" | "defaultMonth" | "calendarProps" | "minDate" | "maxDate"
-> & {
+type PickerShellProps = Omit<PickerTriggerProps, "placeholder"> & {
   /** Muted trigger text while nothing is picked. */
   empty: boolean
   /** Trigger text: the formatted value or the placeholder. */
@@ -146,14 +143,27 @@ type PickerShellProps = Omit<
   open: boolean
   /** Called when the popover opens or closes. */
   onOpenChange: (open: boolean) => void
-  /** Called on a pointer down or focus outside the popover; can prevent the dismiss. */
-  onInteractOutside?: React.ComponentProps<
-    typeof PopoverContent
-  >["onInteractOutside"]
-  children: React.ReactNode
+  /**
+   * The picker's own calendar props: its mode, selection and `onSelect`.
+   * The shell adds `calendarProps`, the date limits, `defaultMonth`, and
+   * focus on the selected day.
+   */
+  calendar: React.ComponentProps<typeof LazyCalendar>
+  /**
+   * Shows a Clear row under the panel. Called when Clear is pressed; the
+   * popover then closes.
+   */
+  onClear?: () => void
+  /** Disable Clear, e.g. while nothing is picked. */
+  clearDisabled?: boolean
+  /** Extra panel rows between the calendar and Clear, e.g. time selects. */
+  children?: React.ReactNode
 }
 
-/** Form-control trigger plus the viewport-clamped calendar popover. */
+/**
+ * Form-control trigger plus the viewport-clamped popover holding the
+ * calendar, any extra rows, and an optional Clear row.
+ */
 export function PickerShell({
   id,
   disabled,
@@ -163,12 +173,18 @@ export function PickerShell({
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
   side,
+  defaultMonth,
+  minDate,
+  maxDate,
+  calendarProps,
   empty,
   label,
   dialogLabel,
   open,
   onOpenChange,
-  onInteractOutside,
+  calendar,
+  onClear,
+  clearDisabled = false,
   children,
 }: PickerShellProps) {
   return (
@@ -206,43 +222,39 @@ export function PickerShell({
         // today) once it loads, as the APG date picker dialog does; Radix
         // focusing the popover first would leave it on the container.
         onOpenAutoFocus={(event) => event.preventDefault()}
-        onInteractOutside={onInteractOutside}
         className={cn(
           "w-auto min-w-0",
           pickerContentClassName,
           contentClassName
         )}
       >
+        <LazyCalendar
+          {...limitCalendarProps(calendarProps, minDate, maxDate)}
+          {...calendar}
+          autoFocus
+          defaultMonth={defaultMonth}
+        />
         {children}
+        {onClear ? (
+          <div
+            data-slot="date-picker-footer"
+            className="flex justify-end border-t p-2"
+          >
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={clearDisabled}
+              onClick={() => {
+                onClear()
+                onOpenChange(false)
+              }}
+            >
+              Clear
+            </Button>
+          </div>
+        ) : null}
       </PopoverContent>
     </Popover>
-  )
-}
-
-/** Clear button row under the calendar. */
-export function PickerClearFooter({
-  disabled,
-  onClear,
-}: {
-  /** Disable the Clear button, e.g. while nothing is picked. */
-  disabled: boolean
-  /** Called when Clear is pressed. */
-  onClear: () => void
-}) {
-  return (
-    <div
-      data-slot="date-picker-footer"
-      className="flex justify-end border-t p-2"
-    >
-      <Button
-        type="button"
-        variant="ghost"
-        size="sm"
-        disabled={disabled}
-        onClick={onClear}
-      >
-        Clear
-      </Button>
-    </div>
   )
 }
