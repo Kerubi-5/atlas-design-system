@@ -9,7 +9,7 @@ import {
 } from "../src/tabs.js"
 
 /** KairOS Settings labels — long enough to overflow a 390px row. */
-export const SETTINGS_LINKS = [
+const SETTINGS_LINKS = [
   "Activity",
   "Preferences",
   "Notifications",

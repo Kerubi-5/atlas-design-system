@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { Button, quietButtonInteraction } from "../src/button.js"
+import { quietButtonInteraction } from "../src/button.js"
 import {
   ButtonVariantsStory,
   OutlineOnSelectedStory,

@@ -1,0 +1,19 @@
+# Git hooks for every contributor, people and AI agents alike. `npm ci`
+# installs them (the `prepare` script). CONTRIBUTING.md says what each one
+# checks and how a person can skip them in an emergency.
+pre-commit:
+  parallel: true
+  jobs:
+    - name: format
+      glob: "*.{js,mjs,ts,tsx,json,md,css,yml,yaml}"
+      run: npx prettier --check {staged_files}
+    - name: lint
+      glob: "*.{js,mjs,ts,tsx}"
+      run: npx oxlint --type-aware --deny-warnings {staged_files}
+    - name: secrets
+      run: npx secretlint {staged_files}
+
+pre-push:
+  jobs:
+    - name: gate
+      run: npm run gate

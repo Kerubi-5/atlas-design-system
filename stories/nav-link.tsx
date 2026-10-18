@@ -1,7 +1,7 @@
 import { NavLink } from "../src/nav-link.js"
 
 /** KairOS-style app shell labels. */
-export const SHELL_LINKS = ["Calendar", "Tasks", "Settings"] as const
+const SHELL_LINKS = ["Calendar", "Tasks", "Settings"] as const
 
 type ShellLink = (typeof SHELL_LINKS)[number]
 

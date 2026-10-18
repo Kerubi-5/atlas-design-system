@@ -18,8 +18,11 @@ jobs:
           node-version: "24"
           cache: npm
       - run: npm ci
+      - run: pipx install semgrep
       - run: npm run check
+      - run: npm run gate:static
       - run: npm run test:coverage
+      - run: npm run size
       - run: npm pack --dry-run
 
   site:

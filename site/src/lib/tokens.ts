@@ -5,13 +5,6 @@ export type CssVar = {
   value: string
 }
 
-export type TokenSection = {
-  id: string
-  title: string
-  description: string
-  vars: CssVar[]
-}
-
 type ThemeTokens = {
   colors: CssVar[]
   darkColors: CssVar[]
@@ -22,7 +15,7 @@ type ThemeTokens = {
 /**
  * Pull custom properties from a CSS block such as `:root { ... }`.
  */
-export function parseCssVars(block: string): CssVar[] {
+function parseCssVars(block: string): CssVar[] {
   const vars: CssVar[] = []
   const seen = new Set<string>()
   const pattern = /--([a-z0-9-]+)\s*:\s*([^;]+);/gi
