@@ -8,6 +8,10 @@ titles, and easier Storybook browsing. Every change to the API is an
 addition; existing types are unchanged. The range picker's first click now emits an
 open-ended range (see Changed below).
 
+- Faster `KanbanBoard`: scrolling no longer re-renders every card (300
+  cards over 20 scroll events: 6,000 `renderCard` calls before, 0 now), and
+  changing one item re-renders only that card when `renderCard` keeps its
+  identity (300 calls before, 1 now).
 - Accessibility: keyboard focus now shows in Windows High Contrast and
   other forced-colors modes, where the box-shadow focus ring disappeared on
   every control. Focusable `TabsContent` panels show the focus ring. A

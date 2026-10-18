@@ -77,7 +77,11 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   onComplete?: (itemId: string) => void
   /** Shows a Remove zone while dragging. */
   onDelete?: (itemId: string) => void
-  /** Card body; the board adds the grip, chrome, and sorting. */
+  /**
+   * Card body; the board adds the grip, chrome, and sorting. Cards re-render
+   * only when their item changes while this and `onCardClick` keep their
+   * identity, so define them outside the render or wrap them in `useCallback`.
+   */
   renderCard: (item: T) => React.ReactNode
   /** Makes the card body a button. */
   onCardClick?: (item: T) => void
@@ -270,9 +274,8 @@ function KanbanBoard<T extends { id: string; position: number }>({
                         column={column.id}
                         onCardClick={onCardClick}
                         className={cardClassName}
-                      >
-                        {renderCard(item)}
-                      </KanbanCardView>
+                        renderCard={renderCard}
+                      />
                     )
                   })}
                 </KanbanColumnView>
@@ -318,12 +321,15 @@ function useOverflowEdges(
   const measure = React.useCallback(() => {
     const element = ref.current
     if (!element) return
-    setEdges(
-      kanbanOverflowEdges(
-        element.scrollLeft,
-        element.clientWidth,
-        element.scrollWidth
-      )
+    const next = kanbanOverflowEdges(
+      element.scrollLeft,
+      element.clientWidth,
+      element.scrollWidth
+    )
+    // Scroll fires every frame; keep the old object so the board (and every
+    // card in it) re-renders only when an edge appears or goes.
+    setEdges((edges) =>
+      edges.start === next.start && edges.end === next.end ? edges : next
     )
   }, [ref])
 
@@ -434,21 +440,22 @@ function stopClick(event: React.MouseEvent) {
   event.stopPropagation()
 }
 
-function KanbanCardView<T extends { id: string }>({
+function KanbanCardViewImpl<T extends { id: string }>({
   item,
   index,
   column,
   onCardClick,
   className,
-  children,
+  renderCard,
 }: {
   item: T
   index: number
   column: string
   onCardClick?: (item: T) => void
   className?: string
-  children: React.ReactNode
+  renderCard: (item: T) => React.ReactNode
 }) {
+  const children = renderCard(item)
   const { handleRef, ref, isDragging } = useSortable({
     id: item.id,
     index,
@@ -505,6 +512,14 @@ function KanbanCardView<T extends { id: string }>({
     </div>
   )
 }
+
+/**
+ * Memoized so a board update re-renders only the cards whose item, index or
+ * column changed, when `renderCard` and the other props keep their identity.
+ */
+const KanbanCardView = React.memo(
+  KanbanCardViewImpl
+) as typeof KanbanCardViewImpl
 
 /**
  * Finish / Remove zones under the board while a card drags. Not sticky: a
