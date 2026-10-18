@@ -24,6 +24,41 @@ npm run test:visual --prefix site # screenshots of every component, light, dark,
 
 CI runs all of these on every pull request. Run them before you push.
 
+## Commit and push checks
+
+`npm ci` installs git hooks ([lefthook.yml](./lefthook.yml)) that block a
+commit or push until the code passes. People and AI agents get the same
+hooks.
+
+- **On commit**, for the staged files: Prettier, oxlint, and a secret scan
+  (secretlint).
+- **On push**, `npm run gate`: `npm run check`, then `npm run gate:static`
+  (oxlint with type information, knip, Semgrep, secretlint), the bundle-size
+  budgets (size-limit), and the tests.
+
+What each tool checks and where its rules live:
+
+| Check    | Tool                                          | Rules                |
+| -------- | --------------------------------------------- | -------------------- |
+| Lint     | oxlint with type-aware rules (TypeScript 7)   | `.oxlintrc.json`     |
+| Unused   | knip: unused files, exports, and dependencies | `knip.json`          |
+| Security | Semgrep, offline, on `src/`                   | `.semgrep.yml`       |
+| Secrets  | secretlint                                    | `.secretlintrc.json` |
+| Size     | size-limit, brotli size of `dist/`            | `.size-limit.json`   |
+
+Semgrep is a Python tool: install it once with `brew install semgrep` (or
+`pipx install semgrep`). The push fails, rather than skipping, when it is
+missing.
+
+When a check fails, fix the code: delete what knip reports unused, rework
+what Semgrep flags, and shrink a module that grew past its budget before
+you think about raising the budget. Raise a budget or turn off a rule only
+for a reason you can state, in the same commit, so review sees it.
+
+AI agents never skip the hooks (`--no-verify`, `LEFTHOOK=0`, or changing
+`core.hooksPath`). A person can, in an emergency: `git push --no-verify`.
+CI runs the same checks, so a skipped hook still fails the pull request.
+
 ## Add a component
 
 1. `src/<name>.tsx`, following [DESIGN_RULES.md](./DESIGN_RULES.md): semantic tokens, square

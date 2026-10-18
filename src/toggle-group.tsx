@@ -38,6 +38,10 @@ function ToggleGroup({
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> &
   ToggleGroupLayoutProps) {
+  const context = React.useMemo(
+    () => ({ variant, size, spacing, orientation }),
+    [variant, size, spacing, orientation]
+  )
   return (
     <ToggleGroupPrimitive.Root
       data-slot="toggle-group"
@@ -52,9 +56,7 @@ function ToggleGroup({
       )}
       {...props}
     >
-      <ToggleGroupContext.Provider
-        value={{ variant, size, spacing, orientation }}
-      >
+      <ToggleGroupContext.Provider value={context}>
         {children}
       </ToggleGroupContext.Provider>
     </ToggleGroupPrimitive.Root>

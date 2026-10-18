@@ -1,0 +1,70 @@
+# Security rules for the shipped code in src/. They live here, not in the
+# Semgrep registry, so the check runs offline and gives the same answer in
+# the git hook and in CI. Add a rule when a review finds a new risky pattern.
+rules:
+  - id: react-dangerously-set-inner-html
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      dangerouslySetInnerHTML renders raw HTML, an XSS risk in every app that
+      uses the kit. Render children or Markdown instead.
+    pattern: <$EL dangerouslySetInnerHTML={...} />
+
+  - id: dom-html-sink
+    languages: [typescript]
+    severity: ERROR
+    message: Writing HTML into the DOM is an XSS risk. Build elements with React.
+    pattern-either:
+      - pattern: $X.innerHTML = $Y
+      - pattern: $X.outerHTML = $Y
+      - pattern: $X.insertAdjacentHTML(...)
+      - pattern: document.write(...)
+      - pattern: document.writeln(...)
+
+  - id: dynamic-code-execution
+    languages: [typescript]
+    severity: ERROR
+    message: eval and the Function constructor run strings as code.
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+      - pattern: Function(...)
+      - pattern: setTimeout("...", ...)
+      - pattern: setInterval("...", ...)
+
+  - id: javascript-url
+    languages: [typescript]
+    severity: ERROR
+    message: "javascript: URLs run code on click. Use an onClick handler."
+    pattern-regex: '(?i)["''`]\s*javascript:'
+
+  - id: blank-target-without-noopener
+    languages: [typescript]
+    severity: ERROR
+    message: >-
+      target="_blank" needs rel="noopener noreferrer" so the opened page
+      can't reach window.opener.
+    patterns:
+      - pattern-either:
+          - pattern: <$EL target="_blank" ... />
+          - pattern: '{ target: "_blank", ... }'
+      - pattern-not: <$EL target="_blank" rel="=~/noopener/" ... />
+      - pattern-not: '{ target: "_blank", rel: "=~/noopener/", ... }'
+
+  - id: post-message-any-origin
+    languages: [typescript]
+    severity: ERROR
+    message: postMessage with "*" sends data to any origin. Name the origin.
+    pattern: $W.postMessage($MSG, "*", ...)
+
+  - id: storage-of-secrets
+    languages: [typescript]
+    severity: ERROR
+    message: Don't keep tokens or passwords in web storage; any script can read it.
+    patterns:
+      - pattern-either:
+          - pattern: localStorage.setItem($KEY, ...)
+          - pattern: sessionStorage.setItem($KEY, ...)
+      - metavariable-regex:
+          metavariable: $KEY
+          regex: (?i).*(token|secret|password|passwd|api[_-]?key|auth).*

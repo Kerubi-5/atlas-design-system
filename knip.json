@@ -1,0 +1,23 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": ["src/**/*.{ts,tsx}", "scripts/*.mjs", "test/**/*.{ts,tsx}"],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "stories/**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "scripts/*.mjs"
+      ]
+    },
+    "site": {
+      "entry": ["tests/**/*.{mjs,ts}"],
+      "project": ["**/*.{ts,tsx,mjs}"]
+    }
+  },
+  "ignoreDependencies": [
+    "tailwindcss",
+    "@secretlint/secretlint-rule-preset-recommend"
+  ],
+  "ignoreBinaries": ["semgrep"]
+}
