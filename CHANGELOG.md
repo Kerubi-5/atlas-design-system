@@ -22,6 +22,12 @@ Additions apps were working around, with no change to existing types.
   `data-state` and `aria-current`. `next/tabs-nav-link` and `next/nav-link`
   now wrap the base links with `asChild`; their rendered markup is
   unchanged.
+- `TabsNav` and `TabsList` rows that overflow can be dragged sideways with
+  a mouse, as touch already could. A press becomes a drag after 4px, so a
+  plain click still activates a tab or link, and the click after a drag is
+  swallowed so a drag never also follows a link. Radix selects a
+  `TabsTrigger` on press, so a drag that starts on an inactive tab still
+  selects it. Markup, classes and keyboard behaviour are unchanged.
 - `theme.css` sets `color-scheme: light` on `:root` and `color-scheme: dark`
   on `.dark`, so native scrollbars and form controls follow the theme.
 - `DateTimePickerButton` drops two unused ids on its time selects (no
