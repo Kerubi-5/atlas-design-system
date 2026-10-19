@@ -58,7 +58,7 @@ export function errorIdFor(id: string) {
  * Id of the hidden "Required" text `FormFieldShell` renders for a required
  * control `id`, for controls that cannot carry `required` themselves.
  */
-export function requiredIdFor(id: string) {
+function requiredIdFor(id: string) {
   return `${id}-required`
 }
 

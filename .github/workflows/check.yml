@@ -24,10 +24,8 @@ jobs:
       # The site's packages give oxlint and knip the site's types and imports.
       - run: npm ci --prefix site
       - run: pipx install semgrep
-      - run: npm run check
-      - run: npm run gate:static
-      - run: npm run test:coverage
-      - run: npm run size
+      # The same gate the pre-push hook runs (lefthook.yml).
+      - run: npm run gate
       - run: npm pack --dry-run
 
   site:

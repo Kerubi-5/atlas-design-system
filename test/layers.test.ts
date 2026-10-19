@@ -32,11 +32,11 @@ for (const file of readdirSync(srcDir, { recursive: true, encoding: "utf8" })) {
     .split(path.sep)
     .join("/")
   const source = readFileSync(path.join(srcDir, file), "utf8")
-  const imports = [...source.matchAll(/from "(\.{1,2}\/[^"]+)\.js"/g)].map(
-    (match) =>
-      path.posix.normalize(
-        path.posix.join(path.posix.dirname(module), match[1]!)
-      )
+  // Static `from "./x.js"` and dynamic `import("./x.js")` alike.
+  const imports = [
+    ...source.matchAll(/(?:from |import\()"(\.{1,2}\/[^"]+)\.js"/g),
+  ].map((match) =>
+    path.posix.normalize(path.posix.join(path.posix.dirname(module), match[1]!))
   )
   graph.set(module, imports)
 }

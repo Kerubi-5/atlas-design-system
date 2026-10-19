@@ -2,7 +2,7 @@
 const PAGE_SIZE = 10
 
 /** Return the next highlighted index for a listbox navigation key. */
-export function moveListboxHighlight(
+function moveListboxHighlight(
   key: string,
   index: number,
   length: number
@@ -48,7 +48,7 @@ export function scrollOptionIntoView(node: HTMLElement | null) {
  * then commits the composition and must not select an option. `keyCode`
  * 229 covers Safari, which ends composition before the keydown.
  */
-export function isComposingKey(event: {
+function isComposingKey(event: {
   nativeEvent: KeyboardEvent
   keyCode: number
 }) {

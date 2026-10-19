@@ -14,6 +14,27 @@ const components = Object.entries(manifest.exports)
   .filter(([, target]) => typeof target === "object")
   .map(([path]) => path.slice(2))
 
+/**
+ * Modules under `src/` that are not public entries: pieces the public
+ * modules share, like `internal/`, but kept beside their owners.
+ */
+const INTERNAL = new Set(["lazy-calendar", "picker-shell", "form/field-shell"])
+
+/** Public module name → its source file, for every module `src/` holds. */
+async function sourceFiles() {
+  const files = new Map<string, string>()
+  for (const dir of ["", "form/", "next/"]) {
+    for (const file of await readdir(resolve(root, "src", dir))) {
+      const match = /^([^.]+)\.tsx?$/.exec(file)
+      if (!match || INTERNAL.has(`${dir}${match[1]}`)) continue
+      files.set(`${dir}${match[1]}`, resolve(root, "src", dir, file))
+    }
+  }
+  return files
+}
+
+const sources = await sourceFiles()
+
 /** Feature entries that may import optional peers. Everything else is core. */
 const featureEntries = new Set([
   "calendar",
@@ -134,6 +155,35 @@ describe("published modules", () => {
     ])
   })
 
+  it("exports every public module in src/ and nothing else", () => {
+    // A new src/ module without a package.json export, or an export whose
+    // module is gone, fails here instead of in an app's import.
+    expect([...components].sort()).toEqual([...sources.keys()].sort())
+  })
+
+  it("documents each feature entry's install with the kit's peer ranges", async () => {
+    // COMPONENTS.md's optional-peer table is what people copy; its ranges
+    // must be package.json's, and its rows must cover every feature entry.
+    const docs = await readFile(resolve(root, "COMPONENTS.md"), "utf8")
+    const rows = [...docs.matchAll(/^\| (.+?) +\| `npm i (.+?)` +\|$/gm)]
+    expect(rows.length).toBeGreaterThan(0)
+    const documented = new Set<string>()
+    for (const [, entries, install] of rows) {
+      for (const [, entry] of entries!.matchAll(/`([^`]+)`/g)) {
+        documented.add(entry!)
+      }
+      for (const spec of install!.split(/\s+/)) {
+        const at = spec.lastIndexOf("@")
+        const name = spec.slice(0, at)
+        expect(
+          manifest.peerDependencies[name],
+          `${spec} in COMPONENTS.md must match package.json`
+        ).toBe(spec.slice(at + 1))
+      }
+    }
+    expect([...documented].sort()).toEqual([...featureEntries].sort())
+  })
+
   it("exports compiled JavaScript and declarations for every public module", async () => {
     for (const name of components) {
       const entry = manifest.exports[`./${name}`]
@@ -227,55 +277,17 @@ describe("published modules", () => {
     expect(types).not.toMatch(/sonner/i)
   })
 
-  it("preserves client boundaries for hooks and event handlers", async () => {
-    for (const name of [
-      "accordion",
-      "avatar",
-      "calendar",
-      "chart",
-      "checkbox",
-      "combobox",
-      "date-picker",
-      "date-time-picker",
-      "dialog",
-      "dropdown-menu",
-      "error-boundary",
-      "field",
-      "info-tip",
-      "kanban",
-      "label",
-      "period-stepper",
-      "popover",
-      "progress",
-      "radio-group",
-      "search-picker",
-      "select",
-      "separator",
-      "slider",
-      "sortable-table-head",
-      "switch",
-      "table",
-      "tabs",
-      "theme-provider",
-      "toast",
-      "toggle",
-      "toggle-group",
-      "tooltip",
-      "form/checkbox-field",
-      "form/combobox-field",
-      "form/control-field",
-      "form/date-picker-field",
-      "form/date-time-picker-field",
-      "form/markdown-field",
-      "form/select-field",
-      "form/text-field",
-      "form/toggle-group-field",
-      "next/nav-link",
-      "next/period-stepper",
-      "next/tabs-nav-link",
-    ]) {
-      const source = await readFile(resolve(root, `dist/${name}.js`), "utf8")
-      expect(source.startsWith('"use client";')).toBe(true)
+  it("preserves each module's client boundary through compilation", async () => {
+    // The compiled file starts with "use client" exactly when the source
+    // does: dropping it breaks hooks and handlers in a server component,
+    // and adding it drags a client boundary into a server-safe module.
+    for (const [name, file] of sources) {
+      const source = await readFile(file, "utf8")
+      const compiled = await readFile(resolve(root, `dist/${name}.js`), "utf8")
+      expect(
+        compiled.startsWith('"use client";'),
+        `dist/${name}.js must carry "use client" exactly when src does`
+      ).toBe(source.startsWith('"use client"'))
     }
   })
 
