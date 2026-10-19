@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   LabelInputTextareaStory,
   FieldStory,
+  FocusFirstInvalidStory,
   FormHelpersStory,
   CustomControlFieldStory,
 } from "../../stories/fields.js"
@@ -30,4 +31,15 @@ export const TriggerAlignment: Story = {
 }
 export const CustomControlField: Story = {
   render: () => <CustomControlFieldStory />,
+}
+export const FocusFirstInvalid: Story = {
+  render: () => <FocusFirstInvalidStory />,
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Press Save with the fields empty: `focusFirstInvalid` moves focus to the first field with an error, and the errors show. Fields carry `id={field.name}` so the handler finds them.",
+      },
+    },
+  },
 }

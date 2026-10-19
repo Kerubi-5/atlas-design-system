@@ -3,24 +3,23 @@
 import type * as React from "react"
 import Link from "next/link.js"
 
-import { cn } from "../utils.js"
-import { tabsTriggerVariants } from "../internal/tabs-styles.js"
+import { TabsNavLink as BaseTabsNavLink } from "../tabs.js"
 
+/**
+ * Next.js adapter for `TabsNavLink`: the base link with `asChild` around a
+ * Next `Link`, so it renders the same element. Next `Link` props plus a
+ * required `active` boolean (`isNavActive(usePathname(), href)` from
+ * `atlas-react-kit/nav-link` works here too).
+ */
 function TabsNavLink({
   active,
   className,
   ...props
 }: React.ComponentProps<typeof Link> & { active: boolean }) {
   return (
-    <Link
-      data-slot="tabs-nav-link"
-      // data-state reuses the trigger's active styles; aria-current is what
-      // assistive tech reads.
-      data-state={active ? "active" : "inactive"}
-      aria-current={active ? "page" : undefined}
-      className={cn(tabsTriggerVariants(), className)}
-      {...props}
-    />
+    <BaseTabsNavLink asChild active={active} className={className}>
+      <Link {...props} />
+    </BaseTabsNavLink>
   )
 }
 

@@ -2,8 +2,30 @@
 
 ## Unreleased
 
-Internal only; the public API and rendered markup are unchanged.
+Additions apps were working around, with no change to existing types.
 
+- `DatePickerButton` single mode takes `clearable`: a Clear row that emits
+  `undefined` and closes the popover, and a second click on the selected
+  day then keeps it. `FormDatePickerField` forwards it. Without
+  `clearable`, nothing changes.
+- `FormSelectField`, `FormDatePickerField`, and `FormDateTimePickerField`
+  take an optional `id` for their control, like `FormTextField`; the
+  default stays a generated id.
+- New entry `form/focus-first-invalid`: `focusFirstInvalid(formId)` returns
+  an invalid-submit handler (TanStack Form's `onSubmitInvalid`) that focuses
+  the first control in the form whose field has errors, matched by control
+  id. Give fields `id={field.name}`.
+- `isNavActive(pathname, href)` from `nav-link`: true on the path itself
+  or a page under it, for the `active` prop of both link kinds.
+- `TabsNavLink` from `tabs`: the link inside `TabsNav` as a plain anchor
+  (`asChild` for a router link), so apps outside Next no longer hand-roll
+  `data-state` and `aria-current`. `next/tabs-nav-link` and `next/nav-link`
+  now wrap the base links with `asChild`; their rendered markup is
+  unchanged.
+- `theme.css` sets `color-scheme: light` on `:root` and `color-scheme: dark`
+  on `.dark`, so native scrollbars and form controls follow the theme.
+- `DateTimePickerButton` drops two unused ids on its time selects (no
+  rendered change).
 - `DatePickerButton` and `DateTimePickerButton` now share their calendar
   wiring (date limits, `calendarProps`, focus on the selected day) and the
   Clear row, which closes the popover, through one internal picker shell.

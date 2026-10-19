@@ -123,6 +123,24 @@ describe("DateTimePickerButton", () => {
     ).toBeInTheDocument()
   })
 
+  it("keeps the value and the popover when the selected day is clicked again", async () => {
+    const user = createUser()
+    const onChange = vi.fn<(date: Date | null) => void>()
+    render(<DateTimePickerHarness initial={afternoon} onChange={onChange} />)
+
+    await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
+    expect(await screen.findByRole("grid")).toBeVisible()
+
+    // Day Picker would deselect the day; the picker ignores that so a set
+    // time is not dropped by an accidental second tap. Clear is the way out.
+    await user.click(getDayButton(new Date(2026, 9, 10)))
+    expect(onChange).not.toHaveBeenCalled()
+    expect(screen.getByRole("grid")).toBeVisible()
+    expect(
+      screen.getByRole("button", { name: /October 10.*2:30/ })
+    ).toHaveAttribute("data-empty", "false")
+  })
+
   it("preserves the clock when the calendar day changes", async () => {
     const user = createUser()
     const onChange = vi.fn<(date: Date | null) => void>()

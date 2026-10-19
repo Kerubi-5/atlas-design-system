@@ -48,10 +48,20 @@ export type DatePickerSingleProps = DatePickerSharedProps & {
   mode?: "single"
   /** Controlled day, as a `Date` or `yyyy-MM-dd`. Omitted is empty. */
   value?: DateLike
-  /** Called with the picked day, or `undefined` on Clear. */
+  /**
+   * Called with the picked day. With `clearable`, Clear calls it with
+   * `undefined`; without, a second click on the selected day does.
+   */
   onValueChange?: (date: Date | undefined) => void
   /** @deprecated Use `onValueChange`; `onChange` keeps working until 2.0. */
   onChange?: (date: Date | undefined) => void
+  /**
+   * Shows a Clear row under the calendar, which emits `undefined` and
+   * closes the popover. A click on the selected day then keeps it instead
+   * of clearing it, so Clear is the one way to empty the field. Default
+   * `false`.
+   */
+  clearable?: boolean
 }
 
 export type DatePickerRangeProps = DatePickerSharedProps & {
@@ -88,11 +98,16 @@ function DatePickerSingleButton({
   placeholder = "Pick a date",
   numberOfMonths,
   defaultMonth,
+  clearable = false,
   ...shell
 }: DatePickerSingleProps) {
   const [open, setOpen] = React.useState(false)
   const emit = onValueChange ?? onChange
   const date = toDate(value)
+  const onSelect = (next: Date | undefined) => {
+    emit?.(next)
+    setOpen(false)
+  }
 
   return (
     <PickerShell
@@ -103,15 +118,21 @@ function DatePickerSingleButton({
       open={open}
       onOpenChange={setOpen}
       defaultMonth={defaultMonth ?? date}
-      calendar={{
-        mode: "single",
-        selected: date,
-        numberOfMonths,
-        onSelect: (next) => {
-          emit?.(next)
-          setOpen(false)
-        },
-      }}
+      calendar={
+        clearable
+          ? // Day Picker's `required` keeps the day on a second click, so
+            // Clear is the one way out; its type needs the literal `true`.
+            {
+              mode: "single",
+              required: true,
+              selected: date,
+              numberOfMonths,
+              onSelect,
+            }
+          : { mode: "single", selected: date, numberOfMonths, onSelect }
+      }
+      onClear={clearable ? () => emit?.(undefined) : undefined}
+      clearDisabled={!date}
     />
   )
 }
@@ -167,7 +188,8 @@ function DatePickerRangeButton({
  * Calendar popover trigger styled as a form control (same chrome as Input
  * and SelectTrigger). `mode="single"` (default) accepts `Date` or
  * `yyyy-MM-dd` and emits `Date | undefined`. `mode="range"` accepts
- * `{ from, to }` and emits `DateRange | undefined`. Range mode shows one
+ * `{ from, to }` and emits `DateRange | undefined`. Range mode always has a
+ * Clear row; single mode shows one with `clearable`. Range mode shows one
  * month below `md` and two at `md+` unless `numberOfMonths` is set. The
  * popover clamps to the viewport (`side` is overridable). `className` styles
  * the trigger, `contentClassName` the popover, and `calendarProps` reaches

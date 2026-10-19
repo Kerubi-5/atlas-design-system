@@ -2,8 +2,9 @@
 
 import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
-import { Tabs as TabsPrimitive } from "radix-ui"
+import { Slot, Tabs as TabsPrimitive } from "radix-ui"
 
+import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing } from "./internal/styles.js"
 import {
   tabsListVariants,
@@ -171,12 +172,40 @@ function TabsContent({
 }
 
 /**
+ * Tab-styled link for `TabsNav`. Pass `active` from the route: the active
+ * link gets the trigger's selected chrome (`data-state="active"`) and
+ * `aria-current="page"`. `asChild` wraps a router `Link` with these styles,
+ * like `NavLink`; Next apps can import `next/tabs-nav-link` instead.
+ */
+function TabsNavLink({
+  asChild,
+  active,
+  className,
+  ...props
+}: React.ComponentProps<"a"> &
+  AsChildProps & {
+    /** This link is the current view: `aria-current="page"` and the active chrome. */
+    active: boolean
+  }) {
+  const Comp = asChild ? Slot.Root : "a"
+
+  return (
+    <Comp
+      data-slot="tabs-nav-link"
+      data-state={active ? "active" : "inactive"}
+      aria-current={active ? "page" : undefined}
+      className={cn(tabsTriggerVariants(), className)}
+      {...props}
+    />
+  )
+}
+
+/**
  * Tab-styled links for a view switcher that changes the URL. Use this, not
  * `Tabs` + `TabsTrigger asChild`, when there are no `TabsContent` panels:
- * tabs would point assistive tech at panels that don't exist. Style each link
- * with `tabsTriggerVariants()` and mark the active one with
- * `data-state="active"` and `aria-current="page"` (the Next adapter
- * `TabsNavLink` does this for you).
+ * tabs would point assistive tech at panels that don't exist. Each link is
+ * a `TabsNavLink` with `active` from the app (`asChild` for a router link,
+ * or the Next adapter `next/tabs-nav-link`).
  *
  * Overflow is handled here: the row scrolls horizontally only, with padding
  * for active borders and focus rings counted in the scroller height (so the
@@ -228,6 +257,7 @@ export {
   TabsTrigger,
   TabsContent,
   TabsNav,
+  TabsNavLink,
   tabsListVariants,
   tabsTriggerVariants,
 }

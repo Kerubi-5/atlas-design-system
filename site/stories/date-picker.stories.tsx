@@ -9,6 +9,7 @@ type Args = {
   value: string
   placeholder: string
   disabled: boolean
+  clearable: boolean
   numberOfMonths: number
   minDate?: string
   maxDate?: string
@@ -19,6 +20,7 @@ const meta = {
     value: "2026-10-09",
     placeholder: "Pick a date",
     disabled: false,
+    clearable: false,
     numberOfMonths: 1,
   },
   argTypes: {
@@ -28,6 +30,11 @@ const meta = {
     },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
+    clearable: {
+      control: "boolean",
+      description:
+        "Adds a Clear row to the popover; a second click on the selected day then keeps it",
+    },
     numberOfMonths: { control: { type: "number", min: 1, max: 3 } },
     minDate: {
       control: "text",
@@ -59,6 +66,17 @@ export default meta
 type Story = StoryObj<typeof meta>
 export const Playground: Story = {}
 export const Empty: Story = { args: { value: "" } }
+export const Clearable: Story = {
+  args: { clearable: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`clearable` shows a Clear row that emits `undefined` and closes the popover. `FormDatePickerField` forwards it.",
+      },
+    },
+  },
+}
 export const Disabled: Story = { args: { disabled: true } }
 export const Limited: Story = {
   args: { minDate: "2026-10-05", maxDate: "2026-10-23" },

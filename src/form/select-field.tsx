@@ -20,6 +20,12 @@ type Props = FormFieldBaseProps &
     onValueChange: (value: string) => void
     /** Trigger text while no item is selected. */
     placeholder?: string
+    /**
+     * Id of the trigger the label points at. Defaults to a generated id;
+     * pass the field name (`id={field.name}`) so a submit handler such as
+     * `focusFirstInvalid` can find the control.
+     */
+    id?: string
     /** Requires a value (native form validation) and marks the label. */
     required?: boolean
     /** Forwarded to the select trigger. */
@@ -32,6 +38,7 @@ type Props = FormFieldBaseProps &
 
 /** Select control with built-in field error text and invalid styling. */
 export function FormSelectField({
+  id: idProp,
   value,
   meta,
   submitted,
@@ -46,7 +53,8 @@ export function FormSelectField({
   children,
 }: Props) {
   const errorText = metaErrorText(meta, { submitted, showError })
-  const id = useId()
+  const generatedId = useId()
+  const id = idProp ?? generatedId
 
   return (
     <FormFieldShell

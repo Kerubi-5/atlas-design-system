@@ -1,11 +1,10 @@
-import { cn } from "../src/utils.js"
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsNav,
+  TabsNavLink,
   TabsTrigger,
-  tabsTriggerVariants,
 } from "../src/tabs.js"
 
 /** KairOS Settings labels — long enough to overflow a 390px row. */
@@ -80,20 +79,15 @@ export function TabsNavStory({
 } = {}) {
   return (
     <TabsNav aria-label="Settings" className={className}>
-      {SETTINGS_LINKS.map((label) => {
-        const isActive = label === active
-        return (
-          <a
-            key={label}
-            href={`#${settingsSlug(label)}`}
-            aria-current={isActive ? "page" : undefined}
-            data-state={isActive ? "active" : "inactive"}
-            className={cn(tabsTriggerVariants())}
-          >
-            {label}
-          </a>
-        )
-      })}
+      {SETTINGS_LINKS.map((label) => (
+        <TabsNavLink
+          key={label}
+          href={`#${settingsSlug(label)}`}
+          active={label === active}
+        >
+          {label}
+        </TabsNavLink>
+      ))}
     </TabsNav>
   )
 }
