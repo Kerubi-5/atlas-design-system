@@ -461,3 +461,54 @@ describe("KanbanBoard overflow cues", () => {
     })
   })
 })
+
+describe("KanbanBoard render counts", () => {
+  // Interactions that repeat many times a second. Each case failed before
+  // its fix; the PR that added it records the before and after.
+  const stages = ["todo", "doing", "done"].map((id) => ({ id, label: id }))
+  const manyCards: Card[] = stages.flatMap((column) =>
+    Array.from({ length: 100 }, (_, index) => ({
+      id: `${column.id}-${index}`,
+      position: index,
+      title: `${column.id} ${index}`,
+      stage: column.id,
+    }))
+  )
+
+  it("does not re-render its cards while scrolling leaves the overflow edges unchanged", () => {
+    const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)
+    const { container } = render(
+      <KanbanBoard
+        columns={stages}
+        items={manyCards}
+        getColumnId={getColumnId}
+        onMove={() => {}}
+        renderCard={renderCard}
+      />
+    )
+    const scroller = container.querySelector<HTMLElement>(
+      "[data-slot=kanban-scroller]"
+    )!
+    renderCard.mockClear()
+    for (let i = 0; i < 20; i += 1) fireEvent.scroll(scroller)
+    expect(renderCard).toHaveBeenCalledTimes(0)
+  })
+
+  it("re-renders only the card whose item changed", () => {
+    const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)
+    const props = {
+      columns: stages,
+      getColumnId,
+      onMove: () => {},
+      renderCard,
+    }
+    const { rerender } = render(<KanbanBoard {...props} items={manyCards} />)
+    renderCard.mockClear()
+    const next = manyCards.map((card) =>
+      card.id === "doing-5" ? { ...card, position: 5.5 } : card
+    )
+    rerender(<KanbanBoard {...props} items={next} />)
+    expect(renderCard).toHaveBeenCalledTimes(1)
+    expect(renderCard).toHaveBeenCalledWith(next[105])
+  })
+})

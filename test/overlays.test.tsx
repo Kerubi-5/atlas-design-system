@@ -16,7 +16,13 @@ import {
   PopoverTrigger,
 } from "../src/popover.js"
 
-import { createUser, render, screen, waitFor } from "./helpers.js"
+import {
+  createUser,
+  findPopoverContent,
+  render,
+  screen,
+  waitFor,
+} from "./helpers.js"
 
 function focusIsInside(container: Element | null) {
   return Boolean(
@@ -46,11 +52,7 @@ describe("Popover", () => {
     expect(trigger.querySelector("button")).toBeNull()
 
     await user.click(trigger)
-    const content = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const content = await findPopoverContent()
 
     expect(screen.getByText("Limit the table.")).toBeVisible()
     await waitFor(() => {

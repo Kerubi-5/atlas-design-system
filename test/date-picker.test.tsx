@@ -1,3 +1,4 @@
+import { fr } from "date-fns/locale"
 import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
@@ -8,6 +9,8 @@ import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import {
   createUser,
   expectFormControlTrigger,
+  findPopoverContent,
+  getDayButton,
   render,
   screen,
   stubMatchMedia,
@@ -17,19 +20,6 @@ import {
 
 const october = new Date(2026, 9, 1)
 const locale = { code: "en-US" }
-
-/**
- * Day buttons expose `data-day` from `toLocaleDateString`. Pin en-US so the
- * query is stable in CI.
- */
-function getDayButton(date: Date) {
-  const stamp = date.toLocaleDateString("en-US")
-  const button = document.querySelector(`[data-day="${stamp}"]`)
-  if (!(button instanceof HTMLElement)) {
-    throw new Error(`No calendar day button for ${stamp}`)
-  }
-  return button
-}
 
 function RangePickerHarness({
   initial,
@@ -129,6 +119,43 @@ describe("Calendar", () => {
       "data-range-middle",
       "true"
     )
+  })
+
+  it("preserves calendar nodes on parent updates and refreshes locale without losing navigation focus", () => {
+    const month = new Date(2026, 9, 1)
+    const { container, rerender } = render(
+      <Calendar mode="single" defaultMonth={month} />
+    )
+    const root = container.querySelector('[data-slot="calendar"]')
+    const day = container.querySelector<HTMLButtonElement>("button[data-day]")!
+    const nextMonth = screen.getByRole("button", {
+      name: "Go to the Next Month",
+    })
+    nextMonth.focus()
+
+    rerender(
+      <Calendar mode="single" defaultMonth={month} className="updated" />
+    )
+    expect(container.querySelector('[data-slot="calendar"]')).toBe(root)
+    expect(container.querySelector("button[data-day]")).toBe(day)
+    expect(nextMonth).toHaveFocus()
+
+    rerender(
+      <Calendar
+        mode="single"
+        defaultMonth={month}
+        locale={fr}
+        weekStartsOn={0}
+      />
+    )
+    expect(container.querySelector('[data-slot="calendar"]')).toBe(root)
+    const localizedDay =
+      container.querySelector<HTMLButtonElement>("button[data-day]")!
+    expect(localizedDay.dataset.day).toBe(
+      new Date(2026, 8, 27).toLocaleDateString("fr")
+    )
+    expect(localizedDay).toHaveAccessibleName(/septembre/)
+    expect(nextMonth).toHaveFocus()
   })
 })
 
@@ -548,11 +575,7 @@ describe("DatePickerButton range mode", () => {
     render(<RangePickerHarness />)
 
     await user.click(screen.getByRole("button", { name: "Export range" }))
-    const popover = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const popover = await findPopoverContent()
 
     expect(popover).toHaveClass("w-auto")
     expect(popover.className).not.toMatch(/\bw-72\b/)
@@ -587,11 +610,7 @@ describe("DatePickerButton range mode", () => {
     )
 
     await user.click(screen.getByRole("button", { name: "Export range" }))
-    const popover = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const popover = await findPopoverContent()
 
     expect(screen.getAllByRole("grid")).toHaveLength(1)
     expect(popover.className.split(/\s+/)).toContain("w-auto")
@@ -646,11 +665,7 @@ describe("DatePickerButton range mode", () => {
     )
 
     await user.click(screen.getByRole("button", { name: "Export range" }))
-    const popover = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const popover = await findPopoverContent()
     expect(popover).toHaveAttribute("data-side", "top")
   })
 })

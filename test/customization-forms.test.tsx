@@ -13,30 +13,20 @@ import { pickerValueId } from "../src/internal/form-control.js"
 import { LazyCalendar } from "../src/lazy-calendar.js"
 import { SelectItem } from "../src/select.js"
 
-import { createUser, fakeTextField, render, screen } from "./helpers.js"
+import {
+  createUser,
+  fakeTextField,
+  getDayButton,
+  render,
+  screen,
+  slot,
+} from "./helpers.js"
 
 const october = new Date(2026, 9, 1)
-
-function getDayButton(date: Date) {
-  const stamp = date.toLocaleDateString("en-US")
-  const button = document.querySelector(`[data-day="${stamp}"]`)
-  if (!(button instanceof HTMLElement)) {
-    throw new Error(`No calendar day button for ${stamp}`)
-  }
-  return button
-}
 
 /** Day Picker's first weekday header (the row is hidden from the a11y tree). */
 function firstWeekday() {
   return document.querySelector(".rdp-weekday")?.getAttribute("aria-label")
-}
-
-function slot(name: string, root: ParentNode = document) {
-  const element = root.querySelector(`[data-slot="${name}"]`)
-  if (!(element instanceof HTMLElement)) {
-    throw new Error(`No [data-slot="${name}"]`)
-  }
-  return element
 }
 
 // Runs first: once the calendar chunk resolves, Suspense stops showing it.

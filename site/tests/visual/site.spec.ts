@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 
 import { GITHUB_URL, NPM_URL } from "../../src/lib/docs.js"
+import { sidebarGroups } from "../sidebar-groups.mjs"
 
 // Loads the Storybook UI itself (the screenshots only load the preview
 // iframe), so a manager addon that throws fails here.
@@ -29,18 +30,9 @@ test("the README page links to GitHub and npm", async ({ page }) => {
 
 test("the sidebar groups components by purpose", async ({ page }) => {
   await page.goto("/?path=/docs/docs-readme--docs")
-  await expect(page.locator('[data-nodetype="root"]')).toHaveText([
-    "Docs",
-    "Foundations",
-    "Actions",
-    "Forms",
-    "Navigation",
-    "Feedback",
-    "Overlays",
-    "Data display",
-    "Layout",
-    "Examples",
-  ])
+  await expect(page.locator('[data-nodetype="root"]')).toHaveText(
+    sidebarGroups as string[]
+  )
 })
 
 test("links to a page's old Components/ id land on its new page", async ({

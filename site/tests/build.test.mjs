@@ -4,6 +4,8 @@ import path from "node:path"
 import { fileURLToPath } from "node:url"
 import test from "node:test"
 
+import { sidebarGroups } from "./sidebar-groups.mjs"
+
 const siteRoot = fileURLToPath(new URL("../", import.meta.url))
 const repoRoot = path.resolve(siteRoot, "..")
 const output = path.join(siteRoot, "dist")
@@ -235,13 +237,7 @@ test("every component story has usage guidance", async () => {
 })
 
 test("every component story sits in a sidebar group", async () => {
-  const preview = await fs.readFile(
-    path.join(siteRoot, ".storybook/preview.tsx"),
-    "utf8"
-  )
-  const order = /storySort: \{([\s\S]*?)\n\s*\},/.exec(preview)?.[1] ?? ""
-  const groups = new Set([...order.matchAll(/"([^"]+)"/g)].map((m) => m[1]))
-  assert.ok(groups.has("Forms"), "preview.tsx lists the sidebar groups")
+  const groups = new Set(sidebarGroups)
   const storiesDir = path.join(siteRoot, "stories")
   for (const file of await fs.readdir(storiesDir)) {
     if (!file.endsWith(".stories.tsx")) continue
@@ -251,7 +247,7 @@ test("every component story sits in a sidebar group", async () => {
     const [group, name, ...rest] = title.split("/")
     assert.ok(
       groups.has(group) && name && rest.length === 0,
-      `${file}: title "${title}" should be "<Group>/<Name>" with a group from storySort in preview.tsx`
+      `${file}: title "${title}" should be "<Group>/<Name>" with a group from storySort in .storybook/preview.tsx`
     )
   }
 })

@@ -31,7 +31,7 @@ import {
   TabsNav,
   TabsTrigger,
 } from "../src/tabs.js"
-import { render, screen } from "./helpers.js"
+import { classes, render, screen } from "./helpers.js"
 
 /**
  * The kit keeps intrinsic control sizes; apps decide container sizes. These
@@ -40,8 +40,6 @@ import { render, screen } from "./helpers.js"
  * to a variant (`data-[size=*]:`, `group-data-[*]:`, `*:`) that twMerge
  * cannot dedupe.
  */
-const classes = (element: Element | null) =>
-  element?.getAttribute("class")?.split(/\s+/) ?? []
 
 describe("parents leave width to the app", () => {
   it("Field stops forcing its children to full width", () => {

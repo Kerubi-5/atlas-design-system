@@ -15,7 +15,7 @@ import { SearchPicker } from "../src/search-picker.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
 import { TabsNav } from "../src/tabs.js"
-import { createUser, render, screen } from "./helpers.js"
+import { classes, createUser, render, screen } from "./helpers.js"
 
 /**
  * Apps decide how wide and tall containers and overlays are. The kit keeps
@@ -23,7 +23,6 @@ import { createUser, render, screen } from "./helpers.js"
  * viewport clamps that stop overlays leaving the screen, but no design
  * widths or heights an app would have to fight.
  */
-const classes = (element: Element) => element.className.split(/\s+/)
 const sizeClass = /^(?:[a-z0-9-]+:)*(?:min-|max-)?(?:w|h)-/
 
 describe("consumer sizing", () => {

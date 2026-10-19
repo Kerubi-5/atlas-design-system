@@ -75,8 +75,10 @@ const preview: Preview = {
     controls: { expanded: true },
     viewport: { options: atlasViewports },
     options: {
-      // Component pages are grouped by purpose; the build test keeps every
-      // component story in one of these groups.
+      // Component pages are grouped by purpose. Storybook reads this literal
+      // statically when it indexes stories, so it cannot come from a module;
+      // tests/sidebar-groups.mjs reads it for the build and site tests, which
+      // keep every component story in one of these groups.
       storySort: {
         order: [
           "Docs",

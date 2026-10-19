@@ -11,6 +11,7 @@ import { useMediaQuery } from "../src/internal/use-media-query.js"
 
 import {
   createUser,
+  dismissToastsAfterEach,
   fakeTextField,
   render,
   screen,
@@ -129,15 +130,7 @@ describe("FormMarkdownField", () => {
 })
 
 describe("toast action and cancel buttons", () => {
-  // Wait for Sonner's unmount timers, so none fires after jsdom is torn down.
-  afterEach(async () => {
-    act(() => {
-      toast.dismiss()
-    })
-    await waitFor(() =>
-      expect(document.querySelector("[data-sonner-toast]")).toBeNull()
-    )
-  })
+  dismissToastsAfterEach()
 
   it("calls the kit callbacks when action and cancel are clicked", async () => {
     const user = createUser()
