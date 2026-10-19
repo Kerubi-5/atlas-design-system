@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
-import { selectedToggleChrome, Toggle, toggleVariants } from "../src/toggle.js"
+import { selectedState } from "../src/internal/styles.js"
+import { Toggle, toggleVariants } from "../src/toggle.js"
 import { ToggleGroup, ToggleGroupItem } from "../src/toggle-group.js"
 
 import { createUser, render, screen } from "./helpers.js"
@@ -27,7 +28,7 @@ function expectSelectedChrome(className: string) {
 
 describe("Toggle", () => {
   it("styles the selected state from data-state, aria-pressed, and aria-checked", () => {
-    expectSelectedChrome(selectedToggleChrome)
+    expectSelectedChrome(selectedState.toggle)
     expectSelectedChrome(toggleVariants())
     expect(toggleVariants()).toContain("hover:border-selected-foreground")
     expect(toggleVariants()).toContain("hover:bg-selected")

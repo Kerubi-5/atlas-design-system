@@ -1,0 +1,4 @@
+# App-owned files (Claude desktop writes settings.local.json and worktrees
+# here). Git ignores them through the global ignore file; Prettier only reads
+# the repository's .gitignore, so it needs its own line.
+.claude/

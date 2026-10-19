@@ -8,12 +8,16 @@ import {
   ariaDisabledState,
   choiceHitArea,
   controlSize,
+  controlText,
   disabledState,
   fieldSurface,
   focusRing,
   hitArea44,
+  inlineIcon,
   invalidState,
+  listboxScroll,
   optionState,
+  quietTextHover,
   sectionLabel,
   selectedState,
 } from "../src/internal/styles.js"
@@ -63,6 +67,22 @@ const retyped: Array<[string, RegExp, string]> = [
     /text-xs font-semibold tracking-widest text-muted-foreground uppercase/,
     "sectionLabel",
   ],
+  [
+    "control text",
+    /font-semibold tracking-widest whitespace-nowrap uppercase/,
+    "controlText",
+  ],
+  [
+    "inline icon size",
+    /\[&_svg:not\(\[class\*='size-'\]\)\]:size-3/,
+    "inlineIcon",
+  ],
+  [
+    "brand text hover",
+    /hover:text-selected-foreground focus-visible:text-selected-foreground/,
+    "quietTextHover",
+  ],
+  ["listbox scroll frame", /max-h-60 overflow-y-auto/, "listboxScroll"],
   ["clamp", /Math\.min\([^()]*Math\.max\(/, "clamp from internal/math"],
   [
     "overlay surface",
@@ -124,5 +144,11 @@ describe("shared state classes", () => {
       expect(size).toMatch(/^h-\d+ px-\d+ /)
     }
     expect(sectionLabel).toContain("tracking-widest")
+    expect(controlText).toContain("whitespace-nowrap")
+    expect(inlineIcon.default).toContain("[&_svg]:shrink-0")
+    expect(inlineIcon.default).toMatch(/:size-3\.5$/)
+    expect(inlineIcon.sm).toMatch(/:size-3$/)
+    expect(quietTextHover).toContain("focus-visible:text-selected-foreground")
+    expect(listboxScroll).toContain("overflow-y-auto")
   })
 })

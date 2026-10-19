@@ -5,8 +5,10 @@ import { Slot } from "radix-ui"
 import type { AsChildProps } from "./internal/as-child.js"
 import {
   controlSize,
+  controlText,
   disabledState,
   focusRing,
+  inlineIcon,
   invalidState,
   selectedState,
 } from "./internal/styles.js"
@@ -29,7 +31,10 @@ const buttonVariants = cva(
     focusRing,
     invalidState,
     disabledState,
-    "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding text-xs font-semibold tracking-widest whitespace-nowrap uppercase transition-all select-none active:not-aria-[haspopup]:translate-y-px [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+    "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding",
+    controlText,
+    "transition-all select-none active:not-aria-[haspopup]:translate-y-px",
+    inlineIcon.default,
   ],
   {
     variants: {
@@ -45,11 +50,11 @@ const buttonVariants = cva(
       },
       size: {
         default: `${controlSize.default} gap-1.5`,
-        xs: "h-7 gap-1 px-3 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 [&_svg:not([class*='size-'])]:size-3",
+        xs: `h-7 gap-1 px-3 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2 ${inlineIcon.sm}`,
         sm: `${controlSize.sm} gap-1`,
         lg: `${controlSize.lg} gap-1.5`,
         icon: "size-10",
-        "icon-xs": "size-7 [&_svg:not([class*='size-'])]:size-3",
+        "icon-xs": `size-7 ${inlineIcon.sm}`,
         "icon-sm": "size-9",
         "icon-lg": "size-11",
       },

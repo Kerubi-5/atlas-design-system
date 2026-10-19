@@ -11,7 +11,8 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "./popover.js"
-import { focusRing, hitArea44 } from "./internal/styles.js"
+import { focusRing, hitArea44, quietTextHover } from "./internal/styles.js"
+import { HOVER_MEDIA_QUERY, useMediaQuery } from "./internal/use-media-query.js"
 import { cn } from "./utils.js"
 
 export type InfoTipLayout = "box" | "inline"
@@ -50,14 +51,6 @@ export type InfoTipProps = {
 >
 
 /**
- * True when a mouse can hover. Touch and coarse pointers must use click;
- * a hover-open popover would trap them after the first tap.
- */
-function canHoverOpen() {
-  return window.matchMedia("(hover: hover) and (pointer: fine)").matches
-}
-
-/**
  * Longer help than a Tooltip: a Popover with a 20px glyph and a 44px hit
  * area. Hover opens only on a fine pointer; click, tap, and keyboard always
  * toggle it. Not a glossary or "coming soon" chip — pass that copy in.
@@ -83,6 +76,8 @@ function InfoTip({
   const openedBy = React.useRef<"hover" | "click" | null>(null)
   const titleId = React.useId()
   const inline = layout === "inline"
+  // Hover opens only for a pointer that can hover; touch must click.
+  const canHoverOpen = useMediaQuery(HOVER_MEDIA_QUERY)
 
   const cancelClose = () => {
     if (closeTimer.current !== null) {
@@ -92,7 +87,7 @@ function InfoTip({
   }
 
   const openFromHover = () => {
-    if (!canHoverOpen()) return
+    if (!canHoverOpen) return
     cancelClose()
     if (open) return
     openedBy.current = "hover"
@@ -100,7 +95,7 @@ function InfoTip({
   }
 
   const closeFromHover = () => {
-    if (!canHoverOpen() || openedBy.current !== "hover") return
+    if (!canHoverOpen || openedBy.current !== "hover") return
     cancelClose()
     // Leave a beat so the pointer can travel from the glyph into the panel.
     closeTimer.current = window.setTimeout(() => setOpen(false), 120)
@@ -128,7 +123,8 @@ function InfoTip({
           data-layout={layout}
           className={cn(
             focusRing,
-            "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground hover:text-selected-foreground focus-visible:text-selected-foreground",
+            "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground",
+            quietTextHover,
             inline ? cn("size-5 align-middle", hitArea44) : "size-11",
             className
           )}

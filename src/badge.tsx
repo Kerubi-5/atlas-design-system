@@ -3,14 +3,17 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
 import type { AsChildProps } from "./internal/as-child.js"
-import { focusRing, invalidState } from "./internal/styles.js"
+import { controlText, focusRing, invalidState } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 const badgeVariants = cva(
   [
     focusRing,
     invalidState,
-    "group/badge inline-flex w-fit shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-none border-0 bg-transparent px-0 py-0 text-[0.625rem] font-semibold tracking-widest whitespace-nowrap uppercase transition-colors has-data-[icon=inline-end]:pr-0 has-data-[icon=inline-start]:pl-0 [&>svg]:pointer-events-none [&>svg:not([class*='size-'])]:size-3",
+    "group/badge inline-flex w-fit shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-none border-0 bg-transparent px-0 py-0",
+    controlText,
+    // Smaller than `controlText`'s `text-xs`; tailwind-merge keeps this one.
+    "text-[0.625rem] transition-colors has-data-[icon=inline-end]:pr-0 has-data-[icon=inline-start]:pl-0 [&>svg]:pointer-events-none [&>svg:not([class*='size-'])]:size-3",
   ],
   {
     variants: {

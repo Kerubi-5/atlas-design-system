@@ -57,6 +57,12 @@ export const selectedState = {
 export const listboxEmpty =
   "px-3 py-4 text-center text-sm text-muted-foreground"
 
+/**
+ * The scrolling frame of a listbox (Combobox, SearchPicker): about ten rows
+ * tall, then scrolls. A consumer `listClassName` replaces the height.
+ */
+export const listboxScroll = "max-h-60 overflow-y-auto"
+
 /** Options in menus and listboxes. */
 export const optionState = {
   /** Highlight as focus moves: grey fill plus a 2px ring bar (the fill alone is 1.1:1). */
@@ -100,6 +106,34 @@ export const controlSize = {
   sm: "h-9 px-4 has-data-[icon=inline-end]:pr-3 has-data-[icon=inline-start]:pl-3",
   lg: "h-11 px-8 has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5",
 }
+
+/**
+ * Label text of a control (Button, Toggle, Badge): small, bold, wide-tracked
+ * uppercase on one line. Badge adds its own `text-[0.625rem]` after it;
+ * tailwind-merge then drops the `text-xs`.
+ */
+export const controlText =
+  "text-xs font-semibold tracking-widest whitespace-nowrap uppercase"
+
+/**
+ * Icons inside a control or row: no pointer events, no shrinking, 14px
+ * unless the icon sets its own `size-*`. `sm` lowers that default to 12px
+ * for the xs controls; it goes after `default`, and tailwind-merge keeps
+ * the later size.
+ */
+export const inlineIcon = {
+  default:
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+  sm: "[&_svg:not([class*='size-'])]:size-3",
+}
+
+/**
+ * Brand-colored text on hover and keyboard focus for quiet links and
+ * triggers (BreadcrumbLink, AccordionTrigger, InfoTip). DESIGN_RULES.md,
+ * "Tokens": brand text is `text-selected-foreground`, never `text-primary`.
+ */
+export const quietTextHover =
+  "hover:text-selected-foreground focus-visible:text-selected-foreground"
 
 /**
  * Uppercase muted label used on tiles, legends, and thin section chrome.
