@@ -4,38 +4,16 @@
 // (2.4.11); the page reflows at 320px without scrolling sideways (1.4.10);
 // and WCAG's text-spacing overrides clip no text (1.4.12).
 import assert from "node:assert/strict"
-import fs from "node:fs/promises"
-import path from "node:path"
 import test from "node:test"
 
-import { chromium } from "playwright"
-
-import { distDir, serve } from "./serve.mjs"
+import { openStory, storyIndex, withSite } from "./browser.mjs"
 
 const CONCURRENCY = 4
 const MAX_TABS = 40
-const NO_MOTION =
-  "*, *::before, *::after { transition: none !important; animation: none !important; }"
 const TEXT_SPACING =
   "* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }"
 // Kanban cards ring the whole card while the grip has focus.
 const RING_ON_PARENT = new Set(["kanban-card-handle"])
-
-async function openStory(page, baseUrl, id, theme = "light") {
-  await page.goto(
-    `${baseUrl}/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`
-  )
-  await page.waitForFunction(
-    () => /sb-show-main|sb-show-errordisplay/.test(document.body.className),
-    null,
-    { timeout: 20_000 }
-  )
-  await page.addStyleTag({ content: NO_MOTION })
-  await page.evaluate(async () => {
-    await document.fonts.ready
-    await new Promise((resolve) => setTimeout(resolve, 200))
-  })
-}
 
 function describe(element) {
   const slot = element.getAttribute("data-slot")
@@ -205,30 +183,23 @@ async function auditStory(browser, baseUrl, entry) {
 }
 
 test("every story keeps focus visible, reflows at 320px, and survives text spacing", async () => {
-  const index = JSON.parse(
-    await fs.readFile(path.join(distDir, "index.json"), "utf8")
-  )
+  const index = await storyIndex()
   const stories = Object.values(index.entries).filter(
     (entry) => entry.type === "story"
   )
   assert.ok(stories.length > 0, "index.json lists stories")
-  const server = await serve()
-  const baseUrl = `http://127.0.0.1:${server.address().port}`
-  const browser = await chromium.launch()
-  const problems = []
-  try {
+  const problems = await withSite(async ({ browser, baseUrl }) => {
+    const found = []
     for (let i = 0; i < stories.length; i += CONCURRENCY) {
       const batch = await Promise.all(
         stories
           .slice(i, i + CONCURRENCY)
           .map((entry) => auditStory(browser, baseUrl, entry))
       )
-      problems.push(...batch.flat())
+      found.push(...batch.flat())
     }
-  } finally {
-    await browser.close()
-    server.close()
-  }
+    return found
+  })
   assert.deepEqual(
     problems,
     [],

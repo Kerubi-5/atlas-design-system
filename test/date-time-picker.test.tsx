@@ -11,6 +11,8 @@ import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import {
   createUser,
   expectFormControlTrigger,
+  findPopoverContent,
+  getDayButton,
   render,
   screen,
   waitFor,
@@ -18,19 +20,6 @@ import {
 
 const october = new Date(2026, 9, 1)
 const afternoon = new Date(2026, 9, 10, 14, 30)
-
-/**
- * Day buttons expose `data-day` from `toLocaleDateString`. Pin en-US so the
- * query is stable in CI.
- */
-function getDayButton(date: Date) {
-  const stamp = date.toLocaleDateString("en-US")
-  const button = document.querySelector(`[data-day="${stamp}"]`)
-  if (!(button instanceof HTMLElement)) {
-    throw new Error(`No calendar day button for ${stamp}`)
-  }
-  return button
-}
 
 function DateTimePickerHarness({
   initial = null,
@@ -256,11 +245,7 @@ describe("DateTimePickerButton", () => {
     )
 
     await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
-    const popover = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const popover = await findPopoverContent()
 
     expect(screen.getAllByRole("grid")).toHaveLength(1)
     const classes = popover.className.split(/\s+/)
@@ -289,11 +274,7 @@ describe("DateTimePickerButton", () => {
     )
 
     await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
-    const popover = await waitFor(() => {
-      const node = document.querySelector("[data-slot=popover-content]")
-      expect(node).toBeTruthy()
-      return node as HTMLElement
-    })
+    const popover = await findPopoverContent()
     expect(popover).toHaveAttribute("data-side", "top")
   })
 })
@@ -348,7 +329,7 @@ describe("FormDateTimePickerField", () => {
   })
 
   it("renders a labelled trigger and field error", () => {
-    const html = renderToStaticMarkup(
+    render(
       <FormDateTimePickerField
         value={afternoon}
         onValueChange={() => {}}
@@ -356,15 +337,13 @@ describe("FormDateTimePickerField", () => {
         meta={{ errors: ["Required"] }}
       />
     )
-    expect(html).toContain("Starts")
-    expect(html).toContain("October 10")
-    expect(html).toContain("2:30")
-    expect(html).toContain('aria-invalid="true"')
-    expect(html).toContain('role="alert"')
-    expect(html).toContain("rounded-none")
-    expect(html).toContain("text-base")
-    expect(html).toContain("px-3")
-    expect(html).toContain("border-input")
+    const trigger = screen.getByLabelText("Starts")
+    expect(trigger).toHaveTextContent("October 10")
+    expect(trigger).toHaveTextContent("2:30")
+    expect(trigger).toHaveAttribute("aria-invalid", "true")
+    expect(screen.getByRole("alert")).toHaveTextContent("Required")
+    expect(trigger).toHaveClass("rounded-none")
+    expectFormControlTrigger(trigger)
   })
 
   it("forwards className onto the labelled trigger", () => {

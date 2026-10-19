@@ -5,9 +5,7 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { chromium } from "playwright"
-
-import { distDir, serve } from "./serve.mjs"
+import { THEMES, openStory, withSite } from "./browser.mjs"
 
 const stories = [
   {
@@ -21,32 +19,16 @@ const stories = [
 ]
 
 test("selected Toggle and ToggleGroup use the wash and selected border", async () => {
-  const browser = await chromium.launch()
-  const server = await serve(distDir)
-  const port = server.address().port
-  try {
-    for (const theme of ["light", "dark"]) {
+  await withSite(async ({ context, baseUrl }) => {
+    for (const theme of THEMES) {
       for (const story of stories) {
-        const page = await browser.newPage()
-        await page.goto(
-          `http://127.0.0.1:${port}/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme}`
-        )
-        await page.waitForSelector("body.sb-show-main")
+        const page = await context.newPage()
+        await openStory(page, baseUrl, story.id, theme)
         if (theme === "dark") {
           await page.waitForFunction(() =>
             Boolean(document.querySelector(".dark"))
           )
         }
-        await page.addStyleTag({
-          content:
-            "*, *::before, *::after { transition: none !important; animation: none !important; }",
-        })
-        await page.evaluate(async () => {
-          await document.fonts.ready
-          await new Promise((resolve) =>
-            requestAnimationFrame(() => requestAnimationFrame(resolve))
-          )
-        })
         const measured = await page.evaluate((selected) => {
           const named = [
             ...document.querySelectorAll(
@@ -128,8 +110,5 @@ test("selected Toggle and ToggleGroup use the wash and selected border", async (
         )
       }
     }
-  } finally {
-    await browser.close()
-    await new Promise((resolve) => server.close(resolve))
-  }
+  })
 })

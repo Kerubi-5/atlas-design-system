@@ -624,4 +624,62 @@ describe("Combobox", () => {
     })
     expect(getCombobox()).toHaveTextContent("e")
   })
+
+  it("caches creation checks on navigation and refreshes them for new props", async () => {
+    const catalog = [
+      { value: "1", label: "Niño" },
+      { value: "2", label: "Nino Nuevo" },
+    ]
+    const normalizeCreateValue = vi.fn((query: string) => query.trim())
+    const createLabel = vi.fn((value: string) => `Add ${value}`)
+    const props = {
+      options: catalog,
+      creatable: true,
+      normalizeCreateValue,
+      createLabel,
+      onValueChange: vi.fn(),
+      "aria-label": "Choice",
+    }
+    const { rerender } = render(<Combobox {...props} />)
+    await createUser().click(screen.getByRole("combobox", { name: "Choice" }))
+    const input = screen.getByRole("textbox", { name: "Search" })
+    fireEvent.change(input, { target: { value: "nino" } })
+    expect(screen.getAllByRole("option")).toHaveLength(2)
+    expect(
+      screen.queryByRole("option", { name: "Add nino" })
+    ).not.toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: "ni" } })
+    expect(screen.getByRole("option", { name: "Add ni" })).toBeInTheDocument()
+    normalizeCreateValue.mockClear()
+    createLabel.mockClear()
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    fireEvent.mouseEnter(screen.getByRole("option", { name: "Add ni" }))
+    expect(normalizeCreateValue).not.toHaveBeenCalled()
+    expect(createLabel).not.toHaveBeenCalled()
+
+    rerender(
+      <Combobox
+        {...props}
+        options={[...catalog, { value: "ni", label: "New catalog entry" }]}
+      />
+    )
+    expect(
+      screen.queryByRole("option", { name: "Add ni" })
+    ).not.toBeInTheDocument()
+    expect(normalizeCreateValue).toHaveBeenCalledTimes(1)
+
+    const nextOnValueChange = vi.fn()
+    rerender(
+      <Combobox
+        {...props}
+        onValueChange={nextOnValueChange}
+        normalizeCreateValue={() => "New"}
+        createLabel={(value) => `Create ${value}`}
+      />
+    )
+    fireEvent.click(screen.getByRole("option", { name: "Create New" }))
+    expect(nextOnValueChange).toHaveBeenCalledWith("New")
+    expect(props.onValueChange).not.toHaveBeenCalled()
+  })
 })

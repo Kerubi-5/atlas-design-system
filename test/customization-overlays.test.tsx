@@ -20,13 +20,12 @@ import {
 } from "../src/select.js"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../src/tooltip.js"
 
-import { createUser, render, screen, within } from "./helpers.js"
+import { classes, createUser, render, screen, within } from "./helpers.js"
 
 /**
  * Overlays and pickers stay customizable: every visible part has a
  * `data-slot`, and parts `className` cannot reach take their own prop.
  */
-const classes = (element: Element) => element.className.split(/\s+/)
 
 describe("Dialog customization", () => {
   it("styles the overlay and the built-in close button by prop", () => {

@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test"
 
+import { openStory, storyRoot } from "../browser.mjs"
+
 const controls = [
   ["actions-button--variants", "[data-slot=button]:not(:disabled)"],
   ["overlays-info-tip--layouts", "[data-slot=info-tip-trigger]"],
@@ -20,15 +22,9 @@ for (const width of [1280, 390]) {
     }) => {
       await page.setViewportSize({ width, height: 900 })
       for (const [id, selector] of controls) {
-        await page.goto(
-          `/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}`
-        )
-        const root = page.locator("#storybook-root")
+        await openStory(page, "", id, theme)
+        const root = storyRoot(page)
         await expect(root).toBeVisible()
-        await page.addStyleTag({
-          content:
-            "*, *::before, *::after { transition: none !important; animation: none !important; }",
-        })
         if (id === "overlays-dialog--playground")
           await root.getByRole("button").first().click()
         const targets = page.locator(selector)

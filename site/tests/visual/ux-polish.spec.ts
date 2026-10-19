@@ -1,22 +1,15 @@
 import { expect, test } from "@playwright/test"
 
+import { openStory } from "../browser.mjs"
+
 for (const width of [1280, 390]) {
   for (const theme of ["light", "dark"]) {
     test(`picker values and dialog titles fit at ${width} ${theme}`, async ({
       page,
     }, info) => {
       await page.setViewportSize({ width, height: 844 })
-      const story = async (id: string, args = "") => {
-        await page.goto(
-          `/iframe.html?id=${id}&viewMode=story&globals=theme:${theme}${args}`
-        )
-        await page.waitForSelector("body.sb-show-main")
-        await page.evaluate(() => document.fonts.ready)
-        await page.addStyleTag({
-          content:
-            "*, *::before, *::after { transition: none !important; animation: none !important; }",
-        })
-      }
+      const story = (id: string, args?: string) =>
+        openStory(page, "", id, theme, { args })
       await story("forms-date-picker--narrow-range")
       const trigger = page
         .locator("[data-slot=date-picker-value]")
@@ -80,7 +73,7 @@ for (const width of [1280, 390]) {
         page.getByRole("button", { name: "Open dialog" })
       ).toBeFocused()
 
-      await story("overlays-dialog--long-title", "&args=showCloseButton:false")
+      await story("overlays-dialog--long-title", "showCloseButton:false")
       await page.getByRole("button", { name: "Open dialog" }).click()
       await expect(close).toHaveCount(0)
       expect(

@@ -72,21 +72,19 @@ CI runs the same gate, so a skipped hook still fails the pull request.
    in `src/` has none.
 3. A shared example in `stories/` and a Storybook file in `site/stories/`
    with a `Playground` whose controls drive the component. Title it
-   `<Group>/<Name>` with the sidebar group people would look in:
-   Foundations, Actions, Forms, Navigation, Feedback, Overlays, Data
-   display, or Layout (the list is `storySort` in
-   `site/.storybook/preview.tsx`). The site tests fail when an export or
-   example has no story, or a story has no group.
+   `<Group>/<Name>` with the sidebar group people would look in (the
+   `storySort` list in `site/.storybook/preview.tsx`). The site tests fail
+   when an export or example has no story, or a story has no group.
 4. A usage entry in `site/src/lib/usage.ts` (use for, not for,
    accessibility). The site tests fail without one.
 5. Tests in `test/` for the behavior people rely on: roles, keyboard,
    labels, state changes. `npm run test:coverage` fails below the floors in
    `vitest.config.ts` (95% of lines).
-6. A screenshot entry in `site/tests/visual/components.spec.ts` (with an
-   `open` step if it shows an overlay, and in `phoneStories` if its layout
-   changes at 390px); the visual test fails when a component page has none.
-   If it opens an overlay, add it to `OVERLAYS` in `site/tests/a11y.test.mjs`
-   so axe scans it open.
+6. A screenshot entry in `site/tests/visual/components.spec.ts` (and in
+   `phoneStories` if its layout changes at 390px); the visual test fails
+   when a component page has none. If it opens an overlay, list it in
+   `site/tests/overlays.mjs` instead (id, what it shows, how to open it):
+   the screenshot captures it open and axe scans it open.
 7. A row in [COMPONENTS.md](./COMPONENTS.md). New components start as **beta**: add them to
    the Status list there and to `beta` in `site/src/lib/usage.ts`.
 8. When it covers a common need, a row in the agent skill's table in

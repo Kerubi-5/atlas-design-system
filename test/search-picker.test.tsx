@@ -228,4 +228,81 @@ describe("SearchPicker", () => {
       screen.getAllByRole("option")[0]!.id
     )
   })
+
+  it("renders only the two changing SearchPicker rows on highlight moves", () => {
+    const items = Array.from({ length: 400 }, (_, index) => ({
+      id: String(index),
+      name: `Option ${index}`,
+    }))
+    const getLabel = vi.fn((item: (typeof items)[number]) => item.name)
+    const getValue = vi.fn((item: (typeof items)[number]) => item.id)
+    const onSelect = vi.fn()
+    const props = { items, getLabel, getValue, onSelect, label: "Choice" }
+    const { rerender } = render(<SearchPicker {...props} />)
+    const input = screen.getByRole("combobox", { name: "Choice" })
+    const rows = screen.getAllByRole("option")
+    getLabel.mockClear()
+    getValue.mockClear()
+
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    expect(getLabel).toHaveBeenCalledTimes(2)
+    expect(getValue).not.toHaveBeenCalled()
+    expect(input).toHaveAttribute("aria-activedescendant", rows[1]!.id)
+
+    getLabel.mockClear()
+    fireEvent.mouseEnter(rows[3]!)
+    expect(getLabel).toHaveBeenCalledTimes(2)
+
+    const nextOnSelect = vi.fn()
+    rerender(
+      <SearchPicker
+        {...props}
+        onSelect={nextOnSelect}
+        getLabel={(item) => `Updated ${item.name}`}
+      />
+    )
+    expect(rows[3]).toHaveAccessibleName("Updated Option 3")
+    fireEvent.click(rows[3]!)
+    expect(nextOnSelect).toHaveBeenCalledWith(items[3])
+    expect(onSelect).not.toHaveBeenCalled()
+
+    rerender(<SearchPicker {...props} disabled />)
+    expect(rows[3]).toBeDisabled()
+  })
+
+  it("keeps custom filtering and invalidates the search index when a catalog changes", () => {
+    const items = [
+      { id: "1", name: "Niño" },
+      { id: "2", name: "North" },
+    ]
+    const getLabel = (item: (typeof items)[number]) => item.name
+    const props = {
+      items,
+      getLabel,
+      getValue: (item: (typeof items)[number]) => item.id,
+      onSelect: vi.fn(),
+      label: "Choice",
+    }
+    const { rerender } = render(<SearchPicker {...props} />)
+    const input = screen.getByRole("combobox", { name: "Choice" })
+    fireEvent.change(input, { target: { value: " NINO " } })
+    expect(screen.getAllByRole("option")).toHaveLength(1)
+    rerender(
+      <SearchPicker
+        {...props}
+        items={[...items, { id: "3", name: "Nino Nuevo" }]}
+      />
+    )
+    expect(screen.getAllByRole("option")).toHaveLength(2)
+
+    const filter = vi.fn(
+      (_item: (typeof items)[number], query: string) => query === " NINO "
+    )
+    rerender(<SearchPicker {...props} filter={filter} />)
+    expect(filter).toHaveBeenCalledWith(items[0], " NINO ", getLabel)
+    expect(screen.getAllByRole("option")).toHaveLength(2)
+    filter.mockClear()
+    fireEvent.keyDown(input, { key: "ArrowDown" })
+    expect(filter).not.toHaveBeenCalled()
+  })
 })

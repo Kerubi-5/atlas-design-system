@@ -1,48 +1,42 @@
-import fs from "node:fs"
-import { fileURLToPath } from "node:url"
-
 import { expect, test, type Page } from "@playwright/test"
+
+import { openStory, storyIndex, storyRoot } from "../browser.mjs"
+import { OVERLAYS } from "../overlays.mjs"
 
 /**
  * Screenshots of every component page, in light and dark, plus a phone-width
- * pass for the layouts most likely to break at 390px. Overlays are opened
- * first so the menu, dialog, or list itself is compared. A token or class
- * change that shifts the look fails here before it ships, and the last test
- * fails when a component page has no screenshot.
+ * pass for the layouts most likely to break at 390px. Overlays (the shared
+ * list in tests/overlays.mjs, which axe also scans open) are opened first so
+ * the menu, dialog, or list itself is compared. A token or class change that
+ * shifts the look fails here before it ships, and the last test fails when a
+ * component page has no screenshot.
  */
 type Story = {
   id: string
   /** Opens the overlay; the screenshot then covers the whole viewport. */
   open?: (page: Page) => Promise<unknown>
 }
+type Overlay = {
+  id: string
+  shows: string
+  open: (page: Page) => Promise<unknown>
+}
 
-const root = (page: Page) => page.locator("#storybook-root")
-const clickFirst =
-  (role: "button" | "combobox", shows: string) => async (page: Page) => {
-    await root(page).getByRole(role).first().click()
-    await expect(page.getByRole(shows as "dialog").first()).toBeVisible()
-  }
+/** Overlay stories whose component page another story already captures. */
+const capturedElsewhere = new Set([
+  "overlays-info-tip--playground",
+  "forms-date-picker--playground",
+])
 
-const waitForToasts =
-  (count = 1) =>
-  async (page: Page) => {
-    await expect(page.locator("[data-sonner-toast]")).toHaveCount(count)
-    await expect(page.locator("[data-sonner-toast]").first()).toBeVisible()
-  }
-
-/** One story per toast chrome variant; captured at 1280 and 390, light and dark. */
-const toastVariantStories: Story[] = [
-  { id: "feedback-toast--plain", open: waitForToasts() },
-  { id: "feedback-toast--success", open: waitForToasts() },
-  { id: "feedback-toast--info", open: waitForToasts() },
-  { id: "feedback-toast--warning", open: waitForToasts() },
-  { id: "feedback-toast--error", open: waitForToasts() },
-  { id: "feedback-toast--loading", open: waitForToasts() },
-  { id: "feedback-toast--with-description", open: waitForToasts() },
-  { id: "feedback-toast--with-action-and-cancel", open: waitForToasts() },
-  { id: "feedback-toast--long-text", open: waitForToasts() },
-  { id: "feedback-toast--stacked", open: waitForToasts(3) },
-]
+const overlayStories: Story[] = (OVERLAYS as Overlay[])
+  .filter((overlay) => !capturedElsewhere.has(overlay.id))
+  .map((overlay) => ({
+    id: overlay.id,
+    open: async (page) => {
+      await overlay.open(page)
+      await expect(page.locator(overlay.shows).first()).toBeVisible()
+    },
+  }))
 
 const stories: Story[] = [
   { id: "foundations-tokens--theme" },
@@ -50,10 +44,6 @@ const stories: Story[] = [
   { id: "actions-button--variants" },
   { id: "actions-toggle--variants" },
   { id: "actions-toggle-group--playground" },
-  {
-    id: "actions-dropdown-menu--row-actions",
-    open: (page) => page.getByRole("button", { name: "Actions" }).click(),
-  },
   { id: "examples-fields--trigger-alignment" },
   { id: "forms-input--invalid" },
   { id: "forms-textarea--playground" },
@@ -64,31 +54,10 @@ const stories: Story[] = [
   { id: "forms-radio-group--composition" },
   { id: "forms-switch--settings" },
   { id: "forms-slider--labelled" },
-  { id: "forms-select--playground", open: clickFirst("combobox", "listbox") },
-  { id: "forms-combobox--playground", open: clickFirst("combobox", "listbox") },
-  {
-    id: "forms-combobox--creatable",
-    open: async (page) => {
-      await root(page).getByRole("combobox").first().click()
-      await expect(page.getByRole("listbox").first()).toBeVisible()
-      await page.getByPlaceholder("Search or type a 3-letter code").fill("PHP")
-      await expect(
-        page.getByRole("option", { name: 'Create "PHP"' })
-      ).toBeVisible()
-    },
-  },
   { id: "forms-search-picker--example" },
   { id: "forms-calendar--single-day" },
   { id: "forms-date-picker--range-reference" },
   { id: "forms-date-picker--narrow-range" },
-  {
-    id: "forms-date-time-picker--playground",
-    open: async (page) => {
-      await clickFirst("button", "dialog")(page)
-      // The calendar loads on first open; capture it, not the spinner.
-      await expect(page.getByRole("grid")).toBeVisible()
-    },
-  },
   { id: "navigation-tabs--composition" },
   { id: "navigation-tabs--nav" },
   { id: "navigation-tabs--nav-narrow" },
@@ -103,25 +72,6 @@ const stories: Story[] = [
   { id: "feedback-skeleton--loading" },
   { id: "feedback-empty-panel--sizes" },
   { id: "feedback-error-boundary--fallback" },
-  { id: "feedback-toast--types", open: waitForToasts(5) },
-  {
-    id: "feedback-toast--playground",
-    open: async (page) => {
-      await root(page).getByRole("button").first().click()
-      await expect(page.locator("[data-sonner-toast]").first()).toBeVisible()
-    },
-  },
-  ...toastVariantStories,
-  { id: "overlays-dialog--playground", open: clickFirst("button", "dialog") },
-  { id: "overlays-dialog--long-title", open: clickFirst("button", "dialog") },
-  { id: "overlays-popover--playground", open: clickFirst("button", "dialog") },
-  {
-    id: "overlays-tooltip--playground",
-    open: async (page) => {
-      await root(page).getByRole("button").first().focus()
-      await expect(page.getByRole("tooltip")).toBeVisible()
-    },
-  },
   { id: "overlays-info-tip--layouts" },
   { id: "data-display-badge--variants" },
   { id: "data-display-avatar--sizes" },
@@ -136,14 +86,18 @@ const stories: Story[] = [
   { id: "layout-card--full-bleed" },
   { id: "layout-separator--with-skeleton" },
   { id: "layout-page-header--with-stepper" },
-  {
-    id: "layout-accordion--faq",
-    open: (page) =>
-      page.getByRole("button", { name: "When do exports run?" }).click(),
-  },
+  ...overlayStories,
 ]
 
-const toastVariantIds = toastVariantStories.map((story) => story.id)
+/** One story per toast chrome variant; captured at 1280 and 390, light and dark. */
+const toastVariantIds = overlayStories
+  .map((story) => story.id)
+  .filter(
+    (id) =>
+      id.startsWith("feedback-toast--") &&
+      id !== "feedback-toast--types" &&
+      id !== "feedback-toast--playground"
+  )
 
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([
@@ -177,15 +131,11 @@ const wideStories = new Set([
 async function capture(page: Page, story: Story, theme: string, name: string) {
   // "Today" markers in calendars must not move the baseline from day to day.
   await page.clock.setFixedTime(new Date("2026-01-15T12:00:00Z"))
-  await page.goto(
-    `/iframe.html?id=${story.id}&viewMode=story&globals=theme:${theme}`
-  )
-  await page.waitForSelector("body.sb-show-main")
-  await page.evaluate(() => document.fonts.ready)
+  await openStory(page, "", story.id, theme)
   await story.open?.(page)
   if (!story.open) await page.mouse.move(0, 0)
   // Overlays portal outside the story root, so capture the viewport then.
-  const target = story.open ? page : root(page)
+  const target = story.open ? page : storyRoot(page)
   await expect(target).toHaveScreenshot(name)
 }
 
@@ -221,10 +171,8 @@ test("tab scroller content fits the box without a vertical scrollbar", async ({
       width,
       height: width === 390 ? 844 : 720,
     })
-    await page.goto(`/iframe.html?id=${id}&viewMode=story&globals=theme:light`)
-    await page.waitForSelector("body.sb-show-main")
-    await page.evaluate(() => document.fonts.ready)
-    const scrollers = root(page).locator("[data-slot=tabs-scroller]")
+    await openStory(page, "", id)
+    const scrollers = storyRoot(page).locator("[data-slot=tabs-scroller]")
     await expect(scrollers.first()).toBeVisible()
     const metrics = await scrollers.evaluateAll((nodes) =>
       nodes.map((node) => {
@@ -264,12 +212,8 @@ test("settings tabs share one horizontal padding at 1280 and 390", async ({
       width,
       height: width === 390 ? 844 : 720,
     })
-    await page.goto(
-      "/iframe.html?id=navigation-tabs--nav&viewMode=story&globals=theme:light"
-    )
-    await page.waitForSelector("body.sb-show-main")
-    await page.evaluate(() => document.fonts.ready)
-    const links = root(page).locator("[data-slot=tabs-nav] a")
+    await openStory(page, "", "navigation-tabs--nav")
+    const links = storyRoot(page).locator("[data-slot=tabs-nav] a")
     await expect(links).toHaveCount(6)
     const pads = await links.evaluateAll((nodes) =>
       nodes.map((link) => {
@@ -286,13 +230,10 @@ test("settings tabs share one horizontal padding at 1280 and 390", async ({
   }
 })
 
-test("every component page has a screenshot", () => {
-  const index = JSON.parse(
-    fs.readFileSync(
-      fileURLToPath(new URL("../../dist/index.json", import.meta.url)),
-      "utf8"
-    )
-  ) as { entries: Record<string, { id: string; title: string }> }
+test("every component page has a screenshot", async () => {
+  const index = (await storyIndex()) as {
+    entries: Record<string, { id: string; title: string }>
+  }
   const captured = new Set(stories.map((story) => story.id.split("--")[0]))
   const missing = [
     ...new Set(

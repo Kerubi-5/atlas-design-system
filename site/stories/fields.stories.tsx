@@ -1,9 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import {
   LabelInputTextareaStory,
-  FieldStory,
   FocusFirstInvalidStory,
-  FormHelpersStory,
   CustomControlFieldStory,
 } from "../../stories/fields.js"
 import { FormControlTriggersStory } from "../../stories/form-control-triggers.js"
@@ -24,8 +22,6 @@ type Story = StoryObj<typeof meta>
 export const LabelsAndInputs: Story = {
   render: () => <LabelInputTextareaStory />,
 }
-export const FieldComposition: Story = { render: () => <FieldStory /> }
-export const FormHelpers: Story = { render: () => <FormHelpersStory /> }
 export const TriggerAlignment: Story = {
   render: () => <FormControlTriggersStory />,
 }

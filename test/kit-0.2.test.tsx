@@ -12,6 +12,8 @@ import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import { SortableTableHead } from "../src/sortable-table-head.js"
 import { ThemeProvider } from "../src/theme-provider.js"
 
+import { expectFormControlTrigger, render, screen } from "./helpers.js"
+
 describe("date helpers", () => {
   it("parses local calendar dates without UTC shifting", () => {
     const date = toDate("2026-10-05")
@@ -32,7 +34,7 @@ describe("date helpers", () => {
 
 describe("date picker field", () => {
   it("renders a labelled trigger and field error", () => {
-    const html = renderToStaticMarkup(
+    render(
       <FormDatePickerField
         value="2026-10-05"
         onValueChange={() => {}}
@@ -40,14 +42,12 @@ describe("date picker field", () => {
         meta={{ errors: ["Required"] }}
       />
     )
-    expect(html).toContain("Due")
-    expect(html).toContain("October 5")
-    expect(html).toContain('aria-invalid="true"')
-    expect(html).toContain('role="alert"')
-    expect(html).toContain("rounded-none")
-    expect(html).toContain("text-base")
-    expect(html).toContain("px-3")
-    expect(html).toContain("border-input")
+    const trigger = screen.getByLabelText("Due")
+    expect(trigger).toHaveTextContent("October 5")
+    expect(trigger).toHaveAttribute("aria-invalid", "true")
+    expect(screen.getByRole("alert")).toHaveTextContent("Required")
+    expect(trigger).toHaveClass("rounded-none")
+    expectFormControlTrigger(trigger)
   })
 
   it("forwards className onto the labelled trigger", () => {

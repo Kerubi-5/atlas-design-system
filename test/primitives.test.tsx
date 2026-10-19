@@ -1,6 +1,6 @@
 import * as React from "react"
 import { act } from "react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { Checkbox } from "../src/checkbox.js"
 import {
@@ -23,7 +23,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../src/tabs.js"
 import { ThemeProvider } from "../src/theme-provider.js"
 import { Toaster, toast } from "../src/toast.js"
 
-import { createUser, render, screen, waitFor, within } from "./helpers.js"
+import {
+  createUser,
+  dismissToastsAfterEach,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "./helpers.js"
 
 describe("Checkbox", () => {
   it("toggles from its label and the keyboard", async () => {
@@ -209,11 +216,7 @@ describe("Toaster", () => {
     )
   }
 
-  afterEach(() => {
-    act(() => {
-      toast.dismiss()
-    })
-  })
+  dismissToastsAfterEach()
 
   it("shows a toast() message and returns its id", async () => {
     renderToaster()

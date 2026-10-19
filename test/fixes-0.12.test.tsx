@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { DatePickerButton } from "../src/date-picker.js"
 import { DateTimePickerButton } from "../src/date-time-picker.js"
@@ -15,21 +15,14 @@ import { Toaster, toast } from "../src/toast.js"
 
 import {
   createUser,
+  dismissToastsAfterEach,
   fakeTextField,
+  getDayButton,
   render,
   screen,
   stubMatchMedia,
   waitFor,
 } from "./helpers.js"
-
-function getDayButton(date: Date) {
-  const stamp = date.toLocaleDateString("en-US")
-  const button = document.querySelector(`[data-day="${stamp}"]`)
-  if (!(button instanceof HTMLElement)) {
-    throw new Error(`No calendar day button for ${stamp}`)
-  }
-  return button
-}
 
 const day = (date: number, month = 9, year = 2026) =>
   new Date(year, month, date)
@@ -259,15 +252,7 @@ describe("visible required marker", () => {
 })
 
 describe("stacked toasts", () => {
-  // Wait for Sonner's unmount timers, so none fires after jsdom is torn down.
-  afterEach(async () => {
-    act(() => {
-      toast.dismiss()
-    })
-    await waitFor(() =>
-      expect(document.querySelector("[data-sonner-toast]")).toBeNull()
-    )
-  })
+  dismissToastsAfterEach()
 
   it("expands the stack while keyboard focus is inside it", async () => {
     const user = createUser()
