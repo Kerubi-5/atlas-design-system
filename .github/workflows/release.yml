@@ -89,14 +89,21 @@ jobs:
       # vX.Y.Z tag and a GitHub Release whose notes are that version's
       # CHANGELOG.md section. Runs even when publish was skipped, so a
       # missing tag for an already-published version is backfilled.
+      # Right after a publish the registry can lag for a minute (1.1.0 went
+      # untagged that way), so the step trusts the publish step it just ran
+      # and asks npm only on a re-run, where an unpublished version must
+      # never be tagged.
       - name: Tag and GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          PUBLISHED: ${{ steps.check.outputs.skip == 'false' }}
         run: |
           VERSION=$(node -p "require('./package.json').version")
           TAG="v${VERSION}"
-          npm view "atlas-react-kit@${VERSION}" version >/dev/null 2>&1 || {
-            echo "atlas-react-kit@${VERSION} is not on npm; not tagging."; exit 0; }
+          if [ "$PUBLISHED" != "true" ]; then
+            npm view "atlas-react-kit@${VERSION}" version >/dev/null 2>&1 || {
+              echo "atlas-react-kit@${VERSION} is not on npm; not tagging."; exit 0; }
+          fi
           awk -v v="$VERSION" '
             $0 ~ "^## " v "( |$)" {on=1; next}
             on && /^## / {exit}
