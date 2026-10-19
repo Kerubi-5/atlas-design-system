@@ -104,7 +104,7 @@ export const usage: Record<string, string> = {
 
 **Accessibility** Name the figure with \`title\` or \`aria-label\`. Don't rely on the swatch color alone; every item has a text label.`,
   "Date picker": `
-**Use for** a single date, or a from/to range with \`mode="range"\`, in a form.
+**Use for** a single date, or a from/to range with \`mode="range"\`, in a form. Set \`clearable\` when an empty value is a valid answer.
 
 **Not for** dates people type faster than they click (birthdays years back may suit a text input).
 
@@ -186,7 +186,7 @@ export const usage: Record<string, string> = {
 
 **Not for** in-page view switches that belong in the URL as tabs (use \`TabsNav\` / \`TabsNavLink\`) or a hierarchy trail (use \`Breadcrumb\`).
 
-**Accessibility** The current item is \`aria-current="page"\`. Pass \`asChild\` to render a router link, or use \`next/nav-link\` in Next. Put the links in a labelled \`nav\`.`,
+**Accessibility** The current item is \`aria-current="page"\`; \`isNavActive(pathname, href)\` decides it. Pass \`asChild\` to render a router link, or use \`next/nav-link\` in Next. Put the links in a labelled \`nav\`.`,
   "Page header": `
 **Use for** the title row at the top of a page: the \`h1\`, a one-line hint, and page actions. Pair with \`PeriodStepper\` for dated pages and \`SkipLink\` in the app shell.
 
@@ -282,7 +282,7 @@ export const usage: Record<string, string> = {
   Tabs: `
 **Use for** switching between panels of related content on one page.
 
-**Not for** navigation that changes the URL (use \`TabsNav\` with links).
+**Not for** navigation that changes the URL (use \`TabsNav\` with \`TabsNavLink\`s).
 
 **Accessibility** Arrow keys move between tabs; every \`TabsTrigger\` needs a matching \`TabsContent\`. A long row scrolls horizontally inside \`TabsList\` / \`TabsNav\` (no vertical scrollbar) and joins the tab order while it overflows, like \`Table\`.`,
   Textarea: `

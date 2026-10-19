@@ -96,8 +96,6 @@ export function DateTimePickerButton({
   const date = value ?? null
   const step = resolveTimeStep(timeStep)
   const empty = date == null
-  const hourId = React.useId()
-  const minuteId = React.useId()
 
   return (
     <PickerShell
@@ -147,11 +145,7 @@ export function DateTimePickerButton({
             }}
             disabled={empty}
           >
-            <SelectTrigger
-              id={hourId}
-              aria-label="Hour"
-              className="min-w-0 flex-1"
-            >
+            <SelectTrigger aria-label="Hour" className="min-w-0 flex-1">
               <SelectValue placeholder="––" />
             </SelectTrigger>
             <SelectContent>
@@ -175,11 +169,7 @@ export function DateTimePickerButton({
             }}
             disabled={empty}
           >
-            <SelectTrigger
-              id={minuteId}
-              aria-label="Minute"
-              className="min-w-0 flex-1"
-            >
+            <SelectTrigger aria-label="Minute" className="min-w-0 flex-1">
               <SelectValue placeholder="––" />
             </SelectTrigger>
             <SelectContent>

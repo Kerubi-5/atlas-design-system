@@ -308,7 +308,8 @@ describe("published modules", () => {
     const navLink = await import("../dist/nav-link.js")
     expect(typeof button.Button).toBe("function")
     expect(typeof tabs.TabsNav).toBe("function")
-    expect(tabs).not.toHaveProperty("TabsNavLink")
+    // The base link lives in `tabs`; only `next/tabs-nav-link` needs Next.
+    expect(typeof tabs.TabsNavLink).toBe("function")
     expect(typeof navLink.NavLink).toBe("function")
     expect(typeof navLink.navLinkVariants).toBe("function")
   })

@@ -252,6 +252,10 @@
       "types": "./dist/form/field-error.d.ts",
       "default": "./dist/form/field-error.js"
     },
+    "./form/focus-first-invalid": {
+      "types": "./dist/form/focus-first-invalid.d.ts",
+      "default": "./dist/form/focus-first-invalid.js"
+    },
     "./form/markdown-field": {
       "types": "./dist/form/markdown-field.d.ts",
       "default": "./dist/form/markdown-field.js"

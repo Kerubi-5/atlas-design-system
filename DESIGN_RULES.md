@@ -175,11 +175,11 @@ touched it (`meta.isTouched`), never on a field they have not reached yet.
 submit; TanStack Form does, so its users pass `meta` only.
 
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
-`TabsNav` with links and `aria-current="page"` on the active link. The optional
-Next adapter provides `TabsNavLink` with this behavior. App-shell destinations
+`TabsNav` of `TabsNavLink`s with `active` from the app. App-shell destinations
 (Calendar, Tasks, Settings) use `NavLink` from `nav-link`: a pill with `active`
-from the app, not tabs. Pass `asChild` for a router link, or use the optional
-Next adapter `next/nav-link`. `TabsNav` and `TabsList` scroll overflowing
+from the app, not tabs. Both links take `asChild` for a router link, or come
+as Next adapters (`next/tabs-nav-link`, `next/nav-link`); `isNavActive`
+compares the pathname with a link's `href`. `TabsNav` and `TabsList` scroll overflowing
 labels inside themselves, like `Table`. Do not wrap them in another
 horizontal scroller: that pairing adds a stray vertical scrollbar.
 

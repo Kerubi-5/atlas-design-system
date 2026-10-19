@@ -64,8 +64,9 @@ Import each component from its subpath, e.g.
 | Custom control the kit has no form field for               | `FormControlField` from `form/control-field`                                                                            |
 | Form-level error (save failed)                             | `FormFeedbackField` from `form/feedback-field`                                                                          |
 | Content panels on one page                                 | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                            |
-| View switch that changes the URL                           | `TabsNav` with links: `TabsNavLink` from `next/tabs-nav-link` in Next, else `tabsTriggerVariants()`                     |
-| App shell nav (Calendar, Tasks, Settings)                  | `NavLink` from `nav-link` (`asChild` for a router link); Next: `next/nav-link`                                          |
+| View switch that changes the URL                           | `TabsNav` with `TabsNavLink` from `tabs` (`asChild` for a router link); Next: `next/tabs-nav-link`                      |
+| App shell nav (Calendar, Tasks, Settings)                  | `NavLink` from `nav-link` (`asChild` for a router link); Next: `next/nav-link`; `active={isNavActive(pathname, href)}`  |
+| Focus the first invalid field when a submit fails          | `focusFirstInvalid(formId)` from `form/focus-first-invalid`; give fields `id={field.name}`                              |
 | Skip-to-content link                                       | `SkipLink` from `skip-link`                                                                                             |
 | Page title row with actions                                | `PageHeader` from `page-header`                                                                                         |
 | Previous / today / next period                             | `PeriodStepper` from `period-stepper`; `next/period-stepper` for URL periods                                            |

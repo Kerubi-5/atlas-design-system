@@ -7,6 +7,7 @@ import {
   TabsContent,
   TabsList,
   TabsNav,
+  TabsNavLink as BaseTabsNavLink,
   TabsTrigger,
   tabsTriggerVariants,
 } from "../src/tabs.js"
@@ -210,25 +211,62 @@ describe("tab trigger padding", () => {
   })
 })
 
-describe("TabsNav without Next", () => {
-  it("styles plain links with the public trigger variants", () => {
+describe("TabsNavLink", () => {
+  const linkClass = (markup: string) =>
+    /<a[^>]*class="([^"]*)"/.exec(markup)?.[1]
+
+  it("renders a plain anchor with the trigger chrome and the active marks", () => {
     const plain = renderToStaticMarkup(
       <TabsNav aria-label="Preview views">
-        <a
-          href="#list"
-          data-state="active"
-          aria-current="page"
-          className={tabsTriggerVariants()}
-        >
+        <BaseTabsNavLink href="#list" active>
           List
-        </a>
+        </BaseTabsNavLink>
+        <BaseTabsNavLink href="#board" active={false}>
+          Board
+        </BaseTabsNavLink>
       </TabsNav>
     )
+    expect(plain).toMatch(
+      /<a[^>]*data-slot="tabs-nav-link"[^>]*data-state="active"[^>]*aria-current="page"[^>]*href="#list"[^>]*>List<\/a>/
+    )
+    expect(plain).toMatch(
+      /<a[^>]*data-state="inactive"[^>]*href="#board"[^>]*>Board<\/a>/
+    )
+    expect(plain.match(/aria-current="page"/g)).toHaveLength(1)
     // Same classes as the Next adapter, so both paths share the active style.
-    const linkClass = (markup: string) =>
-      /<a[^>]*class="([^"]*)"/.exec(markup)?.[1]
-    expect(linkClass(plain)).toContain("bg-selected")
     expect(linkClass(plain)).toBe(linkClass(html))
+    expect(linkClass(plain)).toContain("bg-selected")
+  })
+
+  it("merges the chrome onto a child with asChild", () => {
+    render(
+      <TabsNav aria-label="Preview views">
+        <BaseTabsNavLink asChild active>
+          <a href="#list">List</a>
+        </BaseTabsNavLink>
+      </TabsNav>
+    )
+    const link = screen.getByRole("link", { name: "List" })
+    expect(link).toHaveAttribute("data-slot", "tabs-nav-link")
+    expect(link).toHaveAttribute("aria-current", "page")
+    expect(link.className).toBe(tabsTriggerVariants())
+  })
+
+  it("renders the same markup through the Next adapter", () => {
+    // The adapter wraps the base link with asChild around a Next Link, so
+    // the DOM must not differ from the core export.
+    expect(html).toBe(
+      renderToStaticMarkup(
+        <TabsNav aria-label="Items view">
+          <BaseTabsNavLink href="/items?view=pipeline" active>
+            Pipeline
+          </BaseTabsNavLink>
+          <BaseTabsNavLink href="/items?view=table" active={false}>
+            Table
+          </BaseTabsNavLink>
+        </TabsNav>
+      )
+    )
   })
 })
 

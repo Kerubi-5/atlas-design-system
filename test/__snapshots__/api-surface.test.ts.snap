@@ -157,6 +157,9 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
     "FieldError",
     "getFieldErrorMessage",
   ],
+  "./form/focus-first-invalid": [
+    "focusFirstInvalid",
+  ],
   "./form/markdown-field": [
     "FormMarkdownField",
   ],
@@ -193,6 +196,7 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
   ],
   "./nav-link": [
     "NavLink",
+    "isNavActive",
     "navLinkVariants",
   ],
   "./next/nav-link": [
@@ -297,6 +301,7 @@ exports[`public API surface > lists every runtime export per entry point 1`] = `
     "TabsContent",
     "TabsList",
     "TabsNav",
+    "TabsNavLink",
     "TabsTrigger",
     "tabsListVariants",
     "tabsTriggerVariants",

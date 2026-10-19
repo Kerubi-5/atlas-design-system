@@ -226,7 +226,111 @@ describe("DatePickerButton", () => {
   })
 })
 
+describe("DatePickerButton clearable", () => {
+  it("shows a Clear row only when clearable", async () => {
+    const user = createUser()
+    const { unmount } = render(
+      <DatePickerButton value="2026-10-05" onValueChange={() => {}} />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 5/ }))
+    await screen.findByRole("grid")
+    expect(screen.queryByRole("button", { name: "Clear" })).toBeNull()
+    unmount()
+
+    render(
+      <DatePickerButton value="2026-10-05" onValueChange={() => {}} clearable />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 5/ }))
+    await screen.findByRole("grid")
+    expect(screen.getByRole("button", { name: "Clear" })).toBeEnabled()
+  })
+
+  it("disables Clear while nothing is picked", async () => {
+    const user = createUser()
+    render(<DatePickerButton onValueChange={() => {}} clearable />)
+    await user.click(screen.getByRole("button", { name: "Pick a date" }))
+    await screen.findByRole("grid")
+    expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled()
+  })
+
+  it("emits undefined and closes on Clear", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn<(date: Date | undefined) => void>()
+    render(
+      <DatePickerButton
+        value="2026-10-05"
+        onValueChange={onValueChange}
+        clearable
+      />
+    )
+    const trigger = screen.getByRole("button", { name: /^October 5/ })
+    await user.click(trigger)
+    await screen.findByRole("grid")
+
+    await user.click(screen.getByRole("button", { name: "Clear" }))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    expect(onValueChange).toHaveBeenLastCalledWith(undefined)
+    expect(trigger).toHaveFocus()
+  })
+
+  it("keeps the day when the selected day is clicked again", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn<(date: Date | undefined) => void>()
+    render(
+      <DatePickerButton
+        value="2026-10-05"
+        onValueChange={onValueChange}
+        clearable
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 5/ }))
+    await screen.findByRole("grid")
+
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    expect(onValueChange.mock.calls.at(-1)?.[0]?.getDate()).toBe(5)
+  })
+
+  it("still clears on a second click without clearable, as before", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn<(date: Date | undefined) => void>()
+    render(
+      <DatePickerButton value="2026-10-05" onValueChange={onValueChange} />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 5/ }))
+    await screen.findByRole("grid")
+
+    await user.click(getDayButton(new Date(2026, 9, 5)))
+    await waitFor(() => {
+      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
+    })
+    expect(onValueChange).toHaveBeenLastCalledWith(undefined)
+  })
+})
+
 describe("FormDatePickerField", () => {
+  it("forwards clearable to the picker", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn<(date: Date | undefined) => void>()
+    render(
+      <FormDatePickerField
+        value="2026-10-05"
+        onValueChange={onValueChange}
+        label="Due"
+        clearable
+      />
+    )
+    await user.click(screen.getByLabelText("Due"))
+    await screen.findByRole("grid")
+    await user.click(screen.getByRole("button", { name: "Clear" }))
+    expect(onValueChange).toHaveBeenLastCalledWith(undefined)
+  })
+
   it("associates the label and opens from the labelled trigger", async () => {
     const user = createUser()
     render(

@@ -19,12 +19,23 @@ const navLinkVariants = cva([
 ])
 
 /**
+ * Whether `href` is the current page for a nav link: the path itself, or a
+ * page under it (`/tasks` is active on `/tasks/42`, not on `/tasks-archive`).
+ * The kit has no router, so the app passes the pathname:
+ * `active={isNavActive(pathname, href)}`.
+ */
+function isNavActive(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`)
+}
+
+/**
  * Pill link for app-shell destinations (Calendar, Tasks, Settings). Pass
- * `active` from the route; the kit does not read the URL. `asChild` wraps a
- * router `Link` with these styles, the same Slot pattern as `BreadcrumbLink`.
+ * `active` from the route (`isNavActive` compares a pathname with the
+ * link's `href`); the kit does not read the URL. `asChild` wraps a router
+ * `Link` with these styles, the same Slot pattern as `BreadcrumbLink`.
  *
  * Not a tab: in-page view switches that belong in the URL use `TabsNav`
- * and `tabsTriggerVariants()`. Next apps can import the optional adapter
+ * and `TabsNavLink`. Next apps can import the optional adapter
  * from `atlas-react-kit/next/nav-link` instead of composing `asChild`.
  */
 function NavLink({
@@ -50,4 +61,4 @@ function NavLink({
   )
 }
 
-export { NavLink, navLinkVariants }
+export { NavLink, isNavActive, navLinkVariants }

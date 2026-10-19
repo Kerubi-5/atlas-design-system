@@ -18,10 +18,16 @@ type Props = PickerFieldBaseProps & {
   onValueChange: (date: Date | undefined) => void
   /** Trigger text while no day is picked. Default "Pick a date". */
   placeholder?: string
+  /**
+   * Shows a Clear row in the popover, which calls `onValueChange` with
+   * `undefined`. Default `false`.
+   */
+  clearable?: boolean
 }
 
 /** Date picker with built-in field error text and invalid styling. */
 export function FormDatePickerField({
+  id: idProp,
   onValueChange,
   label,
   meta,
@@ -32,7 +38,8 @@ export function FormDatePickerField({
   ...picker
 }: Props) {
   const errorText = metaErrorText(meta, { submitted, showError })
-  const id = useId()
+  const generatedId = useId()
+  const id = idProp ?? generatedId
 
   return (
     <FormFieldShell

@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it } from "vitest"
 
-import { NavLink, navLinkVariants } from "../src/nav-link.js"
+import { NavLink, isNavActive, navLinkVariants } from "../src/nav-link.js"
 import { NavLink as NextNavLink } from "../src/next/nav-link.js"
 import { NavLinkAsChildStory, NavLinkShellStory } from "../stories/nav-link.js"
 
@@ -92,23 +92,58 @@ describe("NavLink", () => {
   })
 })
 
+describe("isNavActive", () => {
+  it("matches the path itself and pages under it, not a sibling prefix", () => {
+    expect(isNavActive("/tasks", "/tasks")).toBe(true)
+    expect(isNavActive("/tasks/42", "/tasks")).toBe(true)
+    expect(isNavActive("/tasks/42/edit", "/tasks")).toBe(true)
+    expect(isNavActive("/tasks-archive", "/tasks")).toBe(false)
+    expect(isNavActive("/calendar", "/tasks")).toBe(false)
+    expect(isNavActive("/", "/tasks")).toBe(false)
+  })
+
+  it("treats the root as active only on the root", () => {
+    expect(isNavActive("/", "/")).toBe(true)
+    expect(isNavActive("/tasks", "/")).toBe(false)
+  })
+})
+
 describe("next/nav-link", () => {
+  const nextHtml = renderToStaticMarkup(
+    <>
+      <NextNavLink href="/calendar" active>
+        Calendar
+      </NextNavLink>
+      <NextNavLink href="/tasks" active={false}>
+        Tasks
+      </NextNavLink>
+    </>
+  )
+
   it("is a Next Link with the same pill classes as the core export", () => {
-    const nextHtml = renderToStaticMarkup(
-      <>
-        <NextNavLink href="/calendar" active>
-          Calendar
-        </NextNavLink>
-        <NextNavLink href="/tasks" active={false}>
-          Tasks
-        </NextNavLink>
-      </>
-    )
     expect(nextHtml).toMatch(/<a[^>]*href="\/calendar"/)
     expect(nextHtml).toMatch(/<a[^>]*href="\/tasks"/)
     expect(nextHtml.match(/aria-current="page"/g)).toHaveLength(1)
     expect(nextHtml).toMatch(/data-state="inactive"/)
     expect(linkClass(nextHtml, "Calendar")).toBe(navLinkVariants())
     expect(linkClass(nextHtml, "Calendar")).toBe(linkClass(html, "Calendar"))
+  })
+
+  it("renders the same markup as the core NavLink", () => {
+    // The adapter wraps the base NavLink with asChild, so the DOM must not
+    // differ from a plain anchor rendered by the core export.
+    expect(nextHtml).toBe(
+      renderToStaticMarkup(
+        <>
+          <NavLink href="/calendar" active>
+            Calendar
+          </NavLink>
+          <NavLink href="/tasks" active={false}>
+            Tasks
+          </NavLink>
+        </>
+      )
+    )
+    expect(nextHtml).toMatch(/<a[^>]*data-slot="nav-link"/)
   })
 })

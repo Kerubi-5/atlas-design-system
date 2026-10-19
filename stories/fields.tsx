@@ -1,5 +1,6 @@
 import { useState } from "react"
 
+import { Button } from "../src/button.js"
 import { Input } from "../src/input.js"
 import { Label } from "../src/label.js"
 import { Textarea } from "../src/textarea.js"
@@ -16,6 +17,7 @@ import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import { FormMarkdownField } from "../src/form/markdown-field.js"
 import { FieldError, type FieldMetaState } from "../src/form/field-error.js"
 import { FormFeedbackField } from "../src/form/feedback-field.js"
+import { focusFirstInvalid } from "../src/form/focus-first-invalid.js"
 import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField, type TextFieldApi } from "../src/form/text-field.js"
 import { SelectItem } from "../src/select.js"
@@ -109,6 +111,70 @@ export function FormHelpersStory() {
       <FieldError message="This name is already taken." />
       <FormFeedbackField message="Could not save. Try again." />
     </div>
+  )
+}
+
+/**
+ * A failed submit focuses the first field with an error, in page order,
+ * through `focusFirstInvalid`. The fields carry `id={name}` so the handler
+ * can find them by field name; errors show once the form is submitted.
+ */
+export function FocusFirstInvalidStory() {
+  const [submitted, setSubmitted] = useState(false)
+  const amountValue = useDemoField("amount", "")
+  const amount: TextFieldApi = {
+    ...amountValue,
+    state: {
+      ...amountValue.state,
+      meta: {
+        errors: amountValue.state.value ? [] : ["Enter an amount"],
+        isTouched: false,
+      },
+    },
+  }
+  const [currency, setCurrency] = useState<string | undefined>()
+  const currencyMeta: FieldMetaState = {
+    errors: currency ? [] : ["Pick a currency"],
+    isTouched: false,
+  }
+  const fieldMeta = {
+    amount: { errors: amount.state.meta.errors },
+    currency: { errors: currencyMeta.errors },
+  }
+  const focusInvalid = focusFirstInvalid("focus-first-invalid-form")
+
+  return (
+    <form
+      id="focus-first-invalid-form"
+      className="grid max-w-md gap-4"
+      onSubmit={(event) => {
+        event.preventDefault()
+        setSubmitted(true)
+        focusInvalid({ formApi: { state: { fieldMeta } } })
+      }}
+    >
+      <FormTextField
+        field={amount}
+        label="Amount"
+        submitted={submitted}
+        required
+      />
+      <FormSelectField
+        id="currency"
+        label="Currency"
+        value={currency}
+        onValueChange={setCurrency}
+        meta={currencyMeta}
+        submitted={submitted}
+        required
+      >
+        <SelectItem value="usd">US Dollar</SelectItem>
+        <SelectItem value="php">Philippine peso</SelectItem>
+      </FormSelectField>
+      <div>
+        <Button type="submit">Save</Button>
+      </div>
+    </form>
   )
 }
 

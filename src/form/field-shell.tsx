@@ -83,6 +83,12 @@ export function describedBy(
  */
 export type PickerFieldBaseProps = FormFieldBaseProps &
   FormFieldMetaProps & {
+    /**
+     * Id of the trigger the label points at. Defaults to a generated id;
+     * pass the field name (`id={field.name}`) so a submit handler such as
+     * `focusFirstInvalid` can find the control.
+     */
+    id?: string
     /** Disables the trigger so no date can be picked. */
     disabled?: boolean
     /** Marks the label and adds "Required" to the trigger's description. */

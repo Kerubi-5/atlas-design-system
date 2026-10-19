@@ -24,6 +24,7 @@ type Props = PickerFieldBaseProps & {
 
 /** Date-time picker with built-in field error text and invalid styling. */
 export function FormDateTimePickerField({
+  id: idProp,
   onValueChange,
   label,
   meta,
@@ -34,7 +35,8 @@ export function FormDateTimePickerField({
   ...picker
 }: Props) {
   const errorText = metaErrorText(meta, { submitted, showError })
-  const id = useId()
+  const generatedId = useId()
+  const id = idProp ?? generatedId
 
   return (
     <FormFieldShell
