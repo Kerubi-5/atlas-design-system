@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "../src/card.js"
 import { EmptyPanel } from "../src/empty-panel.js"
+import { FieldLabel } from "../src/field.js"
 import { Input } from "../src/input.js"
 import { Label } from "../src/label.js"
 import {
@@ -90,6 +91,35 @@ describe("Input and Label", () => {
     expect(field).toHaveAttribute("placeholder", "name@example.com")
     expect(field.className).toMatch(/rounded-none/)
     expect(screen.getByText("Email")).toHaveAttribute("data-slot", "label")
+  })
+
+  it("marks a required Label without changing its name", () => {
+    render(
+      <>
+        <Label htmlFor="email" required>
+          Email
+        </Label>
+        <input id="email" required />
+      </>
+    )
+    const marker = document.querySelector('[data-slot="label-required"]')
+    expect(marker).toHaveTextContent("*")
+    expect(marker).toHaveAttribute("aria-hidden", "true")
+    expect(screen.getByRole("textbox")).toHaveAccessibleName("Email")
+  })
+
+  it("leaves optional labels unmarked and styles the marker by className", () => {
+    render(
+      <>
+        <Label>Optional</Label>
+        <FieldLabel required requiredClassName="text-primary">
+          Name
+        </FieldLabel>
+      </>
+    )
+    const markers = document.querySelectorAll('[data-slot="label-required"]')
+    expect(markers).toHaveLength(1)
+    expect(markers[0]).toHaveClass("text-primary")
   })
 })
 
@@ -180,6 +210,18 @@ describe("Card", () => {
     expect(content.className.split(/\s+/)).toContain("px-0")
     expect(content.className).not.toMatch(/px-\(--card-p\)/)
     expect(content.className.split(/\s+/)).not.toContain("!px-0")
+  })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("lets CardTitle be a section heading", () => {
+    render(
+      <Card>
+        <CardTitle as="h2">Spending</CardTitle>
+      </Card>
+    )
+    expect(
+      screen.getByRole("heading", { level: 2, name: "Spending" })
+    ).toBeInTheDocument()
   })
 })
 

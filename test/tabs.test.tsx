@@ -226,6 +226,58 @@ describe("TabsNav", () => {
   })
 })
 
+const persistentLabels = [
+  "Alpha",
+  "Bravo",
+  "Charlie",
+  "Delta",
+  "Echo",
+  "Foxtrot",
+]
+
+function PersistentNav({ active }: { active: string }) {
+  return (
+    <TabsNav aria-label="Views">
+      {persistentLabels.map((label) => (
+        <a
+          key={label}
+          href={`#${label}`}
+          className={tabsTriggerVariants()}
+          aria-current={label === active ? "page" : undefined}
+        >
+          {label}
+        </a>
+      ))}
+    </TabsNav>
+  )
+}
+
+describe("TabsNav in a persistent layout", () => {
+  const original = HTMLElement.prototype.scrollIntoView
+  afterEach(() => {
+    HTMLElement.prototype.scrollIntoView = original
+  })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("reveals the new active link when the route changes without remount", () => {
+    const scrollIntoView = vi.fn()
+    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const { rerender } = render(<PersistentNav active="Alpha" />)
+    expect(scrollIntoView.mock.instances).toEqual([
+      screen.getByRole("link", { name: "Alpha" }),
+    ])
+
+    rerender(<PersistentNav active="Foxtrot" />)
+    expect(scrollIntoView.mock.instances.at(-1)).toBe(
+      screen.getByRole("link", { name: "Foxtrot" })
+    )
+
+    // Re-renders that keep the same active link do not scroll again.
+    rerender(<PersistentNav active="Foxtrot" />)
+    expect(scrollIntoView).toHaveBeenCalledTimes(2)
+  })
+})
+
 describe("TabsNav mouse drag", () => {
   function renderLinks(onClick: (event: React.MouseEvent) => void) {
     render(

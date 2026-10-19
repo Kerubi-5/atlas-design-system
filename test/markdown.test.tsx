@@ -20,6 +20,13 @@ describe("safeMarkdownUrl", () => {
     expect(safeMarkdownUrl("data:text/html,hi")).toBe("")
     expect(safeMarkdownUrl("vbscript:msg")).toBe("")
   })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("rejects protocol-relative URLs that look like root paths", () => {
+    expect(safeMarkdownUrl("//evil.example/login")).toBe("")
+    expect(safeMarkdownUrl("/\\evil.example/login")).toBe("")
+    expect(safeMarkdownUrl("/settings")).toBe("/settings")
+  })
 })
 
 describe("Markdown", () => {
@@ -48,5 +55,27 @@ describe("Markdown", () => {
     expect(screen.getByText("<script>alert(1)</script>")).toBeInTheDocument()
     expect(screen.queryByRole("link")).not.toBeInTheDocument()
     expect(screen.getByText("x").tagName).toBe("SPAN")
+  })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("keeps GFM column alignment", () => {
+    render(
+      <Markdown content={"| Item | Amount |\n| :-- | --: |\n| Tea | 4.50 |"} />
+    )
+    expect(screen.getByRole("cell", { name: "4.50" }).style.textAlign).toBe(
+      "right"
+    )
+    expect(
+      screen.getByRole("columnheader", { name: "Amount" }).style.textAlign
+    ).toBe("right")
+  })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("shows the alt text instead of a broken image for an unsafe URL", () => {
+    const { container } = render(
+      <Markdown content={"![Chart](javascript:alert(1))"} />
+    )
+    expect(container.querySelector("img")).toBeNull()
+    expect(screen.getByText("Chart")).toBeInTheDocument()
   })
 })

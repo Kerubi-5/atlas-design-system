@@ -77,9 +77,10 @@ CI runs the same gate, so a skipped hook still fails the pull request.
    when an export or example has no story, or a story has no group.
 4. A usage entry in `site/src/lib/usage.ts` (use for, not for,
    accessibility). The site tests fail without one.
-5. Tests in `test/` for the behavior people rely on: roles, keyboard,
-   labels, state changes. `npm run test:coverage` fails below the floors in
-   `vitest.config.ts` (95% of lines).
+5. Tests in `test/<name>.test.tsx`, next to the component's existing cases,
+   for the behavior people rely on: roles, keyboard, labels, state changes.
+   `npm run test:coverage` fails below the floors in `vitest.config.ts`
+   (95% of lines).
 6. A screenshot entry in `site/tests/visual/components.spec.ts` (and in
    `phoneStories` if its layout changes at 390px); the visual test fails
    when a component page has none. If it opens an overlay, list it in
