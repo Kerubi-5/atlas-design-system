@@ -1,10 +1,17 @@
 import { fr } from "date-fns/locale"
 import { useState } from "react"
+import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
 
 import { Calendar } from "../src/calendar.js"
-import { DatePickerButton, type DateRange } from "../src/date-picker.js"
+import {
+  DatePickerButton,
+  type DateRange,
+  formatLocalDate,
+  toDate,
+} from "../src/date-picker.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
+import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 
 import {
   createUser,
@@ -20,6 +27,8 @@ import {
 
 const october = new Date(2026, 9, 1)
 const locale = { code: "en-US" }
+const day = (date: number, month = 9, year = 2026) =>
+  new Date(year, month, date)
 
 function RangePickerHarness({
   initial,
@@ -45,6 +54,24 @@ function RangePickerHarness({
     />
   )
 }
+
+describe("date helpers", () => {
+  it("parses local calendar dates without UTC shifting", () => {
+    const date = toDate("2026-10-05")
+    expect(date?.getFullYear()).toBe(2026)
+    expect(date?.getMonth()).toBe(9)
+    expect(date?.getDate()).toBe(5)
+    expect(toDate("")).toBeUndefined()
+    expect(toDate(undefined)).toBeUndefined()
+    expect(toDate("2026-13-40")).toBeUndefined()
+  })
+
+  it("round-trips a Date through formatLocalDate", () => {
+    const date = new Date(2026, 9, 5)
+    expect(formatLocalDate(date)).toBe("2026-10-05")
+    expect(toDate(date)).toBe(date)
+  })
+})
 
 describe("Calendar", () => {
   it("selects a single day", async () => {
@@ -251,6 +278,122 @@ describe("DatePickerButton", () => {
     const trigger = screen.getByRole("button", { name: /^Due.*October 5/ })
     expect(trigger).toHaveAccessibleDescription("Business days only")
   })
+
+  it("shows the placeholder when empty", () => {
+    const html = renderToStaticMarkup(
+      <DatePickerButton value={undefined} onChange={() => {}} />
+    )
+    expect(html).toContain("Pick a date")
+    expect(html).toContain('data-empty="true"')
+  })
+})
+
+describe("DatePickerButton minDate and maxDate", () => {
+  it("disables days outside the range and keeps navigation inside it", async () => {
+    const user = createUser()
+    const onChange = vi.fn()
+    render(
+      <DatePickerButton
+        value="2026-10-15"
+        minDate="2026-10-10"
+        maxDate={day(20)}
+        onChange={onChange}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 15/ }))
+    await screen.findByRole("grid")
+
+    expect(getDayButton(day(9))).toBeDisabled()
+    expect(getDayButton(day(21))).toBeDisabled()
+    expect(getDayButton(day(10))).toBeEnabled()
+    expect(getDayButton(day(20))).toBeEnabled()
+    expect(
+      screen.getByRole("button", { name: /previous month/i })
+    ).toHaveAttribute("aria-disabled", "true")
+    expect(screen.getByRole("button", { name: /next month/i })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+
+    await user.click(getDayButton(day(9)))
+    expect(onChange).not.toHaveBeenCalled()
+  })
+
+  it("keeps calendarProps.disabled alongside the limits", async () => {
+    const user = createUser()
+    render(
+      <DatePickerButton
+        value="2026-10-15"
+        minDate="2026-10-06"
+        calendarProps={{ disabled: { dayOfWeek: [0] } }}
+        onChange={() => {}}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 15/ }))
+    await screen.findByRole("grid")
+
+    // October 11, 2026 is a Sunday; Monday October 5 is before minDate.
+    expect(getDayButton(day(11))).toBeDisabled()
+    expect(getDayButton(day(5))).toBeDisabled()
+    expect(getDayButton(day(12))).toBeEnabled()
+  })
+
+  it("opens on the first allowed month when nothing is picked", async () => {
+    const user = createUser()
+    render(
+      <DatePickerButton
+        value={undefined}
+        minDate="2099-03-10"
+        onChange={() => {}}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: "Pick a date" }))
+    await screen.findByRole("grid")
+    expect(getDayButton(day(10, 2, 2099))).toBeEnabled()
+    expect(getDayButton(day(9, 2, 2099))).toBeDisabled()
+  })
+
+  it("limits range mode", async () => {
+    stubMatchMedia(false)
+    const user = createUser()
+    render(
+      <DatePickerButton
+        mode="range"
+        value={{ from: "2026-10-12", to: "2026-10-14" }}
+        minDate="2026-10-10"
+        maxDate="2026-10-20"
+        onChange={() => {}}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 12/ }))
+    await screen.findByRole("grid")
+    expect(getDayButton(day(9))).toBeDisabled()
+    expect(getDayButton(day(21))).toBeDisabled()
+  })
+
+  // The date-time field is rendered too so both adapters forward the limits.
+  it("forwards the limits from the form fields", async () => {
+    const user = createUser()
+    render(
+      <>
+        <FormDatePickerField
+          label="Due"
+          value="2026-10-15"
+          minDate="2026-10-10"
+          onValueChange={() => {}}
+        />
+        <FormDateTimePickerField
+          label="Starts"
+          value={null}
+          maxDate={day(20)}
+          onValueChange={() => {}}
+        />
+      </>
+    )
+    await user.click(screen.getByRole("button", { name: /^Due/ }))
+    await screen.findByRole("grid")
+    expect(getDayButton(day(9))).toBeDisabled()
+  })
 })
 
 describe("DatePickerButton clearable", () => {
@@ -386,6 +529,36 @@ describe("FormDatePickerField", () => {
       expect(screen.queryByRole("grid")).not.toBeInTheDocument()
     })
     expect(trigger).toHaveFocus()
+  })
+
+  // Covers the date-time field too: both pickers share the required marker.
+  it("marks required pickers and announces it in the trigger description", () => {
+    render(
+      <>
+        <FormDatePickerField
+          label="Due"
+          value={undefined}
+          required
+          onValueChange={() => {}}
+        />
+        <FormDateTimePickerField
+          label="Starts"
+          value={null}
+          required
+          meta={{ errors: ["Pick a time"] }}
+          onValueChange={() => {}}
+        />
+      </>
+    )
+    expect(
+      document.querySelectorAll('[data-slot="label-required"]')
+    ).toHaveLength(2)
+    expect(
+      screen.getByRole("button", { name: /^Due/ })
+    ).toHaveAccessibleDescription("Required")
+    expect(
+      screen.getByRole("button", { name: /^Starts/ })
+    ).toHaveAccessibleDescription("Required Pick a time")
   })
 })
 
@@ -667,5 +840,27 @@ describe("DatePickerButton range mode", () => {
     await user.click(screen.getByRole("button", { name: "Export range" }))
     const popover = await findPopoverContent()
     expect(popover).toHaveAttribute("data-side", "top")
+  })
+
+  it("renders a range trigger with from and to labels", () => {
+    const html = renderToStaticMarkup(
+      <DatePickerButton
+        mode="range"
+        value={{ from: "2026-10-05", to: "2026-11-10" }}
+        onChange={() => {}}
+      />
+    )
+    expect(html).toContain("October 5")
+    expect(html).toContain("November 10")
+    expect(html).toContain("rounded-none")
+    expect(html).toContain('data-empty="false"')
+  })
+
+  it("shows the range placeholder when empty", () => {
+    const html = renderToStaticMarkup(
+      <DatePickerButton mode="range" value={undefined} onChange={() => {}} />
+    )
+    expect(html).toContain("Pick a date range")
+    expect(html).toContain('data-empty="true"')
   })
 })

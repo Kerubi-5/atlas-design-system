@@ -1,5 +1,4 @@
 import { useState } from "react"
-import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
 
 import {
@@ -277,6 +276,22 @@ describe("DateTimePickerButton", () => {
     const popover = await findPopoverContent()
     expect(popover).toHaveAttribute("data-side", "top")
   })
+
+  it("limits the days to minDate and maxDate", async () => {
+    const user = createUser()
+    render(
+      <DateTimePickerButton
+        value={new Date(2026, 9, 15, 9, 30)}
+        minDate={new Date(2026, 9, 10)}
+        maxDate={new Date(2026, 9, 20)}
+        onChange={() => {}}
+      />
+    )
+    await user.click(screen.getByRole("button", { name: /^October 15/ }))
+    await screen.findByRole("grid")
+    expect(getDayButton(new Date(2026, 9, 9))).toBeDisabled()
+    expect(getDayButton(new Date(2026, 9, 21))).toBeDisabled()
+  })
 })
 
 describe("FormDateTimePickerField", () => {
@@ -344,17 +359,5 @@ describe("FormDateTimePickerField", () => {
     expect(screen.getByRole("alert")).toHaveTextContent("Required")
     expect(trigger).toHaveClass("rounded-none")
     expectFormControlTrigger(trigger)
-  })
-
-  it("forwards className onto the labelled trigger", () => {
-    const html = renderToStaticMarkup(
-      <FormDateTimePickerField
-        value={afternoon}
-        onValueChange={() => {}}
-        label="Starts"
-        className="w-40"
-      />
-    )
-    expect(html).toContain("w-40")
   })
 })

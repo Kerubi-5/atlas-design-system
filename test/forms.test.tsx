@@ -158,3 +158,80 @@ describe("form field descriptions", () => {
     )
   })
 })
+
+function markdownField(value: string, errors: string[] = []) {
+  return fakeTextField("notes", value, errors)
+}
+
+describe("FormMarkdownField", () => {
+  it("forwards typing and blur to the field api", async () => {
+    const user = createUser()
+    const field = markdownField("")
+    render(<FormMarkdownField field={field} label="Notes" />)
+    const box = screen.getByLabelText("Notes")
+    expect(box).toHaveAttribute("placeholder", "Markdown supported")
+    expect(box).toHaveAttribute("rows", "5")
+    await user.type(box, "a")
+    await user.tab()
+    expect(field.handleChange).toHaveBeenCalledWith("a")
+    expect(field.handleBlur).toHaveBeenCalled()
+  })
+
+  it("shows an empty-preview message for blank content", async () => {
+    const user = createUser()
+    render(<FormMarkdownField field={markdownField("   ")} label="Notes" />)
+    await user.click(screen.getByRole("radio", { name: "Preview" }))
+    expect(screen.getByText("Nothing to preview")).toBeInTheDocument()
+  })
+
+  it("stays in its mode when the active toggle is pressed again", async () => {
+    const user = createUser()
+    render(<FormMarkdownField field={markdownField("Hi")} label="Notes" />)
+    await user.click(screen.getByRole("radio", { name: "Write" }))
+    expect(screen.getByLabelText("Notes")).toBeInTheDocument()
+  })
+
+  it("hides errors and invalid state when showError is false", () => {
+    render(
+      <FormMarkdownField
+        field={markdownField("", ["Required"])}
+        id="custom-notes"
+        label="Notes"
+        placeholder="Write here"
+        rows={3}
+        showError={false}
+      />
+    )
+    const box = screen.getByLabelText("Notes")
+    expect(box).toHaveAttribute("id", "custom-notes")
+    expect(box).toHaveAttribute("rows", "3")
+    expect(box).not.toHaveAttribute("aria-invalid")
+    expect(screen.queryByRole("alert")).toBeNull()
+  })
+})
+
+describe("visible required marker", () => {
+  it("marks required text and markdown fields and keeps native required", () => {
+    render(
+      <>
+        <FormTextField
+          field={fakeTextField("email", "")}
+          label="Email"
+          required
+        />
+        <FormMarkdownField
+          field={fakeTextField("body", "")}
+          label="Body"
+          required
+        />
+        <FormTextField field={fakeTextField("nick", "")} label="Nickname" />
+      </>
+    )
+    expect(
+      document.querySelectorAll('[data-slot="label-required"]')
+    ).toHaveLength(2)
+    expect(screen.getByRole("textbox", { name: "Email" })).toBeRequired()
+    expect(screen.getByRole("textbox", { name: "Body" })).toBeRequired()
+    expect(screen.getByRole("textbox", { name: "Nickname" })).not.toBeRequired()
+  })
+})

@@ -44,4 +44,13 @@ describe("Meter", () => {
       width: "100%",
     })
   })
+
+  // Found in the 1.0 audit; failed before its fix.
+  it("announces and draws the minimum for a NaN reading", () => {
+    render(<Meter value={Number.NaN} max={100} aria-label="Spend" />)
+    const meter = screen.getByRole("meter", { name: "Spend" })
+    expect(meter).toHaveAttribute("aria-valuenow", "0")
+    const fill = meter.querySelector<HTMLElement>("[data-slot=meter-fill]")!
+    expect(fill.style.width).toBe("0%")
+  })
 })
