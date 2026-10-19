@@ -8,7 +8,7 @@ React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
 when using `next/nav-link`, `next/period-stepper`, or `next/tabs-nav-link`.
 
 ```sh
-npm install --save-exact atlas-react-kit@1.1.0
+npm install --save-exact atlas-react-kit@1.2.0
 ```
 
 Import components by subpath:

@@ -125,12 +125,10 @@ describe("className overrides win", () => {
     const list = screen.getByRole("tablist", { name: "Views" })
     const scroller = list.closest("[data-slot=tabs-scroller]")
     expect(classes(list)).toContain("h-9")
-    expect(classes(list).filter((name) => /(?:^|:)h-11$/.test(name))).toEqual(
-      []
-    )
+    expect(classes(list).filter((name) => /(?:^|:)h-7$/.test(name))).toEqual([])
     expect(classes(scroller)).toContain("h-11")
     expect(
-      classes(scroller).filter((name) => /(?:^|:)h-13$/.test(name))
+      classes(scroller).filter((name) => /(?:^|:)h-9$/.test(name))
     ).toEqual([])
     expect(classes(scroller)).not.toContain("w-full")
   })
@@ -148,8 +146,8 @@ describe("className overrides win", () => {
     const scroller = list.closest("[data-slot=tabs-scroller]")
     expect(classes(list)).toContain("flex-col")
     expect(classes(list)).toContain("h-fit")
-    expect(classes(list)).not.toContain("h-11")
-    expect(classes(scroller)).not.toContain("h-13")
+    expect(classes(list)).not.toContain("h-7")
+    expect(classes(scroller)).not.toContain("h-9")
   })
 
   it("TabsNav takes scrollerClassName and listClassName", () => {
@@ -167,7 +165,7 @@ describe("className overrides win", () => {
     expect(classes(scroller)).toContain("p-0")
     expect(classes(scroller)).not.toContain("p-1")
     expect(classes(list)).toContain("h-9")
-    expect(classes(list)).not.toContain("h-11")
+    expect(classes(list)).not.toContain("h-7")
   })
 
   it("Avatar size", () => {

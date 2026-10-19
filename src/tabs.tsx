@@ -18,7 +18,7 @@ import { cn } from "./utils.js"
 type Orientation = "horizontal" | "vertical"
 
 /**
- * The root's orientation, so the list can pick plain size classes (`h-11`)
+ * The root's orientation, so the list can pick plain size classes (`h-7`)
  * that a consumer `className` replaces, instead of `group-data-*` variants
  * that would beat it.
  */
@@ -26,7 +26,7 @@ const TabsOrientationContext = React.createContext<Orientation>("horizontal")
 
 /** Props `TabsList` and `TabsNav` share for the scroller around their row. */
 type TabsScrollerClassNameProps = {
-  /** Classes for the scroller around the tab row (`h-13` with `p-1` by default). */
+  /** Classes for the scroller around the tab row (`h-9` with `p-1` by default). */
   scrollerClassName?: string
 }
 
@@ -55,7 +55,7 @@ function Tabs({
  * Horizontal scroller around a tab row. `overflow-x: auto` alone would
  * compute `overflow-y` to `auto` as well (CSS overflow pairing), so the
  * active tab's border and focus ring grow a vertical scrollbar. Pad for
- * those strokes *inside* the box (`h-13` = `h-11` list + `p-1`), clip the
+ * those strokes *inside* the box (`h-9` = `h-7` list + `p-1`), clip the
  * y axis as a backstop, and fade the edges while the row overflows —
  * same cue as `Table`. While it overflows, a mouse can also drag the row
  * sideways (`useDragScroll`); touch, wheel and keyboard scroll as before.
@@ -114,9 +114,9 @@ function TabsScroller({
 }
 
 /**
- * The tab row inside its scroller. `className` styles the list (its `h-11`
+ * The tab row inside its scroller. `className` styles the list (its `h-7`
  * height, fill, gap); `scrollerClassName` styles the scroller around it
- * (`h-13` with `p-1` for the active border and focus ring).
+ * (`h-9` with `p-1` for the active border and focus ring).
  */
 function TabsList({
   className,

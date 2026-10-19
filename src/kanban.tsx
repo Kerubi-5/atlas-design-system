@@ -95,7 +95,7 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   deleteLabel?: string
   /** Classes for the horizontal scroller that holds the columns. */
   scrollerClassName?: string
-  /** Classes for every column, e.g. its width. */
+  /** Classes for every column, e.g. to pin a width instead of growing. */
   columnClassName?: string
   /** Classes for every card, including the one under the pointer while dragging. */
   cardClassName?: string
@@ -106,7 +106,8 @@ const COLUMN_DROP_PRIORITY = 1
 /** Rail zones beat columns when both are under the pointer. */
 const ACTION_ZONE_PRIORITY = 10
 
-const columnSize = "w-72 min-w-72 min-h-[min(70vh,32rem)]"
+/** Grow to fill the board; 18rem floor so a long row still scrolls. */
+const columnSize = "flex-1 basis-72 min-w-72 min-h-[min(70vh,32rem)]"
 
 /**
  * Drag-and-drop board built on dnd-kit. The consumer owns `items` and maps
@@ -375,7 +376,7 @@ function KanbanColumnView({
       data-slot="kanban-column"
       data-drop-target={isDropTarget || undefined}
       className={cn(
-        "flex shrink-0 snap-start flex-col gap-3 p-3",
+        "flex snap-start flex-col gap-3 p-3",
         "bg-muted/40 ring-1 ring-foreground/5",
         "data-drop-target:bg-muted/60 data-drop-target:ring-2 data-drop-target:ring-ring/60",
         columnSize,
@@ -693,10 +694,7 @@ function KanbanSkeleton({
       {...props}
     >
       {Array.from({ length: columnCount }, (_, index) => (
-        <Skeleton
-          key={index}
-          className={cn("shrink-0", columnSize, columnClassName)}
-        />
+        <Skeleton key={index} className={cn(columnSize, columnClassName)} />
       ))}
     </div>
   )
