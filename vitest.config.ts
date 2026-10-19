@@ -9,8 +9,8 @@ export default defineConfig({
       provider: "v8",
       include: ["src/**"],
       reporter: ["text-summary", "text"],
-      // Floors just under the current numbers (95% lines, 87% branches):
-      // CI fails when new code lands without tests.
+      // Floors below the numbers at 1.0 (98% lines, 93% branches): CI fails
+      // when new code lands without tests.
       thresholds: { lines: 95, statements: 94, functions: 94, branches: 90 },
     },
   },

@@ -55,7 +55,8 @@ with the application.
 - [Design rules](./DESIGN_RULES.md): tokens, accessibility, writing, and
   composition. This guide ships in the npm package.
 - [Contributing](./CONTRIBUTING.md): component changes, checks, and releases.
-- [Roadmap to 1.0](./ROADMAP-1.0.md): decisions needed before the 1.0 release.
+- [Decisions behind 1.0 (record)](./ROADMAP-1.0.md): the closed roadmap that
+  led to 1.0.0.
 - [Changelog](./CHANGELOG.md): published and upcoming changes.
 
 ## AI coding assistants
@@ -86,51 +87,8 @@ and package entry points for search and indexing tools.
 
 ## Development and releases
 
-```sh
-npm ci
-npm run check
-npm test
-npm pack
-npm ci --prefix site
-npm run build --prefix site
-npm run preview --prefix site
-```
-
-`tsc` emits individual ESM files and TypeScript declarations. CSS is shipped
-without compilation and processed by the consuming application's Tailwind build.
-The public site is Storybook in `site/`. `npm run build --prefix site`
-typechecks the stories, builds Storybook into `site/dist`, then checks the
-static output. Vercel serves that directory; `/playground` and `/storybook`
-redirect to `/`. The site and Storybook dependencies are not part of the npm
-package. Optional feature libraries (markdown, dates, toasts, theme, Next, dnd-kit) are
-peer dependencies and are required only when those entry points are imported.
-The package does not bundle React.
-
-Run `npm run dev --prefix site` (or `npm run storybook --prefix site`) for the
-playground on port 6006. Existing examples live in `stories/` and are imported
-by CSF story files in `site/stories/`, so component tests and previews share the
-same examples. Add Storybook entries there when adding an example; the
-static-output check reports any existing demo that has no Storybook entry.
-Interactive stories use Storybook args so changing a control or interacting with
-the component updates the same value. Configuration is in `site/.storybook/`.
-
-The Storybook preview disables the kit's theme shortcut and uses the theme
-toolbar instead. The accessibility panel checks the rendered story; it does not
-replace keyboard or assistive-technology testing.
-
-Bumping the version in `package.json` and merging to `main` (path-filtered
-to package files) or running `workflow_dispatch` publishes through npm OIDC
-trusted publishing after check, test, and pack gates. Versions already on npm
-are skipped.
-
-If trusted publishing is not configured, pack and publish a validated
-artifact with the package owner's npm login:
-
-```sh
-mkdir -p release-artifacts
-npm pack --pack-destination release-artifacts
-npm publish ./release-artifacts/atlas-react-kit-1.0.0.tgz --access public
-```
+Setup, checks, the component checklist, and releases are in
+[CONTRIBUTING.md](./CONTRIBUTING.md).
 
 Pin an exact package version in consuming applications. Roll back an upgrade by
 restoring the previous version and lockfile. License: MIT; upstream notices are

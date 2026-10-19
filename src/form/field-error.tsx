@@ -19,9 +19,10 @@ export type FieldMetaState = {
 /** When a field shows its error: the `form/*` fields' shared timing props. */
 export type ErrorTimingProps = {
   /**
-   * Set once the form has been submitted (TanStack Form:
-   * `form.state.submissionAttempts > 0`), so an untouched field shows its
-   * error too. Only matters when `meta.isTouched` is passed.
+   * Set once the form has been submitted, so an untouched field shows its
+   * error too. For form libraries that do not mark fields touched on
+   * submit; TanStack Form does, so its users pass `meta` only. Only matters
+   * when `meta.isTouched` is passed.
    */
   submitted?: boolean
   /** When false, never shows error text or invalid styling. Default true. */

@@ -129,13 +129,10 @@ or the viewport minus gutters on small screens.
 
 Use `EmptyPanel` for empty states, `TableBodySkeleton` for loading table bodies,
 and `<Card flush>` for an edge-to-edge list or table. `Table` scrolls wide
-columns inside itself (`min-w-0 overflow-x-auto`) and tightens cell padding
-below `sm`. `CardContent className="px-0"`
-overrides body padding without `!px-0` when only the body should go flush. Cards
-keep `min-h-min shrink-0` so they do not collapse inside a bounded flex
-column, and `min-w-0` so nested tables scroll instead of widening the card.
-`Dialog` already scrolls inside the viewport on small screens; avoid
-additional height limits.
+columns inside itself, `Card` neither collapses in a bounded flex column nor
+widens around a nested table, and `Dialog` already scrolls inside the
+viewport on small screens; avoid additional height limits. The classes each
+one uses are in its COMPONENTS.md row.
 
 Apps decide how wide and tall containers and overlays are. The kit sets
 intrinsic control sizes (the button, input, tab and row heights, icons,
@@ -144,12 +141,10 @@ clamps overlays to the viewport, but no design widths or heights on
 dialogs, popovers, menus, or lists. Set them with `className`: give each
 `DialogContent` a width such as `sm:max-w-md`, and each `PopoverContent`
 one such as `w-72`. Where the sized part is not the element `className`
-reaches, a prop names it: `InfoTip` takes `contentClassName` (default
-`w-72`), and `Combobox` and `SearchPicker` take `listClassName` (default
-`max-h-60`). `TabsNav` fills a block container but sizes to its links in a
-flex row; add `w-full` to stretch it there. `Tooltip` keeps a `max-w-xs` reading width, `Textarea` a
-`min-h-16` starting height, and toasts their 356px width; override the first
-two with `className`.
+reaches, a `*ClassName` prop names it, with its default where there is one
+(COMPONENTS.md, "Styling parts"). The few parts that keep a reading width or
+a starting height (`Tooltip`, `Textarea`) take `className` to override it;
+toasts keep their width.
 
 Parents do not force sizes on their children. A vertical `Field` stretches
 its controls through the flex column, so a control's own width class (such
@@ -172,32 +167,28 @@ triggers as outline buttons in application code.
 error sits below the control. It takes no space until it shows, so a row of
 fields keeps its controls on one top edge only with `items-start`
 (`grid grid-cols-2 items-start gap-3`); the default `stretch` is fine for a
-single column. Wrap a control the kit does not ship (a combobox, a segmented
+single column. Wrap a control the kit has no form field for (a colour
 picker) in `FormControlField` instead of `Field` and `FieldLabel`, whose
-`gap-3` spacing does not match. A field shows its error once
-`meta.isTouched` is true or `submitted` is set, never on a field the person
-has not reached yet.
+`gap-3` spacing does not match. A field shows its error once the person has
+touched it (`meta.isTouched`), never on a field they have not reached yet.
+`submitted` is for form libraries that do not mark every field touched on
+submit; TanStack Form does, so its users pass `meta` only.
 
 Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
 `TabsNav` with links and `aria-current="page"` on the active link. The optional
 Next adapter provides `TabsNavLink` with this behavior. App-shell destinations
 (Calendar, Tasks, Settings) use `NavLink` from `nav-link`: a pill with `active`
 from the app, not tabs. Pass `asChild` for a router link, or use the optional
-Next adapter `next/nav-link`. `TabsNav` and `TabsList`
-scroll overflowing labels inside themselves (`overflow-x-auto overflow-y-hidden`,
-with padding for the active border and focus ring counted in the scroller
-height, and an edge fade like `Table`). Do not wrap them in another
-`overflow-x-auto` — that pairing forces `overflow-y: auto` and a stray
-vertical scrollbar.
+Next adapter `next/nav-link`. `TabsNav` and `TabsList` scroll overflowing
+labels inside themselves, like `Table`. Do not wrap them in another
+horizontal scroller: that pairing adds a stray vertical scrollbar.
 
-Use `FormTextField`, `FormSelectField`, `FormDatePickerField`,
-`FormDateTimePickerField`, `FormMarkdownField`, and `FormFeedbackField` for
-portable form controls, and `FieldError` for field messages. `Combobox` (popover)
+Use the `form/*` fields (one row each in COMPONENTS.md) for portable form
+controls, and `FieldError` for field messages. `Combobox` (popover)
 and `SearchPicker` (always-visible list), `DatePickerButton` (including
 `mode="range"`), `DateTimePickerButton`, `Slider`, `Meter` (scale with ticks;
 `Progress` is a plain 0–100 job bar), `InfoTip` (longer than `Tooltip`),
 `Markdown`, `ColorLegend`, `StatTile`, `ThemeProvider`, `ErrorBoundary`, and
 `SortableTableHead` are first-class kit pieces. Domain data and application
 shells stay with the application: currency or timezone option lists,
-query-library error views, WYSIWYG editors, kanban boards, and dashboard
-widgets.
+query-library error views, and WYSIWYG editors.

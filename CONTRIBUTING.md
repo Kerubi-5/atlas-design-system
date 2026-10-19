@@ -4,8 +4,6 @@ Atlas React Kit is the shared UI for Atlas apps. Changes land here, ship as a
 package version, and apps upgrade deliberately. People and AI agents follow
 the same steps.
 
-Heading to 1.0? Start with [ROADMAP-1.0.md](./ROADMAP-1.0.md).
-
 ## Set up and check
 
 Working on the kit needs Node 22.12 or newer (Vitest 5). Apps that install
@@ -17,6 +15,7 @@ npm ci --prefix site
 npm run check                     # typecheck and Prettier
 npm run test:coverage             # behavior and package tests, coverage floors
 npm run build --prefix site       # Storybook build and site tests
+npm run dev --prefix site         # Storybook playground on port 6006
 npx playwright install chromium   # once, for the browser checks
 npm run test:a11y --prefix site   # token contrast, axe on every story and open overlay
 npm run test:visual --prefix site # screenshots of every component, light, dark, 390px
@@ -125,14 +124,19 @@ checks this.
 
 ## Versions and releases
 
-The package follows semantic versioning; before 1.0:
+The package follows semantic versioning.
 
-- **Minor** (0.x.0): new components, props, or exports, visual token
+From 1.0, a **major** release is needed for any breaking change to a
+stable component. Breaking means removing or renaming an export, a prop, a
+public token, or a documented `data-slot`; narrowing a prop's type; or
+changing a default prop value. Visual-only changes (spacing, color values
+within a token, animation) are minor. Beta components stay exempt (see
+"Status labels" below). Radix-based components pass through their primitive's props, so a `radix-ui`
+major upgrade ships as a kit major.
+
+- **Minor** (1.x.0): new components, props, exports, or tokens, visual
   changes, and any change to a beta component's API.
-- **Patch** (0.x.y): bug fixes that don't change the API.
-- **Breaking changes** to stable components only ship in a minor release,
-  after a deprecation, with migration notes under "Breaking" in the
-  changelog.
+- **Patch** (1.x.y): bug fixes that change no API.
 
 To release, bump `version` in `package.json`, rename the changelog's
 Unreleased heading to the version and date, and update the version in the
@@ -140,20 +144,21 @@ README install snippet. Merging that to `main` publishes to npm through the
 release workflow (OIDC trusted publishing) after check, test, and pack
 pass. Versions already on npm are skipped.
 
-From 1.0, a **major** release is needed for any breaking change to a
-stable component. Breaking means removing or renaming an export, a prop, a
-public token, or a documented `data-slot`; narrowing a prop's type; or
-changing a default prop value. Visual-only changes (spacing, color values
-within a token, animation) are minor. Beta components stay exempt, as above.
-Radix-based components pass through their primitive's props, so a `radix-ui`
-major upgrade ships as a kit major.
+If trusted publishing is not configured, pack and publish a validated
+artifact with the package owner's npm login:
+
+```sh
+mkdir -p release-artifacts
+npm pack --pack-destination release-artifacts
+npm publish ./release-artifacts/*.tgz --access public
+```
 
 ## Deprecations
 
 1. Mark the export or prop `@deprecated` in its JSDoc with the replacement.
 2. Add a "Deprecated" changelog entry and update `COMPONENTS.md`.
 3. Keep it working for at least one minor release.
-4. Remove it in a later minor release with a "Removed" changelog entry.
+4. Remove it in the next major release with a "Removed" changelog entry.
 
 ## Status labels
 
