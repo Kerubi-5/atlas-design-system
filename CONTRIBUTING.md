@@ -33,7 +33,9 @@ hooks.
   (secretlint).
 - **On push**, `npm run gate`: `npm run check`, then `npm run gate:static`
   (oxlint with type information, knip, Semgrep, secretlint), the bundle-size
-  budgets (size-limit), and the tests.
+  budgets (size-limit), and the tests with coverage. CI runs the same
+  `npm run gate` on every pull request, so a push that passes the hook
+  passes CI.
 
 What each tool checks and where its rules live:
 
@@ -56,7 +58,7 @@ for a reason you can state, in the same commit, so review sees it.
 
 AI agents never skip the hooks (`--no-verify`, `LEFTHOOK=0`, or changing
 `core.hooksPath`). A person can, in an emergency: `git push --no-verify`.
-CI runs the same checks, so a skipped hook still fails the pull request.
+CI runs the same gate, so a skipped hook still fails the pull request.
 
 ## Add a component
 
@@ -66,8 +68,8 @@ CI runs the same checks, so a skipped hook still fails the pull request.
    disabled, field, selected, and option states from
    `src/internal/styles.ts` instead of typing the classes;
    `test/dry.test.ts` fails on a retyped state.
-2. An export in `package.json`, and the module in `test/artifact.test.ts`
-   (the module list, plus the `"use client"` list when it applies).
+2. An export in `package.json`; `test/artifact.test.ts` fails when a module
+   in `src/` has none.
 3. A shared example in `stories/` and a Storybook file in `site/stories/`
    with a `Playground` whose controls drive the component. Title it
    `<Group>/<Name>` with the sidebar group people would look in:

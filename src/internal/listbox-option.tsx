@@ -24,7 +24,7 @@ type ListboxOptionProps = Omit<
  * scrolled into view while active. Pass `data-slot`, handlers, and the
  * component's right padding and indicator.
  */
-export function ListboxOption({
+function ListboxOption({
   listId,
   index,
   active,
