@@ -11,6 +11,7 @@ import {
   tabsScrollerVariants,
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
+import { useDragScroll } from "./internal/use-drag-scroll.js"
 import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
 import { cn } from "./utils.js"
 
@@ -56,7 +57,8 @@ function Tabs({
  * active tab's border and focus ring grow a vertical scrollbar. Pad for
  * those strokes *inside* the box (`h-13` = `h-11` list + `p-1`), clip the
  * y axis as a backstop, and fade the edges while the row overflows —
- * same cue as `Table`.
+ * same cue as `Table`. While it overflows, a mouse can also drag the row
+ * sideways (`useDragScroll`); touch, wheel and keyboard scroll as before.
  */
 function TabsScroller({
   variant = "default",
@@ -75,6 +77,7 @@ function TabsScroller({
   const ref = React.useRef<HTMLDivElement>(null)
   const revealed = React.useRef<HTMLElement | null>(null)
   const overflowing = useHorizontalOverflow(ref)
+  useDragScroll(ref, overflowing)
 
   // Runs after every render, not just mount: TabsNav usually sits in a
   // persistent layout, so a route change updates the active link in place.
@@ -209,8 +212,9 @@ function TabsNavLink({
  *
  * Overflow is handled here: the row scrolls horizontally only, with padding
  * for active borders and focus rings counted in the scroller height (so the
- * list cannot overflow on y), an edge fade while it overflows, and the
- * active link scrolled into view on mount. Do not wrap it in
+ * list cannot overflow on y), an edge fade while it overflows, the
+ * active link scrolled into view on mount, and a mouse drag that scrolls
+ * the row (a plain click still follows the link). Do not wrap it in
  * `overflow-x-auto`. `scrollerClassName` styles that scroller and
  * `listClassName` the row of links inside it.
  */

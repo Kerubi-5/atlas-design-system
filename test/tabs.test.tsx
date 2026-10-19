@@ -1,6 +1,9 @@
+import type * as React from "react"
+import { fireEvent } from "@testing-library/react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { afterEach, describe, expect, it, vi } from "vitest"
 
+import { DRAG_THRESHOLD } from "../src/internal/use-drag-scroll.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
 import {
   Tabs,
@@ -17,7 +20,7 @@ import {
   TabsOverflowStory,
 } from "../stories/navigation.js"
 
-import { render, screen, waitFor } from "./helpers.js"
+import { createUser, render, screen, waitFor } from "./helpers.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
 // in a labelled nav, not a tab widget whose tabs point at panels that don't
@@ -36,6 +39,63 @@ const html = renderToStaticMarkup(
 
 function scrollerOf(element: HTMLElement | null) {
   return element?.closest("[data-slot=tabs-scroller]") ?? null
+}
+
+/**
+ * jsdom has no layout, so every element reports an 800px row in a 390px
+ * box while `run` executes: the scroller overflows, joins the tab order and
+ * takes mouse drags.
+ */
+async function withOverflow(run: () => Promise<void>) {
+  const descriptors = {
+    scrollWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "scrollWidth"
+    ),
+    clientWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "clientWidth"
+    ),
+  }
+  Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+    configurable: true,
+    get: () => 800,
+  })
+  Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+    configurable: true,
+    get: () => 390,
+  })
+  try {
+    await run()
+  } finally {
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+      if (descriptor) {
+        Object.defineProperty(HTMLElement.prototype, key, descriptor)
+      } else {
+        delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+          key
+        ]
+      }
+    }
+  }
+}
+
+const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
+
+/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
+function dragWithMouse(target: Element, from: number, to: number) {
+  fireEvent.pointerDown(target, { ...mouse, buttons: 1, clientX: from })
+  fireEvent.pointerMove(target, { ...mouse, buttons: 1, clientX: to })
+  fireEvent.pointerUp(target, { ...mouse, buttons: 0, clientX: to })
+}
+
+/** The scroller once `useHorizontalOverflow` has seen the overflow. */
+async function overflowingScroller(element: HTMLElement) {
+  const scroller = scrollerOf(element) as HTMLElement
+  await waitFor(() => {
+    expect(scroller).toHaveAttribute("tabindex", "0")
+  })
+  return scroller
 }
 
 function expectHorizontalOnlyScroller(element: Element | null) {
@@ -137,41 +197,96 @@ describe("TabsNav", () => {
   })
 
   it("joins the tab order while the row is wider than the box", async () => {
-    const descriptors = {
-      scrollWidth: Object.getOwnPropertyDescriptor(
-        HTMLElement.prototype,
-        "scrollWidth"
-      ),
-      clientWidth: Object.getOwnPropertyDescriptor(
-        HTMLElement.prototype,
-        "clientWidth"
-      ),
-    }
-    Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
-      configurable: true,
-      get: () => 800,
-    })
-    Object.defineProperty(HTMLElement.prototype, "clientWidth", {
-      configurable: true,
-      get: () => 390,
-    })
-    try {
+    await withOverflow(async () => {
       const { container } = render(<TabsNavStory />)
       const scroller = container.querySelector("[data-slot=tabs-scroller]")
       await waitFor(() => {
         expect(scroller).toHaveAttribute("tabindex", "0")
       })
-    } finally {
-      for (const [key, descriptor] of Object.entries(descriptors)) {
-        if (descriptor) {
-          Object.defineProperty(HTMLElement.prototype, key, descriptor)
-        } else {
-          delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
-            key
-          ]
-        }
-      }
-    }
+    })
+  })
+
+  it("stays out of the tab order and ignores mouse drags while the row fits", () => {
+    const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault())
+    render(
+      <TabsNav aria-label="Settings">
+        <BaseTabsNavLink href="#activity" active onClick={onClick}>
+          Activity
+        </BaseTabsNavLink>
+      </TabsNav>
+    )
+    const link = screen.getByRole("link", { name: "Activity" })
+    const scroller = scrollerOf(link) as HTMLElement
+    expect(scroller).not.toHaveAttribute("tabindex")
+    scroller.scrollLeft = 100
+    dragWithMouse(link, 200, 100)
+    expect(scroller.scrollLeft).toBe(100)
+    fireEvent.click(link)
+    expect(onClick).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("TabsNav mouse drag", () => {
+  function renderLinks(onClick: (event: React.MouseEvent) => void) {
+    render(
+      <TabsNav aria-label="Settings">
+        <BaseTabsNavLink href="#activity" active onClick={onClick}>
+          Activity
+        </BaseTabsNavLink>
+        <BaseTabsNavLink href="#preferences" active={false} onClick={onClick}>
+          Preferences
+        </BaseTabsNavLink>
+      </TabsNav>
+    )
+    return screen.getByRole("link", { name: "Preferences" })
+  }
+
+  it("scrolls the row by the drag distance both ways without following the link", async () => {
+    await withOverflow(async () => {
+      const onClick = vi.fn()
+      const link = renderLinks(onClick)
+      const scroller = await overflowingScroller(link)
+      scroller.scrollLeft = 100
+
+      // Right to left: the content follows the pointer, so scrollLeft grows.
+      dragWithMouse(link, 200, 170)
+      expect(scroller.scrollLeft).toBe(130)
+      // The browser fires the click after pointerup; the drag swallows it.
+      expect(fireEvent.click(link)).toBe(false)
+      expect(onClick).not.toHaveBeenCalled()
+
+      // Left to right.
+      dragWithMouse(link, 200, 260)
+      expect(scroller.scrollLeft).toBe(70)
+      expect(fireEvent.click(link)).toBe(false)
+      expect(onClick).not.toHaveBeenCalled()
+    })
+  })
+
+  it("keeps a plain click on a link working", async () => {
+    await withOverflow(async () => {
+      const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault())
+      const link = renderLinks(onClick)
+      const scroller = await overflowingScroller(link)
+      scroller.scrollLeft = 100
+
+      // A press that wobbles less than the threshold is still a click.
+      fireEvent.pointerDown(link, { ...mouse, buttons: 1, clientX: 200 })
+      fireEvent.pointerMove(link, {
+        ...mouse,
+        buttons: 1,
+        clientX: 200 + DRAG_THRESHOLD - 1,
+      })
+      fireEvent.pointerUp(link, { ...mouse, buttons: 0, clientX: 203 })
+      fireEvent.click(link)
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(scroller.scrollLeft).toBe(100)
+
+      // The full browser sequence for a click, with no movement at all.
+      await createUser().click(link)
+      expect(onClick).toHaveBeenCalledTimes(2)
+      expect(scroller.scrollLeft).toBe(100)
+    })
   })
 })
 
@@ -314,6 +429,38 @@ describe("TabsList overflow", () => {
     expect(scroller).toHaveAttribute("data-variant", "default")
     expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
     expectScrollerFitsList(scroller, list)
+  })
+
+  it("takes the same mouse drag as TabsNav and keeps plain clicks", async () => {
+    await withOverflow(async () => {
+      const onClick = vi.fn()
+      render(
+        <Tabs defaultValue="overview">
+          <TabsList aria-label="Order">
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="activity" onClick={onClick}>
+              Activity
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="overview">Overview panel</TabsContent>
+          <TabsContent value="activity">Activity panel</TabsContent>
+        </Tabs>
+      )
+      const tab = screen.getByRole("tab", { name: "Activity" })
+      const scroller = await overflowingScroller(tab)
+      scroller.scrollLeft = 100
+
+      dragWithMouse(tab, 200, 150)
+      expect(scroller.scrollLeft).toBe(150)
+      expect(fireEvent.click(tab)).toBe(false)
+      expect(onClick).not.toHaveBeenCalled()
+
+      // Radix selects on press, so a plain click still switches the tab.
+      await createUser().click(tab)
+      expect(tab).toHaveAttribute("aria-selected", "true")
+      expect(onClick).toHaveBeenCalledTimes(1)
+      expect(scroller.scrollLeft).toBe(150)
+    })
   })
 
   it("gives the line variant extra bottom padding for the underline", () => {
