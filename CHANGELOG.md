@@ -2,8 +2,27 @@
 
 ## Unreleased
 
-Internal only, plus one deprecation; the public API is unchanged. Rendered
-classes are unchanged except where noted.
+## 1.2.0 - 2026-10-20
+
+Visual fixes for the layouts KairOS reported on production, plus the
+internal style-sharing work already on main. No public props change;
+apps only need to bump the package.
+
+- `KanbanBoard` columns grow to fill the board (`flex-1 basis-72
+min-w-72`) instead of staying a fixed 18rem. Boards with a few
+  columns fill the row; boards with many (KairOS Leads ~10 stages)
+  still scroll horizontally. `columnClassName` still overrides the
+  default size.
+- `TabsNav` and `TabsList` default row height matches `Button`
+  `size="sm"`: the scroller is `h-9` (36px) with `p-1` around an
+  `h-7` list, so the muted track no longer sits 16px taller than a
+  small button. The list-plus-padding rule is unchanged, so the
+  focus ring stays inside the box and no vertical scrollbar appears.
+  The line variant is `h-10` for its underline. A list `className`
+  height still replaces the default.
+
+Internal only, plus one deprecation; the public API is unchanged.
+Rendered classes are unchanged except where noted above.
 
 - Deprecated: `selectedToggleChrome` from `toggle`; `toggleVariants()`
   already includes this chrome. It stays exported until 2.0.

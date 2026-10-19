@@ -22,8 +22,8 @@ const tabsListVariants = cva(
         line: "gap-1 bg-transparent",
       },
       orientation: {
-        auto: 'group-data-[orientation="horizontal"]/tabs:h-11 group-data-[orientation="vertical"]/tabs:h-fit group-data-[orientation="vertical"]/tabs:flex-col',
-        horizontal: "h-11",
+        auto: 'group-data-[orientation="horizontal"]/tabs:h-7 group-data-[orientation="vertical"]/tabs:h-fit group-data-[orientation="vertical"]/tabs:flex-col',
+        horizontal: "h-7",
         vertical: "h-fit flex-col",
       },
     },
@@ -36,13 +36,14 @@ const tabsListVariants = cva(
 
 /**
  * Horizontal scroller around a tab row. `p-1` leaves room for the active
- * border and focus ring; the height is the `h-11` list plus that padding
- * (`h-13` = 44px + 8px) so the list fits the content box. Putting padding
- * on an overflow box without this height makes `scrollHeight` 4px taller
- * than `clientHeight` (48 vs 44) and a vertical scrollbar appears if
- * `overflow-y` is not hidden. Line variant adds `pb-2` for the underline
- * (`h-14` = 44px + 4px + 8px). A block, so it fills its parent without
- * `w-full`. `theme.css` hides the scrollbar and draws the edge fades.
+ * border and focus ring; the height is the `h-7` list plus that padding
+ * (`h-9` = 28px + 8px) so the list fits the content box and the outer
+ * row matches `Button` `size="sm"`. Putting padding on an overflow box
+ * without this height makes `scrollHeight` taller than `clientHeight`
+ * and a vertical scrollbar appears if `overflow-y` is not hidden. Line
+ * variant adds `pb-2` for the underline (`h-10` = 28px + 4px + 8px). A
+ * block, so it fills its parent without `w-full`. `theme.css` hides the
+ * scrollbar and draws the edge fades.
  */
 const tabsScrollerVariants = cva(
   "relative box-border min-w-0 max-w-full overflow-x-auto overflow-y-hidden overscroll-x-contain p-1",
@@ -58,8 +59,8 @@ const tabsScrollerVariants = cva(
       },
     },
     compoundVariants: [
-      { variant: "default", orientation: "horizontal", className: "h-13" },
-      { variant: "line", orientation: "horizontal", className: "h-14" },
+      { variant: "default", orientation: "horizontal", className: "h-9" },
+      { variant: "line", orientation: "horizontal", className: "h-10" },
     ],
     defaultVariants: {
       variant: "default",

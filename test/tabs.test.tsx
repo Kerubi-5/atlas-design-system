@@ -113,7 +113,8 @@ function expectHorizontalOnlyScroller(element: Element | null) {
 
 /**
  * `p-1` (0.5rem) sits on the overflow scroller. The used height must include
- * that padding (`h-13` = `h-11` + `p-1`×2) so the list fits the content box.
+ * that padding (`h-9` = `h-7` + `p-1`×2) so the list fits the content box
+ * and the outer row matches `Button` `size="sm"`.
  * jsdom has no layout, so this is a computed-size check; Playwright asserts
  * `scrollHeight === clientHeight` with `overflow-y` forced off `hidden`.
  */
@@ -126,10 +127,10 @@ function expectScrollerFitsList(
   expect(scrollerClasses).toContain("p-1")
   expect(scrollerClasses).toContain("box-border")
   // Plain classes chosen from the orientation, so a consumer `className`
-  // such as `h-9` replaces them (a `group-data-[...]:h-11` variant would win).
-  expect(listClasses).toContain("h-11")
+  // such as `h-9` replaces them (a `group-data-[...]:h-7` variant would win).
+  expect(listClasses).toContain("h-7")
   const line = scrollerClasses.includes("pb-2")
-  expect(scrollerClasses).toContain(line ? "h-14" : "h-13")
+  expect(scrollerClasses).toContain(line ? "h-10" : "h-9")
   if (scroller instanceof HTMLElement) {
     const previous = scroller.style.overflowY
     scroller.style.overflowY = "auto"

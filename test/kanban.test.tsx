@@ -59,6 +59,8 @@ describe("KanbanBoard", () => {
     const rendered = document.querySelectorAll('[data-slot="kanban-column"]')
     expect(rendered).toHaveLength(3)
     const [todo, doing, done] = [...rendered] as HTMLElement[]
+    expect(todo).toHaveClass("flex-1", "basis-72", "min-w-72")
+    expect(todo).not.toHaveClass("w-72", "shrink-0")
     expect(within(todo!).getByText("To do")).toBeInTheDocument()
     expect(within(todo!).getByText("2")).toBeInTheDocument()
     expect(within(todo!).getByText("Write spec")).toBeInTheDocument()
@@ -200,7 +202,7 @@ describe("KanbanBoard", () => {
     expect(scroller).not.toHaveClass("gap-4")
     const column = document.querySelector('[data-slot="kanban-column"]')
     expect(column).toHaveClass("w-40", "min-w-40")
-    expect(column).not.toHaveClass("w-72")
+    expect(column).not.toHaveClass("min-w-72")
     const card = document.querySelector('[data-slot="kanban-card"]')
     expect(card).toHaveClass("shadow-none")
     expect(card).not.toHaveClass("shadow-sm")
