@@ -1,5 +1,27 @@
 # Changelog
 
+## Unreleased
+
+Internal only, plus one deprecation; the public API is unchanged. Rendered
+classes are unchanged except where noted.
+
+- Deprecated: `selectedToggleChrome` from `toggle`; `toggleVariants()`
+  already includes this chrome. It stays exported until 2.0.
+- The inline icon rule (no pointer events, no shrinking, 14px unless the
+  icon sets a size) now has one home, `inlineIcon` in the internal styles
+  module; Button, Toggle, the tab triggers, Select and DropdownMenu compose
+  it. Select's scroll buttons gain its two inert classes
+  (`[&_svg]:pointer-events-none [&_svg]:shrink-0`) next to the icon size
+  they already set.
+- Control label text (Button, Toggle, Badge), the brand text hover and
+  focus (BreadcrumbLink, AccordionTrigger, InfoTip) and the listbox scroll
+  frame (Combobox, SearchPicker) each have one home there too, and
+  `test/dry.test.ts` fails when a component retypes any of them.
+- `InfoTip` reads the hover-capable media query through the kit's
+  `useMediaQuery` hook instead of its own `matchMedia` call.
+- `foldSearchText` lives in the internal search module beside the helpers
+  that use it; `search-picker` still re-exports it.
+
 ## 1.1.0 - 2026-10-20
 
 Additions apps were working around, with no change to existing types.

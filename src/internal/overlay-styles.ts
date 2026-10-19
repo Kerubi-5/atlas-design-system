@@ -32,10 +32,6 @@ export const overlayFadeZoom = `${overlayFade} data-open:zoom-in-95 data-closed:
 export const optionRow =
   "relative flex w-full cursor-default items-center gap-2.5 rounded-none py-2 pl-3 text-left text-sm outline-hidden select-none"
 
-/** Icons in a row: no pointer events, no shrinking, 14px unless sized. */
-export const optionIcon =
-  "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5"
-
 /** Group label in a menu or listbox (DropdownMenuLabel, SelectLabel). */
 export const menuLabel =
   "px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase"

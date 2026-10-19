@@ -95,11 +95,3 @@ export function handleListboxKey(
   }
   return false
 }
-
-/**
- * Case-fold and strip combining marks so "nino" matches "Niño". Shared by
- * Combobox and SearchPicker (which re-exports it).
- */
-export function foldSearchText(value: string) {
-  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
-}

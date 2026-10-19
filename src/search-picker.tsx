@@ -5,7 +5,6 @@ import * as React from "react"
 import { Input } from "./input.js"
 import { Label } from "./label.js"
 import {
-  foldSearchText,
   handleListboxKey,
   listboxOptionId,
 } from "./internal/listbox-navigation.js"
@@ -13,9 +12,10 @@ import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
 import {
   createSearchIndex,
   filterSearchIndex,
-  matchesSearchLabel,
+  foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
+import { listboxScroll } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export { foldSearchText }
@@ -30,7 +30,7 @@ export function defaultSearchFilter<T>(
 ) {
   const needle = normalizeSearchQuery(query)
   if (!needle) return true
-  return matchesSearchLabel(foldSearchText(getLabel(item)), needle)
+  return foldSearchText(getLabel(item)).includes(needle)
 }
 
 export type SearchPickerProps<T> = {
@@ -191,9 +191,7 @@ function SearchPicker<T>({
         role="listbox"
         aria-label={listLabel ?? label}
         className={
-          empty
-            ? "sr-only"
-            : cn("max-h-60 overflow-y-auto", listFrame, listClassName)
+          empty ? "sr-only" : cn(listboxScroll, listFrame, listClassName)
         }
       >
         {rows.map(({ item, value: itemValue }, index) => (

@@ -5,6 +5,12 @@ import * as React from "react"
 /** Tailwind `md` breakpoint. Used for range calendars that stack on small screens. */
 export const MD_MEDIA_QUERY = "(min-width: 768px)"
 
+/**
+ * A pointer that can hover (a mouse or trackpad). Touch and coarse pointers
+ * must use click; a hover-open popover would trap them after the first tap.
+ */
+export const HOVER_MEDIA_QUERY = "(hover: hover) and (pointer: fine)"
+
 function hasMatchMedia() {
   return (
     typeof window !== "undefined" && typeof window.matchMedia === "function"

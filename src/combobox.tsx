@@ -7,7 +7,6 @@ import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
 import {
-  foldSearchText,
   handleListboxKey,
   listboxOptionId,
 } from "./internal/listbox-navigation.js"
@@ -15,8 +14,10 @@ import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
 import {
   createSearchIndex,
   filterSearchIndex,
+  foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
+import { listboxScroll } from "./internal/styles.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import type { SearchPickerProps } from "./search-picker.js"
 import { cn, onInputChange } from "./utils.js"
@@ -314,9 +315,7 @@ export function Combobox({
             ariaLabelledBy ?? (ariaLabel ? undefined : triggerId)
           }
           className={
-            empty
-              ? "sr-only"
-              : cn("max-h-60 overflow-y-auto p-1", listClassName)
+            empty ? "sr-only" : cn(listboxScroll, "p-1", listClassName)
           }
         >
           {list.map((option, index) => {

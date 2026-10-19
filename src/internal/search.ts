@@ -1,12 +1,14 @@
-import { foldSearchText } from "./listbox-navigation.js"
+/**
+ * Case-fold and strip combining marks so "nino" matches "Niño". Shared by
+ * Combobox and SearchPicker (which re-exports it).
+ */
+export function foldSearchText(value: string) {
+  return value.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase()
+}
 
 /** Fold the query once; item labels are folded when their catalog changes. */
 export function normalizeSearchQuery(query: string) {
   return foldSearchText(query.trim())
-}
-
-export function matchesSearchLabel(label: string, needle: string) {
-  return label.includes(needle)
 }
 
 export function createSearchIndex<T>(
@@ -21,6 +23,6 @@ export function filterSearchIndex<T>(
   needle: string
 ) {
   return index
-    .filter(({ label }) => matchesSearchLabel(label, needle))
+    .filter(({ label }) => label.includes(needle))
     .map(({ item }) => item)
 }

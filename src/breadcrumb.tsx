@@ -3,7 +3,7 @@ import { Slot } from "radix-ui"
 import { ChevronRightIcon, MoreHorizontalIcon } from "lucide-react"
 
 import type { AsChildProps } from "./internal/as-child.js"
-import { focusRing } from "./internal/styles.js"
+import { focusRing, quietTextHover } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -48,11 +48,7 @@ function BreadcrumbLink({
   return (
     <Comp
       data-slot="breadcrumb-link"
-      className={cn(
-        focusRing,
-        "transition-colors hover:text-selected-foreground focus-visible:text-selected-foreground",
-        className
-      )}
+      className={cn(focusRing, "transition-colors", quietTextHover, className)}
       {...props}
     />
   )

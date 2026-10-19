@@ -8,12 +8,12 @@ import {
   disabledState,
   fieldSurface,
   focusRing,
+  inlineIcon,
   invalidState,
   optionState,
 } from "./internal/styles.js"
 import {
   menuLabel,
-  optionIcon,
   optionRow,
   overlayFadeZoom,
   overlaySideSlide,
@@ -28,8 +28,10 @@ import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
  */
 const triggerHeight = { default: "h-10", sm: "h-9" } as const
 
-const scrollButtonClassName =
-  "z-10 flex cursor-default items-center justify-center bg-popover py-1 [&_svg:not([class*='size-'])]:size-3.5"
+const scrollButtonClassName = cn(
+  "z-10 flex cursor-default items-center justify-center bg-popover py-1",
+  inlineIcon.default
+)
 
 function Select({
   ...props
@@ -74,7 +76,7 @@ function SelectTrigger({
         focusRing,
         invalidState,
         disabledState,
-        optionIcon,
+        inlineIcon.default,
         triggerHeight[size],
         "flex items-center justify-between gap-1.5 whitespace-nowrap data-placeholder:text-muted-foreground *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5",
         className
@@ -158,7 +160,7 @@ function SelectItem({
         optionState.focus,
         optionState.checked,
         dataDisabledState,
-        optionIcon,
+        inlineIcon.default,
         "pr-8 not-data-[variant=destructive]:focus:**:text-accent-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}

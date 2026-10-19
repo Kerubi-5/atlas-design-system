@@ -6,13 +6,16 @@ import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 import {
   menuLabel,
-  optionIcon,
   optionRow,
   overlayFadeZoom,
   overlaySideSlide,
   overlaySurface,
 } from "./internal/overlay-styles.js"
-import { dataDisabledState, optionState } from "./internal/styles.js"
+import {
+  dataDisabledState,
+  inlineIcon,
+  optionState,
+} from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /** Menu row: the shared option row with menu padding and the inset slot. */
@@ -20,7 +23,7 @@ const menuItemClassName = cn(
   optionRow,
   optionState.focus,
   dataDisabledState,
-  optionIcon,
+  inlineIcon.default,
   "pr-3 data-inset:pl-9"
 )
 
