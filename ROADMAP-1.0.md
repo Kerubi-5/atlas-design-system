@@ -1,12 +1,7 @@
 # Road to 1.0
 
-Handoff for whoever (person or AI agent) takes atlas-react-kit from 0.x to
-1.0. Read the [contribution guide](./CONTRIBUTING.md), [design rules](./DESIGN_RULES.md),
-and [component guide](./COMPONENTS.md). Do not bump to 1.0.0 until every box
-below is checked.
-
-The 0.x release line is current. See the [changelog](./CHANGELOG.md) for
-release history.
+Closed: 1.0.0 shipped on 2026-10-18. Kept as the record of the decisions
+behind it.
 
 ## Exit criteria for 1.0
 
