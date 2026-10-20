@@ -2,8 +2,17 @@
 
 ## Unreleased
 
-Small visual changes from giving repeated styles one home. No public props
-change.
+## 1.2.1 - 2026-10-21
+
+Small visual fixes. No public props change; apps only need to bump the
+package.
+
+- `InlineTip` (and `InfoTip` with `layout="inline"`) scales with the
+  sentence: the glyph is 1em (14px at `text-sm`, was a fixed 20px), sits a
+  quarter em after the word, and is centred on the text's cap height. It no
+  longer grows the line by about a pixel. The `box` layout is unchanged.
+
+From giving repeated styles one home:
 
 - The focus ring on the calendar's month and year dropdowns, the
   `KanbanBoard` card and `SkipLink` now has the kit's 2px gap, like every

@@ -70,6 +70,23 @@ for (const width of WIDTHS) {
           const inline = page
             .locator("[data-slot=info-tip-trigger][data-layout=inline]")
             .first()
+          // The glyph scales with the sentence and leaves its line height.
+          const fit = await inline.evaluate((element) => {
+            const line = element.closest("p")!
+            const style = getComputedStyle(line)
+            return {
+              glyph: element.getBoundingClientRect().height,
+              fontSize: parseFloat(style.fontSize),
+              line: line.getBoundingClientRect().height,
+              lineHeight: parseFloat(style.lineHeight),
+            }
+          })
+          expect(fit.glyph, "inline tip glyph").toBeLessThanOrEqual(
+            fit.fontSize
+          )
+          // A whole number of lines: the sentence may wrap at 390px.
+          const lines = fit.line / fit.lineHeight
+          expect(lines, "inline tip line height").toBe(Math.round(lines))
           const box = await inline.boundingBox()
           expect(box).not.toBeNull()
           await page.mouse.click(box!.x - 8, box!.y + box!.height / 2)
