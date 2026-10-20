@@ -1,4 +1,11 @@
-import type { ComponentProps, ReactNode } from "react"
+"use client"
+
+import {
+  type ComponentProps,
+  type ComponentType,
+  type ReactNode,
+  useId,
+} from "react"
 import { Slot } from "radix-ui"
 
 import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
@@ -34,6 +41,19 @@ export function metaErrorText(
   if (!meta || !showError) return undefined
   if (meta.isTouched === false && !submitted) return undefined
   return getFieldErrorMessage(meta.errors[0])
+}
+
+/**
+ * The error text a `form/*` field shows (`metaErrorText`) and its control
+ * id: `id` when passed, else a generated one.
+ */
+export function useFormField(
+  meta: FieldMetaState | undefined,
+  timing: ErrorTimingProps,
+  id?: string
+) {
+  const generatedId = useId()
+  return { id: id ?? generatedId, errorText: metaErrorText(meta, timing) }
 }
 
 /** Id of the label `FormFieldShell` renders for control `id`. */
@@ -126,6 +146,65 @@ export type PickerFieldBaseProps = FormFieldBaseProps &
     /** Day Picker options forwarded to the calendar (disabled days, etc.). */
     calendarProps?: DatePickerCalendarProps
   }
+
+/** The props a date or date-time field keeps for its shell, not the picker. */
+type PickerFieldOwnKey =
+  | "id"
+  | "label"
+  | "meta"
+  | "submitted"
+  | "showError"
+  | "required"
+  | "fieldClassName"
+
+/**
+ * The date and date-time fields: `picker` (the trigger) in a
+ * `FormFieldShell`, given every prop of `field` the shell does not take. A
+ * button cannot carry `required`, so the trigger is described by the hidden
+ * "Required" text and reads "label, value".
+ */
+export function FormPickerField<P extends PickerFieldBaseProps>({
+  field,
+  picker: Picker,
+}: {
+  /** The field's props. */
+  field: P
+  /** The picker trigger. */
+  picker: ComponentType<
+    Omit<P, PickerFieldOwnKey> & { id: string } & ReturnType<typeof fieldAria>
+  >
+}) {
+  const {
+    id: idProp,
+    label,
+    meta,
+    submitted,
+    showError,
+    required,
+    fieldClassName,
+    ...pickerProps
+  } = field
+  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
+
+  return (
+    <FormFieldShell
+      id={id}
+      label={label}
+      errorText={errorText}
+      required={required}
+      className={fieldClassName}
+    >
+      <Picker
+        {...pickerProps}
+        id={id}
+        {...fieldAria(id, errorText, {
+          required: required && "described",
+          labelledBy: "label-value",
+        })}
+      />
+    </FormFieldShell>
+  )
+}
 
 /**
  * Every `form/*` field's wrapper (`data-slot="form-field"`): children with

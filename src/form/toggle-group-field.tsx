@@ -1,6 +1,6 @@
 "use client"
 
-import { type ReactNode, useId } from "react"
+import type { ReactNode } from "react"
 
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 
@@ -9,7 +9,7 @@ import type {
   FormFieldDescriptionProps,
   FormFieldMetaProps,
 } from "./field-error.js"
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 export type ToggleGroupFieldOption<T extends string> = {
   /** Value passed to `onValueChange` when this item is pressed. */
@@ -56,8 +56,7 @@ export function FormToggleGroupField<T extends string>({
   className,
   fieldClassName,
 }: Props<T>) {
-  const id = useId()
-  const errorText = metaErrorText(meta, { submitted, showError })
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   function handleValueChange(next: string) {
     const option = options.find((o) => o.value === next)

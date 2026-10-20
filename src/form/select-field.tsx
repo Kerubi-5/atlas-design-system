@@ -1,11 +1,11 @@
 "use client"
 
-import { type ReactNode, useId } from "react"
+import type { ReactNode } from "react"
 
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
 import type { FormFieldBaseProps, FormFieldMetaProps } from "./field-error.js"
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps & {
@@ -47,9 +47,7 @@ export function FormSelectField({
   contentClassName,
   children,
 }: Props) {
-  const errorText = metaErrorText(meta, { submitted, showError })
-  const generatedId = useId()
-  const id = idProp ?? generatedId
+  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
 
   return (
     <FormFieldShell

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+Internal only; the public API and rendered HTML are unchanged.
+
+- Every `form/*` field takes its control id and error text from one
+  internal hook, and `FormDatePickerField` and `FormDateTimePickerField`
+  share one picker field body instead of two copies.
+
 ## 1.2.1 - 2026-10-21
 
 Small visual fixes. No public props change; apps only need to bump the

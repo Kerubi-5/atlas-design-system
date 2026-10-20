@@ -1,6 +1,6 @@
 "use client"
 
-import { type ComponentProps, useId } from "react"
+import type { ComponentProps } from "react"
 
 import { Combobox } from "../combobox.js"
 
@@ -9,7 +9,7 @@ import type {
   FormFieldDescriptionProps,
   FormFieldMetaProps,
 } from "./field-error.js"
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps &
@@ -36,8 +36,7 @@ export function FormComboboxField({
   fieldClassName,
   ...props
 }: Props) {
-  const id = useId()
-  const errorText = metaErrorText(meta, { submitted, showError })
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   return (
     <FormFieldShell
