@@ -1,6 +1,6 @@
 # Git hooks for every contributor, people and AI agents alike. `npm ci`
-# installs them (the `prepare` script). CONTRIBUTING.md says what each one
-# checks and how a person can skip them in an emergency.
+# installs them (the `prepare` script). CONTRIBUTING.md says where each
+# tool's rules live and how a person can skip the hooks in an emergency.
 pre-commit:
   parallel: true
   jobs:
@@ -9,7 +9,7 @@ pre-commit:
       run: npx prettier --check {staged_files}
     - name: lint
       glob: "*.{js,mjs,ts,tsx}"
-      run: npx oxlint --type-aware --deny-warnings {staged_files}
+      run: npm run lint -- {staged_files}
     - name: secrets
       run: npx secretlint {staged_files}
 

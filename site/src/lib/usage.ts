@@ -1,23 +1,20 @@
+import components from "../../../COMPONENTS.md?raw"
+
 /**
- * Beta components (see COMPONENTS.md "Status"), keyed like `usage`. The build
- * test keeps this list and COMPONENTS.md in sync.
+ * Beta components, read from the **Beta** paragraph under COMPONENTS.md
+ * "Status" and keyed like `usage` (`dropdown-menu` → `Dropdown menu`).
  */
-export const beta = new Set([
-  "Accordion",
-  "Avatar",
-  "Breadcrumb",
-  "Chart",
-  "Dropdown menu",
-  "Kanban",
-  "Nav link",
-  "Page header",
-  "Pagination",
-  "Period stepper",
-  "Radio group",
-  "Skip link",
-  "Spinner",
-  "Switch",
-])
+const betaParagraph =
+  /\*\*Beta\*\*[\s\S]*?:([\s\S]*?)\n\n/.exec(components)?.[1] ?? ""
+export const beta = new Set(
+  [...betaParagraph.matchAll(/`([a-z-]+)`/g)].map(([, subpath = ""]) => {
+    const name = subpath.replaceAll("-", " ")
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  })
+)
+if (beta.size === 0) {
+  throw new Error('COMPONENTS.md "Status" has no **Beta** list to read')
+}
 
 /**
  * "When to use" guidance shown on each component's docs page, keyed by the
@@ -252,9 +249,7 @@ export const usage: Record<string, string> = {
 
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
-**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.
-
-**Look** A plain \`toast("Saved")\` has no icon. \`success\`, \`info\`, \`warning\`, \`error\`, and \`loading\` add a status icon. Tone colors the icon, title, and border, not the body. The close control is a circular badge on the top-right corner. Left padding matches Alert (\`pl-4\`); the right is \`pr-6\` so copy clears the badge.`,
+**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.`,
   "Stat tile": `
 **Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
 

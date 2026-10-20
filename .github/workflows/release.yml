@@ -16,28 +16,24 @@ name: Release
 # Leave Environment name empty unless this job sets `environment:`.
 # After that, bumping the version in package.json and merging to main
 # publishes it automatically. workflow_dispatch re-runs without a new tag.
-# Docs site (`site/`, `vercel.json`, `stories/`, tests, README) is omitted
-# from this path filter so a docs-only merge does not run publish.
+# Only a package.json change can bump the version, so other merges skip it.
 on:
   push:
     branches: [main]
-    paths:
-      - "src/**"
-      - "package.json"
-      - "package-lock.json"
-      - "theme.css"
-      - "DESIGN_RULES.md"
-      - "COMPONENTS.md"
-      - "NOTICE"
-      - "skills/**"
-      - "tsconfig.json"
+    paths: ["package.json"]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
+  # A regression must never reach npm: the Check workflow, the same one pull
+  # requests run, has to pass on this commit first.
+  check:
+    uses: ./.github/workflows/check.yml
+
   publish:
+    needs: check
     runs-on: ubuntu-latest
     permissions:
       contents: write # push the vX.Y.Z tag and GitHub Release
@@ -54,18 +50,9 @@ jobs:
       - name: Upgrade npm
         run: npm install -g npm@^11
 
+      # `npm publish` builds `dist/` through the prepack script.
       - name: Install
         run: npm ci
-
-      # A regression must never reach npm — quality gates the publish.
-      - name: Check
-        run: npm run check
-
-      - name: Test
-        run: npm test
-
-      - name: Pack dry-run
-        run: npm pack --dry-run
 
       - name: Skip if this version is already published
         id: check
