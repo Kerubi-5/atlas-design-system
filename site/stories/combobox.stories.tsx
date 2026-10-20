@@ -4,13 +4,10 @@ import { useArgs } from "storybook/preview-api"
 import { fn } from "storybook/test"
 import { Combobox } from "../../src/combobox.js"
 import { Label } from "../../src/label.js"
-import { formControlOptions } from "../../stories/form-control-triggers.js"
-
-/** App-side ISO 4217-style check. The kit does not own currency catalogs. */
-function iso4217Code(query: string) {
-  const code = query.trim().toUpperCase()
-  return /^[A-Z]{3}$/.test(code) ? code : null
-}
+import {
+  formControlOptions,
+  iso4217Code,
+} from "../../stories/form-control-triggers.js"
 
 const meta = {
   title: "Forms/Combobox",

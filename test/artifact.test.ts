@@ -16,9 +16,15 @@ const components = Object.entries(manifest.exports)
 
 /**
  * Modules under `src/` that are not public entries: pieces the public
- * modules share, like `internal/`, but kept beside their owners.
+ * modules share, like `internal/`, but kept beside their owners. knip.json
+ * lists them as `!src/…` exclusions from its entry files.
  */
-const INTERNAL = new Set(["lazy-calendar", "picker-shell", "form/field-shell"])
+const knip = JSON.parse(await readFile(resolve(root, "knip.json"), "utf8"))
+const INTERNAL = new Set(
+  (knip.workspaces["."].entry as string[])
+    .filter((pattern) => pattern.startsWith("!src/"))
+    .map((pattern) => pattern.slice("!src/".length).replace(/\.tsx?$/, ""))
+)
 
 /** Public module name → its source file, for every module `src/` holds. */
 async function sourceFiles() {

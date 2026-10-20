@@ -1,6 +1,10 @@
+import type * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Badge } from "../../src/badge.js"
 import { BadgeVariantsStory } from "../../stories/badge.js"
+import { controlOptions } from "../src/lib/controls.js"
+
+type Props = React.ComponentProps<typeof Badge>
 
 const meta = {
   title: "Data display/Badge",
@@ -10,19 +14,24 @@ const meta = {
     children: { control: "text" },
     variant: {
       control: "select",
-      options: [
-        "default",
-        "secondary",
-        "destructive",
-        "outline",
-        "ghost",
-        "link",
-        "soft",
-      ],
+      options: controlOptions<NonNullable<Props["variant"]>>({
+        default: true,
+        secondary: true,
+        destructive: true,
+        outline: true,
+        ghost: true,
+        link: true,
+        soft: true,
+      }),
     },
     tone: {
       control: "select",
-      options: ["neutral", "success", "warning", "destructive"],
+      options: controlOptions<NonNullable<Props["tone"]>>({
+        neutral: true,
+        success: true,
+        warning: true,
+        destructive: true,
+      }),
     },
     asChild: { table: { disable: true } },
   },

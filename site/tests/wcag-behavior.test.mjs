@@ -6,9 +6,15 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { openStory, storyIndex, withSite } from "./browser.mjs"
+import {
+  DESKTOP,
+  THEMES,
+  inBatches,
+  openStory,
+  storyIndex,
+  withSite,
+} from "./browser.mjs"
 
-const CONCURRENCY = 4
 const MAX_TABS = 40
 const TEXT_SPACING =
   "* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }"
@@ -91,12 +97,12 @@ async function focusProblems(page, label, { forced, ringOnParent }) {
 async function auditStory(browser, baseUrl, entry) {
   const context = await browser.newContext({
     reducedMotion: "reduce",
-    viewport: { width: 1280, height: 900 },
+    viewport: DESKTOP,
   })
   const page = await context.newPage()
   const problems = []
   try {
-    for (const theme of ["light", "dark"]) {
+    for (const theme of THEMES) {
       await openStory(page, baseUrl, entry.id, theme)
       problems.push(
         ...(await focusProblems(page, `${entry.id} [${theme}]`, {
@@ -141,7 +147,7 @@ async function auditStory(browser, baseUrl, entry) {
     if (reflow !== null)
       problems.push(`${entry.id}: scrolls sideways at 320px (${reflow})`)
 
-    await page.setViewportSize({ width: 1280, height: 900 })
+    await page.setViewportSize(DESKTOP)
     await openStory(page, baseUrl, entry.id)
     const clipped = (describeSource) => {
       const describe = new Function(`return ${describeSource}`)()
@@ -188,18 +194,9 @@ test("every story keeps focus visible, reflows at 320px, and survives text spaci
     (entry) => entry.type === "story"
   )
   assert.ok(stories.length > 0, "index.json lists stories")
-  const problems = await withSite(async ({ browser, baseUrl }) => {
-    const found = []
-    for (let i = 0; i < stories.length; i += CONCURRENCY) {
-      const batch = await Promise.all(
-        stories
-          .slice(i, i + CONCURRENCY)
-          .map((entry) => auditStory(browser, baseUrl, entry))
-      )
-      found.push(...batch.flat())
-    }
-    return found
-  })
+  const problems = await withSite(({ browser, baseUrl }) =>
+    inBatches(stories.map((entry) => () => auditStory(browser, baseUrl, entry)))
+  )
   assert.deepEqual(
     problems,
     [],

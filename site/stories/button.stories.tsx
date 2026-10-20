@@ -1,3 +1,4 @@
+import type * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { fn } from "storybook/test"
 
@@ -7,6 +8,9 @@ import {
   OutlineOnSelectedStory,
   QuietButtonHoverStory,
 } from "../../stories/button-hover.js"
+import { controlOptions } from "../src/lib/controls.js"
+
+type Props = React.ComponentProps<typeof Button>
 
 const meta = {
   title: "Actions/Button",
@@ -22,27 +26,27 @@ const meta = {
     children: { control: "text" },
     variant: {
       control: "select",
-      options: [
-        "default",
-        "outline",
-        "secondary",
-        "ghost",
-        "destructive",
-        "link",
-      ],
+      options: controlOptions<NonNullable<Props["variant"]>>({
+        default: true,
+        outline: true,
+        secondary: true,
+        ghost: true,
+        destructive: true,
+        link: true,
+      }),
     },
     size: {
       control: "select",
-      options: [
-        "default",
-        "xs",
-        "sm",
-        "lg",
-        "icon",
-        "icon-xs",
-        "icon-sm",
-        "icon-lg",
-      ],
+      options: controlOptions<NonNullable<Props["size"]>>({
+        default: true,
+        xs: true,
+        sm: true,
+        lg: true,
+        icon: true,
+        "icon-xs": true,
+        "icon-sm": true,
+        "icon-lg": true,
+      }),
     },
     disabled: { control: "boolean" },
     asChild: { table: { disable: true } },

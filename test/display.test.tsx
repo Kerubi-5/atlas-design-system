@@ -8,19 +8,9 @@ import {
   CardHeader,
   CardTitle,
 } from "../src/card.js"
-import { EmptyPanel } from "../src/empty-panel.js"
 import { FieldLabel } from "../src/field.js"
 import { Input } from "../src/input.js"
 import { Label } from "../src/label.js"
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../src/table.js"
 
 import {
   CardContentPx0Story,
@@ -222,59 +212,5 @@ describe("Card", () => {
     expect(
       screen.getByRole("heading", { level: 2, name: "Spending" })
     ).toBeInTheDocument()
-  })
-})
-
-describe("Table", () => {
-  it("exposes native table roles", () => {
-    render(
-      <Table>
-        <TableCaption>People</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Name</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow data-state="selected">
-            <TableCell>Ada</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    )
-
-    expect(screen.getByRole("table", { name: "People" })).toHaveAttribute(
-      "data-slot",
-      "table"
-    )
-    expect(
-      screen.getByRole("columnheader", { name: "Name" })
-    ).toBeInTheDocument()
-    expect(screen.getByRole("cell", { name: "Ada" })).toBeInTheDocument()
-    expect(screen.getByRole("row", { name: "Ada" })).toHaveAttribute(
-      "data-state",
-      "selected"
-    )
-  })
-})
-
-describe("EmptyPanel", () => {
-  it("renders empty copy with size and muted styles", () => {
-    const { rerender } = render(<EmptyPanel>No rows yet.</EmptyPanel>)
-    const panel = screen.getByText("No rows yet.")
-    expect(panel.className).toMatch(/border-dashed/)
-    expect(panel.className).toMatch(/bg-muted\/30/)
-    expect(panel.className).toMatch(/py-6/)
-
-    rerender(
-      <EmptyPanel size="sm" muted={false}>
-        Compact
-      </EmptyPanel>
-    )
-    expect(screen.getByText("Compact").className).toMatch(/py-4/)
-    expect(screen.getByText("Compact").className).not.toMatch(/bg-muted\/30/)
-
-    rerender(<EmptyPanel size="lg">Wide</EmptyPanel>)
-    expect(screen.getByText("Wide").className).toMatch(/py-8/)
   })
 })

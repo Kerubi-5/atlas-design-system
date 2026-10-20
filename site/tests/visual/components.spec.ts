@@ -1,7 +1,17 @@
 import { expect, test, type Page } from "@playwright/test"
 
-import { openStory, storyIndex, storyRoot } from "../browser.mjs"
+import {
+  DESKTOP,
+  PHONE,
+  THEMES,
+  openStory,
+  storyIndex,
+  storyRoot,
+} from "../browser.mjs"
 import { OVERLAYS } from "../overlays.mjs"
+
+/** Desktop captures; their baselines were taken 720px tall. */
+const WIDE = { width: DESKTOP.width, height: 720 }
 
 /**
  * Screenshots of every component page, in light and dark, plus a phone-width
@@ -139,21 +149,31 @@ async function capture(page: Page, story: Story, theme: string, name: string) {
   await expect(target).toHaveScreenshot(name)
 }
 
-for (const theme of ["light", "dark"] as const) {
+for (const theme of THEMES) {
   for (const story of stories) {
     test(`${story.id} (${theme})`, async ({ page }) => {
       await capture(page, story, theme, `${story.id}-${theme}.png`)
     })
     if (phoneStories.has(story.id)) {
-      test(`${story.id} (${theme}, 390px)`, async ({ page }) => {
-        await page.setViewportSize({ width: 390, height: 844 })
-        await capture(page, story, theme, `${story.id}-${theme}-390.png`)
+      test(`${story.id} (${theme}, ${PHONE.width}px)`, async ({ page }) => {
+        await page.setViewportSize(PHONE)
+        await capture(
+          page,
+          story,
+          theme,
+          `${story.id}-${theme}-${PHONE.width}.png`
+        )
       })
     }
     if (wideStories.has(story.id)) {
-      test(`${story.id} (${theme}, 1280px)`, async ({ page }) => {
-        await page.setViewportSize({ width: 1280, height: 720 })
-        await capture(page, story, theme, `${story.id}-${theme}-1280.png`)
+      test(`${story.id} (${theme}, ${WIDE.width}px)`, async ({ page }) => {
+        await page.setViewportSize(WIDE)
+        await capture(
+          page,
+          story,
+          theme,
+          `${story.id}-${theme}-${WIDE.width}.png`
+        )
       })
     }
   }
@@ -163,14 +183,11 @@ test("tab scroller content fits the box without a vertical scrollbar", async ({
   page,
 }) => {
   for (const { id, width } of [
-    { id: "navigation-tabs--nav", width: 1280 },
-    { id: "navigation-tabs--nav", width: 390 },
-    { id: "navigation-tabs--overflow", width: 390 },
+    { id: "navigation-tabs--nav", width: WIDE.width },
+    { id: "navigation-tabs--nav", width: PHONE.width },
+    { id: "navigation-tabs--overflow", width: PHONE.width },
   ] as const) {
-    await page.setViewportSize({
-      width,
-      height: width === 390 ? 844 : 720,
-    })
+    await page.setViewportSize(width === PHONE.width ? PHONE : WIDE)
     await openStory(page, "", id)
     const scrollers = storyRoot(page).locator("[data-slot=tabs-scroller]")
     await expect(scrollers.first()).toBeVisible()
@@ -204,14 +221,11 @@ test("tab scroller content fits the box without a vertical scrollbar", async ({
   }
 })
 
-test("settings tabs share one horizontal padding at 1280 and 390", async ({
+test(`settings tabs share one horizontal padding at ${WIDE.width} and ${PHONE.width}`, async ({
   page,
 }) => {
-  for (const width of [1280, 390] as const) {
-    await page.setViewportSize({
-      width,
-      height: width === 390 ? 844 : 720,
-    })
+  for (const width of [WIDE.width, PHONE.width]) {
+    await page.setViewportSize(width === PHONE.width ? PHONE : WIDE)
     await openStory(page, "", "navigation-tabs--nav")
     const links = storyRoot(page).locator("[data-slot=tabs-nav] a")
     await expect(links).toHaveCount(6)

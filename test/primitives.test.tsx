@@ -15,7 +15,6 @@ import { Separator } from "../src/separator.js"
 import { Skeleton } from "../src/skeleton.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../src/tabs.js"
 
 import { createUser, render, screen, within } from "./helpers.js"
 
@@ -48,35 +47,6 @@ describe("Checkbox", () => {
     expect(box).toHaveAttribute("aria-checked", "false")
     expect(box).toBeDisabled()
     expect(box).toHaveAttribute("aria-invalid", "true")
-  })
-})
-
-describe("Tabs", () => {
-  it("moves between tabs with arrow keys and shows the matching panel", async () => {
-    const user = createUser()
-    render(
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Order">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Overview panel</TabsContent>
-        <TabsContent value="activity">Activity panel</TabsContent>
-      </Tabs>
-    )
-    const overview = screen.getByRole("tab", { name: "Overview" })
-    expect(overview).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("tabpanel")).toHaveTextContent("Overview panel")
-    overview.focus()
-    await user.keyboard("{ArrowRight}")
-    const activity = screen.getByRole("tab", { name: "Activity" })
-    expect(activity).toHaveFocus()
-    expect(activity).toHaveAttribute("aria-selected", "true")
-    expect(screen.getByRole("tabpanel")).toHaveTextContent("Activity panel")
-    expect(screen.getByRole("tabpanel")).toHaveAttribute(
-      "aria-labelledby",
-      activity.id
-    )
   })
 })
 

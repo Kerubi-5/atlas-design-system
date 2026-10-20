@@ -1,11 +1,14 @@
+import type * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 import { CircleAlertIcon } from "lucide-react"
 
 import { Alert, AlertDescription, AlertTitle } from "../../src/alert.js"
 import { AlertStory } from "../../stories/feedback.js"
+import { controlOptions } from "../src/lib/controls.js"
 
+type Variant = NonNullable<React.ComponentProps<typeof Alert>["variant"]>
 type Args = {
-  variant: "default" | "success" | "warning" | "destructive"
+  variant: Variant
   title: string
   description: string
   icon: boolean
@@ -22,7 +25,12 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "success", "warning", "destructive"],
+      options: controlOptions<Variant>({
+        default: true,
+        success: true,
+        warning: true,
+        destructive: true,
+      }),
     },
     title: { control: "text" },
     description: { control: "text" },

@@ -2,7 +2,6 @@ import { describe, expect, it, vi } from "vitest"
 
 import { DatePickerButton } from "../src/date-picker.js"
 import { DateTimePickerButton } from "../src/date-time-picker.js"
-import { EmptyPanel } from "../src/empty-panel.js"
 
 import { createUser, render, screen } from "./helpers.js"
 
@@ -39,30 +38,5 @@ describe("onValueChange on the pickers", () => {
     )
     await clickClear(/October 10/)
     expect(onValueChange).toHaveBeenCalledWith(null)
-  })
-
-  it("keeps the deprecated onChange working", async () => {
-    const onChange = vi.fn()
-    render(
-      <DateTimePickerButton
-        value={new Date(2026, 9, 10, 14, 30)}
-        onChange={onChange}
-      />
-    )
-    await clickClear(/October 10/)
-    expect(onChange).toHaveBeenCalledWith(null)
-  })
-})
-
-describe("EmptyPanel size names", () => {
-  it("treats the deprecated md as default", () => {
-    render(
-      <>
-        <EmptyPanel size="default">Default</EmptyPanel>
-        <EmptyPanel size="md">Old</EmptyPanel>
-      </>
-    )
-    expect(screen.getByText("Default").className).toMatch(/py-6/)
-    expect(screen.getByText("Old").className).toMatch(/py-6/)
   })
 })

@@ -20,7 +20,7 @@ import {
   TabsOverflowStory,
 } from "../stories/navigation.js"
 
-import { createUser, render, screen, waitFor } from "./helpers.js"
+import { createUser, render, screen, waitFor, withOverflow } from "./helpers.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
 // in a labelled nav, not a tab widget whose tabs point at panels that don't
@@ -39,45 +39,6 @@ const html = renderToStaticMarkup(
 
 function scrollerOf(element: HTMLElement | null) {
   return element?.closest("[data-slot=tabs-scroller]") ?? null
-}
-
-/**
- * jsdom has no layout, so every element reports an 800px row in a 390px
- * box while `run` executes: the scroller overflows, joins the tab order and
- * takes mouse drags.
- */
-async function withOverflow(run: () => Promise<void>) {
-  const descriptors = {
-    scrollWidth: Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      "scrollWidth"
-    ),
-    clientWidth: Object.getOwnPropertyDescriptor(
-      HTMLElement.prototype,
-      "clientWidth"
-    ),
-  }
-  Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
-    configurable: true,
-    get: () => 800,
-  })
-  Object.defineProperty(HTMLElement.prototype, "clientWidth", {
-    configurable: true,
-    get: () => 390,
-  })
-  try {
-    await run()
-  } finally {
-    for (const [key, descriptor] of Object.entries(descriptors)) {
-      if (descriptor) {
-        Object.defineProperty(HTMLElement.prototype, key, descriptor)
-      } else {
-        delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
-          key
-        ]
-      }
-    }
-  }
 }
 
 const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
@@ -139,6 +100,41 @@ function expectScrollerFitsList(
     scroller.style.overflowY = previous
   }
 }
+
+describe("Tabs", () => {
+  it("moves between tabs with arrow keys and shows the matching panel", async () => {
+    const user = createUser()
+    render(
+      <Tabs defaultValue="overview">
+        <TabsList aria-label="Order">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="activity">Activity</TabsTrigger>
+        </TabsList>
+        <TabsContent value="overview">Overview panel</TabsContent>
+        <TabsContent value="activity">Activity panel</TabsContent>
+      </Tabs>
+    )
+    const overview = screen.getByRole("tab", { name: "Overview" })
+    expect(overview).toHaveAttribute("aria-selected", "true")
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Overview panel")
+    overview.focus()
+    await user.keyboard("{ArrowRight}")
+    const activity = screen.getByRole("tab", { name: "Activity" })
+    expect(activity).toHaveFocus()
+    expect(activity).toHaveAttribute("aria-selected", "true")
+    expect(screen.getByRole("tabpanel")).toHaveTextContent("Activity panel")
+    expect(screen.getByRole("tabpanel")).toHaveAttribute(
+      "aria-labelledby",
+      activity.id
+    )
+  })
+
+  it("marks the active tab with a border (WCAG 1.4.11)", () => {
+    expect(tabsTriggerVariants()).toMatch(
+      /data-\[state="?active"?\]:border-selected-foreground/
+    )
+  })
+})
 
 describe("TabsNav", () => {
   afterEach(() => {

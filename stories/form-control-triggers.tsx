@@ -16,6 +16,15 @@ export const formControlOptions = [
 ]
 
 /**
+ * App-side ISO 4217-style check for Combobox's `normalizeCreateValue`: three
+ * letters, normalized to uppercase. The kit does not own currency catalogs.
+ */
+export const iso4217Code = (query: string) => {
+  const code = query.trim().toUpperCase()
+  return /^[A-Z]{3}$/.test(code) ? code : null
+}
+
+/**
  * Side-by-side Input, SelectTrigger, DatePickerButton, DateTimePickerButton,
  * and Combobox. Used by kit tests and visual captures so form chrome stays
  * aligned.

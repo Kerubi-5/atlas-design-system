@@ -1,3 +1,4 @@
+import type * as React from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import {
@@ -16,7 +17,7 @@ type Args = {
   title: string
   description: string
   body: string
-  size: "default" | "sm"
+  size: React.ComponentProps<typeof Card>["size"]
   flush: boolean
 }
 
@@ -34,7 +35,7 @@ const meta = {
     title: { control: "text" },
     description: { control: "text" },
     body: { control: "text" },
-    size: { control: "select", options: ["default", "sm"] },
+    size: { control: "select" },
     flush: { control: "boolean" },
   },
   render: (args) => (

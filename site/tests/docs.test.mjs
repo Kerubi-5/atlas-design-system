@@ -7,23 +7,25 @@ import assert from "node:assert/strict"
 import test from "node:test"
 
 import {
+  DESKTOP,
+  PHONE,
   THEMES,
+  WIDTHS,
+  inBatches,
   openStory,
   runAxe,
   settle,
   storyIndex,
   storyUrl,
+  violationMessage,
   withSite,
 } from "./browser.mjs"
-
-const WIDTHS = [1280, 390]
-const CONCURRENCY = 4
 
 async function auditDocs(context, baseUrl, entry, theme, width) {
   const label = `${entry.id} [${theme}, ${width}px]`
   const page = await context.newPage()
   try {
-    await page.setViewportSize({ width, height: 900 })
+    await page.setViewportSize({ width, height: DESKTOP.height })
     await page.goto(
       `${baseUrl}${storyUrl(entry.id, { theme, viewMode: "docs" })}`
     )
@@ -45,9 +47,7 @@ async function auditDocs(context, baseUrl, entry, theme, width) {
       )
     }
     for (const violation of await runAxe(page, { wholePage: true })) {
-      problems.push(
-        `${label}: ${violation.id} (${violation.help}) at ${violation.targets.slice(0, 3).join(", ")}`
-      )
+      problems.push(violationMessage(label, violation))
     }
     return problems
   } finally {
@@ -62,23 +62,17 @@ test("every docs page passes WCAG 2.2 AA, follows the theme, and never scrolls s
   )
   assert.ok(docs.length > 0, "index.json lists docs pages")
 
-  const problems = await withSite(async ({ context, baseUrl }) => {
-    const jobs = docs.flatMap((entry) =>
-      THEMES.flatMap((theme) =>
-        WIDTHS.map(
-          (width) => () => auditDocs(context, baseUrl, entry, theme, width)
+  const problems = await withSite(({ context, baseUrl }) =>
+    inBatches(
+      docs.flatMap((entry) =>
+        THEMES.flatMap((theme) =>
+          WIDTHS.map(
+            (width) => () => auditDocs(context, baseUrl, entry, theme, width)
+          )
         )
       )
     )
-    const found = []
-    for (let i = 0; i < jobs.length; i += CONCURRENCY) {
-      const batch = await Promise.all(
-        jobs.slice(i, i + CONCURRENCY).map((job) => job())
-      )
-      found.push(...batch.flat())
-    }
-    return found
-  })
+  )
 
   assert.deepEqual(
     problems,
@@ -114,6 +108,6 @@ test("the Tokens page scrolls its tables by keyboard at 390px", async () => {
         assert.ok(scroller.label, "the scroll region has an accessible name")
       }
     },
-    { viewport: { width: 390, height: 844 } }
+    { viewport: PHONE }
   )
 })

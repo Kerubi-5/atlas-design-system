@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test"
 
-import { openStory } from "../browser.mjs"
+import { PHONE, THEMES, WIDTHS, openStory } from "../browser.mjs"
 
-for (const width of [1280, 390]) {
-  for (const theme of ["light", "dark"]) {
+for (const width of WIDTHS) {
+  for (const theme of THEMES) {
     test(`picker values and dialog titles fit at ${width} ${theme}`, async ({
       page,
     }, info) => {
-      await page.setViewportSize({ width, height: 844 })
+      await page.setViewportSize({ width, height: PHONE.height })
       const story = (id: string, args?: string) =>
         openStory(page, "", id, theme, { args })
       await story("forms-date-picker--narrow-range")
@@ -37,7 +37,7 @@ for (const width of [1280, 390]) {
         expect((await value.locator("..").boundingBox())?.height).toBe(40)
       }
       const inset = await page.getByLabel("Plain input").boundingBox()
-      expect(inset?.x).toBe(width === 390 ? 16 : 24)
+      expect(inset?.x).toBe(width === PHONE.width ? 16 : 24)
 
       await story("forms-date-picker--compact")
       const compact = page
