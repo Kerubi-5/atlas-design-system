@@ -1,5 +1,9 @@
 import { defineConfig } from "@playwright/test"
 
+/** Where `tests/serve.mjs` serves the built site for the screenshots. */
+const port = 4400
+const origin = `http://127.0.0.1:${port}`
+
 /**
  * Screenshot tests for the built Storybook site. Build first
  * (`npm run build`), then `npm run test:visual`; refresh baselines after an
@@ -11,7 +15,7 @@ export default defineConfig({
   fullyParallel: true,
   reporter: process.env.CI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
-    baseURL: "http://127.0.0.1:4400",
+    baseURL: origin,
     viewport: { width: 900, height: 700 },
     deviceScaleFactor: 1,
     // Grayscale, unhinted text on every machine. Hosts whose fontconfig turns
@@ -31,8 +35,8 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { browserName: "chromium" } }],
   webServer: {
-    command: "node tests/serve.mjs 4400",
-    url: "http://127.0.0.1:4400/iframe.html",
+    command: `node tests/serve.mjs ${port}`,
+    url: `${origin}/iframe.html`,
     reuseExistingServer: !process.env.CI,
   },
 })

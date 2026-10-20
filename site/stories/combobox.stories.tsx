@@ -6,6 +6,7 @@ import { Combobox } from "../../src/combobox.js"
 import { Label } from "../../src/label.js"
 import {
   formControlOptions,
+  formControlValues,
   iso4217Code,
 } from "../../stories/form-control-triggers.js"
 
@@ -25,7 +26,7 @@ const meta = {
   argTypes: {
     value: {
       control: "select",
-      options: ["", ...formControlOptions.map((option) => option.value)],
+      options: formControlValues,
     },
     options: { control: "object" },
     placeholder: { control: "text" },

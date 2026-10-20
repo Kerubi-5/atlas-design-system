@@ -2,7 +2,7 @@ import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Button } from "../../src/button.js"
-import { ErrorBoundary, ErrorFallback } from "../../src/error-boundary.js"
+import { ErrorBoundary } from "../../src/error-boundary.js"
 import { ErrorFallbackStory } from "../../stories/display.js"
 
 function Boom({ shouldThrow }: { shouldThrow: boolean }) {
@@ -17,6 +17,7 @@ function Boom({ shouldThrow }: { shouldThrow: boolean }) {
 const meta = {
   title: "Feedback/Error boundary",
   parameters: {
+    controls: { disable: true },
     docs: {
       description: {
         component:
@@ -30,7 +31,6 @@ type Story = StoryObj<typeof meta>
 
 export const Fallback: Story = {
   render: () => <ErrorFallbackStory />,
-  parameters: { controls: { disable: true } },
 }
 
 export const Catch: Story = {
@@ -64,16 +64,4 @@ export const Catch: Story = {
       </div>
     )
   },
-  parameters: { controls: { disable: true } },
-}
-
-export const CustomCopy: Story = {
-  render: () => (
-    <ErrorFallback
-      message="Could not load this panel."
-      onRetry={() => {}}
-      onReload={() => {}}
-    />
-  ),
-  parameters: { controls: { disable: true } },
 }

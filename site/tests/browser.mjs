@@ -2,6 +2,7 @@
 // settle sequence before anything is sampled, axe-core, and one static
 // server plus Chromium bootstrap. The node:test files and the Playwright
 // specs both import it, so everything here takes a Playwright `page`.
+import assert from "node:assert/strict"
 import fs from "node:fs/promises"
 import { createRequire } from "node:module"
 import path from "node:path"
@@ -30,6 +31,28 @@ export const storyRoot = (page) => page.locator("#storybook-root")
 /** The built site's story index (`dist/index.json`). */
 export async function storyIndex() {
   return JSON.parse(await fs.readFile(path.join(distDir, "index.json"), "utf8"))
+}
+
+/**
+ * The index entries of `type` ("story" or "docs") whose id matches `match`;
+ * fails when there are none, so a broken build cannot pass by checking
+ * nothing.
+ */
+export async function indexEntries(type = "story", match = /./) {
+  const entries = Object.values((await storyIndex()).entries).filter(
+    (entry) => entry.type === type && match.test(entry.id)
+  )
+  assert.ok(entries.length > 0, `index.json lists ${type} entries`)
+  return entries
+}
+
+/** Fail with every problem, one per line, under a count of `what`. */
+export function assertNoProblems(problems, what = "problems") {
+  assert.deepEqual(
+    problems,
+    [],
+    `${problems.length} ${what}:\n${problems.join("\n")}`
+  )
 }
 
 /**
@@ -151,21 +174,26 @@ export async function inBatches(jobs) {
   return found
 }
 
+/** A browser context at DESKTOP size with reduced motion, plus `options`. */
+export function newContext(browser, options = {}) {
+  return browser.newContext({
+    reducedMotion: "reduce",
+    viewport: DESKTOP,
+    ...options,
+  })
+}
+
 /**
- * Serve the built site and launch Chromium with one context (DESKTOP,
- * reduced motion, plus `contextOptions`). `fn` gets { browser, context,
- * baseUrl }; browser and server close afterwards, also when `fn` throws.
+ * Serve the built site and launch Chromium with one `newContext` (plus
+ * `contextOptions`). `fn` gets { browser, context, baseUrl }; browser and
+ * server close afterwards, also when `fn` throws.
  */
 export async function withSite(fn, contextOptions = {}) {
   const server = await serve(distDir)
   const baseUrl = `http://127.0.0.1:${server.address().port}`
   const browser = await chromium.launch()
   try {
-    const context = await browser.newContext({
-      reducedMotion: "reduce",
-      viewport: DESKTOP,
-      ...contextOptions,
-    })
+    const context = await newContext(browser, contextOptions)
     return await fn({ browser, context, baseUrl })
   } finally {
     await browser.close()

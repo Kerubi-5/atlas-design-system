@@ -8,7 +8,7 @@ import {
   storyIndex,
   storyRoot,
 } from "../browser.mjs"
-import { OVERLAYS } from "../overlays.mjs"
+import { OVERLAYS, openOverlay, toastVariantIds } from "../overlays.mjs"
 
 /** Desktop captures; their baselines were taken 720px tall. */
 const WIDE = { width: DESKTOP.width, height: 720 }
@@ -42,10 +42,7 @@ const overlayStories: Story[] = (OVERLAYS as Overlay[])
   .filter((overlay) => !capturedElsewhere.has(overlay.id))
   .map((overlay) => ({
     id: overlay.id,
-    open: async (page) => {
-      await overlay.open(page)
-      await expect(page.locator(overlay.shows).first()).toBeVisible()
-    },
+    open: (page) => openOverlay(page, overlay),
   }))
 
 const stories: Story[] = [
@@ -98,16 +95,6 @@ const stories: Story[] = [
   { id: "layout-page-header--with-stepper" },
   ...overlayStories,
 ]
-
-/** One story per toast chrome variant; captured at 1280 and 390, light and dark. */
-const toastVariantIds = overlayStories
-  .map((story) => story.id)
-  .filter(
-    (id) =>
-      id.startsWith("feedback-toast--") &&
-      id !== "feedback-toast--types" &&
-      id !== "feedback-toast--playground"
-  )
 
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([

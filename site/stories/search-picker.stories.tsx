@@ -3,15 +3,7 @@ import { useArgs } from "storybook/preview-api"
 import { fn } from "storybook/test"
 
 import { SearchPicker } from "../../src/search-picker.js"
-import { SearchPickerStory } from "../../stories/search-picker.js"
-
-const items = [
-  { id: "north", name: "North ward" },
-  { id: "east", name: "East ward" },
-  { id: "south", name: "South ward" },
-  { id: "west", name: "West ward" },
-  { id: "central", name: "Central ward" },
-]
+import { placeItems, SearchPickerStory } from "../../stories/search-picker.js"
 
 const meta = {
   title: "Forms/Search picker",
@@ -26,7 +18,7 @@ const meta = {
   argTypes: {
     value: {
       control: "select",
-      options: items.map((item) => item.id),
+      options: placeItems.items.map(placeItems.getValue),
     },
     label: { control: "text" },
     placeholder: { control: "text" },
@@ -38,9 +30,7 @@ const meta = {
     return (
       <SearchPicker
         className="max-w-sm"
-        items={items}
-        getValue={(item) => item.id}
-        getLabel={(item) => item.name}
+        {...placeItems}
         value={args.value}
         label={args.label}
         placeholder={args.placeholder}

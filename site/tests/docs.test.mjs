@@ -11,11 +11,12 @@ import {
   PHONE,
   THEMES,
   WIDTHS,
+  assertNoProblems,
   inBatches,
+  indexEntries,
   openStory,
   runAxe,
   settle,
-  storyIndex,
   storyUrl,
   violationMessage,
   withSite,
@@ -56,11 +57,7 @@ async function auditDocs(context, baseUrl, entry, theme, width) {
 }
 
 test("every docs page passes WCAG 2.2 AA, follows the theme, and never scrolls sideways", async () => {
-  const index = await storyIndex()
-  const docs = Object.values(index.entries).filter(
-    (entry) => entry.type === "docs"
-  )
-  assert.ok(docs.length > 0, "index.json lists docs pages")
+  const docs = await indexEntries("docs")
 
   const problems = await withSite(({ context, baseUrl }) =>
     inBatches(
@@ -74,11 +71,7 @@ test("every docs page passes WCAG 2.2 AA, follows the theme, and never scrolls s
     )
   )
 
-  assert.deepEqual(
-    problems,
-    [],
-    `${problems.length} docs page problems:\n${problems.join("\n")}`
-  )
+  assertNoProblems(problems, "docs page problems")
 })
 
 test("the Tokens page scrolls its tables by keyboard at 390px", async () => {

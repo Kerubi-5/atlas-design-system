@@ -1,17 +1,16 @@
 import assert from "node:assert/strict"
 import fs from "node:fs/promises"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 import test from "node:test"
 
+import { distDir as output, repoRoot, siteRoot } from "./serve.mjs"
 import { sidebarGroups } from "./sidebar-groups.mjs"
 
-const siteRoot = fileURLToPath(new URL("../", import.meta.url))
-const repoRoot = path.resolve(siteRoot, "..")
-const output = path.join(siteRoot, "dist")
-const kit = JSON.parse(
-  await fs.readFile(path.join(repoRoot, "package.json"), "utf8")
-)
+/** A file's text, from path segments such as `output, "index.html"`. */
+const read = (...segments) => fs.readFile(path.join(...segments), "utf8")
+const readJson = async (...segments) => JSON.parse(await read(...segments))
+
+const kit = await readJson(repoRoot, "package.json")
 
 const skipExports = new Set([
   "./theme.css",
@@ -32,11 +31,11 @@ function storyTitle(source) {
 
 test("Storybook is the static site at the output root", async () => {
   for (const filename of ["index.html", "iframe.html", "index.json"]) {
-    const htmlOrJson = await fs.readFile(path.join(output, filename), "utf8")
+    const htmlOrJson = await read(output, filename)
     assert.ok(htmlOrJson.length > 0, `${filename} is non-empty`)
   }
 
-  const html = await fs.readFile(path.join(output, "index.html"), "utf8")
+  const html = await read(output, "index.html")
   const references = [
     ...html.matchAll(
       /<(?:script|link|img)\b[^>]*\b(?:src|href)=["']([^"']+)["']/g
@@ -53,19 +52,14 @@ test("Storybook is the static site at the output root", async () => {
 })
 
 test("the manager document title is Atlas React Kit", async () => {
-  const html = await fs.readFile(path.join(output, "index.html"), "utf8")
+  const html = await read(output, "index.html")
   assert.match(html, /<title>[^<]*Atlas React Kit[^<]*<\/title>/)
-  const manager = await fs.readFile(
-    path.join(siteRoot, ".storybook/manager.ts"),
-    "utf8"
-  )
+  const manager = await read(siteRoot, ".storybook/manager.ts")
   assert.match(manager, /document\.title = KIT_TITLE/)
 })
 
 test("the site publishes its generated docs and package-entry index", async () => {
-  const index = JSON.parse(
-    await fs.readFile(path.join(output, "docs-index.json"), "utf8")
-  )
+  const index = await readJson(output, "docs-index.json")
   assert.equal(index.schemaVersion, 1)
   assert.equal(index.package.name, kit.name)
   assert.equal(index.package.version, kit.version)
@@ -82,7 +76,7 @@ test("the site publishes its generated docs and package-entry index", async () =
 })
 
 test("the site ships its own icon set", async () => {
-  const html = await fs.readFile(path.join(output, "index.html"), "utf8")
+  const html = await read(output, "index.html")
   assert.match(
     html,
     /<link rel="icon" type="image\/svg\+xml" href="\.\/favicon\.svg"/
@@ -91,7 +85,7 @@ test("the site ships its own icon set", async () => {
     html,
     /<link rel="apple-touch-icon" href="\.\/apple-touch-icon\.png"/
   )
-  const favicon = await fs.readFile(path.join(output, "favicon.svg"), "utf8")
+  const favicon = await read(output, "favicon.svg")
   // Paths, not <text>: favicons render without the page's web fonts.
   assert.match(favicon, /<path\b/)
   assert.doesNotMatch(favicon, /<text\b/)
@@ -101,9 +95,7 @@ test("the site ships its own icon set", async () => {
 })
 
 test("required interactive stories, tokens, and docs survive the static build", async () => {
-  const index = JSON.parse(
-    await fs.readFile(path.join(output, "index.json"), "utf8")
-  )
+  const index = await readJson(output, "index.json")
   for (const component of [
     "actions-button",
     "data-display-badge",
@@ -142,9 +134,7 @@ test("required interactive stories, tokens, and docs survive the static build", 
 })
 
 test("every shared demo is rendered by an indexed Storybook entry", async () => {
-  const index = JSON.parse(
-    await fs.readFile(path.join(output, "index.json"), "utf8")
-  )
+  const index = await readJson(output, "index.json")
   const storyFiles = new Set(
     Object.values(index.entries)
       .filter((entry) => entry.type === "story")
@@ -152,17 +142,12 @@ test("every shared demo is rendered by an indexed Storybook entry", async () => 
   )
   const storySources = (
     await Promise.all(
-      [...storyFiles].map((filename) =>
-        fs.readFile(path.resolve(siteRoot, filename), "utf8")
-      )
+      [...storyFiles].map((filename) => read(siteRoot, filename))
     )
   ).join("\n")
   for (const filename of await fs.readdir(path.join(repoRoot, "stories"))) {
     if (!filename.endsWith(".tsx")) continue
-    const source = await fs.readFile(
-      path.join(repoRoot, "stories", filename),
-      "utf8"
-    )
+    const source = await read(repoRoot, "stories", filename)
     for (const [, demo] of source.matchAll(/export function (\w+)/g)) {
       assert.match(
         storySources,
@@ -182,20 +167,15 @@ test("every visual kit export is imported by a Storybook story", async () => {
         .filter(
           (name) => name.endsWith(".stories.tsx") || name.endsWith(".mdx")
         )
-        .map((name) => fs.readFile(path.join(storiesDir, name), "utf8"))
+        .map((name) => read(storiesDir, name))
     )
   ).join("\n")
-  const preview = await fs.readFile(
-    path.join(siteRoot, ".storybook", "preview.tsx"),
-    "utf8"
-  )
+  const preview = await read(siteRoot, ".storybook", "preview.tsx")
   const rootStorySources = (
     await Promise.all(
       (await fs.readdir(path.join(repoRoot, "stories")))
         .filter((name) => name.endsWith(".tsx"))
-        .map((name) =>
-          fs.readFile(path.join(repoRoot, "stories", name), "utf8")
-        )
+        .map((name) => read(repoRoot, "stories", name))
     )
   ).join("\n")
   const haystack = `${storySources}\n${preview}\n${rootStorySources}`
@@ -218,10 +198,7 @@ function storyIdFromPath(storyPath) {
 
 test("every component story has usage guidance", async () => {
   const storiesDir = path.join(siteRoot, "stories")
-  const usageSource = await fs.readFile(
-    path.join(siteRoot, "src/lib/usage.ts"),
-    "utf8"
-  )
+  const usageSource = await read(siteRoot, "src/lib/usage.ts")
   const keys = new Set(
     [...usageSource.matchAll(/^  (?:"([^"]+)"|(\w+)): `/gm)].map(
       (match) => match[1] ?? match[2]
@@ -229,7 +206,7 @@ test("every component story has usage guidance", async () => {
   )
   for (const file of await fs.readdir(storiesDir)) {
     if (!file.endsWith(".stories.tsx")) continue
-    const source = await fs.readFile(path.join(storiesDir, file), "utf8")
+    const source = await read(storiesDir, file)
     const [group, name] = storyTitle(source).split("/")
     if (group === "Examples" || name === "Tokens") continue
     assert.ok(keys.has(name), `${file}: add "${name}" to src/lib/usage.ts`)
@@ -237,13 +214,8 @@ test("every component story has usage guidance", async () => {
 })
 
 test("usage guidance links point at a published guide heading", async () => {
-  const usageSource = await fs.readFile(
-    path.join(siteRoot, "src/lib/usage.ts"),
-    "utf8"
-  )
-  const index = JSON.parse(
-    await fs.readFile(path.join(output, "docs-index.json"), "utf8")
-  )
+  const usageSource = await read(siteRoot, "src/lib/usage.ts")
+  const index = await readJson(output, "docs-index.json")
   const links = [...usageSource.matchAll(/\]\(\.\/([^)#]+)(?:#([^)]+))?\)/g)]
   assert.ok(links.length > 0, "usage.ts links to the guides")
   for (const [link, file, anchor] of links) {
@@ -263,9 +235,7 @@ test("every component story sits in a sidebar group", async () => {
   const storiesDir = path.join(siteRoot, "stories")
   for (const file of await fs.readdir(storiesDir)) {
     if (!file.endsWith(".stories.tsx")) continue
-    const title = storyTitle(
-      await fs.readFile(path.join(storiesDir, file), "utf8")
-    )
+    const title = storyTitle(await read(storiesDir, file))
     const [group, name, ...rest] = title.split("/")
     assert.ok(
       groups.has(group) && name && rest.length === 0,
@@ -275,9 +245,7 @@ test("every component story sits in a sidebar group", async () => {
 })
 
 test("hosting serves Storybook from the site root without an SPA fallback", async () => {
-  const config = JSON.parse(
-    await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")
-  )
+  const config = await readJson(repoRoot, "vercel.json")
   assert.equal(config.outputDirectory, "site/dist")
   assert.equal(
     config.redirects.find((redirect) => redirect.source === "/playground")
@@ -305,7 +273,7 @@ test("hosting serves Storybook from the site root without an SPA fallback", asyn
     config.redirects.find((redirect) => redirect.source.includes(":path")),
     undefined
   )
-  const notFound = await fs.readFile(path.join(output, "404.html"), "utf8")
+  const notFound = await read(output, "404.html")
   assert.match(notFound, /Page not found/)
   assert.match(notFound, /<a href="\/"/)
   await fs.access(path.join(output, "iframe.html"))
@@ -313,8 +281,8 @@ test("hosting serves Storybook from the site root without an SPA fallback", asyn
 })
 
 test("the 404 page uses the theme.css color tokens", async () => {
-  const theme = await fs.readFile(path.join(repoRoot, "theme.css"), "utf8")
-  const page = await fs.readFile(path.join(siteRoot, "public/404.html"), "utf8")
+  const theme = await read(repoRoot, "theme.css")
+  const page = await read(siteRoot, "public/404.html")
   /** `--name: value` pairs in the first `selector { … }` block of `css`. */
   const block = (css, selector) => {
     const start = css.indexOf(`${selector} {`)
@@ -340,12 +308,8 @@ test("the 404 page uses the theme.css color tokens", async () => {
 })
 
 test("redirects and doc cross-links point at indexed entries", async () => {
-  const index = JSON.parse(
-    await fs.readFile(path.join(output, "index.json"), "utf8")
-  )
-  const config = JSON.parse(
-    await fs.readFile(path.join(repoRoot, "vercel.json"), "utf8")
-  )
+  const index = await readJson(output, "index.json")
+  const config = await readJson(repoRoot, "vercel.json")
   for (const { destination } of config.redirects) {
     const storyPath = new URL(
       destination,
@@ -358,15 +322,12 @@ test("redirects and doc cross-links point at indexed entries", async () => {
 
   // Storybook's docs Link prefixes a leading-slash href with `./?path=`, so
   // the map holds bare story paths, never `/?path=` URLs.
-  const docs = await fs.readFile(path.join(siteRoot, "src/lib/docs.ts"), "utf8")
+  const docs = await read(siteRoot, "src/lib/docs.ts")
   const targets = [...docs.matchAll(/"\.\/[\w.]+":\s*"([^"]+)"/g)].map(
     (match) => match[1]
   )
   assert.ok(targets.length >= 3, "docs.ts maps the markdown guides")
-  const startHere = await fs.readFile(
-    path.join(siteRoot, "stories/docs/start-here.mdx"),
-    "utf8"
-  )
+  const startHere = await read(siteRoot, "stories/docs/start-here.mdx")
   targets.push(
     ...[...startHere.matchAll(/\]\((\/(?:docs|story)\/[^)]+)\)/g)].map(
       (match) => match[1]
