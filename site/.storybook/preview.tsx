@@ -30,6 +30,7 @@ import {
   KitDocsContainer,
   ScrollRegion,
 } from "../src/docs-blocks.js"
+import { rewriteDocLinks } from "../src/lib/docs.js"
 import { beta, usage } from "../src/lib/usage.js"
 import "../src/styles.css"
 
@@ -46,7 +47,7 @@ function UsageBlock() {
   return (
     <>
       <Heading>Usage</Heading>
-      <DocsMarkdown>{status + guidance}</DocsMarkdown>
+      <DocsMarkdown>{rewriteDocLinks(status + guidance)}</DocsMarkdown>
     </>
   )
 }

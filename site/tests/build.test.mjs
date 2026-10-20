@@ -236,6 +236,28 @@ test("every component story has usage guidance", async () => {
   }
 })
 
+test("usage guidance links point at a published guide heading", async () => {
+  const usageSource = await fs.readFile(
+    path.join(siteRoot, "src/lib/usage.ts"),
+    "utf8"
+  )
+  const index = JSON.parse(
+    await fs.readFile(path.join(output, "docs-index.json"), "utf8")
+  )
+  const links = [...usageSource.matchAll(/\]\(\.\/([^)#]+)(?:#([^)]+))?\)/g)]
+  assert.ok(links.length > 0, "usage.ts links to the guides")
+  for (const [link, file, anchor] of links) {
+    const guide = index.documents.find((document) => document.path === file)
+    assert.ok(guide, `${link}: ${file} is a published guide`)
+    if (anchor) {
+      assert.ok(
+        guide.headings.some((heading) => heading.anchor === anchor),
+        `${link}: ${file} has a #${anchor} heading`
+      )
+    }
+  }
+})
+
 test("every component story sits in a sidebar group", async () => {
   const groups = new Set(sidebarGroups)
   const storiesDir = path.join(siteRoot, "stories")
