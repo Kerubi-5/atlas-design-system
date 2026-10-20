@@ -74,17 +74,16 @@ describe("InfoTip", () => {
   })
 
   it("opens on hover only when the pointer can hover", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
     await user.hover(screen.getByRole("button", { name: "Hint" }))
     expect(await screen.findByText("Hint title")).toBeVisible()
-    restore()
   })
 
   it("closes a hover-opened panel on the first Escape", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -95,11 +94,10 @@ describe("InfoTip", () => {
     await waitFor(() => {
       expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
     })
-    restore()
   })
 
   it("closes a click-pinned panel on Escape and returns focus to the glyph", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -112,11 +110,10 @@ describe("InfoTip", () => {
       expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
     })
     expect(trigger).toHaveFocus()
-    restore()
   })
 
   it("keeps focus in the field being typed in when hover opens the panel", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(
       <div>
@@ -139,11 +136,10 @@ describe("InfoTip", () => {
       expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
     })
     expect(field).toHaveFocus()
-    restore()
   })
 
   it("stays open after a click when the pointer leaves", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(
       <div>
@@ -156,11 +152,10 @@ describe("InfoTip", () => {
     expect(await screen.findByText("Hint title")).toBeVisible()
     await user.hover(screen.getByRole("button", { name: "Away" }))
     expect(screen.getByText("Hint title")).toBeVisible()
-    restore()
   })
 
   it("does not open on hover for a coarse pointer", async () => {
-    const restore = stubMatchMedia(false)
+    stubMatchMedia(false)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -168,6 +163,5 @@ describe("InfoTip", () => {
     await waitFor(() => {
       expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
     })
-    restore()
   })
 })

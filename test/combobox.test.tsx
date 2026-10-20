@@ -8,6 +8,7 @@ import { iso4217Code } from "../stories/form-control-triggers.js"
 import {
   createUser,
   expectFormControlTrigger,
+  recordScrollIntoView,
   render,
   screen,
   type User,
@@ -329,41 +330,25 @@ describe("Combobox", () => {
 
   it("scrolls the selected option into view when a long list opens", async () => {
     const user = createUser()
-    const scrolled: Element[] = []
-    const originalElement = Element.prototype.scrollIntoView
-    const originalHtml = HTMLElement.prototype.scrollIntoView
-    const record = function (
-      this: Element,
-      _options?: boolean | ScrollIntoViewOptions
-    ) {
-      scrolled.push(this)
-    }
-    Element.prototype.scrollIntoView = record
-    HTMLElement.prototype.scrollIntoView = record
+    const scrollIntoView = recordScrollIntoView()
+    render(
+      <Combobox
+        options={timezoneOptions()}
+        value="tz-47"
+        onValueChange={() => {}}
+      />
+    )
+    await openCombobox(user)
 
-    try {
-      render(
-        <Combobox
-          options={timezoneOptions()}
-          value="tz-47"
-          onValueChange={() => {}}
-        />
-      )
-      await openCombobox(user)
-
-      const selected = screen.getByRole("option", { name: "Timezone 47" })
-      expect(
-        screen
-          .getByPlaceholderText("Search")
-          .getAttribute("aria-activedescendant")
-      ).toBe(selected.id)
-      await waitFor(() => {
-        expect(scrolled).toContain(selected)
-      })
-    } finally {
-      Element.prototype.scrollIntoView = originalElement
-      HTMLElement.prototype.scrollIntoView = originalHtml
-    }
+    const selected = screen.getByRole("option", { name: "Timezone 47" })
+    expect(
+      screen
+        .getByPlaceholderText("Search")
+        .getAttribute("aria-activedescendant")
+    ).toBe(selected.id)
+    await waitFor(() => {
+      expect(scrollIntoView.mock.instances).toContain(selected)
+    })
   })
 
   it("closes on Escape and returns focus to the trigger", async () => {

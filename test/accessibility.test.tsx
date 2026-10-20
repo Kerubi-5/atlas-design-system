@@ -1,12 +1,9 @@
-import { readdirSync, readFileSync } from "node:fs"
-import path from "node:path"
-import { fileURLToPath } from "node:url"
-
 import { describe, expect, it } from "vitest"
 
 import { Calendar } from "../src/calendar.js"
 
 import { render, screen } from "./helpers.js"
+import { srcModules } from "./repo-files.js"
 
 describe("accessible names", () => {
   it("names calendar days with the visible number, not an ordinal", () => {
@@ -31,15 +28,7 @@ describe("accessible names", () => {
 })
 
 describe("focus cues (WCAG 1.4.11)", () => {
-  const srcDir = path.resolve(
-    path.dirname(fileURLToPath(import.meta.url)),
-    "../src"
-  )
-  const sources = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
-    .filter((file) => /\.tsx?$/.test(file))
-    .map(
-      (file) => [file, readFileSync(path.join(srcDir, file), "utf8")] as const
-    )
+  const sources = srcModules()
 
   it("draws focus with the solid ring color, never a translucent one", () => {
     expect(sources.length).toBeGreaterThan(20)

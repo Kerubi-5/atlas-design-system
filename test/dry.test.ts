@@ -1,6 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 
 import { describe, expect, it } from "vitest"
 
@@ -22,18 +20,14 @@ import {
   selectedState,
 } from "../src/internal/styles.js"
 
+import { srcModules } from "./repo-files.js"
+
 /**
  * Shared states live once, in `src/internal/styles.ts`. A component that
  * types one by hand drifts: before this test, Toggle's invalid state had no
  * ring and a destructive Badge drew a translucent focus ring.
  */
-const srcDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../src"
-)
-const sources = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
-  .filter((file) => /\.tsx?$/.test(file))
-  .map((file) => [file, readFileSync(path.join(srcDir, file), "utf8")] as const)
+const sources = srcModules()
 const components = sources.filter(([file]) => !file.startsWith("internal"))
 
 const retyped: Array<[string, RegExp, string]> = [

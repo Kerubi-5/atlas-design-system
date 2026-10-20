@@ -1,6 +1,13 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, expect, vi } from "vitest"
+import { afterEach, expect, onTestFinished, vi } from "vitest"
 
 import type {
   FieldErrorMessage,
@@ -120,8 +127,8 @@ export function expectFormControlTrigger(element: HTMLElement) {
 type MatchMediaListener = (event: MediaQueryListEvent) => void
 
 /**
- * Replace `window.matchMedia` for one test. jsdom's default stub always
- * reports `matches: false` (below `md`).
+ * Replace `window.matchMedia` for one test; `setup.ts` puts back the
+ * default after each test, which reports `matches: false` (below `md`).
  */
 export function stubMatchMedia(
   matches: boolean | ((query: string) => boolean)
@@ -151,10 +158,46 @@ export function stubMatchMedia(
         return false
       },
     }) as MediaQueryList
+}
 
-  return () => {
-    listeners.clear()
-  }
+/**
+ * Spy on `scrollIntoView` for the rest of one test; `mock.instances` are
+ * the elements scrolled, in order.
+ */
+export function recordScrollIntoView() {
+  const spy = vi.spyOn(Element.prototype, "scrollIntoView")
+  onTestFinished(() => spy.mockRestore())
+  return spy
+}
+
+/** A primary-button mouse pointer, for the `press`/`move`/`release` steps. */
+export const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
+
+/** Pointer down at `clientX` with the button held. */
+export function press(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerDown(element, { ...init, buttons: 1, clientX })
+}
+
+/** Pointer move to `clientX` with the button held. */
+export function move(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerMove(element, { ...init, buttons: 1, clientX })
+}
+
+/** Pointer up at `clientX`. */
+export function release(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerUp(element, { ...init, buttons: 0, clientX })
+}
+
+/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
+export function dragWithMouse(
+  element: Element,
+  from: number,
+  to: number,
+  init = mouse
+) {
+  press(element, from, init)
+  move(element, to, init)
+  release(element, to, init)
 }
 
 /**

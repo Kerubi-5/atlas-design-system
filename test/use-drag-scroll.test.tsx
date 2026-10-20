@@ -6,14 +6,14 @@ import {
   useDragScroll,
 } from "../src/internal/use-drag-scroll.js"
 
+import { dragWithMouse, mouse, move, press, release } from "./helpers.js"
+
 /**
  * The hook behind the mouse drag on `TabsNav` and `TabsList`. The component
  * tests cover a drag and a plain click; these cover the guards: not enabled,
  * touch, other buttons, a release outside the box, a cancelled pointer and
  * cleanup.
  */
-
-const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
 
 function mount(enabled = true) {
   const element = document.createElement("div")
@@ -24,18 +24,6 @@ function mount(enabled = true) {
     initialProps: { on: enabled },
   })
   return { element, ...hook }
-}
-
-function press(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerDown(element, { ...init, buttons: 1, clientX })
-}
-
-function move(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerMove(element, { ...init, buttons: 1, clientX })
-}
-
-function release(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerUp(element, { ...init, buttons: 0, clientX })
 }
 
 /** True when the click reached the element with its default intact. */
@@ -50,9 +38,7 @@ describe("useDragScroll", () => {
 
   it("does nothing while not enabled", () => {
     const { element } = mount(false)
-    press(element, 200)
-    move(element, 100)
-    release(element, 100)
+    dragWithMouse(element, 200, 100)
     expect(element.scrollLeft).toBe(100)
     expect(clickGoesThrough(element)).toBe(true)
   })
@@ -74,9 +60,7 @@ describe("useDragScroll", () => {
 
   it("leaves a press that never crosses the threshold as a click", () => {
     const { element } = mount()
-    press(element, 200)
-    move(element, 200 + DRAG_THRESHOLD - 1)
-    release(element, 200 + DRAG_THRESHOLD - 1)
+    dragWithMouse(element, 200, 200 + DRAG_THRESHOLD - 1)
     expect(element.scrollLeft).toBe(100)
     expect(clickGoesThrough(element)).toBe(true)
   })
@@ -85,9 +69,7 @@ describe("useDragScroll", () => {
     const { element } = mount()
     for (const pointerType of ["touch", "pen"]) {
       const init = { ...mouse, pointerType }
-      press(element, 200, init)
-      move(element, 100, init)
-      release(element, 100, init)
+      dragWithMouse(element, 200, 100, init)
     }
     expect(element.scrollLeft).toBe(100)
     expect(clickGoesThrough(element)).toBe(true)
@@ -155,9 +137,7 @@ describe("useDragScroll", () => {
   it("removes its listeners when disabled or unmounted", () => {
     const { element, rerender, unmount } = mount()
     rerender({ on: false })
-    press(element, 200)
-    move(element, 100)
-    release(element, 100)
+    dragWithMouse(element, 200, 100)
     expect(element.scrollLeft).toBe(100)
 
     rerender({ on: true })
@@ -168,9 +148,7 @@ describe("useDragScroll", () => {
     expect(clickGoesThrough(element)).toBe(false)
 
     unmount()
-    press(element, 200)
-    move(element, 100)
-    release(element, 100)
+    dragWithMouse(element, 200, 100)
     expect(element.scrollLeft).toBe(150)
     expect(clickGoesThrough(element)).toBe(true)
   })

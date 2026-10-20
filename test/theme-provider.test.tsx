@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { type ComponentProps, type ReactNode, useState } from "react"
 import { afterEach, describe, expect, it } from "vitest"
 
 import {
@@ -21,6 +21,22 @@ function ThemeProbe() {
   )
 }
 
+/**
+ * `children` and the probe in a light ThemeProvider without the system
+ * theme; `props` override those defaults.
+ */
+function renderThemed(
+  props: Partial<ComponentProps<typeof ThemeProvider>> = {},
+  children?: ReactNode
+) {
+  return render(
+    <ThemeProvider defaultTheme="light" enableSystem={false} {...props}>
+      {children}
+      <ThemeProbe />
+    </ThemeProvider>
+  )
+}
+
 function themeOutput() {
   return screen.getByTestId("theme")
 }
@@ -39,15 +55,7 @@ afterEach(() => {
 
 describe("ThemeProvider", () => {
   it("applies the default theme after mount", async () => {
-    render(
-      <ThemeProvider
-        defaultTheme="dark"
-        enableSystem={false}
-        enableShortcut={false}
-      >
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    renderThemed({ defaultTheme: "dark" })
 
     await waitForTheme(/dark:dark/)
     expect(document.documentElement).toHaveClass("dark")
@@ -56,16 +64,7 @@ describe("ThemeProvider", () => {
   it("reads and writes a custom storage key", async () => {
     localStorage.setItem("kairos-theme", "dark")
 
-    const { unmount } = render(
-      <ThemeProvider
-        storageKey="kairos-theme"
-        defaultTheme="light"
-        enableSystem={false}
-        enableShortcut={false}
-      >
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    const { unmount } = renderThemed({ storageKey: "kairos-theme" })
 
     await waitForTheme(/dark:dark/)
     expect(document.documentElement).toHaveClass("dark")
@@ -75,16 +74,7 @@ describe("ThemeProvider", () => {
     document.documentElement.classList.remove("dark")
     localStorage.setItem("kairos-theme", "light")
 
-    render(
-      <ThemeProvider
-        storageKey="kairos-theme"
-        defaultTheme="dark"
-        enableSystem={false}
-        enableShortcut={false}
-      >
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    renderThemed({ storageKey: "kairos-theme", defaultTheme: "dark" })
 
     await waitForTheme(/light:light/)
     expect(document.documentElement).toHaveClass("light")
@@ -92,11 +82,7 @@ describe("ThemeProvider", () => {
 
   it("toggles light and dark with the d shortcut", async () => {
     const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    renderThemed({ enableShortcut: true })
 
     await waitForTheme(/light:light/)
     await user.keyboard("d")
@@ -109,41 +95,26 @@ describe("ThemeProvider", () => {
     expect(localStorage.getItem("atlas-theme")).toBe("light")
   })
 
-  it("does not toggle while typing in an input", async () => {
+  it.each([
+    ["an input", "input"],
+    ["a textarea", "textarea"],
+  ] as const)("does not toggle while typing in %s", async (_, Control) => {
     const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
-        <label htmlFor="title">Title</label>
-        <input id="title" />
-        <ThemeProbe />
-      </ThemeProvider>
+    renderThemed(
+      { enableShortcut: true },
+      <>
+        <label htmlFor="field">Field</label>
+        <Control id="field" />
+      </>
     )
 
     await waitForTheme(/light:light/)
-    await user.click(screen.getByLabelText("Title"))
+    await user.click(screen.getByLabelText("Field"))
     await user.keyboard("d")
 
-    expect(screen.getByLabelText("Title")).toHaveValue("d")
+    expect(screen.getByLabelText("Field")).toHaveValue("d")
     expect(themeOutput()).toHaveTextContent(/light:light/)
     expect(document.documentElement).not.toHaveClass("dark")
-  })
-
-  it("does not toggle while typing in a textarea", async () => {
-    const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
-        <label htmlFor="notes">Notes</label>
-        <textarea id="notes" />
-        <ThemeProbe />
-      </ThemeProvider>
-    )
-
-    await waitForTheme(/light:light/)
-    await user.click(screen.getByLabelText("Notes"))
-    await user.keyboard("d")
-
-    expect(screen.getByLabelText("Notes")).toHaveValue("d")
-    expect(themeOutput()).toHaveTextContent(/light:light/)
   })
 
   it("leaves d to Select typeahead instead of toggling the theme", async () => {
@@ -166,12 +137,7 @@ describe("ThemeProvider", () => {
     }
 
     const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
-        <MonthSelect />
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    renderThemed({ enableShortcut: true }, <MonthSelect />)
 
     await waitForTheme(/light:light/)
     screen.getByRole("combobox", { name: "Month" }).focus()
@@ -186,18 +152,16 @@ describe("ThemeProvider", () => {
 
   it("does not toggle when a focused control already handled the key", async () => {
     const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false} enableShortcut>
-        <button
-          type="button"
-          onKeyDown={(event) => {
-            if (event.key === "d") event.preventDefault()
-          }}
-        >
-          Duplicate
-        </button>
-        <ThemeProbe />
-      </ThemeProvider>
+    renderThemed(
+      { enableShortcut: true },
+      <button
+        type="button"
+        onKeyDown={(event) => {
+          if (event.key === "d") event.preventDefault()
+        }}
+      >
+        Duplicate
+      </button>
     )
 
     await waitForTheme(/light:light/)
@@ -209,11 +173,7 @@ describe("ThemeProvider", () => {
   it("leaves the d shortcut off unless the app turns it on", async () => {
     // A single-key shortcut needs a user-facing off switch (WCAG 2.1.4).
     const user = createUser()
-    render(
-      <ThemeProvider defaultTheme="light" enableSystem={false}>
-        <ThemeProbe />
-      </ThemeProvider>
-    )
+    renderThemed()
 
     await waitForTheme(/light:light/)
     await user.keyboard("d")

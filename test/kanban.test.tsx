@@ -68,7 +68,8 @@ describe("KanbanBoard", () => {
     expect(rendered).toHaveLength(3)
     const [todo, doing, done] = [...rendered] as HTMLElement[]
     expect(todo).toHaveClass("flex-1", "basis-72", "min-w-72")
-    expect(todo).not.toHaveClass("w-72", "shrink-0")
+    expect(todo).not.toHaveClass("w-72")
+    expect(todo).not.toHaveClass("shrink-0")
     expect(within(todo!).getByText("To do")).toBeInTheDocument()
     expect(within(todo!).getByText("2")).toBeInTheDocument()
     expect(within(todo!).getByText("Write spec")).toBeInTheDocument()

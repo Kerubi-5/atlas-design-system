@@ -48,7 +48,7 @@ describe("useMediaQuery", () => {
   // The server renders `defaultMatches`. Reading matchMedia in the first
   // client render made hydration disagree with that markup on a wide screen.
   it("hydrates with defaultMatches, then follows the real query", async () => {
-    const restore = stubMatchMedia(true)
+    stubMatchMedia(true)
     function Probe() {
       return <span>{String(useMediaQuery("(min-width: 768px)"))}</span>
     }
@@ -64,6 +64,5 @@ describe("useMediaQuery", () => {
     expect(container.textContent).toBe("true")
     act(() => root?.unmount())
     container.remove()
-    restore()
   })
 })

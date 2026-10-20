@@ -1,22 +1,16 @@
-import { readFileSync } from "node:fs"
-import path from "node:path"
-import { fileURLToPath } from "node:url"
-
 import { describe, expect, it } from "vitest"
 
 import { focusRing } from "../src/internal/styles.js"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../src/tabs.js"
 import { ToggleGroup, ToggleGroupItem } from "../src/toggle-group.js"
 import { render, screen } from "./helpers.js"
+import { readRepoFile } from "./repo-files.js"
 
 /**
  * Gaps found by the pre-1.0 WCAG sweep (site/tests/wcag-behavior.test.mjs).
  * Each case failed before its fix.
  */
-const themeCss = readFileSync(
-  path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../theme.css"),
-  "utf8"
-)
+const themeCss = readRepoFile("theme.css")
 
 describe("focus in forced colors (WCAG 2.4.7)", () => {
   it("draws keyboard focus as a system-colored outline, since box-shadow rings vanish", () => {

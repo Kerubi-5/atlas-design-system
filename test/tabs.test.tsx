@@ -1,7 +1,7 @@
 import type * as React from "react"
 import { fireEvent } from "@testing-library/react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { DRAG_THRESHOLD } from "../src/internal/use-drag-scroll.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
@@ -20,7 +20,18 @@ import {
   TabsOverflowStory,
 } from "../stories/navigation.js"
 
-import { createUser, render, screen, waitFor, withOverflow } from "./helpers.js"
+import {
+  createUser,
+  dragWithMouse,
+  move,
+  press,
+  recordScrollIntoView,
+  release,
+  render,
+  screen,
+  waitFor,
+  withOverflow,
+} from "./helpers.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
 // in a labelled nav, not a tab widget whose tabs point at panels that don't
@@ -39,15 +50,6 @@ const html = renderToStaticMarkup(
 
 function scrollerOf(element: HTMLElement | null) {
   return element?.closest("[data-slot=tabs-scroller]") ?? null
-}
-
-const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
-
-/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
-function dragWithMouse(target: Element, from: number, to: number) {
-  fireEvent.pointerDown(target, { ...mouse, buttons: 1, clientX: from })
-  fireEvent.pointerMove(target, { ...mouse, buttons: 1, clientX: to })
-  fireEvent.pointerUp(target, { ...mouse, buttons: 0, clientX: to })
 }
 
 /** The scroller once `useHorizontalOverflow` has seen the overflow. */
@@ -137,10 +139,6 @@ describe("Tabs", () => {
 })
 
 describe("TabsNav", () => {
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = () => {}
-  })
-
   it("renders a labelled nav of links", () => {
     expect(html).toMatch(/^<nav[^>]*aria-label="Items view"/)
     expect(html).toMatch(/<a[^>]*href="\/items\?view=pipeline"/)
@@ -180,8 +178,7 @@ describe("TabsNav", () => {
   })
 
   it("scrolls the active link into view on mount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     render(<TabsNavStory active="Apple Reminders" />)
     expect(scrollIntoView).toHaveBeenCalled()
     const active = screen.getByRole("link", { name: "Apple Reminders" })
@@ -248,15 +245,9 @@ function PersistentNav({ active }: { active: string }) {
 }
 
 describe("TabsNav in a persistent layout", () => {
-  const original = HTMLElement.prototype.scrollIntoView
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = original
-  })
-
   // Found in the 1.0 audit; failed before its fix.
   it("reveals the new active link when the route changes without remount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     const { rerender } = render(<PersistentNav active="Alpha" />)
     expect(scrollIntoView.mock.instances).toEqual([
       screen.getByRole("link", { name: "Alpha" }),
@@ -318,13 +309,9 @@ describe("TabsNav mouse drag", () => {
       scroller.scrollLeft = 100
 
       // A press that wobbles less than the threshold is still a click.
-      fireEvent.pointerDown(link, { ...mouse, buttons: 1, clientX: 200 })
-      fireEvent.pointerMove(link, {
-        ...mouse,
-        buttons: 1,
-        clientX: 200 + DRAG_THRESHOLD - 1,
-      })
-      fireEvent.pointerUp(link, { ...mouse, buttons: 0, clientX: 203 })
+      press(link, 200)
+      move(link, 200 + DRAG_THRESHOLD - 1)
+      release(link, 203)
       fireEvent.click(link)
       expect(onClick).toHaveBeenCalledTimes(1)
       expect(scroller.scrollLeft).toBe(100)
@@ -433,10 +420,6 @@ describe("TabsNavLink", () => {
 })
 
 describe("TabsList overflow", () => {
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = () => {}
-  })
-
   it("uses the same horizontal-only scroller as TabsNav", () => {
     render(
       <Tabs defaultValue="overview">
@@ -455,8 +438,7 @@ describe("TabsList overflow", () => {
   })
 
   it("scrolls the active trigger into view on mount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     render(<TabsOverflowStory />)
     const active = screen.getByRole("tab", { name: "Activity" })
     expect(scrollIntoView.mock.instances[0]).toBe(active)
