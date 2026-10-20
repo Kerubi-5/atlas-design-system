@@ -28,23 +28,21 @@ than guessing.
 
 ## 2. Check the project setup once
 
-Components render unstyled unless the app's global stylesheet imports the theme
-and tells Tailwind to scan the kit's compiled files:
+Components render unstyled unless the app's global stylesheet imports the
+theme and tells Tailwind to scan the kit's compiled files. Compare the app
+with the setup in the package's README (the stylesheet lines and dark mode):
 
-```css
-@import "tailwindcss";
-@import "atlas-react-kit/theme.css";
-@source "../node_modules/atlas-react-kit/dist"; /* relative to this CSS file */
+```sh
+cat "$KIT/README.md"
 ```
 
-Dark mode needs `ThemeProvider` from `atlas-react-kit/theme-provider` near the
-root (or a `dark` class on an ancestor). Toasts need one `<Toaster />` from
-`atlas-react-kit/toast`; show them with `toast()` from the same module, using
-only the options it declares. Never import a toast library such as `sonner`
-directly: the kit owns the toast API, and a second copy never reaches its
-toaster. Some entry points need optional peers; install the extras from the
-"Optional peer dependencies" table in `COMPONENTS.md` when you import them.
-Fix missing setup rather than working around unstyled components.
+Toasts need one `<Toaster />` from `atlas-react-kit/toast`; show them with
+`toast()` from the same module, using only the options it declares. Never
+import a toast library such as `sonner` directly: the kit owns the toast API,
+and a second copy never reaches its toaster. Some entry points need optional
+peers; install the extras from the "Optional peer dependencies" table in
+`COMPONENTS.md` when you import them. Fix missing setup rather than working
+around unstyled components.
 
 ## 3. Pick the kit component for the job
 
@@ -54,47 +52,53 @@ Import each component from its subpath, e.g.
 
 | Need                                                       | Use                                                                                                                     |
 | ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| Short fixed list (a handful of options)                    | `Select` family from `select`                                                                                           |
-| Long or searchable list (timezones, currencies)            | `Combobox` from `combobox` with `{ value, label }[]` options; set `creatable` to invent a value the catalog lacks       |
+| Short fixed list (a handful of options)                    | `Select` from `select`                                                                                                  |
+| Long or searchable list (timezones, currencies)            | `Combobox` from `combobox`                                                                                              |
 | Always-visible searchable list (places)                    | `SearchPicker` from `search-picker`                                                                                     |
-| One date, or a from/to range                               | `DatePickerButton` from `date-picker` (`mode="range"` for ranges)                                                       |
+| One date, or a from/to range                               | `DatePickerButton` from `date-picker`                                                                                   |
 | Date and time (not `datetime-local`)                       | `DateTimePickerButton` from `date-time-picker`                                                                          |
 | Labelled field with error text                             | `FormTextField`, `FormSelectField`, `FormDatePickerField`, `FormDateTimePickerField`, `FormMarkdownField` from `form/*` |
 | Checkbox, checkbox group, toggle group, combobox in a form | `FormCheckboxField`, `FormCheckboxGroupField`, `FormToggleGroupField`, `FormComboboxField` from `form/*`                |
 | Custom control the kit has no form field for               | `FormControlField` from `form/control-field`                                                                            |
 | Form-level error (save failed)                             | `FormFeedbackField` from `form/feedback-field`                                                                          |
-| Content panels on one page                                 | `Tabs`, `TabsList`, `TabsTrigger`, `TabsContent` from `tabs`                                                            |
-| View switch that changes the URL                           | `TabsNav` with `TabsNavLink` from `tabs` (`asChild` for a router link); Next: `next/tabs-nav-link`                      |
-| App shell nav (Calendar, Tasks, Settings)                  | `NavLink` from `nav-link` (`asChild` for a router link); Next: `next/nav-link`; `active={isNavActive(pathname, href)}`  |
-| Focus the first invalid field when a submit fails          | `focusFirstInvalid(formId)` from `form/focus-first-invalid`; give fields `id={field.name}`                              |
+| Focus the first invalid field when a submit fails          | `focusFirstInvalid` from `form/focus-first-invalid`                                                                     |
+| Content panels on one page                                 | `Tabs` from `tabs`                                                                                                      |
+| View switch that changes the URL                           | `TabsNav` and `TabsNavLink` from `tabs`; in Next, `next/tabs-nav-link`                                                  |
+| App shell nav (Calendar, Tasks, Settings)                  | `NavLink` from `nav-link`; in Next, `next/nav-link`                                                                     |
 | Skip-to-content link                                       | `SkipLink` from `skip-link`                                                                                             |
 | Page title row with actions                                | `PageHeader` from `page-header`                                                                                         |
-| Previous / today / next period                             | `PeriodStepper` from `period-stepper`; `next/period-stepper` for URL periods                                            |
-| Cards in columns that drag                                 | `KanbanBoard` from `kanban`; `KanbanSkeleton` while loading                                                             |
-| SVG chart axes, grid, tooltip, legend                      | `chart` helpers (`chartFrame`, `ChartYAxisGrid`, `ChartTooltip`, `ChartLegend`)                                         |
-| Status chip (paid, pending, failed)                        | `Badge variant="soft"` with `tone="success"`, `"warning"`, `"destructive"`, or `"neutral"`                              |
-| Data table                                                 | `Table` family from `table`; `SortableTableHead`; `TableBodySkeleton` while loading                                     |
+| Previous / today / next period                             | `PeriodStepper` from `period-stepper`; for URL periods in Next, `next/period-stepper`                                   |
+| Cards in columns that drag                                 | `KanbanBoard` from `kanban`                                                                                             |
+| SVG chart axes, grid, tooltip, legend                      | `chartFrame` and the other helpers from `chart`                                                                         |
+| Status chip (paid, pending, failed)                        | `Badge` from `badge`                                                                                                    |
+| Data table                                                 | `Table` from `table`                                                                                                    |
+| Sortable column header                                     | `SortableTableHead` from `sortable-table-head`                                                                          |
+| Table body while loading                                   | `TableBodySkeleton` from `table-body-skeleton`                                                                          |
 | Nothing to show yet                                        | `EmptyPanel` from `empty-panel`                                                                                         |
-| Grouped content                                            | `Card` family from `card`; `<Card flush>` for an edge-to-edge table or list                                             |
-| Modal                                                      | `Dialog` family from `dialog`                                                                                           |
-| Label for an icon button, or a short hint                  | `Tooltip` from `tooltip`; keep `aria-label` on icon buttons                                                             |
-| Longer help from a glyph                                   | `InfoTip` / `InlineTip` from `info-tip` (not `Tooltip`)                                                                 |
+| Grouped content                                            | `Card` from `card`                                                                                                      |
+| Modal                                                      | `Dialog` from `dialog`                                                                                                  |
+| Label for an icon button, or a short hint                  | `Tooltip` from `tooltip`                                                                                                |
+| Longer help from a glyph                                   | `InfoTip` from `info-tip`                                                                                               |
 | Color scale key                                            | `ColorLegend` from `color-legend`                                                                                       |
-| GitHub-flavoured Markdown                                  | `Markdown` from `markdown`; write/preview with `FormMarkdownField`                                                      |
-| Summary figure in a strip                                  | `StatTile` from `stat-tile` (`statTileGrid`, `sectionLabel`)                                                            |
-| Value against a scale, optional ticks                      | `Meter` from `meter` (not `Progress`)                                                                                   |
+| GitHub-flavoured Markdown                                  | `Markdown` from `markdown`                                                                                              |
+| Summary figure in a strip                                  | `StatTile` from `stat-tile`                                                                                             |
+| Value against a scale, optional ticks                      | `Meter` from `meter`                                                                                                    |
 | Number on a continuous scale                               | `Slider` from `slider`                                                                                                  |
-| Row actions or an overflow menu of commands                | `DropdownMenu` family from `dropdown-menu`                                                                              |
-| Setting that applies immediately                           | `Switch` from `switch`; `Checkbox` for choices submitted with a form                                                    |
-| One choice from a few visible options                      | `RadioGroup` and `RadioGroupItem` from `radio-group`                                                                    |
-| Inline message about a page or section                     | `Alert` from `alert` (`success`, `warning`, `destructive` variants)                                                     |
-| Person or workspace image                                  | `Avatar`, `AvatarImage`, `AvatarFallback` from `avatar`                                                                 |
-| Sections that expand in place                              | `Accordion` family from `accordion`                                                                                     |
-| Pages of a long list                                       | `Pagination` family from `pagination`                                                                                   |
-| Where the page sits in a hierarchy                         | `Breadcrumb` family from `breadcrumb`                                                                                   |
-| Work in progress                                           | `Progress` from `progress` when the percent is known, else `Spinner` from `spinner`                                     |
+| Row actions or an overflow menu of commands                | `DropdownMenu` from `dropdown-menu`                                                                                     |
+| Setting that applies immediately                           | `Switch` from `switch`                                                                                                  |
+| On/off choice submitted with a form                        | `Checkbox` from `checkbox`                                                                                              |
+| One choice from a few visible options                      | `RadioGroup` from `radio-group`                                                                                         |
+| Inline message about a page or section                     | `Alert` from `alert`                                                                                                    |
+| Person or workspace image                                  | `Avatar` from `avatar`                                                                                                  |
+| Sections that expand in place                              | `Accordion` from `accordion`                                                                                            |
+| Pages of a long list                                       | `Pagination` from `pagination`                                                                                          |
+| Where the page sits in a hierarchy                         | `Breadcrumb` from `breadcrumb`                                                                                          |
+| Job with a known percentage                                | `Progress` from `progress`                                                                                              |
+| Wait of unknown length                                     | `Spinner` from `spinner`                                                                                                |
 | Crash recovery around a section                            | `ErrorBoundary` from `error-boundary`                                                                                   |
 | Conditional classes                                        | `cn` from `utils`                                                                                                       |
+
+The parts, props, and options of each are in its `COMPONENTS.md` row.
 
 If nothing fits, build the piece in the app from kit primitives and semantic
 tokens. Do not copy kit source into the app; a missing shared component belongs

@@ -17,7 +17,8 @@ Selected or active navigation, tabs, toggles, chips, rows, and labels use
 `bg-selected text-selected-foreground` plus a `border-selected-foreground`
 border or bar: the wash alone is too faint to show state (1.2:1 against the
 page). Outline and ghost buttons hover with `border-selected-foreground`,
-`text-selected-foreground`, and the selected wash, not a muted grey fill.
+`text-selected-foreground`, and the selected wash, not a muted grey fill,
+even on a selected row (a "Clear selection" button, for example).
 Table row hover can stay `hover:bg-muted`. The shipped controls apply this
 distinction.
 
@@ -26,8 +27,8 @@ it is the primary purple in light mode and a lighter purple in dark mode.
 `text-primary` as text fails contrast on the dark background (about 3.6:1).
 
 Use `success`, `warning`, and `destructive` for good, caution, and bad states.
-For tinted status chips, use `Badge variant="soft"` with `tone="success"`,
-`"warning"`, or `"destructive"`; each meets AA as text on the page, a card, and
+For tinted status chips, use `Badge variant="soft"` with a `tone` (listed in
+its COMPONENTS.md row); each tone meets AA as text on the page, a card, and
 its own soft tint in both themes. Status tones have no paired foreground token;
 avoid placing text on solid status fills. Application-specific identity colors
 belong to the application.
@@ -59,8 +60,8 @@ in COMPONENTS.md.
 - `variant="default"` is the plain look; other variants name what they mean
   (`outline`, `ghost`, `destructive`).
 
-Deprecated aliases (`onChange` on the date pickers, `EmptyPanel`
-`size="md"`) keep working until 2.0.
+Deprecated props and exports say so, with the replacement, in their JSDoc
+and their row in [COMPONENTS.md](./COMPONENTS.md).
 
 ## Accessibility
 
@@ -118,14 +119,11 @@ still read normal words.
 Primitives have square corners. Reserve `rounded-full` for dots, avatars,
 other circles, and the toast close badge. Card and dialog titles already use
 uppercase, tracked `font-heading` styling. Toasts are overlay popovers with
-the same square corners and Alert left/vertical padding (`pl-4 py-3`). Right
-padding is `pr-6` so copy clears the floating close badge. Icon-to-text is
-`gap-x-2.5` so the status icon and copy read as one unit. The close control is
-a circular badge centred on the top-right corner (half outside the border),
+the same square corners and Alert's left padding. The close control is a
+circular badge centred on the top-right corner (half outside the border),
 not a control in the text row. A plain `toast()` has no icon — status icons
 belong to `success`, `info`, `warning`, `error`, and `loading`. Tone colors
-the icon, title, and border, not the body. Width is the content up to 356px,
-or the viewport minus gutters on small screens.
+the icon, title, and border, not the body.
 
 Use `EmptyPanel` for empty states, `TableBodySkeleton` for loading table bodies,
 and `<Card flush>` for an edge-to-edge list or table. `Table` scrolls wide
@@ -163,32 +161,8 @@ or its `data-slot`.
 `text-base md:text-sm`, `border-input`, and `shadow-xs`. Do not restyle those
 triggers as outline buttons in application code.
 
-`form/*` fields stack label, hint, control, and error with `gap-1.5`, and the
-error sits below the control. It takes no space until it shows, so a row of
-fields keeps its controls on one top edge only with `items-start`
-(`grid grid-cols-2 items-start gap-3`); the default `stretch` is fine for a
-single column. Wrap a control the kit has no form field for (a colour
-picker) in `FormControlField` instead of `Field` and `FieldLabel`, whose
-`gap-3` spacing does not match. A field shows its error once the person has
-touched it (`meta.isTouched`), never on a field they have not reached yet.
-`submitted` is for form libraries that do not mark every field touched on
-submit; TanStack Form does, so its users pass `meta` only.
-
-Use `Tabs` with actual `TabsContent` panels. For URL view switches, use a labelled
-`TabsNav` of `TabsNavLink`s with `active` from the app. App-shell destinations
-(Calendar, Tasks, Settings) use `NavLink` from `nav-link`: a pill with `active`
-from the app, not tabs. Both links take `asChild` for a router link, or come
-as Next adapters (`next/tabs-nav-link`, `next/nav-link`); `isNavActive`
-compares the pathname with a link's `href`. `TabsNav` and `TabsList` scroll overflowing
-labels inside themselves, like `Table`. Do not wrap them in another
-horizontal scroller: that pairing adds a stray vertical scrollbar.
-
-Use the `form/*` fields (one row each in COMPONENTS.md) for portable form
-controls, and `FieldError` for field messages. `Combobox` (popover)
-and `SearchPicker` (always-visible list), `DatePickerButton` (including
-`mode="range"`), `DateTimePickerButton`, `Slider`, `Meter` (scale with ticks;
-`Progress` is a plain 0–100 job bar), `InfoTip` (longer than `Tooltip`),
-`Markdown`, `ColorLegend`, `StatTile`, `ThemeProvider`, `ErrorBoundary`, and
-`SortableTableHead` are first-class kit pieces. Domain data and application
-shells stay with the application: currency or timezone option lists,
-query-library error views, and WYSIWYG editors.
+Build forms from the `form/*` fields; [Forms](./COMPONENTS.md#forms) in
+COMPONENTS.md says how they lay out and when they show errors. Pick other
+components by their rows there. Domain data and application shells stay
+with the application: currency or timezone option lists, query-library
+error views, and WYSIWYG editors.

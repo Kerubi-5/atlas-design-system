@@ -236,6 +236,28 @@ test("every component story has usage guidance", async () => {
   }
 })
 
+test("usage guidance links point at a published guide heading", async () => {
+  const usageSource = await fs.readFile(
+    path.join(siteRoot, "src/lib/usage.ts"),
+    "utf8"
+  )
+  const index = JSON.parse(
+    await fs.readFile(path.join(output, "docs-index.json"), "utf8")
+  )
+  const links = [...usageSource.matchAll(/\]\(\.\/([^)#]+)(?:#([^)]+))?\)/g)]
+  assert.ok(links.length > 0, "usage.ts links to the guides")
+  for (const [link, file, anchor] of links) {
+    const guide = index.documents.find((document) => document.path === file)
+    assert.ok(guide, `${link}: ${file} is a published guide`)
+    if (anchor) {
+      assert.ok(
+        guide.headings.some((heading) => heading.anchor === anchor),
+        `${link}: ${file} has a #${anchor} heading`
+      )
+    }
+  }
+})
+
 test("every component story sits in a sidebar group", async () => {
   const groups = new Set(sidebarGroups)
   const storiesDir = path.join(siteRoot, "stories")
@@ -250,24 +272,6 @@ test("every component story sits in a sidebar group", async () => {
       `${file}: title "${title}" should be "<Group>/<Name>" with a group from storySort in .storybook/preview.tsx`
     )
   }
-})
-
-test("beta labels match between COMPONENTS.md and the docs site", async () => {
-  const guide = await fs.readFile(path.join(repoRoot, "COMPONENTS.md"), "utf8")
-  const betaLine = /\*\*Beta\*\*[\s\S]*?:([\s\S]*?)\n\n/.exec(guide)?.[1] ?? ""
-  const inGuide = [...betaLine.matchAll(/`([a-z-]+)`/g)].map((m) => m[1]).sort()
-  const usageSource = await fs.readFile(
-    path.join(siteRoot, "src/lib/usage.ts"),
-    "utf8"
-  )
-  const betaBlock = /export const beta = new Set\(\[([\s\S]*?)\]\)/.exec(
-    usageSource
-  )?.[1]
-  const inSite = [...(betaBlock ?? "").matchAll(/"([^"]+)"/g)]
-    .map((m) => m[1].toLowerCase().replaceAll(" ", "-"))
-    .sort()
-  assert.ok(inGuide.length > 0, "COMPONENTS.md lists beta components")
-  assert.deepEqual(inSite, inGuide)
 })
 
 test("hosting serves Storybook from the site root without an SPA fallback", async () => {
