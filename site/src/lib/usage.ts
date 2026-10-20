@@ -1,23 +1,20 @@
+import components from "../../../COMPONENTS.md?raw"
+
 /**
- * Beta components (see COMPONENTS.md "Status"), keyed like `usage`. The build
- * test keeps this list and COMPONENTS.md in sync.
+ * Beta components, read from the **Beta** paragraph under COMPONENTS.md
+ * "Status" and keyed like `usage` (`dropdown-menu` → `Dropdown menu`).
  */
-export const beta = new Set([
-  "Accordion",
-  "Avatar",
-  "Breadcrumb",
-  "Chart",
-  "Dropdown menu",
-  "Kanban",
-  "Nav link",
-  "Page header",
-  "Pagination",
-  "Period stepper",
-  "Radio group",
-  "Skip link",
-  "Spinner",
-  "Switch",
-])
+const betaParagraph =
+  /\*\*Beta\*\*[\s\S]*?:([\s\S]*?)\n\n/.exec(components)?.[1] ?? ""
+export const beta = new Set(
+  [...betaParagraph.matchAll(/`([a-z-]+)`/g)].map(([, subpath = ""]) => {
+    const name = subpath.replaceAll("-", " ")
+    return name.charAt(0).toUpperCase() + name.slice(1)
+  })
+)
+if (beta.size === 0) {
+  throw new Error('COMPONENTS.md "Status" has no **Beta** list to read')
+}
 
 /**
  * "When to use" guidance shown on each component's docs page, keyed by the
@@ -44,11 +41,11 @@ export const usage: Record<string, string> = {
 
 **Accessibility** Give \`AvatarImage\` an \`alt\` unless the name is already shown next to it (then use \`alt=""\`). The fallback shows initials while the image loads or if it fails.`,
   Badge: `
-**Use for** short status or category labels: Paid, Pending, Beta. Use \`variant="soft"\` with a \`tone\` for status.
+**Use for** short status or category labels: Paid, Pending, Beta. Status chips take their variant and tone from [Tokens](./DESIGN_RULES.md#tokens).
 
 **Not for** actions (use \`Button\`) or long text.
 
-**Accessibility** Don't rely on color alone: the word carries the meaning. Every soft tone meets AA in both themes.`,
+**Accessibility** Don't rely on color alone: the word carries the meaning.`,
   Breadcrumb: `
 **Use for** showing where a page sits in a hierarchy of three or more levels, with links back up.
 
@@ -60,7 +57,7 @@ export const usage: Record<string, string> = {
 
 **Not for** navigation to another page (use a link; \`asChild\` can style one as a button).
 
-**Accessibility** Label with a verb ("Save order"). Icon-only buttons need \`aria-label\`; add a \`Tooltip\` for sighted users.`,
+**Accessibility** Label with a verb ("Save order"). Name icon-only buttons as [Accessibility](./DESIGN_RULES.md#accessibility) says, and add a \`Tooltip\` for sighted users.`,
   Calendar: `
 **Use for** an always-visible month grid, such as a scheduling sidebar.
 
@@ -126,7 +123,7 @@ export const usage: Record<string, string> = {
 
 **Not for** choosing a form value (use \`Select\` or \`Combobox\`) or site navigation.
 
-**Accessibility** Opens with Enter, Space, or Arrow Down; arrows move between items; typing jumps to an item. Icon-only triggers need \`aria-label\`.`,
+**Accessibility** Opens with Enter, Space, or Arrow Down; arrows move between items; typing jumps to an item. Name icon-only triggers as [Accessibility](./DESIGN_RULES.md#accessibility) says.`,
   "Empty panel": `
 **Use for** the space where a list, table, or widget will show content once there is some.
 
@@ -150,7 +147,7 @@ export const usage: Record<string, string> = {
 
 **Not for** a short label (use \`Tooltip\`) or a glossary / "coming soon" chip.
 
-**Accessibility** \`label\` is required (\`aria-label\` on the icon button). Hover opens only on a fine pointer; click, tap, and keyboard always toggle it.`,
+**Accessibility** \`label\` is required (\`aria-label\` on the icon button). Click, tap, and keyboard always toggle it.`,
   Input: `
 **Use for** single-line text: names, emails, search terms, numbers.
 
@@ -178,13 +175,13 @@ export const usage: Record<string, string> = {
   Meter: `
 **Use for** a current value against a scale, with optional ticks: spend vs a cap, pace vs typical.
 
-**Not for** a determinate job bar (use \`Progress\`) or an unknown wait (use \`Spinner\`).
+**Not for** an unknown wait (use \`Spinner\`). The \`meter\` and \`progress\` rows in [Components](./COMPONENTS.md) say when to use \`Progress\` instead.
 
 **Accessibility** It is \`role="meter"\` with \`aria-valuemin\`, \`aria-valuemax\`, and \`aria-valuenow\`. \`aria-label\` is required.`,
   "Nav link": `
 **Use for** app-shell navigation: Calendar, Tasks, Settings. Pass \`active\` from the route; the kit has no router.
 
-**Not for** in-page view switches that belong in the URL as tabs (use \`TabsNav\` / \`TabsNavLink\`) or a hierarchy trail (use \`Breadcrumb\`).
+**Not for** a hierarchy trail (use \`Breadcrumb\`). [App shell navigation](./COMPONENTS.md#app-shell-navigation) says when to use \`TabsNav\` instead.
 
 **Accessibility** The current item is \`aria-current="page"\`; \`isNavActive(pathname, href)\` decides it. Pass \`asChild\` to render a router link, or use \`next/nav-link\` in Next. Put the links in a labelled \`nav\`.`,
   "Page header": `
@@ -208,7 +205,7 @@ export const usage: Record<string, string> = {
   Progress: `
 **Use for** a job with a known percentage: uploads, imports, multi-step processing.
 
-**Not for** unknown durations (use \`Spinner\`) or a value against a scale with ticks (use \`Meter\`).
+**Not for** unknown durations (use \`Spinner\`). The \`meter\` and \`progress\` rows in [Components](./COMPONENTS.md) say when to use \`Meter\` instead.
 
 **Accessibility** Name it with \`aria-label\` or \`aria-labelledby\` and show the percentage as text.`,
   "Radio group": `
@@ -252,9 +249,9 @@ export const usage: Record<string, string> = {
 
 **Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
 
-**Writing** Past tense and short. Mount one \`Toaster\` near the app root and call \`toast()\`, \`toast.success()\`, or \`toast.error()\` from \`atlas-react-kit/toast\`. To turn a \`toast.loading()\` into its result, pass its id: \`toast.success("Saved", { id })\`.
+**Writing** Past tense and short.
 
-**Look** A plain \`toast("Saved")\` has no icon. \`success\`, \`info\`, \`warning\`, \`error\`, and \`loading\` add a status icon. Tone colors the icon, title, and border, not the body. The close control is a circular badge on the top-right corner. Left padding matches Alert (\`pl-4\`); the right is \`pr-6\` so copy clears the badge.`,
+**Setup** The \`toast\` row in [Components](./COMPONENTS.md) shows how to mount \`Toaster\` and call \`toast()\`.`,
   "Stat tile": `
 **Use for** a labelled figure in a summary strip: spent, remaining, a count. Optional children hold a \`Meter\`.
 
@@ -282,7 +279,7 @@ export const usage: Record<string, string> = {
   Tabs: `
 **Use for** switching between panels of related content on one page.
 
-**Not for** navigation that changes the URL (use \`TabsNav\` with \`TabsNavLink\`s).
+**Not for** navigation: [App shell navigation](./COMPONENTS.md#app-shell-navigation) says when to use \`TabsNav\` or \`NavLink\`.
 
 **Accessibility** Arrow keys move between tabs; every \`TabsTrigger\` needs a matching \`TabsContent\`. A long row scrolls horizontally inside \`TabsList\` / \`TabsNav\` (no vertical scrollbar) and joins the tab order while it overflows, like \`Table\`.`,
   Textarea: `
@@ -292,27 +289,27 @@ export const usage: Record<string, string> = {
 
 **Accessibility** Pair with a visible \`Label\`; set \`aria-invalid\` with a field error.`,
   "Theme provider": `
-**Use for** light, dark, and system themes at the app root. The \`d\` shortcut toggles the theme outside text fields and typeahead widgets.
+**Use for** light, dark, and system themes at the app root.
 
 **Not for** per-component theming; tokens already switch with the theme.
 
-**Accessibility** Respect the system preference by default (\`defaultTheme="system"\`); turn off the shortcut with \`enableShortcut={false}\` if it clashes with app shortcuts.`,
+**Accessibility** Respect the system preference by default (\`defaultTheme="system"\`). Read [Theme](./COMPONENTS.md#theme) before turning on the \`d\` shortcut.`,
   "Toggle group": `
 **Use for** a small set of pressed/unpressed options shown together, such as view modes (List, Board).
 
 **Not for** form values submitted later (use \`RadioGroup\` or \`Checkbox\`) or navigation (use \`Tabs\` or \`TabsNav\`).
 
-**Accessibility** Give icon-only items \`aria-label\`; arrow keys move between items. The selected item uses the same wash, \`text-selected-foreground\`, and \`border-selected-foreground\` as a pressed \`Toggle\`, including in single (radio) mode.`,
+**Accessibility** Name icon-only items as [Accessibility](./DESIGN_RULES.md#accessibility) says; arrow keys move between items. The selected item uses the same wash, \`text-selected-foreground\`, and \`border-selected-foreground\` as a pressed \`Toggle\`, including in single (radio) mode.`,
   Toggle: `
 **Use for** a single pressed/unpressed control, such as Bold in a toolbar.
 
 **Not for** settings (use \`Switch\`).
 
-**Accessibility** Exposes \`aria-pressed\` and \`data-state=on\`; icon-only toggles need \`aria-label\`. The pressed look is the selected wash plus a \`selected-foreground\` border.`,
+**Accessibility** Exposes \`aria-pressed\` and \`data-state=on\`; name icon-only toggles as [Accessibility](./DESIGN_RULES.md#accessibility) says. The pressed look is the selected wash plus a \`selected-foreground\` border.`,
   Tooltip: `
 **Use for** short labels on icon-only buttons and hints for truncated text.
 
 **Not for** essential information or anything interactive (use visible text or a \`Popover\`).
 
-**Accessibility** Opens on hover and keyboard focus. Keep \`aria-label\` on icon buttons; the tooltip helps sighted users.`,
+**Accessibility** Opens on hover and keyboard focus. It helps sighted users but does not name the button; name icon buttons as [Accessibility](./DESIGN_RULES.md#accessibility) says.`,
 }

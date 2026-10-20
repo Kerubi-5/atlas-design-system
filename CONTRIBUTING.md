@@ -7,13 +7,12 @@ the same steps.
 ## Set up and check
 
 Working on the kit needs Node 22.12 or newer (Vitest 5). Apps that install
-the package only need Node 20.19.
+the package need only the Node versions in `engines` in `package.json`.
 
 ```sh
 npm ci
 npm ci --prefix site
-npm run check                     # typecheck and Prettier
-npm run test:coverage             # behavior and package tests, coverage floors
+npm run gate                      # the checks the push hook runs
 npm run build --prefix site       # Storybook build and site tests
 npm run dev --prefix site         # Storybook playground on port 6006
 npx playwright install chromium   # once, for the browser checks
@@ -21,21 +20,16 @@ npm run test:a11y --prefix site   # token contrast, axe on every story and open 
 npm run test:visual --prefix site # screenshots of every component, light, dark, 390px
 ```
 
-CI runs all of these on every pull request. Run them before you push.
+The scripts in `package.json` say what each command runs. CI runs the gate
+and the site checks on every pull request
+([check.yml](./.github/workflows/check.yml)); run them before you push.
 
 ## Commit and push checks
 
 `npm ci` installs git hooks ([lefthook.yml](./lefthook.yml)) that block a
-commit or push until the code passes. People and AI agents get the same
+commit or push until the code passes: quick checks on the staged files at
+commit, and `npm run gate` at push. People and AI agents get the same
 hooks.
-
-- **On commit**, for the staged files: Prettier, oxlint, and a secret scan
-  (secretlint).
-- **On push**, `npm run gate`: `npm run check`, then `npm run gate:static`
-  (oxlint with type information, knip, Semgrep, secretlint), the bundle-size
-  budgets (size-limit), and the tests with coverage. CI runs the same
-  `npm run gate` on every pull request, so a push that passes the hook
-  passes CI.
 
 What each tool checks and where its rules live:
 
@@ -57,8 +51,8 @@ you think about raising the budget. Raise a budget or turn off a rule only
 for a reason you can state, in the same commit, so review sees it.
 
 AI agents never skip the hooks (`--no-verify`, `LEFTHOOK=0`, or changing
-`core.hooksPath`). A person can, in an emergency: `git push --no-verify`.
-CI runs the same gate, so a skipped hook still fails the pull request.
+`core.hooksPath`). A person can, in an emergency: `git push --no-verify`;
+CI still fails the pull request.
 
 ## Add a component
 
@@ -79,15 +73,15 @@ CI runs the same gate, so a skipped hook still fails the pull request.
    accessibility). The site tests fail without one.
 5. Tests in `test/<name>.test.tsx`, next to the component's existing cases,
    for the behavior people rely on: roles, keyboard, labels, state changes.
-   `npm run test:coverage` fails below the floors in `vitest.config.ts`
-   (95% of lines).
+   `npm run test:coverage` fails below the coverage floors in
+   `vitest.config.ts`.
 6. A screenshot entry in `site/tests/visual/components.spec.ts` (and in
    `phoneStories` if its layout changes at 390px); the visual test fails
    when a component page has none. If it opens an overlay, list it in
    `site/tests/overlays.mjs` instead (id, what it shows, how to open it):
    the screenshot captures it open and axe scans it open.
 7. A row in [COMPONENTS.md](./COMPONENTS.md). New components start as **beta**: add them to
-   the Status list there and to `beta` in `site/src/lib/usage.ts`.
+   the Status list there, which the docs site reads its beta labels from.
 8. When it covers a common need, a row in the agent skill's table in
    `skills/atlas-react-kit/SKILL.md`.
 9. A `CHANGELOG.md` entry under Unreleased.
@@ -139,11 +133,11 @@ major upgrade ships as a kit major.
   changes, and any change to a beta component's API.
 - **Patch** (1.x.y): bug fixes that change no API.
 
-To release, bump `version` in `package.json`, rename the changelog's
-Unreleased heading to the version and date, and update the version in the
-README install snippet. Merging that to `main` publishes to npm through the
-release workflow (OIDC trusted publishing) after check, test, and pack
-pass. Versions already on npm are skipped.
+To release, run `npm version X.Y.Z --no-git-tag-version` (it updates
+`package.json` and `package-lock.json`) and rename the changelog's
+Unreleased heading to the version and date. Merging that to `main` runs the
+release workflow, which publishes to npm (OIDC trusted publishing) once the
+Check workflow passes on that commit. Versions already on npm are skipped.
 
 If trusted publishing is not configured, pack and publish a validated
 artifact with the package owner's npm login:

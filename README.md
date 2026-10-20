@@ -4,11 +4,11 @@ Shared React components and a Tailwind theme with square corners, semantic
 colors, and distinct selected states. From 1.0 the API is stable: breaking
 changes to stable components only ship in a major release (see
 [CONTRIBUTING.md](./CONTRIBUTING.md#versions-and-releases)).
-React 19, Tailwind 4, and Node >=20.19 are required. Next 16 is needed only
-when using `next/nav-link`, `next/period-stepper`, or `next/tabs-nav-link`.
+The React, Tailwind, and Node versions it supports are `peerDependencies`
+and `engines` in `package.json`.
 
 ```sh
-npm install --save-exact atlas-react-kit@1.2.0
+npm install --save-exact atlas-react-kit
 ```
 
 Import components by subpath:
@@ -42,9 +42,10 @@ this example assumes it is one directory below the project root.
 ```
 
 The theme includes animations and shared light/dark tokens. Wrap the tree with
-`ThemeProvider` from `atlas-react-kit/theme-provider` (install
-`next-themes@^0.4.6` first), or set the `dark` class on an ancestor to activate
-dark colors. Supply your own font configuration;
+`ThemeProvider` from `atlas-react-kit/theme-provider` (install `next-themes`
+from the [install table](./COMPONENTS.md#optional-peer-dependencies) first),
+or set the `dark` class on an ancestor to activate dark colors. Supply your
+own font configuration;
 `font-heading` uses the configured sans font. Application-specific tokens stay
 with the application.
 
