@@ -34,13 +34,8 @@ export function metaErrorText(
   return getFieldErrorMessage(meta.errors[0])
 }
 
-/** `aria-invalid` for the control: `true` while there is error text. */
-export function invalidWhen(errorText: string | undefined) {
-  return errorText ? true : undefined
-}
-
 /** Id of the label `FormFieldShell` renders for control `id`. */
-export function labelIdFor(id: string) {
+function labelIdFor(id: string) {
   return `${id}-label`
 }
 
@@ -63,18 +58,43 @@ function requiredIdFor(id: string) {
 }
 
 /**
- * `aria-describedby` for the control: the given hint ids, plus the error
- * text while there is one, or `undefined` when there is nothing to read.
+ * ARIA for a field's control, from the ids `FormFieldShell` renders:
+ * invalid while there is error text, described by the hint, the hidden
+ * "Required" text, and the error. `required: "described"` is for a button
+ * trigger, which cannot take `aria-required`; leave `required` out where
+ * the control carries native `required`. `labelledBy: "label"` names a
+ * group; `"label-value"` reads a picker "label, value".
  */
-export function describedBy(
+export function fieldAria(
   id: string,
   errorText: string | undefined,
-  ...hintIds: Array<string | undefined>
+  {
+    description,
+    required,
+    labelledBy,
+  }: {
+    /** The field's hint; when set, the control is described by it. */
+    description?: ReactNode
+    required?: boolean | "described"
+    labelledBy?: "label" | "label-value"
+  } = {}
 ) {
-  const ids = [...hintIds, errorText ? errorIdFor(id) : undefined].filter(
-    Boolean
-  )
-  return ids.length ? ids.join(" ") : undefined
+  const describedBy = [
+    description ? descriptionIdFor(id) : undefined,
+    required === "described" ? requiredIdFor(id) : undefined,
+    errorText ? errorIdFor(id) : undefined,
+  ].filter(Boolean)
+  return {
+    "aria-invalid": errorText ? (true as const) : undefined,
+    "aria-describedby": describedBy.length ? describedBy.join(" ") : undefined,
+    "aria-required": required === true ? (true as const) : undefined,
+    ...(labelledBy && {
+      "aria-labelledby":
+        labelledBy === "label"
+          ? labelIdFor(id)
+          : `${labelIdFor(id)} ${pickerValueId(id)}`,
+    }),
+  }
 }
 
 /**
@@ -104,28 +124,6 @@ export type PickerFieldBaseProps = FormFieldBaseProps &
     /** Day Picker options forwarded to the calendar (disabled days, etc.). */
     calendarProps?: DatePickerCalendarProps
   }
-
-/**
- * Trigger ARIA for the date and date-time fields: invalid while there is
- * error text, named "label, value" (a `<label for>` alone would hide the
- * picked value), and described by "Required" (a button cannot take
- * `aria-required`) and the error.
- */
-export function pickerFieldAria(
-  id: string,
-  errorText: string | undefined,
-  required?: boolean
-) {
-  return {
-    "aria-invalid": invalidWhen(errorText),
-    "aria-labelledby": `${labelIdFor(id)} ${pickerValueId(id)}`,
-    "aria-describedby": describedBy(
-      id,
-      errorText,
-      required ? requiredIdFor(id) : undefined
-    ),
-  }
-}
 
 /**
  * Label, control, and error text stacked with the kit's field spacing.

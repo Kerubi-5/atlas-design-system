@@ -17,6 +17,7 @@ import {
 } from "sonner"
 
 import { buttonVariants } from "./button.js"
+import { statusTone } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /*
@@ -130,7 +131,7 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  *
  * Icon policy: a plain `toast()` has no icon. `success`, `info`, `warning`,
  * `error`, and `loading` each show a status icon. Tone colors the icon, title,
- * and border (same approach as Alert), not the body text.
+ * and border (`statusTone`, shared with Alert), not the body text.
  *
  * Close button: a circular badge centred on the top-right corner (`-top-2
  * -right-2`, half outside the border). Ghost / icon-xs still supplies the
@@ -160,7 +161,7 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   // 1.625rem = 16px icon + 10px gap-x-2.5.
   content:
     "flex min-w-0 flex-1 basis-full flex-col gap-1 [[data-icon]+&]:basis-[calc(100%-1.625rem)]",
-  title: "font-medium leading-5",
+  title: "font-medium leading-5 text-(--status-tone)",
   description: "leading-5 text-muted-foreground",
   icon: "flex size-4 shrink-0 items-center justify-center [&_svg]:size-4",
   actionButton: cn(buttonVariants({ size: "xs" }), "shrink-0"),
@@ -172,17 +173,17 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
     buttonVariants({ variant: "ghost", size: "icon-xs" }),
     "!absolute !-top-2 !-right-2 !left-auto !z-10 !size-6 !rounded-full !border !border-border !bg-popover !p-0 !text-muted-foreground !shadow-xs !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
   ),
-  success: "border-success/40 [&_[data-title]]:text-success",
-  info: "[&_[data-title]]:text-foreground",
-  warning: "border-warning/40 [&_[data-title]]:text-warning",
-  error: "border-destructive/40 [&_[data-title]]:text-destructive",
+  success: statusTone.success,
+  info: statusTone.neutral,
+  warning: statusTone.warning,
+  error: statusTone.destructive,
 }
 
 const icons: SonnerProps["icons"] = {
-  success: <CircleCheckIcon aria-hidden className="text-success" />,
-  info: <InfoIcon aria-hidden className="text-foreground" />,
-  warning: <CircleAlertIcon aria-hidden className="text-warning" />,
-  error: <CircleAlertIcon aria-hidden className="text-destructive" />,
+  success: <CircleCheckIcon aria-hidden className="text-(--status-tone)" />,
+  info: <InfoIcon aria-hidden className="text-(--status-tone)" />,
+  warning: <CircleAlertIcon aria-hidden className="text-(--status-tone)" />,
+  error: <CircleAlertIcon aria-hidden className="text-(--status-tone)" />,
   loading: (
     <LoaderCircleIcon
       aria-hidden

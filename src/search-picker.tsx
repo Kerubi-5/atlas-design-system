@@ -4,18 +4,19 @@ import * as React from "react"
 
 import { Input } from "./input.js"
 import { Label } from "./label.js"
+import { handleListboxKey } from "./internal/listbox-navigation.js"
 import {
-  handleListboxKey,
-  listboxOptionId,
-} from "./internal/listbox-navigation.js"
-import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
+  Listbox,
+  ListboxEmptyStatus,
+  listboxInputAria,
+  PickerOption,
+} from "./internal/listbox-option.js"
 import {
   createSearchIndex,
   filterSearchIndex,
   foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
-import { listboxScroll } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 export { foldSearchText }
@@ -79,7 +80,7 @@ function SearchPicker<T>({
   onSelect,
   label,
   placeholder = "Search",
-  emptyText = "No results",
+  emptyText,
   listLabel,
   disabled,
   className,
@@ -100,10 +101,7 @@ function SearchPicker<T>({
   const foldedQuery =
     filter === defaultSearchFilter ? normalizeSearchQuery(query) : ""
   const filtered = React.useMemo(() => {
-    if (normalizedItems) {
-      if (!foldedQuery) return items
-      return filterSearchIndex(normalizedItems, foldedQuery)
-    }
+    if (normalizedItems) return filterSearchIndex(normalizedItems, foldedQuery)
     return items.filter((item) => filter(item, query, getLabel))
   }, [items, filter, foldedQuery, getLabel, normalizedItems, query])
 
@@ -176,23 +174,18 @@ function SearchPicker<T>({
         role="combobox"
         aria-expanded
         aria-controls={listId}
-        aria-autocomplete="list"
-        aria-activedescendant={
-          active ? listboxOptionId(listId, highlight) : undefined
-        }
+        {...listboxInputAria(listId, active ? highlight : undefined)}
         value={query}
         disabled={disabled}
         placeholder={placeholder}
         onChange={(event) => setQuery(event.target.value)}
         onKeyDown={onKeyDown}
       />
-      <ul
+      <Listbox
         id={listId}
-        role="listbox"
+        empty={empty}
         aria-label={listLabel ?? label}
-        className={
-          empty ? "sr-only" : cn(listboxScroll, listFrame, listClassName)
-        }
+        className={cn(listFrame, listClassName)}
       >
         {rows.map(({ item, value: itemValue }, index) => (
           <PickerOption
@@ -209,7 +202,7 @@ function SearchPicker<T>({
             onSelect={selectItem}
           />
         ))}
-      </ul>
+      </Listbox>
       <ListboxEmptyStatus
         data-slot="search-picker-empty"
         empty={empty}

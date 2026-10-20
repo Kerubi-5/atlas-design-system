@@ -20,10 +20,9 @@ import {
   type FormFieldMetaProps,
 } from "./field-error.js"
 import {
-  describedBy,
   descriptionIdFor,
   errorIdFor,
-  invalidWhen,
+  fieldAria,
   metaErrorText,
 } from "./field-shell.js"
 
@@ -81,9 +80,7 @@ export function FormCheckboxField({
       onBlur={onBlur}
       disabled={disabled}
       required={required}
-      aria-required={required || undefined}
-      aria-invalid={invalidWhen(errorText)}
-      aria-describedby={describedBy(id, errorText, descriptionId)}
+      {...fieldAria(id, errorText, { description, required })}
       className={className}
     />
   )
@@ -167,8 +164,7 @@ export function FormCheckboxGroupField<T extends string | number>({
   return (
     <FieldSet
       data-slot="form-field"
-      aria-invalid={invalidWhen(errorText)}
-      aria-describedby={describedBy(id, errorText, descriptionId)}
+      {...fieldAria(id, errorText, { description })}
       className={cn("gap-1.5", fieldClassName)}
     >
       <FieldLegend variant="label" className="mb-0">

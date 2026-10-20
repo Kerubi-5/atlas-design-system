@@ -53,6 +53,19 @@ export const selectedState = {
     "hover:border-selected-foreground hover:bg-selected hover:text-selected-foreground",
 }
 
+/**
+ * Status colours of Alert and Toast: a tinted border, plus `--status-tone`,
+ * which each component puts on its title and icon with
+ * `text-(--status-tone)`. `neutral` unsets the tone, so title and icon keep
+ * the surface's text colour (and a toned parent cannot leak in).
+ */
+export const statusTone = {
+  neutral: "[--status-tone:initial]",
+  success: "border-success/40 [--status-tone:var(--color-success)]",
+  warning: "border-warning/40 [--status-tone:var(--color-warning)]",
+  destructive: "border-destructive/40 [--status-tone:var(--color-destructive)]",
+}
+
 /** The "No results" row of a listbox. */
 export const listboxEmpty =
   "px-3 py-4 text-center text-sm text-muted-foreground"

@@ -51,8 +51,10 @@ describe("Toaster", () => {
     expect(item).toHaveAttribute("data-styled", "false")
     expect(item.className).toContain("bg-popover")
     expect(item.className).toContain("border-destructive/40")
+    // The icon takes the toast's tone (`statusTone`, shared with Alert).
+    expect(item.className).toContain("[--status-tone:var(--color-destructive)]")
     expect(item.querySelector("[data-icon] svg")).toHaveClass(
-      "text-destructive"
+      "text-(--status-tone)"
     )
     expect(screen.getByText("The server did not respond.")).toBeVisible()
     const retry = screen.getByRole("button", { name: "Retry" })

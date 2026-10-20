@@ -4,6 +4,8 @@ import * as React from "react"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
 import {
+  OVERLAY_COLLISION_PADDING,
+  OVERLAY_SIDE_OFFSET,
   overlayFadeZoom,
   overlaySideSlide,
   overlaySurface,
@@ -25,8 +27,8 @@ function PopoverTrigger({
 function PopoverContent({
   className,
   align = "center",
-  sideOffset = 4,
-  collisionPadding = 8,
+  sideOffset = OVERLAY_SIDE_OFFSET,
+  collisionPadding = OVERLAY_COLLISION_PADDING,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   return (

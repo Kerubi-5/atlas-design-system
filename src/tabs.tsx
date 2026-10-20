@@ -4,6 +4,10 @@ import * as React from "react"
 import { type VariantProps } from "class-variance-authority"
 import { Slot, Tabs as TabsPrimitive } from "radix-ui"
 
+import {
+  activeLinkAttributes,
+  activeLinkSelector,
+} from "./internal/active-link.js"
 import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing } from "./internal/styles.js"
 import {
@@ -84,9 +88,7 @@ function TabsScroller({
   React.useLayoutEffect(() => {
     const scroller = ref.current
     if (!scroller) return
-    const active = scroller.querySelector<HTMLElement>(
-      '[aria-current="page"], [data-state="active"]'
-    )
+    const active = scroller.querySelector<HTMLElement>(activeLinkSelector)
     if (!active || active === revealed.current) return
     revealed.current = active
     active.scrollIntoView({
@@ -195,8 +197,7 @@ function TabsNavLink({
   return (
     <Comp
       data-slot="tabs-nav-link"
-      data-state={active ? "active" : "inactive"}
-      aria-current={active ? "page" : undefined}
+      {...activeLinkAttributes(active)}
       className={cn(tabsTriggerVariants(), className)}
       {...props}
     />

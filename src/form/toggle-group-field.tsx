@@ -9,14 +9,7 @@ import type {
   FormFieldDescriptionProps,
   FormFieldMetaProps,
 } from "./field-error.js"
-import {
-  describedBy,
-  descriptionIdFor,
-  FormFieldShell,
-  invalidWhen,
-  labelIdFor,
-  metaErrorText,
-} from "./field-shell.js"
+import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 
 export type ToggleGroupFieldOption<T extends string> = {
   /** Value passed to `onValueChange` when this item is pressed. */
@@ -90,13 +83,7 @@ export function FormToggleGroupField<T extends string>({
         size={size}
         spacing={0}
         disabled={disabled}
-        aria-labelledby={labelIdFor(id)}
-        aria-invalid={invalidWhen(errorText)}
-        aria-describedby={describedBy(
-          id,
-          errorText,
-          description ? descriptionIdFor(id) : undefined
-        )}
+        {...fieldAria(id, errorText, { description, labelledBy: "label" })}
         className={className}
       >
         {options.map((option) => (

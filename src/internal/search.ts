@@ -18,10 +18,15 @@ export function createSearchIndex<T>(
   return items.map((item) => ({ item, label: foldSearchText(getLabel(item)) }))
 }
 
+/**
+ * The items whose folded label includes `needle` (a `normalizeSearchQuery`
+ * result), in order; every item when `needle` is empty.
+ */
 export function filterSearchIndex<T>(
   index: ReturnType<typeof createSearchIndex<T>>,
   needle: string
 ) {
+  if (!needle) return index.map(({ item }) => item)
   return index
     .filter(({ label }) => label.includes(needle))
     .map(({ item }) => item)

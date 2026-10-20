@@ -5,13 +5,7 @@ import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
 
 import type { FieldMetaState, FormFieldBaseProps } from "./field-error.js"
-import {
-  describedBy,
-  descriptionIdFor,
-  FormFieldShell,
-  invalidWhen,
-  metaErrorText,
-} from "./field-shell.js"
+import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 
 export type TextFieldApi = {
   /** Field name; the default control id. */
@@ -95,7 +89,6 @@ export function FormTextField({
 }) {
   const onChange = onInputChange(field.handleChange)
   const errorText = metaErrorText(field.state.meta, { submitted, showError })
-  const descriptionId = description ? descriptionIdFor(id) : undefined
   const controlProps = {
     id,
     value: field.state.value,
@@ -106,8 +99,7 @@ export function FormTextField({
     required,
     minLength,
     className,
-    "aria-invalid": invalidWhen(errorText),
-    "aria-describedby": describedBy(id, errorText, descriptionId),
+    ...fieldAria(id, errorText, { description }),
   }
 
   return (

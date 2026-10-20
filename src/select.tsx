@@ -15,6 +15,8 @@ import {
 import {
   menuLabel,
   optionRow,
+  OVERLAY_COLLISION_PADDING,
+  OVERLAY_SIDE_OFFSET,
   overlayFadeZoom,
   overlaySideSlide,
   overlaySurface,
@@ -96,8 +98,8 @@ function SelectContent({
   children,
   position = "popper",
   align = "center",
-  sideOffset = 4,
-  collisionPadding = 8,
+  sideOffset = OVERLAY_SIDE_OFFSET,
+  collisionPadding = OVERLAY_COLLISION_PADDING,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
   return (

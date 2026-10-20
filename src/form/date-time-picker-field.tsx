@@ -5,9 +5,9 @@ import { useId } from "react"
 import { DateTimePickerButton } from "../date-time-picker.js"
 
 import {
+  fieldAria,
   FormFieldShell,
   metaErrorText,
-  pickerFieldAria,
   type PickerFieldBaseProps,
 } from "./field-shell.js"
 
@@ -50,7 +50,10 @@ export function FormDateTimePickerField({
         {...picker}
         id={id}
         onValueChange={onValueChange}
-        {...pickerFieldAria(id, errorText, required)}
+        {...fieldAria(id, errorText, {
+          required: required && "described",
+          labelledBy: "label-value",
+        })}
       />
     </FormFieldShell>
   )
