@@ -49,6 +49,17 @@ function DateTimePickerHarness({
   )
 }
 
+/** The harness on `afternoon` with its calendar open. */
+async function openAfternoon() {
+  const user = createUser()
+  const onChange = vi.fn<(date: Date | null) => void>()
+  render(<DateTimePickerHarness initial={afternoon} onChange={onChange} />)
+  const trigger = screen.getByRole("button", { name: /October 10.*2:30/ })
+  await user.click(trigger)
+  expect(await screen.findByRole("grid")).toBeVisible()
+  return { user, onChange, trigger }
+}
+
 describe("resolveTimeStep", () => {
   it("defaults to 15 and rejects values that do not divide 60", () => {
     expect(resolveTimeStep(undefined)).toBe(15)
@@ -115,30 +126,18 @@ describe("DateTimePickerButton", () => {
   })
 
   it("keeps the value and the popover when the selected day is clicked again", async () => {
-    const user = createUser()
-    const onChange = vi.fn<(date: Date | null) => void>()
-    render(<DateTimePickerHarness initial={afternoon} onChange={onChange} />)
-
-    await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
-    expect(await screen.findByRole("grid")).toBeVisible()
+    const { user, onChange, trigger } = await openAfternoon()
 
     // Day Picker would deselect the day; the picker ignores that so a set
     // time is not dropped by an accidental second tap. Clear is the way out.
     await user.click(getDayButton(day(10)))
     expect(onChange).not.toHaveBeenCalled()
     expect(screen.getByRole("grid")).toBeVisible()
-    expect(
-      screen.getByRole("button", { name: /October 10.*2:30/ })
-    ).toHaveAttribute("data-empty", "false")
+    expect(trigger).toHaveAttribute("data-empty", "false")
   })
 
   it("preserves the clock when the calendar day changes", async () => {
-    const user = createUser()
-    const onChange = vi.fn<(date: Date | null) => void>()
-    render(<DateTimePickerHarness initial={afternoon} onChange={onChange} />)
-
-    await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
-    expect(await screen.findByRole("grid")).toBeVisible()
+    const { user, onChange } = await openAfternoon()
 
     await user.click(getDayButton(day(20)))
     const next = onChange.mock.calls.at(-1)?.[0]
@@ -149,14 +148,8 @@ describe("DateTimePickerButton", () => {
   })
 
   it("clears the value and returns to the placeholder", async () => {
-    const user = createUser()
-    const onChange = vi.fn<(date: Date | null) => void>()
-    render(<DateTimePickerHarness initial={afternoon} onChange={onChange} />)
-
-    const trigger = screen.getByRole("button", { name: /October 10.*2:30/ })
+    const { user, onChange, trigger } = await openAfternoon()
     expect(trigger).toHaveAttribute("data-empty", "false")
-    await user.click(trigger)
-    expect(await screen.findByRole("grid")).toBeVisible()
 
     await user.click(screen.getByRole("button", { name: "Clear" }))
     await waitForNoRole("grid")
@@ -167,12 +160,7 @@ describe("DateTimePickerButton", () => {
   })
 
   it("closes on Escape and returns focus to the trigger", async () => {
-    const user = createUser()
-    render(<DateTimePickerButton value={afternoon} onChange={() => {}} />)
-
-    const trigger = screen.getByRole("button", { name: /October 10.*2:30/ })
-    await user.click(trigger)
-    expect(await screen.findByRole("grid")).toBeVisible()
+    const { user, trigger } = await openAfternoon()
 
     await user.keyboard("{Escape}")
     await waitForNoRole("grid")

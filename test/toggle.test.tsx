@@ -66,16 +66,21 @@ describe("Toggle", () => {
   })
 })
 
+/** A single-choice Day / Week / Month group with Day on. */
+function RangeGroup() {
+  return (
+    <ToggleGroup type="single" defaultValue="day" aria-label="Range">
+      <ToggleGroupItem value="day">Day</ToggleGroupItem>
+      <ToggleGroupItem value="week">Week</ToggleGroupItem>
+      <ToggleGroupItem value="month">Month</ToggleGroupItem>
+    </ToggleGroup>
+  )
+}
+
 describe("ToggleGroup", () => {
   it("keeps a single selection", async () => {
     const user = createUser()
-    render(
-      <ToggleGroup type="single" defaultValue="day" aria-label="Range">
-        <ToggleGroupItem value="day">Day</ToggleGroupItem>
-        <ToggleGroupItem value="week">Week</ToggleGroupItem>
-        <ToggleGroupItem value="month">Month</ToggleGroupItem>
-      </ToggleGroup>
-    )
+    render(<RangeGroup />)
 
     const day = screen.getByRole("radio", { name: "Day" })
     const week = screen.getByRole("radio", { name: "Week" })
@@ -116,13 +121,7 @@ describe("ToggleGroup", () => {
 
   it("moves focus between items with arrow keys", async () => {
     const user = createUser()
-    render(
-      <ToggleGroup type="single" defaultValue="day" aria-label="Range">
-        <ToggleGroupItem value="day">Day</ToggleGroupItem>
-        <ToggleGroupItem value="week">Week</ToggleGroupItem>
-        <ToggleGroupItem value="month">Month</ToggleGroupItem>
-      </ToggleGroup>
-    )
+    render(<RangeGroup />)
 
     const day = screen.getByRole("radio", { name: "Day" })
     const week = screen.getByRole("radio", { name: "Week" })

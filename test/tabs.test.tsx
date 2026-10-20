@@ -103,19 +103,26 @@ function expectScrollerFitsList(
   }
 }
 
+/** Overview and Activity tabs in a list named "Order", Overview open. */
+function OrderTabs({ onActivityClick }: { onActivityClick?: () => void }) {
+  return (
+    <Tabs defaultValue="overview">
+      <TabsList aria-label="Order">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity" onClick={onActivityClick}>
+          Activity
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="overview">Overview panel</TabsContent>
+      <TabsContent value="activity">Activity panel</TabsContent>
+    </Tabs>
+  )
+}
+
 describe("Tabs", () => {
   it("moves between tabs with arrow keys and shows the matching panel", async () => {
     const user = createUser()
-    render(
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Order">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Overview panel</TabsContent>
-        <TabsContent value="activity">Activity panel</TabsContent>
-      </Tabs>
-    )
+    render(<OrderTabs />)
     const overview = screen.getByRole("tab", { name: "Overview" })
     expect(overview).toHaveAttribute("aria-selected", "true")
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Overview panel")
@@ -421,15 +428,7 @@ describe("TabsNavLink", () => {
 
 describe("TabsList overflow", () => {
   it("uses the same horizontal-only scroller as TabsNav", () => {
-    render(
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Order">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Overview panel</TabsContent>
-      </Tabs>
-    )
+    render(<OrderTabs />)
     const list = screen.getByRole("tablist", { name: "Order" })
     const scroller = scrollerOf(list)
     expectHorizontalOnlyScroller(scroller)
@@ -463,18 +462,7 @@ describe("TabsList overflow", () => {
   it("takes the same mouse drag as TabsNav and keeps plain clicks", async () => {
     await withOverflow(async () => {
       const onClick = vi.fn()
-      render(
-        <Tabs defaultValue="overview">
-          <TabsList aria-label="Order">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="activity" onClick={onClick}>
-              Activity
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview">Overview panel</TabsContent>
-          <TabsContent value="activity">Activity panel</TabsContent>
-        </Tabs>
-      )
+      render(<OrderTabs onActivityClick={onClick} />)
       const tab = screen.getByRole("tab", { name: "Activity" })
       const scroller = await overflowingScroller(tab)
       scroller.scrollLeft = 100

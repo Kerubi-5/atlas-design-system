@@ -15,6 +15,8 @@ import { SearchPicker } from "../src/search-picker.js"
 import { Table } from "../src/table.js"
 import { TableBodySkeleton } from "../src/table-body-skeleton.js"
 import { TabsNav } from "../src/tabs.js"
+import { placeItems } from "../stories/search-picker.js"
+
 import { classes, createUser, render, screen } from "./helpers.js"
 
 /**
@@ -105,9 +107,7 @@ describe("consumer sizing", () => {
           listClassName="max-h-96"
         />
         <SearchPicker
-          items={[{ id: "1", name: "Manila" }]}
-          getValue={(item) => item.id}
-          getLabel={(item) => item.name}
+          {...placeItems}
           onSelect={() => {}}
           label="Place"
           listClassName="max-h-none"

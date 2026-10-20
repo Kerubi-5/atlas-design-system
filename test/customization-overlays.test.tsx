@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "../src/select.js"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../src/tooltip.js"
+import { placeItems } from "../stories/search-picker.js"
 
 import { classes, createUser, render, screen, within } from "./helpers.js"
 
@@ -224,9 +225,7 @@ describe("SearchPicker customization", () => {
   it("names options and the empty state, and forwards root props", () => {
     render(
       <SearchPicker
-        items={[{ id: "1", name: "Manila" }]}
-        getValue={(item) => item.id}
-        getLabel={(item) => item.name}
+        {...placeItems}
         onSelect={() => {}}
         label="Place"
         data-testid="place-picker"
@@ -237,7 +236,7 @@ describe("SearchPicker customization", () => {
     const root = screen.getByTestId("place-picker")
     expect(root).toHaveAttribute("data-slot", "search-picker")
     expect(root).toHaveAttribute("id", "place")
-    expect(screen.getByRole("option", { name: "Manila" })).toHaveAttribute(
+    expect(screen.getByRole("option", { name: "North ward" })).toHaveAttribute(
       "data-slot",
       "search-picker-option"
     )
@@ -252,16 +251,8 @@ describe("SearchPicker customization", () => {
   })
 
   it("does not repeat the active fill on top of the shared highlight", () => {
-    render(
-      <SearchPicker
-        items={[{ id: "1", name: "Manila" }]}
-        getValue={(item) => item.id}
-        getLabel={(item) => item.name}
-        onSelect={() => {}}
-        label="Place"
-      />
-    )
-    const option = screen.getByRole("option", { name: "Manila" })
+    render(<SearchPicker {...placeItems} onSelect={() => {}} label="Place" />)
+    const option = screen.getByRole("option", { name: "North ward" })
     const names = classes(option)
     expect(names.filter((name) => name === "bg-accent")).toHaveLength(1)
   })

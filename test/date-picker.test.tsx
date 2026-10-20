@@ -31,6 +31,17 @@ import {
 
 const locale = { code: "en-US" }
 
+/** The range `spy` was last called with, as local `yyyy-MM-dd` days. */
+function lastRange(spy: {
+  mock: { calls: [DateRange | undefined, ...unknown[]][] }
+}) {
+  const range = spy.mock.calls.at(-1)?.[0]
+  return [
+    range?.from && formatLocalDate(range.from),
+    range?.to && formatLocalDate(range.to),
+  ]
+}
+
 function RangePickerHarness({
   initial,
   placeholder = "Export range",
@@ -129,11 +140,7 @@ describe("Calendar", () => {
     await user.click(getDayButton(day(5)))
     await user.click(getDayButton(new Date(2026, 10, 10)))
 
-    const last = onSelect.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.from?.getMonth()).toBe(9)
-    expect(last?.to?.getDate()).toBe(10)
-    expect(last?.to?.getMonth()).toBe(10)
+    expect(lastRange(onSelect)).toEqual(["2026-10-05", "2026-11-10"])
 
     expect(getDayButton(day(5))).toHaveAttribute("data-range-start", "true")
     expect(getDayButton(new Date(2026, 10, 10))).toHaveAttribute(
@@ -598,11 +605,7 @@ describe("DatePickerButton range mode", () => {
 
     await user.click(getDayButton(new Date(2026, 10, 10)))
     await waitForNoRole("grid")
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.from?.getMonth()).toBe(9)
-    expect(last?.to?.getDate()).toBe(10)
-    expect(last?.to?.getMonth()).toBe(10)
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-11-10"])
   })
 
   it("clears a selected range and returns to the placeholder", async () => {
@@ -646,15 +649,11 @@ describe("DatePickerButton range mode", () => {
     // (Day Picker's resetOnSelect): the clicked day is the new start.
     await user.click(getDayButton(day(20)))
     expect(screen.getAllByRole("grid")).toHaveLength(2)
-    const started = onChange.mock.calls.at(-1)?.[0]
-    expect(started?.from?.getDate()).toBe(20)
-    expect(started?.to).toBeUndefined()
+    expect(lastRange(onChange)).toEqual(["2026-10-20", undefined])
 
     await user.click(getDayButton(day(25)))
     await waitForNoRole("grid")
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(20)
-    expect(last?.to?.getDate()).toBe(25)
+    expect(lastRange(onChange)).toEqual(["2026-10-20", "2026-10-25"])
     expect(
       screen.getByRole("button", { name: /October 20.*October 25/ })
     ).toBeInTheDocument()
@@ -667,12 +666,10 @@ describe("DatePickerButton range mode", () => {
 
     expect(await openPicker(user, "Export range")).toHaveLength(2)
     await user.click(getDayButton(day(5)))
-    expect(onChange.mock.calls.at(-1)?.[0]?.to).toBeUndefined()
+    expect(lastRange(onChange)).toEqual(["2026-10-05", undefined])
 
     await user.click(getDayButton(day(5)))
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.to?.getDate()).toBe(5)
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-10-05"])
     // A same-day range keeps the popover open, as before.
     expect(screen.getAllByRole("grid")).toHaveLength(2)
   })
@@ -691,9 +688,7 @@ describe("DatePickerButton range mode", () => {
 
     await user.click(getDayButton(day(9)))
     await waitForNoRole("grid")
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.to?.getDate()).toBe(9)
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-10-09"])
   })
 
   it("keeps a two-month, auto-sized popover while the calendar is open", async () => {
