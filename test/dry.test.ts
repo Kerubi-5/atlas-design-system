@@ -38,8 +38,10 @@ const components = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
 const retyped: Array<[string, RegExp, string]> = [
   [
     "focus ring",
-    /(?<![\w-])focus-visible:(?:border-ring|ring-ring|ring-2)\b/,
-    "focusRing",
+    // Under any focus variant, including `has-focus-visible:`, and under a
+    // `group-data-*:` state that stands in for focus.
+    /(?<![\w-])(?:(?:has|group|peer)-)?focus(?:-visible|-within)?:(?:border-ring|ring-ring|ring-2)\b|group-data-\[[^\]]+\](?:\/[\w-]+)?:(?:border-ring|ring-ring|ring-2)\b/,
+    "focusRing or focusRingWithin",
   ],
   ["invalid state", /aria-invalid:(?:border|ring)-destructive/, "invalidState"],
   [
@@ -66,6 +68,11 @@ const retyped: Array<[string, RegExp, string]> = [
     "section label",
     /text-xs font-semibold tracking-widest text-muted-foreground uppercase/,
     "sectionLabel",
+  ],
+  [
+    "label text",
+    /text-xs font-semibold (?:tracking-wide )?uppercase/,
+    "labelText",
   ],
   [
     "control text",

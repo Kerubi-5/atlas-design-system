@@ -10,6 +10,7 @@ import {
   overlaySideSlide,
   overlaySurface,
 } from "./internal/overlay-styles.js"
+import { labelText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 function Popover({
@@ -71,7 +72,7 @@ function PopoverTitle({ className, ...props }: React.ComponentProps<"h2">) {
   return (
     <h2
       data-slot="popover-title"
-      className={cn("text-xs font-semibold uppercase", className)}
+      className={cn(labelText, className)}
       {...props}
     />
   )

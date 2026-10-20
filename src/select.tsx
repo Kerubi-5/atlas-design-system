@@ -6,6 +6,7 @@ import { Select as SelectPrimitive } from "radix-ui"
 import {
   dataDisabledState,
   disabledState,
+  emptyValueText,
   fieldSurface,
   focusRing,
   inlineIcon,
@@ -78,9 +79,11 @@ function SelectTrigger({
         focusRing,
         invalidState,
         disabledState,
+        emptyValueText,
+        emptyValueText,
         inlineIcon.default,
         triggerHeight[size],
-        "flex items-center justify-between gap-1.5 whitespace-nowrap data-placeholder:text-muted-foreground *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5",
+        "flex items-center justify-between gap-1.5 whitespace-nowrap *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5",
         className
       )}
       {...props}

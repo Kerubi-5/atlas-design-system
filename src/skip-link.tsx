@@ -1,5 +1,6 @@
 import type * as React from "react"
 
+import { focusRing } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -17,7 +18,8 @@ function SkipLink({
       data-slot="skip-link"
       href={href}
       className={cn(
-        "sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-3 focus:py-2 focus:text-sm focus:ring-2 focus:ring-ring",
+        "sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:bg-background focus:px-3 focus:py-2 focus:text-sm",
+        focusRing,
         className
       )}
       {...props}

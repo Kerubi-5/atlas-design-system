@@ -19,6 +19,7 @@ import {
   foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
+import { emptyValueText } from "./internal/styles.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import type { SearchPickerProps } from "./search-picker.js"
 import { cn, onInputChange } from "./utils.js"
@@ -270,17 +271,21 @@ export function Combobox({
           aria-invalid={ariaInvalid}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
+          data-empty={!selected}
           disabled={disabled}
           onKeyDown={onTriggerKeyDown}
           className={cn(
             formControlTriggerClassName,
             "justify-between",
-            !selected && "text-muted-foreground",
+            emptyValueText,
             className
           )}
         >
           <span className="truncate">{selected?.label ?? placeholder}</span>
-          <ChevronDownIcon data-icon="inline-end" className="opacity-50" />
+          <ChevronDownIcon
+            data-icon="inline-end"
+            className="text-muted-foreground"
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 
+import { labelText } from "./internal/styles.js"
 import { PickerShell, type PickerTriggerProps } from "./picker-shell.js"
 import {
   Select,
@@ -133,7 +134,7 @@ export function DateTimePickerButton({
         data-slot="date-time-picker-time"
         className="flex min-w-0 flex-col gap-2 border-t p-3"
       >
-        <p className="text-xs font-semibold tracking-wide uppercase">Time</p>
+        <p className={labelText}>Time</p>
         <div className="flex min-w-0 items-center gap-2">
           <Select
             value={date ? padTimePart(date.getHours()) : undefined}

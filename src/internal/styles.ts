@@ -11,9 +11,17 @@
 export const focusRing =
   "outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
 
+/** The same ring on a wrapper with keyboard focus inside it. */
+export const focusRingWithin =
+  "has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-background"
+
 /** `aria-invalid`: destructive border and a soft glow; the error text carries the message. */
 export const invalidState =
   "aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+
+/** Muted trigger text while empty (`data-placeholder` or `data-empty`). */
+export const emptyValueText =
+  "data-placeholder:text-muted-foreground data-[empty=true]:text-muted-foreground"
 
 /** Native `disabled`: dimmed, with no hover or click. */
 export const disabledState = "disabled:pointer-events-none disabled:opacity-50"
@@ -54,10 +62,8 @@ export const selectedState = {
 }
 
 /**
- * Status colours of Alert and Toast: a tinted border, plus `--status-tone`,
- * which each component puts on its title and icon with
- * `text-(--status-tone)`. `neutral` unsets the tone, so title and icon keep
- * the surface's text colour (and a toned parent cannot leak in).
+ * Alert and Toast tones: a border, and `--status-tone` for the title and
+ * icon (`text-(--status-tone)`). `neutral` unsets it, so they inherit.
  */
 export const statusTone = {
   neutral: "[--status-tone:initial]",
@@ -127,6 +133,9 @@ export const controlSize = {
  */
 export const controlText =
   "text-xs font-semibold tracking-widest whitespace-nowrap uppercase"
+
+/** Field-label text (Label, FieldLegend, FieldTitle, PopoverTitle). */
+export const labelText = "text-xs font-semibold tracking-wide uppercase"
 
 /**
  * Icons inside a control or row: no pointer events, no shrinking, 14px

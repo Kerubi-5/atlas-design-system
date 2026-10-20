@@ -1,6 +1,8 @@
 import type { ComponentProps, ReactNode } from "react"
+import { Slot } from "radix-ui"
 
 import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
+import type { AsChildProps } from "../internal/as-child.js"
 import { pickerValueId } from "../internal/form-control.js"
 import { Label } from "../label.js"
 import { cn } from "../utils.js"
@@ -40,12 +42,12 @@ function labelIdFor(id: string) {
 }
 
 /** Id of the hint `FormFieldShell` renders for control `id`. */
-export function descriptionIdFor(id: string) {
+function descriptionIdFor(id: string) {
   return `${id}-description`
 }
 
 /** Id of the error text `FormFieldShell` renders for control `id`. */
-export function errorIdFor(id: string) {
+function errorIdFor(id: string) {
   return `${id}-error`
 }
 
@@ -126,16 +128,60 @@ export type PickerFieldBaseProps = FormFieldBaseProps &
   }
 
 /**
- * Label, control, and error text stacked with the kit's field spacing.
- * `labelAction` sits on the label's row (the Markdown field's mode toggle).
- * Set `labelFor` to false when the control is not rendered (Markdown
- * preview), so the label does not point at a missing element.
- * `description` is a hint between the label and the control, with id
- * `descriptionIdFor(id)`. `className` and other div props go to the
- * wrapper (`data-slot="form-field"`), e.g. a width.
- * `required` marks the label; the control still sets its own `required`.
- * The error sits below the control and takes no space while there is none,
- * so put fields in a grid row with `items-start` to keep controls aligned.
+ * Every `form/*` field's wrapper (`data-slot="form-field"`): children with
+ * the field spacing, then the error text. `asChild` makes the one child the
+ * wrapper (the checkbox group's fieldset).
+ */
+export function FormFieldFrame({
+  id,
+  errorText,
+  asChild,
+  className,
+  children,
+  ...props
+}: Omit<ComponentProps<"div">, "id"> &
+  AsChildProps & {
+    /** Id of the control; the error id derives from it. */
+    id: string
+    /** Error text under the children; `undefined` shows none. */
+    errorText: string | undefined
+  }) {
+  const Comp = asChild ? Slot.Root : "div"
+  return (
+    <Comp
+      data-slot="form-field"
+      className={cn("flex flex-col gap-1.5", className)}
+      {...props}
+    >
+      <Slot.Slottable>{children}</Slot.Slottable>
+      <FieldError id={errorIdFor(id)} text={errorText} />
+    </Comp>
+  )
+}
+
+/** A field's hint, with id `descriptionIdFor(id)`. */
+export function FormFieldDescription({
+  id,
+  children,
+}: {
+  id: string
+  children: ReactNode
+}) {
+  return (
+    <p
+      id={descriptionIdFor(id)}
+      data-slot="form-field-description"
+      className="text-xs text-muted-foreground"
+    >
+      {children}
+    </p>
+  )
+}
+
+/**
+ * Label, hint, control, and error in a `FormFieldFrame`. `labelAction` sits
+ * on the label's row; `labelFor={false}` when the control is not rendered
+ * (Markdown preview). `required` marks the label only.
  */
 export function FormFieldShell({
   id,
@@ -145,7 +191,6 @@ export function FormFieldShell({
   errorText,
   labelFor = true,
   required,
-  className,
   children,
   ...props
 }: Omit<ComponentProps<"div">, "id" | "children"> & {
@@ -175,11 +220,7 @@ export function FormFieldShell({
     </Label>
   )
   return (
-    <div
-      data-slot="form-field"
-      className={cn("flex flex-col gap-1.5", className)}
-      {...props}
-    >
+    <FormFieldFrame {...props} id={id} errorText={errorText}>
       {labelAction ? (
         <div
           data-slot="form-field-header"
@@ -192,13 +233,7 @@ export function FormFieldShell({
         labelNode
       )}
       {description ? (
-        <p
-          id={descriptionIdFor(id)}
-          data-slot="form-field-description"
-          className="text-xs text-muted-foreground"
-        >
-          {description}
-        </p>
+        <FormFieldDescription id={id}>{description}</FormFieldDescription>
       ) : null}
       {children}
       {required ? (
@@ -206,7 +241,6 @@ export function FormFieldShell({
           Required
         </span>
       ) : null}
-      <FieldError id={errorIdFor(id)} text={errorText} />
-    </div>
+    </FormFieldFrame>
   )
 }

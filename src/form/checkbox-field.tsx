@@ -3,26 +3,18 @@
 import { useId } from "react"
 
 import { Checkbox } from "../checkbox.js"
-import {
-  Field,
-  FieldContent,
-  FieldDescription,
-  FieldLabel,
-  FieldLegend,
-  FieldSet,
-} from "../field.js"
+import { Field, FieldContent, FieldLabel, FieldLegend } from "../field.js"
 import { cn } from "../utils.js"
 
-import {
-  FieldError,
-  type FormFieldBaseProps,
-  type FormFieldDescriptionProps,
-  type FormFieldMetaProps,
+import type {
+  FormFieldBaseProps,
+  FormFieldDescriptionProps,
+  FormFieldMetaProps,
 } from "./field-error.js"
 import {
-  descriptionIdFor,
-  errorIdFor,
   fieldAria,
+  FormFieldDescription,
+  FormFieldFrame,
   metaErrorText,
 } from "./field-shell.js"
 
@@ -70,7 +62,6 @@ export function FormCheckboxField({
   const generatedId = useId()
   const id = idProp ?? generatedId
   const errorText = metaErrorText(meta, { submitted, showError })
-  const descriptionId = description ? descriptionIdFor(id) : undefined
 
   const checkbox = (
     <Checkbox
@@ -91,26 +82,20 @@ export function FormCheckboxField({
   )
 
   return (
-    <div
-      data-slot="form-field"
-      className={cn("flex flex-col gap-1.5", fieldClassName)}
-    >
+    <FormFieldFrame id={id} errorText={errorText} className={fieldClassName}>
       <Field orientation="horizontal">
         {controlPosition === "start" ? checkbox : null}
         {description ? (
           <FieldContent>
             {labelNode}
-            <FieldDescription id={descriptionId}>
-              {description}
-            </FieldDescription>
+            <FormFieldDescription id={id}>{description}</FormFieldDescription>
           </FieldContent>
         ) : (
           labelNode
         )}
         {controlPosition === "end" ? checkbox : null}
       </Field>
-      <FieldError id={errorIdFor(id)} text={errorText} />
-    </div>
+    </FormFieldFrame>
   )
 }
 
@@ -152,7 +137,6 @@ export function FormCheckboxGroupField<T extends string | number>({
 }: CheckboxGroupFieldProps<T>) {
   const id = useId()
   const errorText = metaErrorText(meta, { submitted, showError })
-  const descriptionId = description ? descriptionIdFor(id) : undefined
 
   function toggle(option: T, on: boolean) {
     const next = new Set(value)
@@ -162,43 +146,41 @@ export function FormCheckboxGroupField<T extends string | number>({
   }
 
   return (
-    <FieldSet
-      data-slot="form-field"
-      {...fieldAria(id, errorText, { description })}
-      className={cn("gap-1.5", fieldClassName)}
+    <FormFieldFrame
+      asChild
+      id={id}
+      errorText={errorText}
+      className={fieldClassName}
     >
-      <FieldLegend variant="label" className="mb-0">
-        {label}
-      </FieldLegend>
-      {description ? (
-        <p
-          id={descriptionId}
-          data-slot="form-field-description"
-          className="text-xs text-muted-foreground"
+      <fieldset {...fieldAria(id, errorText, { description })}>
+        <FieldLegend variant="label" className="mb-0">
+          {label}
+        </FieldLegend>
+        {description ? (
+          <FormFieldDescription id={id}>{description}</FormFieldDescription>
+        ) : null}
+        <div
+          data-slot="form-checkbox-group-options"
+          className={cn("flex flex-wrap gap-x-6 gap-y-3 pt-1", className)}
         >
-          {description}
-        </p>
-      ) : null}
-      <div
-        data-slot="form-checkbox-group-options"
-        className={cn("flex flex-wrap gap-x-6 gap-y-3 pt-1", className)}
-      >
-        {options.map((option) => {
-          const optionId = `${id}-${option.value}`
-          return (
-            <Field key={option.value} orientation="horizontal">
-              <Checkbox
-                id={optionId}
-                checked={value.includes(option.value)}
-                onCheckedChange={(next) => toggle(option.value, next === true)}
-                disabled={disabled}
-              />
-              <FieldLabel htmlFor={optionId}>{option.label}</FieldLabel>
-            </Field>
-          )
-        })}
-      </div>
-      <FieldError id={errorIdFor(id)} text={errorText} />
-    </FieldSet>
+          {options.map((option) => {
+            const optionId = `${id}-${option.value}`
+            return (
+              <Field key={option.value} orientation="horizontal">
+                <Checkbox
+                  id={optionId}
+                  checked={value.includes(option.value)}
+                  onCheckedChange={(next) =>
+                    toggle(option.value, next === true)
+                  }
+                  disabled={disabled}
+                />
+                <FieldLabel htmlFor={optionId}>{option.label}</FieldLabel>
+              </Field>
+            )
+          })}
+        </div>
+      </fieldset>
+    </FormFieldFrame>
   )
 }
