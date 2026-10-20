@@ -1,9 +1,10 @@
 /**
- * Classes shared by the kit's floating surfaces (Popover, DropdownMenu,
- * Select, Dialog, Tooltip) and the option rows inside them. Components add
- * these with `cn()` instead of retyping them, so the panels and rows look
- * and move the same everywhere. Tailwind only generates class names it
- * finds as literals, so every class appears here in full.
+ * Classes and placement defaults shared by the kit's floating surfaces
+ * (Popover, DropdownMenu, Select, Dialog, Tooltip) and the option rows
+ * inside them. Components use these instead of retyping them, so the
+ * panels and rows look, sit, and move the same everywhere. Tailwind only
+ * generates class names it finds as literals, so every class appears here
+ * in full.
  */
 
 /** The panel: square corners, popover colors, shadow, and a hairline ring. */
@@ -35,3 +36,9 @@ export const optionRow =
 /** Group label in a menu or listbox (DropdownMenuLabel, SelectLabel). */
 export const menuLabel =
   "px-3 py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+
+/** Default gap in px between a trigger and its panel (Radix `sideOffset`). */
+export const OVERLAY_SIDE_OFFSET = 4
+
+/** Default px a panel keeps from the viewport edge (Radix `collisionPadding`). */
+export const OVERLAY_COLLISION_PADDING = 8

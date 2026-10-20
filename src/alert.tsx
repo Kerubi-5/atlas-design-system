@@ -1,6 +1,7 @@
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
+import { statusTone } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -9,17 +10,14 @@ import { cn } from "./utils.js"
  * (the destructive tint is too faint for text in light mode).
  */
 const alertVariants = cva(
-  "relative grid grid-cols-[0_1fr] items-start gap-y-1 rounded-none border bg-card px-4 py-3 text-sm text-card-foreground has-[>svg]:grid-cols-[--spacing(4)_1fr] has-[>svg]:gap-x-3 [&>svg]:size-4 [&>svg]:translate-y-0.5",
+  "relative grid grid-cols-[0_1fr] items-start gap-y-1 rounded-none border bg-card px-4 py-3 text-sm text-card-foreground has-[>svg]:grid-cols-[--spacing(4)_1fr] has-[>svg]:gap-x-3 *:data-[slot=alert-title]:text-(--status-tone) [&>svg]:size-4 [&>svg]:translate-y-0.5 [&>svg]:text-(--status-tone)",
   {
     variants: {
       variant: {
-        default: "[&>svg]:text-foreground",
-        success:
-          "border-success/40 *:data-[slot=alert-title]:text-success [&>svg]:text-success",
-        warning:
-          "border-warning/40 *:data-[slot=alert-title]:text-warning [&>svg]:text-warning",
-        destructive:
-          "border-destructive/40 *:data-[slot=alert-title]:text-destructive [&>svg]:text-destructive",
+        default: statusTone.neutral,
+        success: statusTone.success,
+        warning: statusTone.warning,
+        destructive: statusTone.destructive,
       },
     },
     defaultVariants: {

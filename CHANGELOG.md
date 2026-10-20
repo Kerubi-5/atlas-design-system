@@ -2,6 +2,23 @@
 
 ## Unreleased
 
+Small visual changes from giving repeated styles one home. No public props
+change.
+
+- The focus ring on the calendar's month and year dropdowns, the
+  `KanbanBoard` card and `SkipLink` now has the kit's 2px gap, like every
+  other control. A calendar day shows the ring on keyboard focus only, not
+  after a click.
+- `FieldLegend`, `FieldTitle` and `PopoverTitle` use the same letter
+  spacing as `Label` (`tracking-wide`).
+- `FormCheckboxField`'s hint is `text-xs`, like every other `form/*` hint.
+- `Combobox`: the chevron is `text-muted-foreground` like `Select`'s,
+  instead of half opacity. With no value, the placeholder stays muted on
+  hover, focus and while open, like `Select` and the date pickers.
+- New type `FieldErrorItem` from `atlas-react-kit/field`: one error as
+  `FieldError` lists it. `FieldErrorMessage` from
+  `atlas-react-kit/form/field-error` builds on it.
+
 ## 1.2.0 - 2026-10-20
 
 Visual fixes for the layouts KairOS reported on production, plus the

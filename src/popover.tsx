@@ -4,10 +4,13 @@ import * as React from "react"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
 import {
+  OVERLAY_COLLISION_PADDING,
+  OVERLAY_SIDE_OFFSET,
   overlayFadeZoom,
   overlaySideSlide,
   overlaySurface,
 } from "./internal/overlay-styles.js"
+import { labelText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 function Popover({
@@ -25,8 +28,8 @@ function PopoverTrigger({
 function PopoverContent({
   className,
   align = "center",
-  sideOffset = 4,
-  collisionPadding = 8,
+  sideOffset = OVERLAY_SIDE_OFFSET,
+  collisionPadding = OVERLAY_COLLISION_PADDING,
   ...props
 }: React.ComponentProps<typeof PopoverPrimitive.Content>) {
   return (
@@ -69,7 +72,7 @@ function PopoverTitle({ className, ...props }: React.ComponentProps<"h2">) {
   return (
     <h2
       data-slot="popover-title"
-      className={cn("text-xs font-semibold uppercase", className)}
+      className={cn(labelText, className)}
       {...props}
     />
   )

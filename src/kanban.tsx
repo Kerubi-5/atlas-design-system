@@ -33,6 +33,7 @@ import {
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
+import { focusRingWithin } from "./internal/styles.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
 
@@ -478,7 +479,7 @@ function KanbanCardViewImpl<T extends { id: string }>({
         // The overlay moves; the source keeps its slot.
         "data-dragging:pointer-events-none data-dragging:invisible",
         // One ring on the card for the grip and the body alike.
-        "has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-background",
+        focusRingWithin,
         onCardClick && "hover:border-foreground/15",
         className
       )}

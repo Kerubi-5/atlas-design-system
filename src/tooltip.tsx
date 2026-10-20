@@ -3,7 +3,10 @@
 import * as React from "react"
 import { Tooltip as TooltipPrimitive } from "radix-ui"
 
-import { overlaySideSlide } from "./internal/overlay-styles.js"
+import {
+  OVERLAY_SIDE_OFFSET,
+  overlaySideSlide,
+} from "./internal/overlay-styles.js"
 import { cn } from "./utils.js"
 
 /** True inside a TooltipProvider, so `Tooltip` does not add its own. */
@@ -51,7 +54,7 @@ function TooltipTrigger({
 function TooltipContent({
   className,
   arrowClassName,
-  sideOffset = 4,
+  sideOffset = OVERLAY_SIDE_OFFSET,
   children,
   ...props
 }: React.ComponentProps<typeof TooltipPrimitive.Content> & {

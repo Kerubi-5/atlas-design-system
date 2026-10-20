@@ -5,12 +5,7 @@ import { type ReactNode, useId } from "react"
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
 import type { FormFieldBaseProps, FormFieldMetaProps } from "./field-error.js"
-import {
-  describedBy,
-  FormFieldShell,
-  invalidWhen,
-  metaErrorText,
-} from "./field-shell.js"
+import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps & {
@@ -68,9 +63,7 @@ export function FormSelectField({
         <SelectTrigger
           id={id}
           className={className}
-          aria-required={required || undefined}
-          aria-invalid={invalidWhen(errorText)}
-          aria-describedby={describedBy(id, errorText)}
+          {...fieldAria(id, errorText, { required })}
         >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>

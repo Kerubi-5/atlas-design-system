@@ -8,12 +8,7 @@ import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
-import {
-  describedBy,
-  FormFieldShell,
-  invalidWhen,
-  metaErrorText,
-} from "./field-shell.js"
+import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 import type { TextFieldBaseProps } from "./text-field.js"
 
 type Mode = "write" | "preview"
@@ -98,8 +93,7 @@ export function FormMarkdownField({
           rows={rows}
           required={required}
           className={className}
-          aria-invalid={invalidWhen(errorText)}
-          aria-describedby={describedBy(id, errorText)}
+          {...fieldAria(id, errorText)}
         />
       ) : (
         <div

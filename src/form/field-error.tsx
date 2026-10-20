@@ -1,8 +1,10 @@
 import type { ReactNode } from "react"
 
+import type { FieldErrorItem } from "../field.js"
 import { cn } from "../utils.js"
 
-export type FieldErrorMessage = string | { message?: string } | undefined
+/** An error as TanStack Form reports it: text, or an error with a `message`. */
+export type FieldErrorMessage = string | FieldErrorItem
 
 export type FieldMetaState = {
   /** Validation errors for the field; the `form/*` fields show the first. */

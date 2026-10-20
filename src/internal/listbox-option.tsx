@@ -4,7 +4,39 @@ import { CheckIcon } from "lucide-react"
 import { cn } from "../utils.js"
 import { listboxOptionId, scrollOptionIntoView } from "./listbox-navigation.js"
 import { optionRow } from "./overlay-styles.js"
-import { listboxEmpty, optionState } from "./styles.js"
+import { listboxEmpty, listboxScroll, optionState } from "./styles.js"
+
+/**
+ * ARIA for the search input of a listbox; the input sets `aria-controls`
+ * itself, where the linter can see it.
+ */
+export function listboxInputAria(
+  listId: string,
+  activeIndex: number | undefined
+) {
+  return {
+    "aria-autocomplete": "list" as const,
+    "aria-activedescendant":
+      activeIndex === undefined
+        ? undefined
+        : listboxOptionId(listId, activeIndex),
+  }
+}
+
+/** The scrolling listbox; sr-only while `ListboxEmptyStatus` shows. */
+export function Listbox({
+  empty,
+  className,
+  ...props
+}: Omit<React.ComponentProps<"ul">, "role"> & { empty: boolean }) {
+  return (
+    <ul
+      role="listbox"
+      className={empty ? "sr-only" : cn(listboxScroll, className)}
+      {...props}
+    />
+  )
+}
 
 type ListboxOptionProps = Omit<
   React.ComponentProps<"button">,
@@ -96,14 +128,15 @@ export const PickerOption = React.memo(
 ) as typeof PickerOptionInner
 
 /**
- * The "No results" status. It sits outside the listbox, which may own only
- * options, and stays mounted (sr-only when not empty) so screen readers
- * announce the empty state as the query changes.
+ * The "No results" status (`children`, default "No results"). It sits
+ * outside the listbox, which may own only options, and stays mounted
+ * (sr-only when not empty) so screen readers announce the empty state as
+ * the query changes.
  */
 export function ListboxEmptyStatus({
   empty,
   className,
-  children,
+  children = "No results",
   ...props
 }: Omit<React.ComponentProps<"div">, "role"> & { empty: boolean }) {
   return (

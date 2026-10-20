@@ -2,6 +2,7 @@ import * as React from "react"
 import { cva } from "class-variance-authority"
 import { Slot } from "radix-ui"
 
+import { activeLinkAttributes } from "./internal/active-link.js"
 import type { AsChildProps } from "./internal/as-child.js"
 import { focusRing, selectedState } from "./internal/styles.js"
 import { cn } from "./utils.js"
@@ -53,8 +54,7 @@ function NavLink({
   return (
     <Comp
       data-slot="nav-link"
-      data-state={active ? "active" : "inactive"}
-      aria-current={active ? "page" : undefined}
+      {...activeLinkAttributes(active)}
       className={cn(navLinkVariants(), className)}
       {...props}
     />

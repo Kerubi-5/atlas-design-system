@@ -9,13 +9,7 @@ import type {
   FormFieldDescriptionProps,
   FormFieldMetaProps,
 } from "./field-error.js"
-import {
-  describedBy,
-  descriptionIdFor,
-  FormFieldShell,
-  invalidWhen,
-  metaErrorText,
-} from "./field-shell.js"
+import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps &
@@ -57,13 +51,7 @@ export function FormComboboxField({
       <Combobox
         {...props}
         id={id}
-        aria-required={required || undefined}
-        aria-invalid={invalidWhen(errorText)}
-        aria-describedby={describedBy(
-          id,
-          errorText,
-          description ? descriptionIdFor(id) : undefined
-        )}
+        {...fieldAria(id, errorText, { description, required })}
       />
     </FormFieldShell>
   )

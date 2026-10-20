@@ -3,6 +3,7 @@
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
+import { labelText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 import { Label } from "./label.js"
 import { Separator } from "./separator.js"
@@ -32,10 +33,7 @@ function FieldLegend({
     <legend
       data-slot="field-legend"
       data-variant={variant}
-      className={cn(
-        "mb-3 font-semibold uppercase data-[variant=label]:text-xs data-[variant=legend]:text-xs",
-        className
-      )}
+      className={cn("mb-3", labelText, className)}
       {...props}
     />
   )
@@ -136,7 +134,8 @@ function FieldTitle({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="field-label"
       className={cn(
-        "flex w-fit items-center gap-2 text-xs font-semibold uppercase group-data-[disabled=true]/field:opacity-50 in-data-[slot=field-label]:font-semibold",
+        labelText,
+        "flex w-fit items-center gap-2 group-data-[disabled=true]/field:opacity-50 in-data-[slot=field-label]:font-semibold",
         className
       )}
       {...props}
@@ -190,6 +189,9 @@ function FieldSeparator({
   )
 }
 
+/** One error as form libraries report it; `FieldError` shows its `message`. */
+type FieldErrorItem = { message?: string } | undefined
+
 function FieldError({
   className,
   children,
@@ -197,7 +199,7 @@ function FieldError({
   ...props
 }: React.ComponentProps<"div"> & {
   /** Errors to list, deduplicated by message; `children` replaces them. */
-  errors?: Array<{ message?: string } | undefined>
+  errors?: FieldErrorItem[]
 }) {
   const content = useMemo(() => {
     if (children) {
@@ -254,3 +256,4 @@ export {
   FieldContent,
   FieldTitle,
 }
+export type { FieldErrorItem }

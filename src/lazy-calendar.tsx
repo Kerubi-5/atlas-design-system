@@ -2,6 +2,7 @@
 
 import * as React from "react"
 
+import { calendarSize } from "./internal/calendar-size.js"
 import { Spinner } from "./spinner.js"
 import { cn } from "./utils.js"
 
@@ -23,12 +24,14 @@ const LazyCalendarInner = React.lazy(() =>
 
 /**
  * While loading, a placeholder the size of a one-month calendar, measured in
- * the calendar's own `--cell-size` (7 columns plus `p-3`; about 9 cells
+ * the calendar's own `calendarSize` (7 columns plus padding; about 9 cells
  * tall), so the popover does not jump. It takes the calendar's `className`,
  * so a `--cell-size` override sizes both.
  */
-const fallbackClassName =
-  "flex h-[calc(var(--cell-size)*9)] w-[calc(var(--cell-size)*7+--spacing(6))] items-center justify-center [--cell-size:--spacing(8)]"
+const fallbackClassName = cn(
+  "flex h-[calc(var(--cell-size)*9)] w-[calc(var(--cell-size)*7+var(--calendar-padding)*2)] items-center justify-center",
+  calendarSize
+)
 
 export function LazyCalendar(
   props: React.ComponentProps<typeof LazyCalendarInner>

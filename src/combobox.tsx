@@ -6,18 +6,20 @@ import { ChevronDownIcon } from "lucide-react"
 import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
+import { handleListboxKey } from "./internal/listbox-navigation.js"
 import {
-  handleListboxKey,
-  listboxOptionId,
-} from "./internal/listbox-navigation.js"
-import { ListboxEmptyStatus, PickerOption } from "./internal/listbox-option.js"
+  Listbox,
+  ListboxEmptyStatus,
+  listboxInputAria,
+  PickerOption,
+} from "./internal/listbox-option.js"
 import {
   createSearchIndex,
   filterSearchIndex,
   foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
-import { listboxScroll } from "./internal/styles.js"
+import { emptyValueText } from "./internal/styles.js"
 import { Popover, PopoverContent, PopoverTrigger } from "./popover.js"
 import type { SearchPickerProps } from "./search-picker.js"
 import { cn, onInputChange } from "./utils.js"
@@ -142,7 +144,7 @@ export function Combobox({
   onValueChange,
   placeholder = "Select",
   searchPlaceholder = "Search",
-  emptyText = "No results",
+  emptyText,
   disabled,
   id,
   className,
@@ -186,11 +188,10 @@ export function Combobox({
       ),
     [creatable, searchIndex]
   )
-  const filtered = React.useMemo(() => {
-    const needle = normalizeSearchQuery(query)
-    if (!needle) return resolvedOptions
-    return filterSearchIndex(searchIndex, needle)
-  }, [resolvedOptions, searchIndex, query])
+  const filtered = React.useMemo(
+    () => filterSearchIndex(searchIndex, normalizeSearchQuery(query)),
+    [searchIndex, query]
+  )
   const createOption = React.useMemo(() => {
     const createValue = creatable
       ? resolveCreateValue(query, existingValues, normalizeCreateValue)
@@ -270,17 +271,21 @@ export function Combobox({
           aria-invalid={ariaInvalid}
           aria-label={ariaLabel}
           aria-labelledby={ariaLabelledBy}
+          data-empty={!selected}
           disabled={disabled}
           onKeyDown={onTriggerKeyDown}
           className={cn(
             formControlTriggerClassName,
             "justify-between",
-            !selected && "text-muted-foreground",
+            emptyValueText,
             className
           )}
         >
           <span className="truncate">{selected?.label ?? placeholder}</span>
-          <ChevronDownIcon data-icon="inline-end" className="opacity-50" />
+          <ChevronDownIcon
+            data-icon="inline-end"
+            className="text-muted-foreground"
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -297,16 +302,13 @@ export function Combobox({
             onKeyDown={onSearchKeyDown}
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder}
-            aria-autocomplete="list"
             aria-controls={listId}
-            aria-activedescendant={
-              activeOption ? listboxOptionId(listId, highlight) : undefined
-            }
+            {...listboxInputAria(listId, activeOption ? highlight : undefined)}
           />
         </div>
-        <ul
+        <Listbox
           id={listId}
-          role="listbox"
+          empty={empty}
           data-slot="combobox-list"
           // Same name as the trigger: its own label, or the <Label htmlFor>
           // that names the trigger (read through the trigger's id).
@@ -314,9 +316,7 @@ export function Combobox({
           aria-labelledby={
             ariaLabelledBy ?? (ariaLabel ? undefined : triggerId)
           }
-          className={
-            empty ? "sr-only" : cn(listboxScroll, "p-1", listClassName)
-          }
+          className={cn("p-1", listClassName)}
         >
           {list.map((option, index) => {
             const isCreate = createOption != null && option === createOption
@@ -337,7 +337,7 @@ export function Combobox({
               />
             )
           })}
-        </ul>
+        </Listbox>
         <ListboxEmptyStatus empty={empty}>{emptyText}</ListboxEmptyStatus>
       </PopoverContent>
     </Popover>

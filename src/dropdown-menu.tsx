@@ -7,6 +7,8 @@ import { CheckIcon, ChevronRightIcon } from "lucide-react"
 import {
   menuLabel,
   optionRow,
+  OVERLAY_COLLISION_PADDING,
+  OVERLAY_SIDE_OFFSET,
   overlayFadeZoom,
   overlaySideSlide,
   overlaySurface,
@@ -69,8 +71,8 @@ function DropdownMenuTrigger({
 function DropdownMenuContent({
   className,
   align = "start",
-  sideOffset = 4,
-  collisionPadding = 8,
+  sideOffset = OVERLAY_SIDE_OFFSET,
+  collisionPadding = OVERLAY_COLLISION_PADDING,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Content>) {
   return (
