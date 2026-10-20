@@ -69,7 +69,7 @@ describe("InfoTip", () => {
 
     const trigger = screen.getByRole("button", { name: "What depth means" })
     expect(trigger).toHaveAttribute("data-layout", "inline")
-    expect(trigger.className.split(/\s+/)).toContain("size-5")
+    expect(trigger.className.split(/\s+/)).toContain("size-[1em]")
     expect(trigger.className).toMatch(/after:size-11/)
   })
 

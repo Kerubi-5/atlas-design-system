@@ -27,8 +27,9 @@ export type InfoTipProps = {
   /** Extra body after the title and description. */
   children?: React.ReactNode
   /**
-   * `inline` keeps the surrounding line height; the 44px hit area overflows.
-   * Default `box`.
+   * `inline` sits in a line of text: the glyph is 1em, a quarter em after
+   * the word, on the text's cap height, and keeps the line height; the 44px
+   * hit area overflows. Default `box`.
    */
   layout?: InfoTipLayout
   /** Panel side. Default `top`; Radix still flips on collision. */
@@ -51,8 +52,8 @@ export type InfoTipProps = {
 >
 
 /**
- * Longer help than a Tooltip: a Popover with a 20px glyph and a 44px hit
- * area. Hover opens only on a fine pointer; click, tap, and keyboard always
+ * Longer help than a Tooltip: a Popover with a 20px glyph (1em inline) and
+ * a 44px hit area. Hover opens only on a fine pointer; click, tap, and keyboard always
  * toggle it. Not a glossary or "coming soon" chip — pass that copy in.
  */
 function InfoTip({
@@ -125,7 +126,11 @@ function InfoTip({
             focusRing,
             "relative inline-flex shrink-0 items-center justify-center rounded-none text-muted-foreground",
             quietTextHover,
-            inline ? cn("size-5 align-middle", hitArea44) : "size-11",
+            // Inline: 1em scales with the sentence; -0.125em centres the
+            // glyph on the cap height without growing the line box.
+            inline
+              ? cn("ml-[0.25em] size-[1em] align-[-0.125em]", hitArea44)
+              : "size-11",
             className
           )}
           onMouseEnter={openFromHover}
@@ -143,7 +148,7 @@ function InfoTip({
         >
           {icon ?? (
             <CircleHelpIcon
-              className="size-5"
+              className={inline ? "size-full" : "size-5"}
               data-icon="info-tip"
               aria-hidden
             />
