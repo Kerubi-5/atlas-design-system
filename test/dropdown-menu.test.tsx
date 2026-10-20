@@ -11,7 +11,13 @@ import {
   DropdownMenuTrigger,
 } from "../src/dropdown-menu.js"
 
-import { createUser, render, screen, waitFor } from "./helpers.js"
+import {
+  createUser,
+  render,
+  screen,
+  waitFor,
+  waitForNoRole,
+} from "./helpers.js"
 
 describe("DropdownMenu", () => {
   function Menu({ onEdit }: { onEdit: () => void }) {
@@ -51,9 +57,7 @@ describe("DropdownMenu", () => {
 
     await user.keyboard("{Enter}")
     expect(onEdit).toHaveBeenCalledTimes(1)
-    await waitFor(() => {
-      expect(screen.queryByRole("menu")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("menu")
     expect(screen.getByRole("button", { name: "Actions" })).toHaveFocus()
   })
 

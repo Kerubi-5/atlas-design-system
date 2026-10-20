@@ -22,6 +22,7 @@ import {
   render,
   screen,
   waitFor,
+  waitForNoRole,
 } from "./helpers.js"
 
 function focusIsInside(container: Element | null) {
@@ -114,9 +115,7 @@ describe("Dialog", () => {
     })
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("dialog")
     expect(trigger).toHaveFocus()
   })
 

@@ -161,12 +161,10 @@ describe("TabsNav", () => {
     const nav = screen.getByRole("navigation", { name: "Settings" })
     const scroller = container.querySelector("[data-slot=tabs-scroller]")
     const list = container.querySelector("[data-slot=tabs-list]")
-    expect(nav.className.split(/\s+/)).toContain("min-w-0")
-    expect(nav.className.split(/\s+/)).toContain("max-w-full")
+    expect(nav).toHaveClass("min-w-0", "max-w-full")
     expectHorizontalOnlyScroller(scroller)
     expectScrollerFitsList(scroller, list)
-    expect(list?.className.split(/\s+/)).toContain("min-w-full")
-    expect(list?.className.split(/\s+/)).toContain("bg-transparent")
+    expect(list).toHaveClass("min-w-full", "bg-transparent")
     expect(screen.getAllByRole("link")).toHaveLength(6)
   })
 
@@ -453,7 +451,7 @@ describe("TabsList overflow", () => {
     const scroller = scrollerOf(list)
     expectHorizontalOnlyScroller(scroller)
     expectScrollerFitsList(scroller, list)
-    expect(list.className.split(/\s+/)).toContain("min-w-full")
+    expect(list).toHaveClass("min-w-full")
   })
 
   it("scrolls the active trigger into view on mount", () => {
@@ -476,7 +474,7 @@ describe("TabsList overflow", () => {
     const list = screen.getByRole("tablist", { name: "Order" })
     const scroller = scrollerOf(list)
     expect(scroller).toHaveAttribute("data-variant", "default")
-    expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
+    expect(scroller).not.toHaveClass("pb-2")
     expectScrollerFitsList(scroller, list)
   })
 
@@ -523,7 +521,7 @@ describe("TabsList overflow", () => {
     )
     const list = screen.getByRole("tablist", { name: "Views" })
     const scroller = scrollerOf(list)
-    expect(scroller?.className.split(/\s+/)).toContain("pb-2")
+    expect(scroller).toHaveClass("pb-2")
     expect(scroller).toHaveAttribute("data-variant", "line")
     expectScrollerFitsList(scroller, list)
   })

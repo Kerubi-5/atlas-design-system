@@ -76,20 +76,15 @@ describe("form-control trigger chrome", () => {
     const dateTrigger = screen.getByRole("button", { name: /^October 9/ })
     const dateTimeTrigger = screen.getByRole("button", { name: /^October 10/ })
     const combobox = screen.getByRole("combobox")
-    expect(dateTrigger.className.split(/\s+/)).toContain("px-3")
-    expect(dateTrigger.className.split(/\s+/)).toContain("text-sm")
-    expect(dateTrigger.className.split(/\s+/)).toContain("hover:bg-background")
+    expect(dateTrigger).toHaveClass("px-3", "text-sm", "hover:bg-background")
     expect(dateTrigger.className.split(/\s+/)).not.toContain(
       "hover:bg-selected"
     )
-    expect(dateTimeTrigger.className.split(/\s+/)).toContain("px-3")
-    expect(dateTimeTrigger.className.split(/\s+/)).toContain("text-sm")
+    expect(dateTimeTrigger).toHaveClass("px-3", "text-sm")
     expect(dateTimeTrigger.className.split(/\s+/)).toContain(
       "hover:bg-background"
     )
-    expect(combobox.className.split(/\s+/)).toContain("px-3")
-    expect(combobox.className.split(/\s+/)).toContain("text-sm")
-    expect(combobox.className.split(/\s+/)).toContain("hover:bg-background")
+    expect(combobox).toHaveClass("px-3", "text-sm", "hover:bg-background")
   })
 
   it("forwards FormDatePickerField className to the trigger", () => {
@@ -103,7 +98,7 @@ describe("form-control trigger chrome", () => {
     )
 
     const trigger = screen.getByLabelText("Due")
-    expect(trigger.className.split(/\s+/)).toContain("w-40")
+    expect(trigger).toHaveClass("w-40")
     expectFormControlTrigger(trigger)
   })
 
@@ -118,7 +113,7 @@ describe("form-control trigger chrome", () => {
     )
 
     const trigger = screen.getByLabelText("Starts")
-    expect(trigger.className.split(/\s+/)).toContain("w-40")
+    expect(trigger).toHaveClass("w-40")
     expectFormControlTrigger(trigger)
   })
 
@@ -135,8 +130,7 @@ describe("form-control trigger chrome", () => {
     )
 
     const trigger = screen.getByLabelText("Size check")
-    expect(trigger.className.split(/\s+/)).toContain("text-base")
-    expect(trigger.className.split(/\s+/)).toContain("md:text-sm")
-    expect(trigger.className.split(/\s+/)).not.toContain("text-sm")
+    expect(trigger).toHaveClass("text-base", "md:text-sm")
+    expect(trigger).not.toHaveClass("text-sm")
   })
 })

@@ -8,7 +8,7 @@ import {
   TooltipTrigger,
 } from "../src/tooltip.js"
 
-import { createUser, render, screen, waitFor } from "./helpers.js"
+import { createUser, render, screen, waitForNoRole } from "./helpers.js"
 
 describe("Tooltip", () => {
   it("opens on keyboard focus and describes the trigger", async () => {
@@ -33,9 +33,7 @@ describe("Tooltip", () => {
     )
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("tooltip")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("tooltip")
   })
 
   it("opens on hover without delay unless an app provider sets one", async () => {

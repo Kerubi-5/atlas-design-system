@@ -42,10 +42,10 @@ describe("consumer sizing", () => {
     )
 
     const dialog = screen.getByRole("dialog", { name: "Title" })
-    expect(classes(dialog)).not.toContain("sm:max-w-md")
+    expect(dialog).not.toHaveClass("sm:max-w-md")
 
     const popover = screen.getByText("Body")
-    expect(classes(popover)).not.toContain("w-72")
+    expect(popover).not.toHaveClass("w-72")
   })
 
   it("leaves menu width to the app", async () => {
@@ -61,7 +61,7 @@ describe("consumer sizing", () => {
 
     await user.click(screen.getByRole("button", { name: "Menu" }))
     const menu = await screen.findByRole("menu")
-    expect(classes(menu)).not.toContain("min-w-40")
+    expect(menu).not.toHaveClass("min-w-40")
   })
 
   it("lets TabsNav size to its links in a flex row", () => {
@@ -78,8 +78,8 @@ describe("consumer sizing", () => {
     // As a block it still fills a normal container; min-w-0 lets it shrink
     // and scroll in a row.
     const nav = screen.getByRole("navigation", { name: "Views" })
-    expect(classes(nav)).not.toContain("w-full")
-    expect(classes(nav)).toContain("min-w-0")
+    expect(nav).toHaveClass("min-w-0")
+    expect(nav).not.toHaveClass("w-full")
   })
 
   it("lets the app size the InfoTip panel", async () => {
@@ -91,8 +91,8 @@ describe("consumer sizing", () => {
     await user.click(screen.getByRole("button", { name: "About depth" }))
     const title = await screen.findByText("Depth")
     const panel = title.closest("[data-slot=popover-content]")!
-    expect(classes(panel)).toContain("w-96")
-    expect(classes(panel)).not.toContain("w-72")
+    expect(panel).toHaveClass("w-96")
+    expect(panel).not.toHaveClass("w-72")
   })
 
   it("lets the app size picker lists", async () => {
@@ -116,14 +116,14 @@ describe("consumer sizing", () => {
     )
 
     const place = screen.getByRole("listbox", { name: "Place" })
-    expect(classes(place)).toContain("max-h-none")
-    expect(classes(place)).not.toContain("max-h-60")
+    expect(place).toHaveClass("max-h-none")
+    expect(place).not.toHaveClass("max-h-60")
 
     await user.click(screen.getByRole("combobox", { name: "" }))
     const listboxes = await screen.findAllByRole("listbox")
     const options = listboxes.find((list) => list !== place)!
-    expect(classes(options)).toContain("max-h-96")
-    expect(classes(options)).not.toContain("max-h-60")
+    expect(options).toHaveClass("max-h-96")
+    expect(options).not.toHaveClass("max-h-60")
   })
 
   it("draws skeleton bars and the date-time panel without design caps", async () => {

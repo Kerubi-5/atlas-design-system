@@ -17,6 +17,9 @@ export function createUser() {
 
 export { render, screen, waitFor, within }
 
+/** The user `createUser` returns. */
+export type User = ReturnType<typeof createUser>
+
 /** The `[data-slot=name]` element under `root`; throws when it is missing. */
 export function slot(name: string, root: ParentNode = document) {
   const element = root.querySelector(`[data-slot="${name}"]`)
@@ -29,6 +32,14 @@ export function slot(name: string, root: ParentNode = document) {
 /** The class tokens of an element; empty when there is no element. */
 export function classes(element: Element | null | undefined) {
   return element?.getAttribute("class")?.split(/\s+/) ?? []
+}
+
+/** The month the picker tests open on: October 2026. */
+export const october = new Date(2026, 9, 1)
+
+/** Day `date` of October 2026, or of another month and year. */
+export function day(date: number, month = 9, year = 2026) {
+  return new Date(year, month, date)
 }
 
 /**
@@ -50,6 +61,19 @@ export function findPopoverContent() {
     const node = document.querySelector("[data-slot=popover-content]")
     expect(node).toBeTruthy()
     return node as HTMLElement
+  })
+}
+
+/** Click the picker trigger named `name`; resolves to the calendar grids. */
+export async function openPicker(user: User, name: string | RegExp) {
+  await user.click(screen.getByRole("button", { name }))
+  return screen.findAllByRole("grid")
+}
+
+/** Wait until nothing with `role` is left, e.g. once an overlay closes. */
+export function waitForNoRole(role: string) {
+  return waitFor(() => {
+    expect(screen.queryAllByRole(role)).toHaveLength(0)
   })
 }
 

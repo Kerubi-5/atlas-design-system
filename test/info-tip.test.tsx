@@ -34,7 +34,7 @@ describe("InfoTip", () => {
 
     const trigger = screen.getByRole("button", { name: "About flood depth" })
     expect(trigger).toHaveAttribute("data-layout", "box")
-    expect(trigger.className.split(/\s+/)).toContain("size-11")
+    expect(trigger).toHaveClass("size-11")
 
     await user.click(trigger)
     expect(await screen.findByText("Depth")).toBeVisible()
@@ -69,7 +69,7 @@ describe("InfoTip", () => {
 
     const trigger = screen.getByRole("button", { name: "What depth means" })
     expect(trigger).toHaveAttribute("data-layout", "inline")
-    expect(trigger.className.split(/\s+/)).toContain("size-[1em]")
+    expect(trigger).toHaveClass("size-[1em]")
     expect(trigger.className).toMatch(/after:size-11/)
   })
 

@@ -43,13 +43,13 @@ describe("Dialog customization", () => {
     )
 
     const overlay = document.querySelector("[data-slot=dialog-overlay]")!
-    expect(classes(overlay)).toContain("bg-black/60")
-    expect(classes(overlay)).not.toContain("bg-black/20")
+    expect(overlay).toHaveClass("bg-black/60")
+    expect(overlay).not.toHaveClass("bg-black/20")
 
     const close = screen.getByRole("button", { name: "Close" })
     expect(close).toHaveAttribute("data-slot", "dialog-close-button")
-    expect(classes(close)).toContain("top-2")
-    expect(classes(close)).not.toContain("top-4")
+    expect(close).toHaveClass("top-2")
+    expect(close).not.toHaveClass("top-4")
 
     // A consumer's own DialogClose keeps the public slot.
     expect(screen.getByRole("button", { name: "Cancel" })).toHaveAttribute(
@@ -177,7 +177,7 @@ describe("Combobox customization", () => {
     const list = await screen.findByRole("listbox")
     expect(list).toHaveAttribute("data-slot", "combobox-list")
     const panel = list.closest("[data-slot=popover-content]")!
-    expect(classes(panel)).toContain("w-96")
+    expect(panel).toHaveClass("w-96")
     expect(classes(panel)).not.toContain(
       "w-[var(--radix-popover-trigger-width)]"
     )

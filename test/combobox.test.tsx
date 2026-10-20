@@ -10,7 +10,9 @@ import {
   expectFormControlTrigger,
   render,
   screen,
+  type User,
   waitFor,
+  waitForNoRole,
 } from "./helpers.js"
 
 const options = [
@@ -76,7 +78,7 @@ function activeOptionLabel() {
   return id ? document.getElementById(id)?.textContent : undefined
 }
 
-async function openCombobox(user: ReturnType<typeof createUser>) {
+async function openCombobox(user: User) {
   await user.click(getCombobox())
   return waitFor(() => {
     expect(screen.getByRole("listbox")).toBeInTheDocument()
@@ -98,9 +100,7 @@ describe("Combobox", () => {
     expect(screen.getByRole("option", { name: "US Dollar" })).toBeVisible()
 
     await user.click(trigger)
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(trigger).toHaveAttribute("aria-expanded", "false")
   })
 
@@ -244,9 +244,7 @@ describe("Combobox", () => {
     expect(activeOptionLabel()).toBe("British Pound")
 
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("British Pound")
   })
 
@@ -374,9 +372,7 @@ describe("Combobox", () => {
     await openCombobox(user)
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveFocus()
     expect(getCombobox()).toHaveTextContent("Euro")
     expect(getCombobox()).toHaveAttribute("aria-expanded", "false")
@@ -388,9 +384,7 @@ describe("Combobox", () => {
     await openCombobox(user)
 
     await user.click(screen.getByRole("option", { name: "Euro" }))
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("Euro")
   })
 
@@ -402,9 +396,7 @@ describe("Combobox", () => {
     // "e" leaves Euro and Japanese Yen; pick Euro with the pointer.
     await user.type(screen.getByPlaceholderText("Search"), "e")
     await user.click(screen.getByRole("option", { name: "Euro" }))
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
 
     await openCombobox(user)
     expect(screen.getByPlaceholderText("Search")).toHaveValue("")
@@ -412,9 +404,7 @@ describe("Combobox", () => {
     expect(activeOptionLabel()).toBe("Euro")
 
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("Euro")
   })
 
@@ -425,9 +415,7 @@ describe("Combobox", () => {
 
     await user.type(screen.getByPlaceholderText("Search"), "yen")
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("Japanese Yen")
 
     await openCombobox(user)
@@ -500,9 +488,7 @@ describe("Combobox", () => {
     expect(activeOptionLabel()).toBe('Create "PHP"')
 
     await user.click(createOption)
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(onValueChange).toHaveBeenCalledWith("PHP")
     expect(getCombobox()).toHaveTextContent("PHP")
 
@@ -511,9 +497,7 @@ describe("Combobox", () => {
     await user.type(screen.getByPlaceholderText("Search"), "kyd")
     expect(activeOptionLabel()).toBe('Create "kyd"')
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(onValueChange).toHaveBeenCalledWith("kyd")
     expect(getCombobox()).toHaveTextContent("kyd")
   })
@@ -547,9 +531,7 @@ describe("Combobox", () => {
     expect(screen.getByRole("option", { name: 'Create "PHP"' })).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(onValueChange).not.toHaveBeenCalled()
     expect(getCombobox()).toHaveTextContent("Select")
     unmount()
@@ -593,9 +575,7 @@ describe("Combobox", () => {
     ).not.toBeInTheDocument()
 
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("Euro")
   })
 
@@ -614,9 +594,7 @@ describe("Combobox", () => {
     await user.keyboard("{End}")
     expect(activeOptionLabel()).toBe("Add e")
     await user.keyboard("{Enter}")
-    await waitFor(() => {
-      expect(screen.queryByRole("listbox")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("listbox")
     expect(getCombobox()).toHaveTextContent("e")
   })
 

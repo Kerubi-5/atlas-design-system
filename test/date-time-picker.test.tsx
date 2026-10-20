@@ -9,15 +9,18 @@ import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 
 import {
   createUser,
+  day,
   expectFormControlTrigger,
   findPopoverContent,
   getDayButton,
+  october,
+  openPicker,
   render,
   screen,
   waitFor,
+  waitForNoRole,
 } from "./helpers.js"
 
-const october = new Date(2026, 9, 1)
 const afternoon = new Date(2026, 9, 10, 14, 30)
 
 function DateTimePickerHarness({
@@ -74,7 +77,7 @@ describe("DateTimePickerButton", () => {
     expect(screen.getByRole("combobox", { name: "Hour" })).toBeDisabled()
     expect(screen.getByRole("combobox", { name: "Minute" })).toBeDisabled()
 
-    await user.click(getDayButton(new Date(2026, 9, 15)))
+    await user.click(getDayButton(day(15)))
 
     expect(screen.getByRole("grid")).toBeVisible()
     const afterDay = onChange.mock.calls.at(-1)?.[0]
@@ -121,7 +124,7 @@ describe("DateTimePickerButton", () => {
 
     // Day Picker would deselect the day; the picker ignores that so a set
     // time is not dropped by an accidental second tap. Clear is the way out.
-    await user.click(getDayButton(new Date(2026, 9, 10)))
+    await user.click(getDayButton(day(10)))
     expect(onChange).not.toHaveBeenCalled()
     expect(screen.getByRole("grid")).toBeVisible()
     expect(
@@ -137,7 +140,7 @@ describe("DateTimePickerButton", () => {
     await user.click(screen.getByRole("button", { name: /October 10.*2:30/ }))
     expect(await screen.findByRole("grid")).toBeVisible()
 
-    await user.click(getDayButton(new Date(2026, 9, 20)))
+    await user.click(getDayButton(day(20)))
     const next = onChange.mock.calls.at(-1)?.[0]
     expect(next?.getDate()).toBe(20)
     expect(next?.getHours()).toBe(14)
@@ -156,9 +159,7 @@ describe("DateTimePickerButton", () => {
     expect(await screen.findByRole("grid")).toBeVisible()
 
     await user.click(screen.getByRole("button", { name: "Clear" }))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(onChange).toHaveBeenLastCalledWith(null)
     expect(trigger).toHaveTextContent("Pick a date and time")
     expect(trigger).toHaveAttribute("data-empty", "true")
@@ -174,9 +175,7 @@ describe("DateTimePickerButton", () => {
     expect(await screen.findByRole("grid")).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveFocus()
   })
 
@@ -185,17 +184,11 @@ describe("DateTimePickerButton", () => {
     const user = createUser()
     render(<DateTimePickerButton value={afternoon} onChange={() => {}} />)
 
-    await user.click(screen.getByRole("button", { name: /October 10/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /October 10/)
     expect(screen.getByRole("dialog")).toHaveAccessibleName(
       "Choose date and time"
     )
-    await waitFor(() =>
-      expect(document.activeElement).toHaveAttribute(
-        "data-day",
-        afternoon.toLocaleDateString()
-      )
-    )
+    await waitFor(() => expect(getDayButton(afternoon)).toHaveFocus())
   })
 
   it("forwards aria-describedby to the trigger", () => {
@@ -282,15 +275,14 @@ describe("DateTimePickerButton", () => {
     render(
       <DateTimePickerButton
         value={new Date(2026, 9, 15, 9, 30)}
-        minDate={new Date(2026, 9, 10)}
-        maxDate={new Date(2026, 9, 20)}
+        minDate={day(10)}
+        maxDate={day(20)}
         onChange={() => {}}
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 15/ }))
-    await screen.findByRole("grid")
-    expect(getDayButton(new Date(2026, 9, 9))).toBeDisabled()
-    expect(getDayButton(new Date(2026, 9, 21))).toBeDisabled()
+    await openPicker(user, /^October 15/)
+    expect(getDayButton(day(9))).toBeDisabled()
+    expect(getDayButton(day(21))).toBeDisabled()
   })
 })
 
@@ -323,9 +315,7 @@ describe("FormDateTimePickerField", () => {
     ).toHaveAccessibleName("Minute")
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveFocus()
   })
 

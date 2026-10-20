@@ -28,7 +28,7 @@ describe("Button quiet hover", () => {
     const clear = screen.getByRole("button", { name: "Clear selection" })
 
     for (const button of [outline, ghost, clear]) {
-      expect(button.className.split(/\s+/)).toContain("hover:bg-selected")
+      expect(button).toHaveClass("hover:bg-selected")
       expect(button.className.split(/\s+/)).toContain(
         "hover:text-selected-foreground"
       )
@@ -36,30 +36,32 @@ describe("Button quiet hover", () => {
         "hover:border-selected-foreground"
       )
       // Focus is the shared solid ring, not a translucent glow (WCAG 1.4.11).
-      expect(button.className.split(/\s+/)).toContain("focus-visible:ring-ring")
-      expect(button.className.split(/\s+/)).not.toContain("hover:bg-muted")
+      expect(button).toHaveClass("focus-visible:ring-ring")
+      expect(button).not.toHaveClass("hover:bg-muted")
     }
 
     const filled = screen.getByRole("button", { name: "default" })
-    expect(filled.className.split(/\s+/)).toContain("hover:bg-primary/80")
-    expect(filled.className.split(/\s+/)).not.toContain("hover:bg-selected")
+    expect(filled).toHaveClass("hover:bg-primary/80")
+    expect(filled).not.toHaveClass("hover:bg-selected")
   })
 
   it("keeps outline readable on a selected wash", () => {
     render(<OutlineOnSelectedStory />)
     const clear = screen.getByRole("button", { name: "Clear selection" })
     expect(clear).toHaveAttribute("data-variant", "outline")
-    expect(clear.className.split(/\s+/)).toContain("hover:bg-selected")
-    expect(clear.className.split(/\s+/)).not.toContain("hover:bg-muted")
+    expect(clear).toHaveClass("hover:bg-selected")
+    expect(clear).not.toHaveClass("hover:bg-muted")
     expect(clear.closest(".bg-selected")).toBeTruthy()
   })
 
   it("documents the hover chrome with a static story", () => {
     render(<QuietButtonHoverStory />)
     const hovered = screen.getByRole("button", { name: "Clear selection" })
-    expect(hovered.className.split(/\s+/)).toContain("border-ring")
-    expect(hovered.className.split(/\s+/)).toContain("bg-selected")
-    expect(hovered.className.split(/\s+/)).toContain("text-selected-foreground")
-    expect(hovered.className.split(/\s+/)).toContain("ring-ring")
+    expect(hovered).toHaveClass(
+      "border-ring",
+      "bg-selected",
+      "text-selected-foreground",
+      "ring-ring"
+    )
   })
 })

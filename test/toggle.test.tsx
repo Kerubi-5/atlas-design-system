@@ -44,11 +44,11 @@ describe("Toggle", () => {
     const toggle = screen.getByRole("button", { name: "Bold" })
     expect(toggle).toHaveAttribute("aria-pressed", "false")
     expectSelectedChrome(toggle.className)
-    expect(toggle.className.split(/\s+/)).toContain("hover:bg-selected")
+    expect(toggle).toHaveClass("hover:bg-selected")
     expect(toggle.className.split(/\s+/)).toContain(
       "hover:text-selected-foreground"
     )
-    expect(toggle.className.split(/\s+/)).not.toContain("hover:bg-muted")
+    expect(toggle).not.toHaveClass("hover:bg-muted")
 
     await user.click(toggle)
     expect(toggle).toHaveAttribute("aria-pressed", "true")
