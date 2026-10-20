@@ -56,12 +56,12 @@ function isComposingKey(event: {
 
 /**
  * Shared keydown for a search input that drives a listbox: navigation keys
- * move the highlight, Enter picks the highlighted index. Returns `true` when
- * the key is handled (or an IME is composing, when every key belongs to the
- * IME), so the caller can stop; `false` leaves the key to the caller (for
- * example SearchPicker's Escape).
+ * move the highlight over `items`, Enter picks the highlighted item. Returns
+ * `true` when the key is handled (or an IME is composing, when every key
+ * belongs to the IME), so the caller can stop; `false` leaves the key to the
+ * caller (for example SearchPicker's Escape).
  */
-export function handleListboxKey(
+export function handleListboxKey<T>(
   event: {
     key: string
     keyCode: number
@@ -69,19 +69,19 @@ export function handleListboxKey(
     preventDefault: () => void
   },
   {
+    items,
     highlight,
-    length,
     setHighlight,
-    onEnter,
+    onPick,
   }: {
+    items: readonly T[]
     highlight: number
-    length: number
     setHighlight: (index: number) => void
-    onEnter: (index: number) => void
+    onPick: (item: T) => void
   }
 ): boolean {
   if (isComposingKey(event)) return true
-  const next = moveListboxHighlight(event.key, highlight, length)
+  const next = moveListboxHighlight(event.key, highlight, items.length)
   if (next !== undefined) {
     event.preventDefault()
     setHighlight(next)
@@ -89,7 +89,8 @@ export function handleListboxKey(
   }
   if (event.key === "Enter") {
     event.preventDefault()
-    onEnter(highlight)
+    const item = items[highlight]
+    if (item !== undefined) onPick(item)
     return true
   }
   return false

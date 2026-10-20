@@ -145,13 +145,10 @@ function SearchPicker<T>({
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     const handled = handleListboxKey(event, {
+      items: filtered,
       highlight,
-      length: filtered.length,
       setHighlight,
-      onEnter: (index) => {
-        const item = filtered[index]
-        if (item) selectItem(item)
-      },
+      onPick: selectItem,
     })
     if (handled || event.key !== "Escape") return
     event.preventDefault()

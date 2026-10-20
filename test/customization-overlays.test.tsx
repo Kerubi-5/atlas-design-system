@@ -268,59 +268,44 @@ describe("InfoTip customization", () => {
 })
 
 describe("handleListboxKey", () => {
-  const keyEvent = (key: string, composing = false) => ({
-    key,
-    keyCode: composing ? 229 : 0,
-    nativeEvent: { isComposing: composing } as KeyboardEvent,
-    preventDefault: vi.fn(),
-  })
+  /** Press `key` in a three-item list highlighted at `highlight`. */
+  function pressKey(key: string, { highlight = 0, composing = false } = {}) {
+    const event = {
+      key,
+      keyCode: composing ? 229 : 0,
+      nativeEvent: { isComposing: composing } as KeyboardEvent,
+      preventDefault: vi.fn(),
+    }
+    const setHighlight = vi.fn()
+    const onPick = vi.fn()
+    const handled = handleListboxKey(event, {
+      items: ["a", "b", "c"],
+      highlight,
+      setHighlight,
+      onPick,
+    })
+    return { handled, event, setHighlight, onPick }
+  }
 
   it("moves the highlight and selects on Enter", () => {
-    const setHighlight = vi.fn()
-    const onEnter = vi.fn()
-    const down = keyEvent("ArrowDown")
-    expect(
-      handleListboxKey(down, { highlight: 0, length: 3, setHighlight, onEnter })
-    ).toBe(true)
-    expect(setHighlight).toHaveBeenCalledWith(1)
-    expect(down.preventDefault).toHaveBeenCalled()
+    const down = pressKey("ArrowDown")
+    expect(down.handled).toBe(true)
+    expect(down.setHighlight).toHaveBeenCalledWith(1)
+    expect(down.event.preventDefault).toHaveBeenCalled()
 
-    const enter = keyEvent("Enter")
-    expect(
-      handleListboxKey(enter, {
-        highlight: 2,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(true)
-    expect(onEnter).toHaveBeenCalledWith(2)
+    const enter = pressKey("Enter", { highlight: 2 })
+    expect(enter.handled).toBe(true)
+    expect(enter.onPick).toHaveBeenCalledWith("c")
   })
 
   it("ignores keys while an IME composes and leaves other keys alone", () => {
-    const setHighlight = vi.fn()
-    const onEnter = vi.fn()
-    const composing = keyEvent("Enter", true)
-    expect(
-      handleListboxKey(composing, {
-        highlight: 0,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(true)
-    expect(onEnter).not.toHaveBeenCalled()
-    expect(composing.preventDefault).not.toHaveBeenCalled()
+    const composing = pressKey("Enter", { composing: true })
+    expect(composing.handled).toBe(true)
+    expect(composing.onPick).not.toHaveBeenCalled()
+    expect(composing.event.preventDefault).not.toHaveBeenCalled()
 
-    const escape = keyEvent("Escape")
-    expect(
-      handleListboxKey(escape, {
-        highlight: 0,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(false)
-    expect(setHighlight).not.toHaveBeenCalled()
+    const escape = pressKey("Escape")
+    expect(escape.handled).toBe(false)
+    expect(escape.setHighlight).not.toHaveBeenCalled()
   })
 })
