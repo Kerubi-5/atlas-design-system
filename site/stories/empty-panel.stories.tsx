@@ -8,12 +8,12 @@ const meta = {
   component: EmptyPanel,
   args: {
     children: "Nothing to show",
-    size: "md",
+    size: "default",
     muted: true,
   },
   argTypes: {
     children: { control: "text" },
-    size: { control: "select", options: ["sm", "md", "lg"] },
+    size: { control: "select" },
     muted: { control: "boolean" },
   },
 } satisfies Meta<typeof EmptyPanel>

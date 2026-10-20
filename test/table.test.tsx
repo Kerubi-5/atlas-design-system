@@ -14,7 +14,7 @@ import {
   ProfileCardTableStory,
 } from "../stories/table-overflow.js"
 
-import { render, screen } from "./helpers.js"
+import { render, screen, waitFor, withOverflow } from "./helpers.js"
 
 describe("Table overflow", () => {
   it("wraps the table in a min-w-0 overflow-x-auto scroller", () => {
@@ -101,5 +101,68 @@ describe("Table overflow", () => {
     expect(container?.className.split(/\s+/)).toContain("overflow-x-auto")
     expect(container?.className.split(/\s+/)).toContain("min-w-0")
     expect(screen.getByRole("cell", { name: "CC BY-NC 4.0" })).toBeVisible()
+  })
+})
+
+describe("Table", () => {
+  it("exposes native table roles", () => {
+    render(
+      <Table>
+        <TableCaption>People</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow data-state="selected">
+            <TableCell>Ada</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    )
+
+    expect(screen.getByRole("table", { name: "People" })).toHaveAttribute(
+      "data-slot",
+      "table"
+    )
+    expect(
+      screen.getByRole("columnheader", { name: "Name" })
+    ).toBeInTheDocument()
+    expect(screen.getByRole("cell", { name: "Ada" })).toBeInTheDocument()
+    expect(screen.getByRole("row", { name: "Ada" })).toHaveAttribute(
+      "data-state",
+      "selected"
+    )
+  })
+})
+
+describe("Table scroll region", () => {
+  function renderTable() {
+    return render(
+      <Table>
+        <TableBody>
+          <TableRow>
+            <TableCell>Wide content</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    )
+  }
+
+  it("stays out of the tab order when nothing overflows", () => {
+    const { container } = renderTable()
+    const scroller = container.querySelector("[data-slot=table-container]")
+    expect(scroller).not.toHaveAttribute("tabindex")
+  })
+
+  it("joins the tab order while its content is wider than the box", async () => {
+    await withOverflow(async () => {
+      const { container } = renderTable()
+      const scroller = container.querySelector("[data-slot=table-container]")
+      await waitFor(() => {
+        expect(scroller).toHaveAttribute("tabindex", "0")
+      })
+    })
   })
 })

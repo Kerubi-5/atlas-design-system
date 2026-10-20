@@ -42,14 +42,7 @@ describe("form-control trigger chrome", () => {
     expectFormControlTrigger(combobox as HTMLElement)
 
     const selectTrigger = screen.getByLabelText("Select trigger")
-    for (const token of [
-      "px-3",
-      "text-base",
-      "md:text-sm",
-      "border-input",
-      "bg-background",
-      "shadow-xs",
-    ]) {
+    for (const token of formControlTriggerTokens) {
       expect(selectTrigger.className.split(/\s+/)).toContain(token)
     }
     // 40px default height, as a plain class or a size variant.

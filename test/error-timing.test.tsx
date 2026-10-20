@@ -3,23 +3,13 @@ import { describe, expect, it } from "vitest"
 import { FormControlField } from "../src/form/control-field.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
-import type { FieldMetaState } from "../src/form/field-error.js"
 import { FormMarkdownField } from "../src/form/markdown-field.js"
 import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField } from "../src/form/text-field.js"
 import { SelectItem } from "../src/select.js"
 import { CustomControlFieldStory } from "../stories/fields.js"
 
-import { render, screen } from "./helpers.js"
-
-function textField(meta: FieldMetaState) {
-  return {
-    name: "amount",
-    state: { value: "", meta },
-    handleChange() {},
-    handleBlur() {},
-  }
-}
+import { fakeTextField, render, screen } from "./helpers.js"
 
 const untouched = { errors: ["Enter an amount"], isTouched: false }
 const touched = { errors: ["Enter an amount"], isTouched: true }
@@ -31,7 +21,12 @@ const touched = { errors: ["Enter an amount"], isTouched: true }
  */
 describe("field error timing", () => {
   it("hides errors on an untouched field", () => {
-    render(<FormTextField field={textField(untouched)} label="Amount" />)
+    render(
+      <FormTextField
+        field={fakeTextField("amount", "", untouched)}
+        label="Amount"
+      />
+    )
     const input = screen.getByRole("textbox", { name: "Amount" })
     expect(input).not.toHaveAttribute("aria-invalid")
     expect(input).not.toHaveAttribute("aria-describedby")
@@ -39,7 +34,12 @@ describe("field error timing", () => {
   })
 
   it("shows the error once the field is touched", () => {
-    render(<FormTextField field={textField(touched)} label="Amount" />)
+    render(
+      <FormTextField
+        field={fakeTextField("amount", "", touched)}
+        label="Amount"
+      />
+    )
     const input = screen.getByRole("textbox", { name: "Amount" })
     expect(input).toHaveAttribute("aria-invalid", "true")
     expect(input).toHaveAccessibleDescription("Enter an amount")
@@ -48,7 +48,11 @@ describe("field error timing", () => {
 
   it("shows the error on an untouched field after submit", () => {
     render(
-      <FormTextField field={textField(untouched)} label="Amount" submitted />
+      <FormTextField
+        field={fakeTextField("amount", "", untouched)}
+        label="Amount"
+        submitted
+      />
     )
     const input = screen.getByRole("textbox", { name: "Amount" })
     expect(input).toHaveAttribute("aria-invalid", "true")
@@ -58,7 +62,7 @@ describe("field error timing", () => {
   it("keeps today's behavior when meta has no isTouched", () => {
     render(
       <FormTextField
-        field={textField({ errors: ["Enter an amount"] })}
+        field={fakeTextField("amount", "", { errors: ["Enter an amount"] })}
         label="Amount"
       />
     )
@@ -71,7 +75,7 @@ describe("field error timing", () => {
   it("lets showError={false} hide a touched or submitted error", () => {
     render(
       <FormTextField
-        field={textField(touched)}
+        field={fakeTextField("amount", "", touched)}
         label="Amount"
         submitted
         showError={false}
@@ -83,7 +87,10 @@ describe("field error timing", () => {
   it("gates the markdown, select, and date fields the same way", () => {
     const { rerender } = render(
       <>
-        <FormMarkdownField field={textField(untouched)} label="Notes" />
+        <FormMarkdownField
+          field={fakeTextField("amount", "", untouched)}
+          label="Notes"
+        />
         <FormSelectField
           value="a"
           onValueChange={() => {}}
@@ -111,7 +118,7 @@ describe("field error timing", () => {
     rerender(
       <>
         <FormMarkdownField
-          field={textField(untouched)}
+          field={fakeTextField("amount", "", untouched)}
           label="Notes"
           submitted
         />

@@ -12,6 +12,8 @@ import { fileURLToPath } from "node:url"
 
 import { chromium } from "playwright"
 
+import { THEMES } from "./browser.mjs"
+
 const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../.."
@@ -105,41 +107,44 @@ test("theme tokens meet WCAG contrast in light and dark", async () => {
     await tab.setContent(
       `<style>${tokens}</style><div id="probe"></div><canvas id="c" width="1" height="1"></canvas>`
     )
-    const results = await tab.evaluate((pairs) => {
-      const probe = document.getElementById("probe")
-      const ctx = document
-        .getElementById("c")
-        .getContext("2d", { willReadFrequently: true })
-      const paint = (layers) => {
-        ctx.clearRect(0, 0, 1, 1)
-        for (const layer of layers) {
-          probe.style.color = ""
-          probe.style.color = layer
-          ctx.fillStyle = getComputedStyle(probe).color
-          ctx.fillRect(0, 0, 1, 1)
+    const results = await tab.evaluate(
+      ({ pairs, themes }) => {
+        const probe = document.getElementById("probe")
+        const ctx = document
+          .getElementById("c")
+          .getContext("2d", { willReadFrequently: true })
+        const paint = (layers) => {
+          ctx.clearRect(0, 0, 1, 1)
+          for (const layer of layers) {
+            probe.style.color = ""
+            probe.style.color = layer
+            ctx.fillStyle = getComputedStyle(probe).color
+            ctx.fillRect(0, 0, 1, 1)
+          }
+          return [...ctx.getImageData(0, 0, 1, 1).data.slice(0, 3)]
         }
-        return [...ctx.getImageData(0, 0, 1, 1).data.slice(0, 3)]
-      }
-      const luminance = (rgb) =>
-        rgb
-          .map((value) => {
-            const c = value / 255
-            return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-          })
-          .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0)
-      const out = []
-      for (const theme of ["light", "dark"]) {
-        document.documentElement.className = theme === "dark" ? "dark" : ""
-        for (const [what, foreground, background, min] of pairs) {
-          const [hi, lo] = [
-            luminance(paint([...background, foreground])),
-            luminance(paint(background)),
-          ].sort((a, b) => b - a)
-          out.push({ theme, what, min, ratio: (hi + 0.05) / (lo + 0.05) })
+        const luminance = (rgb) =>
+          rgb
+            .map((value) => {
+              const c = value / 255
+              return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
+            })
+            .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0)
+        const out = []
+        for (const theme of themes) {
+          document.documentElement.className = theme === "dark" ? "dark" : ""
+          for (const [what, foreground, background, min] of pairs) {
+            const [hi, lo] = [
+              luminance(paint([...background, foreground])),
+              luminance(paint(background)),
+            ].sort((a, b) => b - a)
+            out.push({ theme, what, min, ratio: (hi + 0.05) / (lo + 0.05) })
+          }
         }
-      }
-      return out
-    }, pairs)
+        return out
+      },
+      { pairs, themes: THEMES }
+    )
 
     const failures = results
       .filter((result) => result.ratio < result.min)

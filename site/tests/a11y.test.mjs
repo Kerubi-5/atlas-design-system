@@ -4,10 +4,17 @@
 import assert from "node:assert/strict"
 import test from "node:test"
 
-import { THEMES, openStory, runAxe, storyIndex, withSite } from "./browser.mjs"
+import {
+  PHONE,
+  THEMES,
+  inBatches,
+  openStory,
+  runAxe,
+  storyIndex,
+  violationMessage,
+  withSite,
+} from "./browser.mjs"
 import { OVERLAYS } from "./overlays.mjs"
-
-const CONCURRENCY = 4
 
 /**
  * Overlays render in portals and only after interaction, so the per-story
@@ -47,9 +54,8 @@ async function auditStory(context, baseUrl, entry, theme, overlay) {
     )
 
     const label = overlay ? `${entry.id} (open)` : entry.id
-    const problems = violations.map(
-      (violation) =>
-        `${label} [${theme}]: ${violation.id} (${violation.help}) at ${violation.targets.slice(0, 3).join(", ")}`
+    const problems = violations.map((violation) =>
+      violationMessage(`${label} [${theme}]`, violation)
     )
     if (overlay) {
       for (const key of ["Tab", "Tab", "Tab", "Shift+Tab", "Shift+Tab"]) {
@@ -80,19 +86,13 @@ test("every story passes WCAG 2.2 AA checks in light and dark", async () => {
   )
   assert.ok(stories.length > 0, "index.json lists stories")
 
-  const problems = await withSite(async ({ context, baseUrl }) => {
-    const jobs = stories.flatMap((entry) =>
-      THEMES.map((theme) => () => auditStory(context, baseUrl, entry, theme))
-    )
-    const found = []
-    for (let i = 0; i < jobs.length; i += CONCURRENCY) {
-      const batch = await Promise.all(
-        jobs.slice(i, i + CONCURRENCY).map((job) => job())
+  const problems = await withSite(({ context, baseUrl }) =>
+    inBatches(
+      stories.flatMap((entry) =>
+        THEMES.map((theme) => () => auditStory(context, baseUrl, entry, theme))
       )
-      found.push(...batch.flat())
-    }
-    return found
-  })
+    )
+  )
 
   assert.deepEqual(
     problems,
@@ -159,7 +159,7 @@ test("audited controls pass WCAG 2.2 AA at 390px in both themes", async () => {
       }
       return found
     },
-    { viewport: { width: 390, height: 844 } }
+    { viewport: PHONE }
   )
   assert.deepEqual(problems, [], problems.join("\n"))
 })

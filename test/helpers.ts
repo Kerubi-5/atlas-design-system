@@ -2,7 +2,10 @@ import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, expect, vi } from "vitest"
 
-import type { FieldErrorMessage } from "../src/form/field-error.js"
+import type {
+  FieldErrorMessage,
+  FieldMetaState,
+} from "../src/form/field-error.js"
 
 /**
  * Shared Testing Library entry for kit behavior tests.
@@ -130,15 +133,57 @@ export function stubMatchMedia(
   }
 }
 
-/** A TanStack-shaped text field for the `form/*` adapters, with spy handlers. */
+/**
+ * jsdom has no layout, so every element reports an 800px row in a 390px
+ * box while `run` executes: a horizontal scroller overflows, joins the tab
+ * order and takes mouse drags.
+ */
+export async function withOverflow(run: () => Promise<void>) {
+  const descriptors = {
+    scrollWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "scrollWidth"
+    ),
+    clientWidth: Object.getOwnPropertyDescriptor(
+      HTMLElement.prototype,
+      "clientWidth"
+    ),
+  }
+  Object.defineProperty(HTMLElement.prototype, "scrollWidth", {
+    configurable: true,
+    get: () => 800,
+  })
+  Object.defineProperty(HTMLElement.prototype, "clientWidth", {
+    configurable: true,
+    get: () => 390,
+  })
+  try {
+    await run()
+  } finally {
+    for (const [key, descriptor] of Object.entries(descriptors)) {
+      if (descriptor) {
+        Object.defineProperty(HTMLElement.prototype, key, descriptor)
+      } else {
+        delete (HTMLElement.prototype as unknown as Record<string, unknown>)[
+          key
+        ]
+      }
+    }
+  }
+}
+
+/**
+ * A TanStack-shaped text field for the `form/*` adapters, with spy handlers.
+ * Pass its errors, or a whole `meta` to set `isTouched` as well.
+ */
 export function fakeTextField(
   name: string,
   value: string,
-  errors: FieldErrorMessage[] = []
+  meta: FieldErrorMessage[] | FieldMetaState = []
 ) {
   return {
     name,
-    state: { value, meta: { errors } },
+    state: { value, meta: Array.isArray(meta) ? { errors: meta } : meta },
     handleChange: vi.fn<(value: string) => void>(),
     handleBlur: vi.fn<() => void>(),
   }

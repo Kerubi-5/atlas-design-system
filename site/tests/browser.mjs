@@ -13,6 +13,12 @@ import { distDir, serve } from "./serve.mjs"
 const require = createRequire(import.meta.url)
 
 export const THEMES = ["light", "dark"]
+/** The default browser viewport, and the phone the site must also fit. */
+export const DESKTOP = { width: 1280, height: 900 }
+export const PHONE = { width: 390, height: 844 }
+/** Widths for checks that run at desktop and phone size. */
+export const WIDTHS = [DESKTOP.width, PHONE.width]
+const CONCURRENCY = 4
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
 
 const NO_MOTION =
@@ -125,8 +131,28 @@ export async function runAxe(page, { wholePage = false, rules = {} } = {}) {
   )
 }
 
+/** One problem line for an axe violation, naming its first three targets. */
+export function violationMessage(label, violation) {
+  return `${label}: ${violation.id} (${violation.help}) at ${violation.targets.slice(0, 3).join(", ")}`
+}
+
 /**
- * Serve the built site and launch Chromium with one context (1280×900,
+ * Run `jobs` (functions that resolve to arrays of problems) four at a time,
+ * and resolve to all their problems in order.
+ */
+export async function inBatches(jobs) {
+  const found = []
+  for (let i = 0; i < jobs.length; i += CONCURRENCY) {
+    const batch = await Promise.all(
+      jobs.slice(i, i + CONCURRENCY).map((job) => job())
+    )
+    found.push(...batch.flat())
+  }
+  return found
+}
+
+/**
+ * Serve the built site and launch Chromium with one context (DESKTOP,
  * reduced motion, plus `contextOptions`). `fn` gets { browser, context,
  * baseUrl }; browser and server close afterwards, also when `fn` throws.
  */
@@ -137,7 +163,7 @@ export async function withSite(fn, contextOptions = {}) {
   try {
     const context = await browser.newContext({
       reducedMotion: "reduce",
-      viewport: { width: 1280, height: 900 },
+      viewport: DESKTOP,
       ...contextOptions,
     })
     return await fn({ browser, context, baseUrl })

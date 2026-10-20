@@ -1,6 +1,13 @@
 import { expect, test } from "@playwright/test"
 
-import { openStory, storyRoot } from "../browser.mjs"
+import {
+  DESKTOP,
+  PHONE,
+  THEMES,
+  WIDTHS,
+  openStory,
+  storyRoot,
+} from "../browser.mjs"
 
 const controls = [
   ["actions-button--variants", "[data-slot=button]:not(:disabled)"],
@@ -15,12 +22,12 @@ const controls = [
   ["feedback-toast--plain", "[data-close-button]"],
 ] as const
 
-for (const width of [1280, 390]) {
-  for (const theme of ["light", "dark"]) {
+for (const width of WIDTHS) {
+  for (const theme of THEMES) {
     test(`controls expose visible focus and 24px targets at ${width} ${theme}`, async ({
       page,
     }) => {
-      await page.setViewportSize({ width, height: 900 })
+      await page.setViewportSize({ width, height: DESKTOP.height })
       for (const [id, selector] of controls) {
         await openStory(page, "", id, theme)
         const root = storyRoot(page)
@@ -68,7 +75,7 @@ for (const width of [1280, 390]) {
           await page.mouse.click(box!.x - 8, box!.y + box!.height / 2)
           await expect(page.getByRole("dialog")).toBeVisible()
         }
-        if (id === "navigation-tabs--nav" && width === 390) {
+        if (id === "navigation-tabs--nav" && width === PHONE.width) {
           const cue = await page
             .locator("[data-slot=tabs-scroller]")
             .evaluate((element) => ({

@@ -3,6 +3,7 @@ import { useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import { Combobox } from "../src/combobox.js"
+import { iso4217Code } from "../stories/form-control-triggers.js"
 
 import {
   createUser,
@@ -57,12 +58,6 @@ function ComboboxHarness({
       createLabel={createLabel}
     />
   )
-}
-
-/** App-side ISO 4217-style check: three letters, normalized to uppercase. */
-function iso4217Code(query: string) {
-  const code = query.trim().toUpperCase()
-  return /^[A-Z]{3}$/.test(code) ? code : null
 }
 
 /**
