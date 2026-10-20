@@ -1,5 +1,6 @@
 import * as React from "react"
 
+import { descriptionText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /**
@@ -93,7 +94,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm leading-relaxed text-muted-foreground", className)}
+      className={cn(descriptionText, className)}
       {...props}
     />
   )

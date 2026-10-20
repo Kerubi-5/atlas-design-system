@@ -1,3 +1,5 @@
+import { clamp } from "./math.js"
+
 /** Column id → ordered card ids, derived from the consumer's `items`. */
 export type KanbanGroups = Record<string, string[]>
 
@@ -81,10 +83,7 @@ export function resolveKanbanDrop(
 
   const columnItems = groups[toColumnId] ?? []
   const remaining = columnItems.filter((id) => id !== itemId)
-  const index = Math.max(
-    0,
-    Math.min(rawIndex ?? remaining.length, remaining.length)
-  )
+  const index = clamp(rawIndex ?? remaining.length, 0, remaining.length)
   if (initialGroup === toColumnId && index === columnItems.indexOf(itemId)) {
     return null
   }

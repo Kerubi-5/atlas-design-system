@@ -8,6 +8,7 @@ import {
   overlayFadeZoom,
   overlaySurface,
 } from "./internal/overlay-styles.js"
+import { descriptionText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 import { Button } from "./button.js"
 import { XIcon } from "lucide-react"
@@ -158,7 +159,9 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "mt-0.5 text-sm leading-relaxed text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        "mt-0.5",
+        descriptionText,
+        "*:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
         className
       )}
       {...props}

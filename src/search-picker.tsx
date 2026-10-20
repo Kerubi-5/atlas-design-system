@@ -17,7 +17,7 @@ import {
   foldSearchText,
   normalizeSearchQuery,
 } from "./internal/search.js"
-import { cn } from "./utils.js"
+import { cn, onInputChange } from "./utils.js"
 
 export { foldSearchText }
 
@@ -178,7 +178,7 @@ function SearchPicker<T>({
         value={query}
         disabled={disabled}
         placeholder={placeholder}
-        onChange={(event) => setQuery(event.target.value)}
+        onChange={onInputChange(setQuery)}
         onKeyDown={onKeyDown}
       />
       <Listbox

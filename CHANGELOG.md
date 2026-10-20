@@ -7,6 +7,15 @@ Internal only; the public API and rendered HTML are unchanged.
 - Every `form/*` field takes its control id and error text from one
   internal hook, and `FormDatePickerField` and `FormDateTimePickerField`
   share one picker field body instead of two copies.
+- The description text of `CardDescription`, `PopoverDescription`,
+  `DialogDescription` and `AlertDescription`, and the panel classes of
+  `PopoverContent`, `SelectContent` and `DropdownMenuContent`, each have
+  one home in the internal styles; `test/dry.test.ts` fails on a retyped
+  copy.
+- Listbox keys (Combobox, SearchPicker) and Kanban drops bound their index
+  with the kit's one `clamp`. The only difference: if `items` shrinks
+  below the highlighted row while the query stays the same, Arrow Up and
+  Page Up now land on the last row instead of past it.
 
 ## 1.2.1 - 2026-10-21
 

@@ -31,9 +31,10 @@ const srcDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "../src"
 )
-const components = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
-  .filter((file) => /\.tsx?$/.test(file) && !file.startsWith("internal"))
+const sources = readdirSync(srcDir, { recursive: true, encoding: "utf8" })
+  .filter((file) => /\.tsx?$/.test(file))
   .map((file) => [file, readFileSync(path.join(srcDir, file), "utf8")] as const)
+const components = sources.filter(([file]) => !file.startsWith("internal"))
 
 const retyped: Array<[string, RegExp, string]> = [
   [
@@ -90,7 +91,16 @@ const retyped: Array<[string, RegExp, string]> = [
     "quietTextHover",
   ],
   ["listbox scroll frame", /max-h-60 overflow-y-auto/, "listboxScroll"],
-  ["clamp", /Math\.min\([^()]*Math\.max\(/, "clamp from internal/math"],
+  [
+    "description text",
+    /text-sm leading-relaxed text-muted-foreground/,
+    "descriptionText",
+  ],
+  [
+    "anchored panel",
+    /overlaySurface,\s*overlaySideSlide,\s*overlayFadeZoom/,
+    "anchoredPanel",
+  ],
   [
     "overlay surface",
     /bg-popover text-popover-foreground shadow-md ring-1/,
@@ -131,6 +141,17 @@ describe("shared state classes", () => {
       expect(offenders).toEqual([])
     })
   }
+
+  it("no module but internal/math retypes clamp", () => {
+    const offenders = sources
+      .filter(
+        ([file, source]) =>
+          file !== path.join("internal", "math.ts") &&
+          /Math\.(min|max)\([^()]*Math\.(?!\1)(?:min|max)\(/.test(source)
+      )
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
 
   it("keeps each shared state complete", () => {
     expect(focusRing).toContain("focus-visible:ring-ring")

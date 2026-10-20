@@ -1,5 +1,17 @@
+import { clamp } from "./math.js"
+
 /** Page keys move ten rows, a little more than one max-h-60 list viewport. */
 const PAGE_SIZE = 10
+
+/** Rows each key moves the highlight; Home and End jump to the ends. */
+const keySteps = new Map([
+  ["ArrowDown", 1],
+  ["ArrowUp", -1],
+  ["PageDown", PAGE_SIZE],
+  ["PageUp", -PAGE_SIZE],
+  ["Home", -Infinity],
+  ["End", Infinity],
+])
 
 /** Return the next highlighted index for a listbox navigation key. */
 function moveListboxHighlight(
@@ -7,22 +19,9 @@ function moveListboxHighlight(
   index: number,
   length: number
 ): number | undefined {
-  switch (key) {
-    case "ArrowDown":
-      return length === 0 ? 0 : Math.min(index + 1, length - 1)
-    case "ArrowUp":
-      return Math.max(index - 1, 0)
-    case "Home":
-      return 0
-    case "End":
-      return length === 0 ? 0 : length - 1
-    case "PageDown":
-      return length === 0 ? 0 : Math.min(index + PAGE_SIZE, length - 1)
-    case "PageUp":
-      return Math.max(index - PAGE_SIZE, 0)
-    default:
-      return undefined
-  }
+  const step = keySteps.get(key)
+  if (step === undefined) return undefined
+  return clamp(index + step, 0, Math.max(length - 1, 0))
 }
 
 /**

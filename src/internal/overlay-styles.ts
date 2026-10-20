@@ -26,6 +26,12 @@ export const overlayFade =
 export const overlayFadeZoom = `${overlayFade} data-open:zoom-in-95 data-closed:zoom-out-95`
 
 /**
+ * A panel opened from a trigger (Popover, Select, DropdownMenu): the
+ * surface, sliding in from the trigger's side with a fade and zoom.
+ */
+export const anchoredPanel = `${overlaySurface} ${overlaySideSlide} ${overlayFadeZoom}`
+
+/**
  * Base of a menu or listbox row (SelectItem, DropdownMenuItem, Combobox and
  * SearchPicker options). Each component adds its own right padding and
  * indicator, plus the highlight from `optionState`.
