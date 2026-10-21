@@ -1,5 +1,7 @@
 "use client"
 
+import { useId } from "react"
+
 import { Input } from "../input.js"
 import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
@@ -8,7 +10,7 @@ import type { FieldMetaState, FormFieldBaseProps } from "./field-error.js"
 import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
 
 export type TextFieldApi = {
-  /** Field name; the default control id. */
+  /** Field name; put on the control as `data-field-name` for `focusFirstInvalid`. */
   name: string
   state: {
     /** Current text. */
@@ -29,12 +31,6 @@ export type TextFieldApi = {
 export type TextFieldBaseProps = FormFieldBaseProps & {
   /** The TanStack Form field (or the same shape) the control reads and writes. */
   field: TextFieldApi
-  /**
-   * Control id the label points at. Defaults to `field.name`; pass a unique
-   * id when two forms on one page share a field name (login and sign-up
-   * `email`), or the second label focuses the first input.
-   */
-  id?: string
   /** Sets `required` on the text control and marks the label. */
   required?: boolean
   /** Forwarded to the text control (the input or textarea). */
@@ -47,7 +43,6 @@ export type TextFieldBaseProps = FormFieldBaseProps & {
  */
 export function FormTextField({
   field,
-  id = field.name,
   label,
   placeholder,
   description,
@@ -87,10 +82,12 @@ export function FormTextField({
   /** Minimum text length (native form validation). */
   minLength?: number
 }) {
+  const id = useId()
   const onChange = onInputChange(field.handleChange)
   const errorText = metaErrorText(field.state.meta, { submitted, showError })
   const controlProps = {
     id,
+    "data-field-name": field.name,
     value: field.state.value,
     onChange,
     onBlur: field.handleBlur,

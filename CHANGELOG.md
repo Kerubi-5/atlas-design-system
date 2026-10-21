@@ -1,8 +1,76 @@
 # Changelog
 
-## Unreleased
+## 1.2.2 - 2026-10-21
 
-Internal only; the public API and rendered HTML are unchanged.
+Form fields get their own ids and `focusFirstInvalid` reaches every kind of
+field, plus layout and keyboard fixes. **The form-field section changes the
+API: read it before you upgrade.**
+
+### Form fields
+
+- Every `form/*` field generates its own control id with React `useId`, so
+  two forms on one page can share a field name (login and sign-up `email`)
+  and each label, hint and error still points at its own control. The
+  hint, error and "Required" ids derive from it as before.
+- Removed: the `id` prop of `FormTextField`, `FormMarkdownField`,
+  `FormSelectField`, `FormCheckboxField`, `FormDatePickerField`,
+  `FormDateTimePickerField` and `FormControlField`, and `FormTextField` and
+  `FormMarkdownField` no longer use `field.name` as the control id.
+  TypeScript flags a passed `id`; at runtime it is ignored. Anything that
+  found a control by `#email` or `getElementById(field.name)` (end-to-end
+  tests, `focusFirstInvalid` setups) must look it up by label or by
+  `[data-field-name="email"]`.
+- New: every `form/*` field puts `data-field-name` on its focusable
+  control: the input or textarea, the select, combobox or date trigger, the
+  checkbox (the first box of a checkbox group) and the toggle group.
+  `FormTextField` and `FormMarkdownField` use `field.name`. The other
+  fields take an optional `fieldName` prop (type `FormFieldNameProps` from
+  `form/field-error`): pass `fieldName={field.name}`. `FormControlField`
+  adds `data-field-name` to the props it hands your control, so spread them
+  as before. `DatePickerButton` and `DateTimePickerButton` forward
+  `data-field-name` to their trigger for the date fields.
+- `focusFirstInvalid(formId)` finds fields by `data-field-name` inside the
+  form with that id, instead of matching control ids across
+  `form.elements`. It now reaches comboboxes and toggle groups, whose
+  generated ids never matched a field name, and it never focuses a field of
+  another form that shares a name. A field without a `fieldName` is not a
+  target.
+
+### Layout and keyboard
+
+- `ToggleGroup`: in a single group, the arrow keys now select as they move
+  focus, as in any radio group, since its items are announced as radio
+  buttons. `onValueChange` fires for each arrow press, and the Write /
+  Preview toggle of `FormMarkdownField` switches mode on an arrow key. Tab
+  still only moves focus, and a `multiple` group still only moves focus.
+- `KanbanBoard` (beta): the focus ring on a card is no longer clipped by the
+  column's scrolling body. The body has 4px of padding inside the column's
+  edge (the cards do not move), enough for the 2px ring and its 2px gap on
+  all four sides.
+- `KanbanBoard` (beta): a column header whose name, count and badge do not
+  fit side by side no longer overflows or overlaps. The name truncates (its
+  full text is the hover title) and the count and badge wrap under it,
+  right-aligned, so a 140-160px column holds "Negotiation" and an EV badge.
+- `InfoTip` with `layout="box"` after a label: the glyph sits a quarter em
+  from the text, like `InlineTip` in a sentence, instead of about 16px. The
+  44px target now overlaps the label's last few pixels, and a gap on the
+  parent adds to the quarter em, so leave it off. A tip that is its own
+  parent's first child is unchanged.
+- `Combobox`: the list is at least as wide as the trigger and grows to fit
+  its longest option, up to the space the viewport leaves, so options are
+  no longer cut off. A `contentClassName` width narrower than the trigger
+  no longer narrows it.
+
+### Contributing
+
+- `npm run size` needs Node 22.19 or newer: size-limit 14 uses
+  `fs.promises.glob`, which Node 20 lacks. `CONTRIBUTING.md` now says
+  22.19 (it said 22.12, which Vitest alone needs). The package's own
+  `engines` range, Node 20.19 and up, is unchanged.
+
+### Internal
+
+The rest is internal; the public API and rendered HTML are unchanged.
 
 - Every `form/*` field takes its control id and error text from one
   internal hook, and `FormDatePickerField` and `FormDateTimePickerField`

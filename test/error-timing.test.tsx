@@ -154,7 +154,6 @@ describe("FormControlField", () => {
   it("wires label, required marker, hint, and error to a custom control", () => {
     render(
       <FormControlField
-        id="currency"
         label="Currency"
         description="ISO code"
         required
@@ -164,21 +163,20 @@ describe("FormControlField", () => {
       </FormControlField>
     )
     const input = screen.getByRole("textbox", { name: "Currency" })
-    expect(input).toHaveAttribute("id", "currency")
+    const { id } = input
+    expect(id).not.toBe("")
     expect(input).toHaveAttribute("aria-required", "true")
     expect(input).toHaveAttribute("aria-invalid", "true")
     expect(input).toHaveAttribute(
       "aria-describedby",
-      "currency-description currency-error"
+      `${id}-description ${id}-error`
     )
     expect(input).toHaveAccessibleDescription("ISO code Enter an amount")
-    expect(document.getElementById("currency-label")).toHaveTextContent(
-      "Currency"
-    )
+    expect(document.getElementById(`${id}-label`)).toHaveTextContent("Currency")
     expect(
       document.querySelector('[data-slot="label-required"]')
     ).toBeInTheDocument()
-    expect(screen.getByRole("alert")).toHaveAttribute("id", "currency-error")
+    expect(screen.getByRole("alert")).toHaveAttribute("id", `${id}-error`)
     expect(
       input.closest('[data-slot="form-field"]')?.className.split(" ")
     ).toEqual(expect.arrayContaining(["flex", "flex-col", "gap-1.5"]))

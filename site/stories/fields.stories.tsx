@@ -34,7 +34,7 @@ export const FocusFirstInvalid: Story = {
     docs: {
       description: {
         story:
-          "Press Save with the fields empty: `focusFirstInvalid` moves focus to the first field with an error, and the errors show. Fields carry `id={field.name}` so the handler finds them.",
+          "Press Save with the fields empty: `focusFirstInvalid` moves focus to the first field with an error, and the errors show. Each field carries its field name (`data-field-name`) so the handler finds it inside the form.",
       },
     },
   },

@@ -1,6 +1,6 @@
 "use client"
 
-import { lazy, Suspense, useState } from "react"
+import { lazy, Suspense, useId, useState } from "react"
 
 import { Spinner } from "../spinner.js"
 import { Textarea } from "../textarea.js"
@@ -27,7 +27,6 @@ const Markdown = lazy(() =>
  */
 export function FormMarkdownField({
   field,
-  id = field.name,
   label,
   placeholder = "Markdown supported",
   rows = 5,
@@ -45,6 +44,7 @@ export function FormMarkdownField({
   /** Classes for the Preview surface, e.g. a taller `min-h-40`. */
   previewClassName?: string
 }) {
+  const id = useId()
   const [mode, setMode] = useState<Mode>("write")
   const onChange = onInputChange(field.handleChange)
   const errorText = metaErrorText(field.state.meta, { submitted, showError })
@@ -86,6 +86,7 @@ export function FormMarkdownField({
       {mode === "write" ? (
         <Textarea
           id={id}
+          data-field-name={field.name}
           value={field.state.value}
           onChange={onChange}
           onBlur={field.handleBlur}

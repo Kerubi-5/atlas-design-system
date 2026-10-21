@@ -54,6 +54,19 @@ export type FormFieldMetaProps = {
   meta?: FieldMetaState
 }
 
+/**
+ * The field's name, for the `form/*` fields that are not bound to a `field`
+ * API (the text and Markdown fields read `field.name` themselves).
+ */
+export type FormFieldNameProps = {
+  /**
+   * The field's name (TanStack Form's `field.name`). Put on the control as
+   * `data-field-name`, so `focusFirstInvalid` can find it. Leave it out and
+   * the field is not a focus target.
+   */
+  fieldName?: string
+}
+
 /** The optional hint the `form/*` fields render under the label. */
 export type FormFieldDescriptionProps = {
   /** Hint between the label and the control, read with the control. */

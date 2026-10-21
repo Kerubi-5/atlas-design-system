@@ -120,8 +120,9 @@ export function FormHelpersStory() {
 
 /**
  * A failed submit focuses the first field with an error, in page order,
- * through `focusFirstInvalid`. The fields carry `id={name}` so the handler
- * can find them by field name; errors show once the form is submitted.
+ * through `focusFirstInvalid`. Each field carries its field name
+ * (`data-field-name`) so the handler can find it inside the form; errors
+ * show once the form is submitted.
  */
 export function FocusFirstInvalidStory() {
   const [submitted, setSubmitted] = useState(false)
@@ -150,6 +151,7 @@ export function FocusFirstInvalidStory() {
   return (
     <form
       id="focus-first-invalid-form"
+      noValidate
       className="grid max-w-md gap-4"
       onSubmit={(event) => {
         event.preventDefault()
@@ -164,7 +166,7 @@ export function FocusFirstInvalidStory() {
         required
       />
       <FormSelectField
-        id="currency"
+        fieldName="currency"
         label="Currency"
         value={currency}
         onValueChange={setCurrency}

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { FormDatePickerField } from "../src/form/date-picker-field.js"
-import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
+import { FormComboboxField } from "../src/form/combobox-field.js"
 import { focusFirstInvalid } from "../src/form/focus-first-invalid.js"
 import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField } from "../src/form/text-field.js"
@@ -19,7 +18,7 @@ function OrderForm() {
     <form id="order">
       <FormTextField field={fakeTextField("amount", "")} label="Amount" />
       <FormSelectField
-        id="currency"
+        fieldName="currency"
         label="Currency"
         value={undefined}
         onValueChange={() => {}}
@@ -29,62 +28,6 @@ function OrderForm() {
     </form>
   )
 }
-
-describe("form field ids", () => {
-  it("puts the given id on the select trigger", () => {
-    render(
-      <FormSelectField
-        id="currency"
-        label="Currency"
-        value={undefined}
-        onValueChange={() => {}}
-      >
-        <SelectItem value="php">Philippine peso</SelectItem>
-      </FormSelectField>
-    )
-    const trigger = screen.getByRole("combobox", { name: "Currency" })
-    expect(trigger).toHaveAttribute("id", "currency")
-    expect(screen.getByText("Currency")).toHaveAttribute("for", "currency")
-  })
-
-  it("puts the given id on the date picker trigger", () => {
-    render(
-      <FormDatePickerField
-        id="due"
-        label="Due"
-        value={undefined}
-        onValueChange={() => {}}
-      />
-    )
-    expect(screen.getByLabelText("Due")).toHaveAttribute("id", "due")
-  })
-
-  it("puts the given id on the date-time picker trigger", () => {
-    render(
-      <FormDateTimePickerField
-        id="starts"
-        label="Starts"
-        value={null}
-        onValueChange={() => {}}
-      />
-    )
-    expect(screen.getByLabelText("Starts")).toHaveAttribute("id", "starts")
-  })
-
-  it("still generates an id when none is given", () => {
-    render(
-      <FormSelectField
-        label="Currency"
-        value={undefined}
-        onValueChange={() => {}}
-      >
-        <SelectItem value="php">Philippine peso</SelectItem>
-      </FormSelectField>
-    )
-    const trigger = screen.getByRole("combobox", { name: "Currency" })
-    expect(trigger.id).not.toBe("")
-  })
-})
 
 describe("focusFirstInvalid", () => {
   it("focuses the first invalid field in page order", () => {
@@ -98,7 +41,7 @@ describe("focusFirstInvalid", () => {
     expect(screen.getByLabelText("Amount")).toHaveFocus()
   })
 
-  it("skips valid fields, so a select named by id can be the target", () => {
+  it("skips valid fields, so a select can be the target", () => {
     render(<OrderForm />)
     focusFirstInvalid("order")(
       invalidSubmit({
@@ -125,5 +68,42 @@ describe("focusFirstInvalid", () => {
       )
     ).not.toThrow()
     expect(document.body).toHaveFocus()
+  })
+
+  it("reaches a combobox, and stays inside the form that submitted", () => {
+    const countries = [
+      { value: "ph", label: "Philippines" },
+      { value: "sg", label: "Singapore" },
+    ]
+    render(
+      <>
+        <form id="shipping">
+          <FormComboboxField
+            fieldName="country"
+            label="Shipping country"
+            options={countries}
+            onValueChange={() => {}}
+          />
+        </form>
+        <form id="billing">
+          <FormTextField field={fakeTextField("name", "")} label="Name" />
+          <FormComboboxField
+            fieldName="country"
+            label="Billing country"
+            options={countries}
+            onValueChange={() => {}}
+          />
+        </form>
+      </>
+    )
+    focusFirstInvalid("billing")(
+      invalidSubmit({
+        name: { errors: [] },
+        country: { errors: ["Pick a country"] },
+      })
+    )
+    expect(
+      screen.getByRole("combobox", { name: "Billing country" })
+    ).toHaveFocus()
   })
 })

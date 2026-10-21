@@ -8,6 +8,7 @@ import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
+  FormFieldNameProps,
 } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
@@ -20,6 +21,7 @@ export type ToggleGroupFieldOption<T extends string> = {
 
 type Props<T extends string> = FormFieldBaseProps &
   FormFieldMetaProps &
+  FormFieldNameProps &
   FormFieldDescriptionProps & {
     /** The selected option, or `""` for none yet. */
     value: T | ""
@@ -42,6 +44,7 @@ type Props<T extends string> = FormFieldBaseProps &
  * control), with a visible label and the `form/*` error wiring.
  */
 export function FormToggleGroupField<T extends string>({
+  fieldName,
   label,
   description,
   value,
@@ -75,6 +78,7 @@ export function FormToggleGroupField<T extends string>({
     >
       <ToggleGroup
         id={id}
+        data-field-name={fieldName}
         type="single"
         value={value}
         onValueChange={handleValueChange}

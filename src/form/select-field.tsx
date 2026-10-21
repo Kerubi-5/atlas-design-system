@@ -4,23 +4,22 @@ import type { ReactNode } from "react"
 
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
-import type { FormFieldBaseProps, FormFieldMetaProps } from "./field-error.js"
+import type {
+  FormFieldBaseProps,
+  FormFieldMetaProps,
+  FormFieldNameProps,
+} from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
-  FormFieldMetaProps & {
+  FormFieldMetaProps &
+  FormFieldNameProps & {
     /** The selected item's value, or `undefined` for none. */
     value: string | undefined
     /** Called with the value of the item the person picks. */
     onValueChange: (value: string) => void
     /** Trigger text while no item is selected. */
     placeholder?: string
-    /**
-     * Id of the trigger the label points at. Defaults to a generated id;
-     * pass the field name (`id={field.name}`) so a submit handler such as
-     * `focusFirstInvalid` can find the control.
-     */
-    id?: string
     /** Requires a value (native form validation) and marks the label. */
     required?: boolean
     /** Forwarded to the select trigger. */
@@ -33,7 +32,7 @@ type Props = FormFieldBaseProps &
 
 /** Select control with built-in field error text and invalid styling. */
 export function FormSelectField({
-  id: idProp,
+  fieldName,
   value,
   meta,
   submitted,
@@ -47,7 +46,7 @@ export function FormSelectField({
   contentClassName,
   children,
 }: Props) {
-  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   return (
     <FormFieldShell
@@ -60,6 +59,7 @@ export function FormSelectField({
       <Select value={value} onValueChange={onValueChange} required={required}>
         <SelectTrigger
           id={id}
+          data-field-name={fieldName}
           className={className}
           {...fieldAria(id, errorText, { required })}
         >

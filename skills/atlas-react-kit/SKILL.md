@@ -61,7 +61,7 @@ Import each component from its subpath, e.g.
 | Checkbox, checkbox group, toggle group, combobox in a form | `FormCheckboxField`, `FormCheckboxGroupField`, `FormToggleGroupField`, `FormComboboxField` from `form/*`                |
 | Custom control the kit has no form field for               | `FormControlField` from `form/control-field`                                                                            |
 | Form-level error (save failed)                             | `FormFeedbackField` from `form/feedback-field`                                                                          |
-| Focus the first invalid field when a submit fails          | `focusFirstInvalid` from `form/focus-first-invalid`                                                                     |
+| Focus the first invalid field when a submit fails          | `focusFirstInvalid` from `form/focus-first-invalid`; fields without a `field` prop take `fieldName={field.name}`        |
 | Content panels on one page                                 | `Tabs` from `tabs`                                                                                                      |
 | View switch that changes the URL                           | `TabsNav` and `TabsNavLink` from `tabs`; in Next, `next/tabs-nav-link`                                                  |
 | App shell nav (Calendar, Tasks, Settings)                  | `NavLink` from `nav-link`; in Next, `next/nav-link`                                                                     |

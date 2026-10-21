@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { selectedState } from "../src/internal/styles.js"
 import { Toggle, toggleVariants } from "../src/toggle.js"
@@ -119,7 +119,7 @@ describe("ToggleGroup", () => {
     expectSelectedChrome(italic.className)
   })
 
-  it("moves focus between items with arrow keys", async () => {
+  it("selects as arrow keys move focus, like the radios it announces", async () => {
     const user = createUser()
     render(<RangeGroup />)
 
@@ -130,11 +130,68 @@ describe("ToggleGroup", () => {
     day.focus()
     await user.keyboard("{ArrowRight}")
     expect(week).toHaveFocus()
+    expect(week).toHaveAttribute("aria-checked", "true")
+    expect(day).toHaveAttribute("aria-checked", "false")
 
     await user.keyboard("{ArrowRight}")
     expect(month).toHaveFocus()
+    expect(month).toHaveAttribute("aria-checked", "true")
+    expect(week).toHaveAttribute("aria-checked", "false")
 
     await user.keyboard("{ArrowLeft}")
     expect(week).toHaveFocus()
+    expect(week).toHaveAttribute("aria-checked", "true")
+
+    // Focus wraps from the last item to the first, and selects it too.
+    await user.keyboard("{ArrowRight}{ArrowRight}")
+    expect(day).toHaveFocus()
+    expect(day).toHaveAttribute("aria-checked", "true")
+  })
+
+  it("reports each arrow selection once, and nothing for Tab or a click on the selected item", async () => {
+    const user = createUser()
+    const onValueChange = vi.fn()
+    render(
+      <ToggleGroup
+        type="single"
+        aria-label="Range"
+        onValueChange={onValueChange}
+      >
+        <ToggleGroupItem value="day">Day</ToggleGroupItem>
+        <ToggleGroupItem value="week">Week</ToggleGroupItem>
+      </ToggleGroup>
+    )
+
+    await user.tab()
+    expect(screen.getByRole("radio", { name: "Day" })).toHaveFocus()
+    expect(onValueChange).not.toHaveBeenCalled()
+
+    await user.keyboard("{ArrowRight}")
+    expect(screen.getByRole("radio", { name: "Week" })).toHaveFocus()
+    expect(onValueChange).toHaveBeenCalledTimes(1)
+    expect(onValueChange).toHaveBeenLastCalledWith("week")
+
+    // Clicking the other item still selects it once, not twice.
+    await user.click(screen.getByRole("radio", { name: "Day" }))
+    expect(onValueChange).toHaveBeenCalledTimes(2)
+    expect(onValueChange).toHaveBeenLastCalledWith("day")
+  })
+
+  it("moves focus between multiple-choice items without pressing them", async () => {
+    const user = createUser()
+    render(
+      <ToggleGroup type="multiple" aria-label="Style">
+        <ToggleGroupItem value="bold">Bold</ToggleGroupItem>
+        <ToggleGroupItem value="italic">Italic</ToggleGroupItem>
+      </ToggleGroup>
+    )
+
+    const bold = screen.getByRole("button", { name: "Bold" })
+    const italic = screen.getByRole("button", { name: "Italic" })
+    bold.focus()
+    await user.keyboard("{ArrowRight}")
+    expect(italic).toHaveFocus()
+    expect(italic).toHaveAttribute("aria-pressed", "false")
+    expect(bold).toHaveAttribute("aria-pressed", "false")
   })
 })

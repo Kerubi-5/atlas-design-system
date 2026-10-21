@@ -179,24 +179,22 @@ describe("Combobox customization", () => {
     expect(list).toHaveAttribute("data-slot", "combobox-list")
     const panel = list.closest("[data-slot=popover-content]")!
     expect(panel).toHaveClass("w-96")
-    expect(classes(panel)).not.toContain(
-      "w-[var(--radix-popover-trigger-width)]"
-    )
+    expect(classes(panel)).not.toContain("w-max")
     expect(panel.querySelector("[data-slot=combobox-search]")).not.toBeNull()
     for (const option of within(list).getAllByRole("option")) {
       expect(option).toHaveAttribute("data-slot", "combobox-option")
     }
   })
 
-  it("keeps the panel at the trigger width by default", async () => {
+  it("keeps the panel at least as wide as the trigger by default", async () => {
     const user = createUser()
     render(
       <Combobox options={options} onValueChange={() => {}} aria-label="Word" />
     )
     await user.click(screen.getByRole("combobox", { name: "Word" }))
     const list = await screen.findByRole("listbox")
-    expect(classes(list.closest("[data-slot=popover-content]")!)).toContain(
-      "w-[var(--radix-popover-trigger-width)]"
+    expect(classes(list.closest("[data-slot=popover-content]")!)).toEqual(
+      expect.arrayContaining(["w-max", "min-w-(--radix-popover-trigger-width)"])
     )
   })
 

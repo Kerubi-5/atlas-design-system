@@ -8,11 +8,13 @@ import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
+  FormFieldNameProps,
 } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps &
+  FormFieldNameProps &
   FormFieldDescriptionProps &
   Omit<
     ComponentProps<typeof Combobox>,
@@ -27,6 +29,7 @@ type Props = FormFieldBaseProps &
  * timing. Pass the field's blur handler as `onBlur` so touch state updates.
  */
 export function FormComboboxField({
+  fieldName,
   label,
   description,
   meta,
@@ -50,6 +53,7 @@ export function FormComboboxField({
       <Combobox
         {...props}
         id={id}
+        data-field-name={fieldName}
         {...fieldAria(id, errorText, { description, required })}
       />
     </FormFieldShell>
