@@ -37,12 +37,14 @@ describe("Table overflow", () => {
     const table = screen.getByRole("table", { name: "People" })
     const container = table.closest("[data-slot=table-container]")
     expect(container).toBeTruthy()
-    expect(container?.className.split(/\s+/)).toContain("overflow-x-auto")
-    expect(container?.className.split(/\s+/)).toContain("min-w-0")
-    expect(container?.className.split(/\s+/)).toContain("max-w-full")
-    expect(container?.className.split(/\s+/)).toContain("overscroll-x-contain")
+    expect(container).toHaveClass(
+      "overflow-x-auto",
+      "min-w-0",
+      "max-w-full",
+      "overscroll-x-contain"
+    )
     // w-full fills the scroller; min-w-full was redundant and blocked w-auto.
-    expect(table.className.split(/\s+/)).toContain("w-full")
+    expect(table).toHaveClass("w-full")
   })
 
   it("uses compact padding below sm and the original density from sm up", () => {
@@ -63,10 +65,8 @@ describe("Table overflow", () => {
 
     const head = screen.getByRole("columnheader", { name: "License" })
     const cell = screen.getByRole("cell", { name: "CC BY 4.0" })
-    expect(head.className.split(/\s+/)).toContain("px-2")
-    expect(head.className.split(/\s+/)).toContain("sm:px-3")
-    expect(cell.className.split(/\s+/)).toContain("px-2")
-    expect(cell.className.split(/\s+/)).toContain("sm:p-3")
+    expect(head).toHaveClass("px-2", "sm:px-3")
+    expect(cell).toHaveClass("px-2", "sm:p-3")
   })
 
   it("keeps a wide table inside a 390px panel scroller", () => {
@@ -76,9 +76,8 @@ describe("Table overflow", () => {
     const container = table.closest("[data-slot=table-container]")
     const panel = screen.getByText("In this build").parentElement
 
-    expect(panel?.className.split(/\s+/)).toContain("w-[390px]")
-    expect(container?.className.split(/\s+/)).toContain("overflow-x-auto")
-    expect(container?.className.split(/\s+/)).toContain("min-w-0")
+    expect(panel).toHaveClass("w-[390px]")
+    expect(container).toHaveClass("overflow-x-auto", "min-w-0")
     expect(screen.getByRole("columnheader", { name: "License" })).toBeVisible()
     expect(screen.getByRole("cell", { name: "CC BY-NC 4.0" })).toBeVisible()
   })
@@ -95,11 +94,10 @@ describe("Table overflow", () => {
       .closest("[data-slot=table-container]")
     const panel = card?.parentElement
 
-    expect(panel?.className.split(/\s+/)).toContain("w-[390px]")
-    expect(card?.className.split(/\s+/)).toContain("min-w-0")
-    expect(content?.className.split(/\s+/)).toContain("min-w-0")
-    expect(container?.className.split(/\s+/)).toContain("overflow-x-auto")
-    expect(container?.className.split(/\s+/)).toContain("min-w-0")
+    expect(panel).toHaveClass("w-[390px]")
+    expect(card).toHaveClass("min-w-0")
+    expect(content).toHaveClass("min-w-0")
+    expect(container).toHaveClass("overflow-x-auto", "min-w-0")
     expect(screen.getByRole("cell", { name: "CC BY-NC 4.0" })).toBeVisible()
   })
 })

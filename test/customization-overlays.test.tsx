@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "../src/select.js"
 import { Tooltip, TooltipContent, TooltipTrigger } from "../src/tooltip.js"
+import { placeItems } from "../stories/search-picker.js"
 
 import { classes, createUser, render, screen, within } from "./helpers.js"
 
@@ -43,13 +44,13 @@ describe("Dialog customization", () => {
     )
 
     const overlay = document.querySelector("[data-slot=dialog-overlay]")!
-    expect(classes(overlay)).toContain("bg-black/60")
-    expect(classes(overlay)).not.toContain("bg-black/20")
+    expect(overlay).toHaveClass("bg-black/60")
+    expect(overlay).not.toHaveClass("bg-black/20")
 
     const close = screen.getByRole("button", { name: "Close" })
     expect(close).toHaveAttribute("data-slot", "dialog-close-button")
-    expect(classes(close)).toContain("top-2")
-    expect(classes(close)).not.toContain("top-4")
+    expect(close).toHaveClass("top-2")
+    expect(close).not.toHaveClass("top-4")
 
     // A consumer's own DialogClose keeps the public slot.
     expect(screen.getByRole("button", { name: "Cancel" })).toHaveAttribute(
@@ -177,7 +178,7 @@ describe("Combobox customization", () => {
     const list = await screen.findByRole("listbox")
     expect(list).toHaveAttribute("data-slot", "combobox-list")
     const panel = list.closest("[data-slot=popover-content]")!
-    expect(classes(panel)).toContain("w-96")
+    expect(panel).toHaveClass("w-96")
     expect(classes(panel)).not.toContain(
       "w-[var(--radix-popover-trigger-width)]"
     )
@@ -224,9 +225,7 @@ describe("SearchPicker customization", () => {
   it("names options and the empty state, and forwards root props", () => {
     render(
       <SearchPicker
-        items={[{ id: "1", name: "Manila" }]}
-        getValue={(item) => item.id}
-        getLabel={(item) => item.name}
+        {...placeItems}
         onSelect={() => {}}
         label="Place"
         data-testid="place-picker"
@@ -237,7 +236,7 @@ describe("SearchPicker customization", () => {
     const root = screen.getByTestId("place-picker")
     expect(root).toHaveAttribute("data-slot", "search-picker")
     expect(root).toHaveAttribute("id", "place")
-    expect(screen.getByRole("option", { name: "Manila" })).toHaveAttribute(
+    expect(screen.getByRole("option", { name: "North ward" })).toHaveAttribute(
       "data-slot",
       "search-picker-option"
     )
@@ -252,16 +251,8 @@ describe("SearchPicker customization", () => {
   })
 
   it("does not repeat the active fill on top of the shared highlight", () => {
-    render(
-      <SearchPicker
-        items={[{ id: "1", name: "Manila" }]}
-        getValue={(item) => item.id}
-        getLabel={(item) => item.name}
-        onSelect={() => {}}
-        label="Place"
-      />
-    )
-    const option = screen.getByRole("option", { name: "Manila" })
+    render(<SearchPicker {...placeItems} onSelect={() => {}} label="Place" />)
+    const option = screen.getByRole("option", { name: "North ward" })
     const names = classes(option)
     expect(names.filter((name) => name === "bg-accent")).toHaveLength(1)
   })
@@ -277,59 +268,44 @@ describe("InfoTip customization", () => {
 })
 
 describe("handleListboxKey", () => {
-  const keyEvent = (key: string, composing = false) => ({
-    key,
-    keyCode: composing ? 229 : 0,
-    nativeEvent: { isComposing: composing } as KeyboardEvent,
-    preventDefault: vi.fn(),
-  })
+  /** Press `key` in a three-item list highlighted at `highlight`. */
+  function pressKey(key: string, { highlight = 0, composing = false } = {}) {
+    const event = {
+      key,
+      keyCode: composing ? 229 : 0,
+      nativeEvent: { isComposing: composing } as KeyboardEvent,
+      preventDefault: vi.fn(),
+    }
+    const setHighlight = vi.fn()
+    const onPick = vi.fn()
+    const handled = handleListboxKey(event, {
+      items: ["a", "b", "c"],
+      highlight,
+      setHighlight,
+      onPick,
+    })
+    return { handled, event, setHighlight, onPick }
+  }
 
   it("moves the highlight and selects on Enter", () => {
-    const setHighlight = vi.fn()
-    const onEnter = vi.fn()
-    const down = keyEvent("ArrowDown")
-    expect(
-      handleListboxKey(down, { highlight: 0, length: 3, setHighlight, onEnter })
-    ).toBe(true)
-    expect(setHighlight).toHaveBeenCalledWith(1)
-    expect(down.preventDefault).toHaveBeenCalled()
+    const down = pressKey("ArrowDown")
+    expect(down.handled).toBe(true)
+    expect(down.setHighlight).toHaveBeenCalledWith(1)
+    expect(down.event.preventDefault).toHaveBeenCalled()
 
-    const enter = keyEvent("Enter")
-    expect(
-      handleListboxKey(enter, {
-        highlight: 2,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(true)
-    expect(onEnter).toHaveBeenCalledWith(2)
+    const enter = pressKey("Enter", { highlight: 2 })
+    expect(enter.handled).toBe(true)
+    expect(enter.onPick).toHaveBeenCalledWith("c")
   })
 
   it("ignores keys while an IME composes and leaves other keys alone", () => {
-    const setHighlight = vi.fn()
-    const onEnter = vi.fn()
-    const composing = keyEvent("Enter", true)
-    expect(
-      handleListboxKey(composing, {
-        highlight: 0,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(true)
-    expect(onEnter).not.toHaveBeenCalled()
-    expect(composing.preventDefault).not.toHaveBeenCalled()
+    const composing = pressKey("Enter", { composing: true })
+    expect(composing.handled).toBe(true)
+    expect(composing.onPick).not.toHaveBeenCalled()
+    expect(composing.event.preventDefault).not.toHaveBeenCalled()
 
-    const escape = keyEvent("Escape")
-    expect(
-      handleListboxKey(escape, {
-        highlight: 0,
-        length: 3,
-        setHighlight,
-        onEnter,
-      })
-    ).toBe(false)
-    expect(setHighlight).not.toHaveBeenCalled()
+    const escape = pressKey("Escape")
+    expect(escape.handled).toBe(false)
+    expect(escape.setHighlight).not.toHaveBeenCalled()
   })
 })

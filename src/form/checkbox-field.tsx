@@ -1,7 +1,5 @@
 "use client"
 
-import { useId } from "react"
-
 import { Checkbox } from "../checkbox.js"
 import { Field, FieldContent, FieldLabel, FieldLegend } from "../field.js"
 import { cn } from "../utils.js"
@@ -15,7 +13,7 @@ import {
   fieldAria,
   FormFieldDescription,
   FormFieldFrame,
-  metaErrorText,
+  useFormField,
 } from "./field-shell.js"
 
 type CheckboxFieldProps = FormFieldBaseProps &
@@ -59,9 +57,7 @@ export function FormCheckboxField({
   className,
   fieldClassName,
 }: CheckboxFieldProps) {
-  const generatedId = useId()
-  const id = idProp ?? generatedId
-  const errorText = metaErrorText(meta, { submitted, showError })
+  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
 
   const checkbox = (
     <Checkbox
@@ -135,8 +131,7 @@ export function FormCheckboxGroupField<T extends string | number>({
   className,
   fieldClassName,
 }: CheckboxGroupFieldProps<T>) {
-  const id = useId()
-  const errorText = metaErrorText(meta, { submitted, showError })
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   function toggle(option: T, on: boolean) {
     const next = new Set(value)

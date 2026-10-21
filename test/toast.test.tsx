@@ -14,6 +14,13 @@ import {
   within,
 } from "./helpers.js"
 
+/** The toast showing `text`, once it appears. */
+async function findToast(text: string) {
+  return (await screen.findByText(text)).closest<HTMLElement>(
+    "[data-sonner-toast]"
+  )!
+}
+
 describe("Toaster", () => {
   function renderToaster(props: React.ComponentProps<typeof Toaster> = {}) {
     return render(
@@ -45,8 +52,7 @@ describe("Toaster", () => {
         action: { label: "Retry", onClick: onRetry },
       })
     })
-    const title = await screen.findByText("Could not save")
-    const item = title.closest("[data-sonner-toast]") as HTMLElement
+    const item = await findToast("Could not save")
     expect(item).toHaveAttribute("data-type", "error")
     expect(item).toHaveAttribute("data-styled", "false")
     expect(item.className).toContain("bg-popover")
@@ -69,9 +75,7 @@ describe("Toaster", () => {
     act(() => {
       toast("Saved")
     })
-    const item = (await screen.findByText("Saved")).closest(
-      "[data-sonner-toast]"
-    ) as HTMLElement
+    const item = await findToast("Saved")
     expect(item.querySelector("[data-icon]")).toBeNull()
     expect(item.className).toContain("w-max")
     expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
@@ -98,9 +102,7 @@ describe("Toaster", () => {
     act(() => {
       toast.success("Order archived")
     })
-    const item = (await screen.findByText("Order archived")).closest(
-      "[data-sonner-toast]"
-    ) as HTMLElement
+    const item = await findToast("Order archived")
     await user.click(within(item).getByRole("button", { name: "Close toast" }))
     await waitFor(() => {
       expect(screen.queryByText("Order archived")).toBeNull()
@@ -149,9 +151,7 @@ describe("Toaster", () => {
         unstyled: false,
       } as Parameters<typeof toast.warning>[1])
     })
-    const item = (await screen.findByText("Storage almost full")).closest(
-      "[data-sonner-toast]"
-    ) as HTMLElement
+    const item = await findToast("Storage almost full")
     expect(item).toHaveAttribute("data-styled", "false")
     expect(item.getAttribute("data-rich-colors")).not.toBe("true")
     expect(item.className).not.toContain("app-toast")
@@ -173,9 +173,7 @@ describe("toast action and cancel buttons", () => {
         cancel: { label: "Keep", onClick: onCancel },
       })
     })
-    const item = (await screen.findByText("Archived")).closest(
-      "[data-sonner-toast]"
-    ) as HTMLElement
+    const item = await findToast("Archived")
     await user.click(within(item).getByRole("button", { name: "Undo" }))
     expect(onAction).toHaveBeenCalledTimes(1)
 
@@ -184,9 +182,7 @@ describe("toast action and cancel buttons", () => {
         cancel: { label: "Keep", onClick: onCancel },
       })
     })
-    const second = (await screen.findByText("Archived again")).closest(
-      "[data-sonner-toast]"
-    ) as HTMLElement
+    const second = await findToast("Archived again")
     await user.click(within(second).getByRole("button", { name: "Keep" }))
     await waitFor(() => expect(onCancel).toHaveBeenCalledTimes(1))
   })

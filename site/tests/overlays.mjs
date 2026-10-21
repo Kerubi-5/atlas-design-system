@@ -4,18 +4,55 @@
 // visible once `open(page)` has run; both tests wait for it.
 import { storyRoot } from "./browser.mjs"
 
+const TOAST = "[data-sonner-toast]"
+
 const clickFirst = (role) => (page) =>
   storyRoot(page).getByRole(role).first().click()
+
+/** A story whose first button opens a dialog. */
+const dialogStory = (id) => ({
+  id,
+  shows: "[role=dialog]",
+  open: clickFirst("button"),
+})
 
 /** The story raises its toasts on mount; wait until `count` are in the DOM. */
 const toasts =
   (count = 1) =>
   (page) =>
     page.waitForFunction(
-      (expected) =>
-        document.querySelectorAll("[data-sonner-toast]").length === expected,
-      count
+      ({ selector, expected }) =>
+        document.querySelectorAll(selector).length === expected,
+      { selector: TOAST, expected: count }
     )
+
+/** One story per toast chrome variant, and how many toasts it raises. */
+const toastVariants = {
+  plain: 1,
+  success: 1,
+  info: 1,
+  warning: 1,
+  error: 1,
+  loading: 1,
+  "with-description": 1,
+  "with-action-and-cancel": 1,
+  "long-text": 1,
+  stacked: 3,
+}
+
+/** Ids of the toast variant stories (`feedback-toast--<variant>`). */
+export const toastVariantIds = Object.keys(toastVariants).map(
+  (name) => `feedback-toast--${name}`
+)
+
+/** Open `overlay`'s story content and wait until it shows. */
+export async function openOverlay(page, overlay) {
+  await overlay.open(page)
+  await page
+    .locator(overlay.shows)
+    .first()
+    .waitFor({ state: "visible", timeout: 10_000 })
+}
 
 export const OVERLAYS = [
   {
@@ -42,14 +79,9 @@ export const OVERLAYS = [
       await page.getByRole("option", { name: 'Create "PHP"' }).waitFor()
     },
   },
+  dialogStory("forms-date-picker--playground"),
   {
-    id: "forms-date-picker--playground",
-    shows: "[role=dialog]",
-    open: clickFirst("button"),
-  },
-  {
-    id: "forms-date-time-picker--playground",
-    shows: "[role=dialog]",
+    ...dialogStory("forms-date-time-picker--playground"),
     open: async (page) => {
       await clickFirst("button")(page)
       // The calendar loads on first open; wait for it, not the spinner.
@@ -58,73 +90,19 @@ export const OVERLAYS = [
   },
   {
     id: "feedback-toast--playground",
-    shows: "[data-sonner-toast]",
+    shows: TOAST,
     open: clickFirst("button"),
   },
-  {
-    id: "feedback-toast--types",
-    shows: "[data-sonner-toast]",
-    open: toasts(5),
-  },
-  // One story per toast chrome variant.
-  { id: "feedback-toast--plain", shows: "[data-sonner-toast]", open: toasts() },
-  {
-    id: "feedback-toast--success",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  { id: "feedback-toast--info", shows: "[data-sonner-toast]", open: toasts() },
-  {
-    id: "feedback-toast--warning",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  { id: "feedback-toast--error", shows: "[data-sonner-toast]", open: toasts() },
-  {
-    id: "feedback-toast--loading",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  {
-    id: "feedback-toast--with-description",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  {
-    id: "feedback-toast--with-action-and-cancel",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  {
-    id: "feedback-toast--long-text",
-    shows: "[data-sonner-toast]",
-    open: toasts(),
-  },
-  {
-    id: "feedback-toast--stacked",
-    shows: "[data-sonner-toast]",
-    open: toasts(3),
-  },
-  {
-    id: "overlays-dialog--playground",
-    shows: "[role=dialog]",
-    open: clickFirst("button"),
-  },
-  {
-    id: "overlays-dialog--long-title",
-    shows: "[role=dialog]",
-    open: clickFirst("button"),
-  },
-  {
-    id: "overlays-popover--playground",
-    shows: "[role=dialog]",
-    open: clickFirst("button"),
-  },
-  {
-    id: "overlays-info-tip--playground",
-    shows: "[role=dialog]",
-    open: clickFirst("button"),
-  },
+  { id: "feedback-toast--types", shows: TOAST, open: toasts(5) },
+  ...Object.entries(toastVariants).map(([name, count]) => ({
+    id: `feedback-toast--${name}`,
+    shows: TOAST,
+    open: toasts(count),
+  })),
+  dialogStory("overlays-dialog--playground"),
+  dialogStory("overlays-dialog--long-title"),
+  dialogStory("overlays-popover--playground"),
+  dialogStory("overlays-info-tip--playground"),
   {
     id: "overlays-tooltip--playground",
     shows: "[role=tooltip]",

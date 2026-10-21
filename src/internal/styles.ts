@@ -134,6 +134,12 @@ export const controlSize = {
 export const controlText =
   "text-xs font-semibold tracking-widest whitespace-nowrap uppercase"
 
+/**
+ * Secondary text under a title (CardDescription, PopoverDescription,
+ * DialogDescription, AlertDescription).
+ */
+export const descriptionText = "text-sm leading-relaxed text-muted-foreground"
+
 /** Field-label text (Label, FieldLegend, FieldTitle, PopoverTitle). */
 export const labelText = "text-xs font-semibold tracking-wide uppercase"
 

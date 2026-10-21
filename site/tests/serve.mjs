@@ -17,7 +17,10 @@ const contentTypes = {
   ".woff2": "font/woff2",
 }
 
-export const distDir = fileURLToPath(new URL("../dist", import.meta.url))
+/** The site package, its Storybook build, and the kit repo around it. */
+export const siteRoot = fileURLToPath(new URL("../", import.meta.url))
+export const distDir = path.join(siteRoot, "dist")
+export const repoRoot = path.resolve(siteRoot, "..")
 
 /** Serve `root` on 127.0.0.1; port 0 picks a free one. */
 export function serve(root = distDir, port = 0) {

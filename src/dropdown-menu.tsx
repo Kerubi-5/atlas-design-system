@@ -5,13 +5,11 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
 import {
+  anchoredPanel,
   menuLabel,
   optionRow,
   OVERLAY_COLLISION_PADDING,
   OVERLAY_SIDE_OFFSET,
-  overlayFadeZoom,
-  overlaySideSlide,
-  overlaySurface,
 } from "./internal/overlay-styles.js"
 import {
   dataDisabledState,
@@ -29,10 +27,12 @@ const menuItemClassName = cn(
   "pr-3 data-inset:pl-9"
 )
 
+/** The check or dot in the inset of a checkbox or radio item. */
+const menuIndicatorClassName =
+  "pointer-events-none absolute left-3 flex size-3.5 items-center justify-center"
+
 const menuContentClassName = cn(
-  overlaySurface,
-  overlaySideSlide,
-  overlayFadeZoom,
+  anchoredPanel,
   "z-50 overflow-x-hidden overflow-y-auto p-1"
 )
 
@@ -139,7 +139,7 @@ function DropdownMenuCheckboxItem({
       checked={checked}
       {...props}
     >
-      <span className="pointer-events-none absolute left-3 flex size-3.5 items-center justify-center">
+      <span className={menuIndicatorClassName}>
         <DropdownMenuPrimitive.ItemIndicator>
           <CheckIcon />
         </DropdownMenuPrimitive.ItemIndicator>
@@ -171,7 +171,7 @@ function DropdownMenuRadioItem({
       className={cn(menuItemClassName, "pl-9", className)}
       {...props}
     >
-      <span className="pointer-events-none absolute left-3 flex size-3.5 items-center justify-center">
+      <span className={menuIndicatorClassName}>
         <DropdownMenuPrimitive.ItemIndicator>
           <span className="block size-1.5 rounded-full bg-current" />
         </DropdownMenuPrimitive.ItemIndicator>

@@ -1,7 +1,7 @@
 import type * as React from "react"
 import { fireEvent } from "@testing-library/react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { afterEach, describe, expect, it, vi } from "vitest"
+import { describe, expect, it, vi } from "vitest"
 
 import { DRAG_THRESHOLD } from "../src/internal/use-drag-scroll.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
@@ -20,7 +20,18 @@ import {
   TabsOverflowStory,
 } from "../stories/navigation.js"
 
-import { createUser, render, screen, waitFor, withOverflow } from "./helpers.js"
+import {
+  createUser,
+  dragWithMouse,
+  move,
+  press,
+  recordScrollIntoView,
+  release,
+  render,
+  screen,
+  waitFor,
+  withOverflow,
+} from "./helpers.js"
 
 // Real render (no mocks): a view switcher that changes the URL must be links
 // in a labelled nav, not a tab widget whose tabs point at panels that don't
@@ -39,15 +50,6 @@ const html = renderToStaticMarkup(
 
 function scrollerOf(element: HTMLElement | null) {
   return element?.closest("[data-slot=tabs-scroller]") ?? null
-}
-
-const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
-
-/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
-function dragWithMouse(target: Element, from: number, to: number) {
-  fireEvent.pointerDown(target, { ...mouse, buttons: 1, clientX: from })
-  fireEvent.pointerMove(target, { ...mouse, buttons: 1, clientX: to })
-  fireEvent.pointerUp(target, { ...mouse, buttons: 0, clientX: to })
 }
 
 /** The scroller once `useHorizontalOverflow` has seen the overflow. */
@@ -101,19 +103,26 @@ function expectScrollerFitsList(
   }
 }
 
+/** Overview and Activity tabs in a list named "Order", Overview open. */
+function OrderTabs({ onActivityClick }: { onActivityClick?: () => void }) {
+  return (
+    <Tabs defaultValue="overview">
+      <TabsList aria-label="Order">
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="activity" onClick={onActivityClick}>
+          Activity
+        </TabsTrigger>
+      </TabsList>
+      <TabsContent value="overview">Overview panel</TabsContent>
+      <TabsContent value="activity">Activity panel</TabsContent>
+    </Tabs>
+  )
+}
+
 describe("Tabs", () => {
   it("moves between tabs with arrow keys and shows the matching panel", async () => {
     const user = createUser()
-    render(
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Order">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Overview panel</TabsContent>
-        <TabsContent value="activity">Activity panel</TabsContent>
-      </Tabs>
-    )
+    render(<OrderTabs />)
     const overview = screen.getByRole("tab", { name: "Overview" })
     expect(overview).toHaveAttribute("aria-selected", "true")
     expect(screen.getByRole("tabpanel")).toHaveTextContent("Overview panel")
@@ -137,10 +146,6 @@ describe("Tabs", () => {
 })
 
 describe("TabsNav", () => {
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = () => {}
-  })
-
   it("renders a labelled nav of links", () => {
     expect(html).toMatch(/^<nav[^>]*aria-label="Items view"/)
     expect(html).toMatch(/<a[^>]*href="\/items\?view=pipeline"/)
@@ -161,12 +166,10 @@ describe("TabsNav", () => {
     const nav = screen.getByRole("navigation", { name: "Settings" })
     const scroller = container.querySelector("[data-slot=tabs-scroller]")
     const list = container.querySelector("[data-slot=tabs-list]")
-    expect(nav.className.split(/\s+/)).toContain("min-w-0")
-    expect(nav.className.split(/\s+/)).toContain("max-w-full")
+    expect(nav).toHaveClass("min-w-0", "max-w-full")
     expectHorizontalOnlyScroller(scroller)
     expectScrollerFitsList(scroller, list)
-    expect(list?.className.split(/\s+/)).toContain("min-w-full")
-    expect(list?.className.split(/\s+/)).toContain("bg-transparent")
+    expect(list).toHaveClass("min-w-full", "bg-transparent")
     expect(screen.getAllByRole("link")).toHaveLength(6)
   })
 
@@ -182,8 +185,7 @@ describe("TabsNav", () => {
   })
 
   it("scrolls the active link into view on mount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     render(<TabsNavStory active="Apple Reminders" />)
     expect(scrollIntoView).toHaveBeenCalled()
     const active = screen.getByRole("link", { name: "Apple Reminders" })
@@ -250,15 +252,9 @@ function PersistentNav({ active }: { active: string }) {
 }
 
 describe("TabsNav in a persistent layout", () => {
-  const original = HTMLElement.prototype.scrollIntoView
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = original
-  })
-
   // Found in the 1.0 audit; failed before its fix.
   it("reveals the new active link when the route changes without remount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     const { rerender } = render(<PersistentNav active="Alpha" />)
     expect(scrollIntoView.mock.instances).toEqual([
       screen.getByRole("link", { name: "Alpha" }),
@@ -320,13 +316,9 @@ describe("TabsNav mouse drag", () => {
       scroller.scrollLeft = 100
 
       // A press that wobbles less than the threshold is still a click.
-      fireEvent.pointerDown(link, { ...mouse, buttons: 1, clientX: 200 })
-      fireEvent.pointerMove(link, {
-        ...mouse,
-        buttons: 1,
-        clientX: 200 + DRAG_THRESHOLD - 1,
-      })
-      fireEvent.pointerUp(link, { ...mouse, buttons: 0, clientX: 203 })
+      press(link, 200)
+      move(link, 200 + DRAG_THRESHOLD - 1)
+      release(link, 203)
       fireEvent.click(link)
       expect(onClick).toHaveBeenCalledTimes(1)
       expect(scroller.scrollLeft).toBe(100)
@@ -435,30 +427,17 @@ describe("TabsNavLink", () => {
 })
 
 describe("TabsList overflow", () => {
-  afterEach(() => {
-    HTMLElement.prototype.scrollIntoView = () => {}
-  })
-
   it("uses the same horizontal-only scroller as TabsNav", () => {
-    render(
-      <Tabs defaultValue="overview">
-        <TabsList aria-label="Order">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="activity">Activity</TabsTrigger>
-        </TabsList>
-        <TabsContent value="overview">Overview panel</TabsContent>
-      </Tabs>
-    )
+    render(<OrderTabs />)
     const list = screen.getByRole("tablist", { name: "Order" })
     const scroller = scrollerOf(list)
     expectHorizontalOnlyScroller(scroller)
     expectScrollerFitsList(scroller, list)
-    expect(list.className.split(/\s+/)).toContain("min-w-full")
+    expect(list).toHaveClass("min-w-full")
   })
 
   it("scrolls the active trigger into view on mount", () => {
-    const scrollIntoView = vi.fn()
-    HTMLElement.prototype.scrollIntoView = scrollIntoView
+    const scrollIntoView = recordScrollIntoView()
     render(<TabsOverflowStory />)
     const active = screen.getByRole("tab", { name: "Activity" })
     expect(scrollIntoView.mock.instances[0]).toBe(active)
@@ -476,25 +455,14 @@ describe("TabsList overflow", () => {
     const list = screen.getByRole("tablist", { name: "Order" })
     const scroller = scrollerOf(list)
     expect(scroller).toHaveAttribute("data-variant", "default")
-    expect(scroller?.className.split(/\s+/)).not.toContain("pb-2")
+    expect(scroller).not.toHaveClass("pb-2")
     expectScrollerFitsList(scroller, list)
   })
 
   it("takes the same mouse drag as TabsNav and keeps plain clicks", async () => {
     await withOverflow(async () => {
       const onClick = vi.fn()
-      render(
-        <Tabs defaultValue="overview">
-          <TabsList aria-label="Order">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="activity" onClick={onClick}>
-              Activity
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview">Overview panel</TabsContent>
-          <TabsContent value="activity">Activity panel</TabsContent>
-        </Tabs>
-      )
+      render(<OrderTabs onActivityClick={onClick} />)
       const tab = screen.getByRole("tab", { name: "Activity" })
       const scroller = await overflowingScroller(tab)
       scroller.scrollLeft = 100
@@ -523,7 +491,7 @@ describe("TabsList overflow", () => {
     )
     const list = screen.getByRole("tablist", { name: "Views" })
     const scroller = scrollerOf(list)
-    expect(scroller?.className.split(/\s+/)).toContain("pb-2")
+    expect(scroller).toHaveClass("pb-2")
     expect(scroller).toHaveAttribute("data-variant", "line")
     expectScrollerFitsList(scroller, list)
   })

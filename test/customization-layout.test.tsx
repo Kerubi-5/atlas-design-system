@@ -70,19 +70,18 @@ describe("parents leave width to the app", () => {
   it("FieldGroup keeps w-full because its inline-size container has no intrinsic width", () => {
     const { container } = render(<FieldGroup />)
     const group = container.querySelector("[data-slot=field-group]")
-    expect(classes(group)).toContain("@container/field-group")
-    expect(classes(group)).toContain("w-full")
+    expect(group).toHaveClass("@container/field-group", "w-full")
   })
 
   it("Alert sizes to its container without w-full", () => {
     render(<Alert>Saved</Alert>)
-    expect(classes(screen.getByRole("status"))).not.toContain("w-full")
+    expect(screen.getByRole("status")).not.toHaveClass("w-full")
   })
 
   it("Pagination does not center or stretch itself", () => {
     render(<Pagination />)
     const nav = screen.getByRole("navigation", { name: "Pagination" })
-    expect(classes(nav)).toContain("flex")
+    expect(nav).toHaveClass("flex")
     for (const name of ["mx-auto", "w-full", "justify-center"]) {
       expect(classes(nav)).not.toContain(name)
     }
@@ -102,13 +101,11 @@ describe("parents leave width to the app", () => {
     )
     const table = screen.getByRole("table", { name: "People" })
     const container = table.closest("[data-slot=table-container]")
-    expect(classes(container)).toContain("max-h-64")
-    expect(classes(container)).not.toContain("w-full")
-    expect(classes(container)).toContain("min-w-0")
-    expect(classes(container)).toContain("max-w-full")
-    expect(classes(table)).toContain("w-auto")
-    expect(classes(table)).not.toContain("w-full")
-    expect(classes(table)).not.toContain("min-w-full")
+    expect(container).toHaveClass("max-h-64", "min-w-0", "max-w-full")
+    expect(container).not.toHaveClass("w-full")
+    expect(table).toHaveClass("w-auto")
+    expect(table).not.toHaveClass("w-full")
+    expect(table).not.toHaveClass("min-w-full")
   })
 })
 
@@ -124,13 +121,13 @@ describe("className overrides win", () => {
     )
     const list = screen.getByRole("tablist", { name: "Views" })
     const scroller = list.closest("[data-slot=tabs-scroller]")
-    expect(classes(list)).toContain("h-9")
+    expect(list).toHaveClass("h-9")
     expect(classes(list).filter((name) => /(?:^|:)h-7$/.test(name))).toEqual([])
-    expect(classes(scroller)).toContain("h-11")
+    expect(scroller).toHaveClass("h-11")
     expect(
       classes(scroller).filter((name) => /(?:^|:)h-9$/.test(name))
     ).toEqual([])
-    expect(classes(scroller)).not.toContain("w-full")
+    expect(scroller).not.toHaveClass("w-full")
   })
 
   it("vertical TabsList drops the horizontal row height", () => {
@@ -144,10 +141,9 @@ describe("className overrides win", () => {
     )
     const list = screen.getByRole("tablist", { name: "Side" })
     const scroller = list.closest("[data-slot=tabs-scroller]")
-    expect(classes(list)).toContain("flex-col")
-    expect(classes(list)).toContain("h-fit")
-    expect(classes(list)).not.toContain("h-7")
-    expect(classes(scroller)).not.toContain("h-9")
+    expect(list).toHaveClass("flex-col", "h-fit")
+    expect(list).not.toHaveClass("h-7")
+    expect(scroller).not.toHaveClass("h-9")
   })
 
   it("TabsNav takes scrollerClassName and listClassName", () => {
@@ -162,16 +158,16 @@ describe("className overrides win", () => {
     )
     const scroller = container.querySelector("[data-slot=tabs-scroller]")
     const list = container.querySelector("[data-slot=tabs-list]")
-    expect(classes(scroller)).toContain("p-0")
-    expect(classes(scroller)).not.toContain("p-1")
-    expect(classes(list)).toContain("h-9")
-    expect(classes(list)).not.toContain("h-7")
+    expect(scroller).toHaveClass("p-0")
+    expect(scroller).not.toHaveClass("p-1")
+    expect(list).toHaveClass("h-9")
+    expect(list).not.toHaveClass("h-7")
   })
 
   it("Avatar size", () => {
     const { container } = render(<Avatar className="size-12" />)
     const avatar = container.querySelector("[data-slot=avatar]")
-    expect(classes(avatar)).toContain("size-12")
+    expect(avatar).toHaveClass("size-12")
     expect(
       classes(avatar).filter((name) => /size-(?:6|8|10)$/.test(name))
     ).toEqual([])
@@ -202,13 +198,11 @@ describe("className overrides win", () => {
     const [horizontal, vertical] = container.querySelectorAll(
       "[data-slot=separator]"
     )
-    expect(classes(horizontal)).toContain("w-12")
-    expect(classes(horizontal)).toContain("h-px")
+    expect(horizontal).toHaveClass("w-12", "h-px")
     expect(
       classes(horizontal).filter((name) => name.endsWith("w-full"))
     ).toEqual([])
-    expect(classes(vertical)).toContain("w-0.5")
-    expect(classes(vertical)).toContain("self-stretch")
+    expect(vertical).toHaveClass("w-0.5", "self-stretch")
     expect(classes(vertical).filter((name) => name.endsWith("w-px"))).toEqual(
       []
     )
@@ -217,8 +211,8 @@ describe("className overrides win", () => {
   it("Badge icon size yields to an icon's own size class", () => {
     render(<Badge>New</Badge>)
     const badge = screen.getByText("New")
-    expect(classes(badge)).not.toContain("[&>svg]:size-3!")
-    expect(classes(badge)).toContain("[&>svg:not([class*='size-'])]:size-3")
+    expect(badge).toHaveClass("[&>svg:not([class*='size-'])]:size-3")
+    expect(badge).not.toHaveClass("[&>svg]:size-3!")
   })
 })
 
@@ -237,7 +231,7 @@ describe("slots and pass-through props", () => {
     )
     const button = screen.getByRole("button", { name: "Name" })
     expect(button).toHaveAttribute("data-slot", "sortable-table-head-button")
-    expect(classes(button)).toContain("justify-between")
+    expect(button).toHaveClass("justify-between")
   })
 
   it("StatTile slots and root props", () => {
@@ -278,8 +272,7 @@ describe("slots and pass-through props", () => {
     )
     const header = container.querySelector("[data-slot=accordion-header]")
     expect(header).toBeTruthy()
-    expect(classes(header)).toContain("flex")
-    expect(classes(header)).toContain("px-4")
+    expect(header).toHaveClass("flex", "px-4")
     expect(screen.getByText("Answer")).toHaveAttribute(
       "data-slot",
       "accordion-content-inner"
@@ -291,8 +284,8 @@ describe("slots and pass-through props", () => {
       <Progress value={40} indicatorClassName="bg-success" />
     )
     const indicator = container.querySelector("[data-slot=progress-indicator]")
-    expect(classes(indicator)).toContain("bg-success")
-    expect(classes(indicator)).not.toContain("bg-primary")
+    expect(indicator).toHaveClass("bg-success")
+    expect(indicator).not.toHaveClass("bg-primary")
   })
 
   it("Slider passes other props to the Radix root", () => {
@@ -330,7 +323,7 @@ describe("slots and pass-through props", () => {
       "data-slot",
       "color-legend-range"
     )
-    expect(classes(screen.getByText("Depth"))).toContain("tracking-widest")
+    expect(screen.getByText("Depth")).toHaveClass("tracking-widest")
   })
 
   it("EmptyPanel slot and props", () => {
@@ -367,15 +360,15 @@ describe("slots and pass-through props", () => {
       </table>
     )
     const body = container.querySelector("[data-slot=table-body]")
-    expect(classes(body)).toContain("opacity-60")
+    expect(body).toHaveClass("opacity-60")
   })
 
   it("ErrorFallback className", () => {
     render(<ErrorFallback className="py-16" />)
     const alert = screen.getByRole("alert")
     expect(alert).toHaveAttribute("data-slot", "error-boundary")
-    expect(classes(alert)).toContain("py-16")
-    expect(classes(alert)).not.toContain("py-8")
+    expect(alert).toHaveClass("py-16")
+    expect(alert).not.toHaveClass("py-8")
   })
 })
 

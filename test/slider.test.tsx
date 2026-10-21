@@ -36,7 +36,7 @@ describe("Slider", () => {
     expect(slider).toHaveAttribute("aria-valuemin", "0")
     expect(slider).toHaveAttribute("aria-valuemax", "100")
     expect(slider.className).toMatch(/after:size-11/)
-    expect(slider.className.split(/\s+/)).toContain("size-4")
+    expect(slider).toHaveClass("size-4")
     expect(slider.className).toMatch(/rounded-none/)
   })
 

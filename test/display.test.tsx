@@ -173,10 +173,12 @@ describe("Card", () => {
     const flush = screen.getByText("Flush").closest("[data-slot=card]")
     expect(flush).toHaveAttribute("data-size", "sm")
     expect(flush?.className ?? "").toMatch(/\[--card-p:0px\]/)
-    expect(flush?.className.split(/\s+/)).toContain("min-h-min")
-    expect(flush?.className.split(/\s+/)).toContain("min-w-0")
-    expect(flush?.className.split(/\s+/)).toContain("shrink-0")
-    expect(flush?.className.split(/\s+/)).toContain("overflow-hidden")
+    expect(flush).toHaveClass(
+      "min-h-min",
+      "min-w-0",
+      "shrink-0",
+      "overflow-hidden"
+    )
     expect(flush?.className ?? "").not.toMatch(/py-\(--card-p\)/)
   })
 
@@ -185,10 +187,12 @@ describe("Card", () => {
     const cards = document.querySelectorAll("[data-slot=card]")
     expect(cards).toHaveLength(2)
     for (const card of cards) {
-      expect(card.className.split(/\s+/)).toContain("min-h-min")
-      expect(card.className.split(/\s+/)).toContain("min-w-0")
-      expect(card.className.split(/\s+/)).toContain("shrink-0")
-      expect(card.className.split(/\s+/)).toContain("overflow-hidden")
+      expect(card).toHaveClass(
+        "min-h-min",
+        "min-w-0",
+        "shrink-0",
+        "overflow-hidden"
+      )
     }
     expect(screen.getByText(/must not collapse/)).toBeInTheDocument()
   })
@@ -197,9 +201,9 @@ describe("Card", () => {
     render(<CardContentPx0Story />)
     const content = screen.getByText("Full-bleed body")
     expect(content).toHaveAttribute("data-slot", "card-content")
-    expect(content.className.split(/\s+/)).toContain("px-0")
+    expect(content).toHaveClass("px-0")
     expect(content.className).not.toMatch(/px-\(--card-p\)/)
-    expect(content.className.split(/\s+/)).not.toContain("!px-0")
+    expect(content).not.toHaveClass("!px-0")
   })
 
   // Found in the 1.0 audit; failed before its fix.

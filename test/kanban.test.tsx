@@ -17,7 +17,11 @@ import {
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "../src/internal/kanban-plugins.js"
-import { KanbanBoard, KanbanSkeleton } from "../src/kanban.js"
+import {
+  KanbanBoard,
+  type KanbanBoardProps,
+  KanbanSkeleton,
+} from "../src/kanban.js"
 
 import { createUser, render, screen, within } from "./helpers.js"
 
@@ -43,24 +47,29 @@ function renderCard(card: Card) {
   return <span>{card.title}</span>
 }
 
+function renderBoard(props: Partial<KanbanBoardProps<Card>> = {}) {
+  return render(
+    <KanbanBoard
+      columns={columns}
+      items={cards}
+      getColumnId={getColumnId}
+      onMove={vi.fn()}
+      renderCard={renderCard}
+      {...props}
+    />
+  )
+}
+
 describe("KanbanBoard", () => {
   it("renders columns in order with counts, badges, and empty copy", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-        emptyLabel="Drop a card"
-      />
-    )
+    renderBoard({ emptyLabel: "Drop a card" })
 
     const rendered = document.querySelectorAll('[data-slot="kanban-column"]')
     expect(rendered).toHaveLength(3)
     const [todo, doing, done] = [...rendered] as HTMLElement[]
     expect(todo).toHaveClass("flex-1", "basis-72", "min-w-72")
-    expect(todo).not.toHaveClass("w-72", "shrink-0")
+    expect(todo).not.toHaveClass("w-72")
+    expect(todo).not.toHaveClass("shrink-0")
     expect(within(todo!).getByText("To do")).toBeInTheDocument()
     expect(within(todo!).getByText("2")).toBeInTheDocument()
     expect(within(todo!).getByText("Write spec")).toBeInTheDocument()
@@ -72,16 +81,7 @@ describe("KanbanBoard", () => {
   it("opens a card from its body and keeps the grip separate", async () => {
     const user = createUser()
     const onCardClick = vi.fn()
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-        onCardClick={onCardClick}
-      />
-    )
+    renderBoard({ onCardClick })
 
     await user.click(screen.getByRole("button", { name: "Ship it" }))
     expect(onCardClick).toHaveBeenCalledWith(cards[2])
@@ -94,15 +94,7 @@ describe("KanbanBoard", () => {
   })
 
   it("renders a static card body when cards do not open", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-      />
-    )
+    renderBoard()
     expect(
       screen.queryByRole("button", { name: "Write spec" })
     ).not.toBeInTheDocument()
@@ -110,16 +102,7 @@ describe("KanbanBoard", () => {
   })
 
   it("shows skeleton columns while the first load has no items", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={[]}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-        isLoading
-      />
-    )
+    renderBoard({ items: [], isLoading: true })
     expect(
       document.querySelectorAll(
         '[data-slot="kanban-column"] [data-slot="skeleton"]'
@@ -129,34 +112,18 @@ describe("KanbanBoard", () => {
   })
 
   it("dims the board while a refetch has items", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-        isLoading
-      />
-    )
+    renderBoard({ isLoading: true })
     expect(
       document.querySelector('[data-slot="kanban-scroller"]')
     ).toHaveAttribute("data-loading")
   })
 
   it("keeps the drop rail hidden until a drag starts", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        onComplete={vi.fn()}
-        onDelete={vi.fn()}
-        renderCard={renderCard}
-        completeLabel="Mark done"
-      />
-    )
+    renderBoard({
+      onComplete: vi.fn(),
+      onDelete: vi.fn(),
+      completeLabel: "Mark done",
+    })
     const rail = document.querySelector('[data-slot="kanban-action-rail"]')
     expect(rail).toHaveAttribute("aria-hidden", "true")
     expect(rail).toHaveTextContent("Mark done")
@@ -164,35 +131,20 @@ describe("KanbanBoard", () => {
   })
 
   it("leaves out the drop rail without complete or delete handlers", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-      />
-    )
+    renderBoard()
     expect(
       document.querySelector('[data-slot="kanban-action-rail"]')
     ).not.toBeInTheDocument()
   })
 
   it("lets the consumer size the board, scroller, columns, and cards", () => {
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-        className="max-w-3xl"
-        scrollerClassName="gap-2"
-        columnClassName="w-40 min-w-40"
-        cardClassName="shadow-none"
-        aria-label="Pipeline"
-      />
-    )
+    renderBoard({
+      className: "max-w-3xl",
+      scrollerClassName: "gap-2",
+      columnClassName: "w-40 min-w-40",
+      cardClassName: "shadow-none",
+      "aria-label": "Pipeline",
+    })
     const root = document.querySelector('[data-slot="kanban-board"]')
     expect(root).toHaveClass("max-w-3xl", "min-w-0")
     expect(root).not.toHaveClass("w-full")
@@ -423,15 +375,7 @@ describe("kanban plugins", () => {
 describe("KanbanBoard overflow cues", () => {
   it("shows fades and scroll buttons once columns overflow", async () => {
     const user = createUser()
-    render(
-      <KanbanBoard
-        columns={columns}
-        items={cards}
-        getColumnId={getColumnId}
-        onMove={vi.fn()}
-        renderCard={renderCard}
-      />
-    )
+    renderBoard()
     const scroller = document.querySelector<HTMLElement>(
       '[data-slot="kanban-scroller"]'
     )!
@@ -479,15 +423,11 @@ describe("KanbanBoard render counts", () => {
 
   it("does not re-render its cards while scrolling leaves the overflow edges unchanged", () => {
     const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)
-    const { container } = render(
-      <KanbanBoard
-        columns={stages}
-        items={manyCards}
-        getColumnId={getColumnId}
-        onMove={() => {}}
-        renderCard={renderCard}
-      />
-    )
+    const { container } = renderBoard({
+      columns: stages,
+      items: manyCards,
+      renderCard,
+    })
     const scroller = container.querySelector<HTMLElement>(
       "[data-slot=kanban-scroller]"
     )!

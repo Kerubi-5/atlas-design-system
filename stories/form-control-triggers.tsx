@@ -15,6 +15,19 @@ export const formControlOptions = [
   { value: "eur", label: "Euro" },
 ]
 
+/** `formControlOptions` as `SelectItem`s. */
+export const formControlSelectItems = formControlOptions.map((option) => (
+  <SelectItem key={option.value} value={option.value}>
+    {option.label}
+  </SelectItem>
+))
+
+/** The option values plus `""` (none), for a Storybook select control. */
+export const formControlValues = [
+  "",
+  ...formControlOptions.map((option) => option.value),
+]
+
 /**
  * App-side ISO 4217-style check for Combobox's `normalizeCreateValue`: three
  * letters, normalized to uppercase. The kit does not own currency catalogs.
@@ -37,10 +50,7 @@ export function FormControlTriggersStory() {
         <SelectTrigger aria-label="Select trigger">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="usd">US Dollar</SelectItem>
-          <SelectItem value="eur">Euro</SelectItem>
-        </SelectContent>
+        <SelectContent>{formControlSelectItems}</SelectContent>
       </Select>
       <DatePickerButton value="2026-10-09" onValueChange={() => {}} />
       <DateTimePickerButton

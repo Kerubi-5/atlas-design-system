@@ -22,14 +22,19 @@ import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField, type TextFieldApi } from "../src/form/text-field.js"
 import { SelectItem } from "../src/select.js"
 
+import {
+  formControlOptions,
+  formControlSelectItems,
+} from "./form-control-triggers.js"
+
 /**
  * Local TextFieldApi stand-in so form stories do not pull in a form library.
  */
-function useDemoField(
+export const useDemoField = (
   name: string,
   initial = "",
   meta: FieldMetaState = { errors: [] }
-): TextFieldApi {
+): TextFieldApi => {
   const [value, setValue] = useState(initial)
   return {
     name,
@@ -92,8 +97,7 @@ export function FormHelpersStory() {
         value={currency}
         onValueChange={setCurrency}
       >
-        <SelectItem value="usd">US Dollar</SelectItem>
-        <SelectItem value="eur">Euro</SelectItem>
+        {formControlSelectItems}
       </FormSelectField>
       <FormDatePickerField
         label="As of"
@@ -197,10 +201,7 @@ export function CustomControlFieldStory() {
         {(control) => (
           <Combobox
             {...control}
-            options={[
-              { value: "usd", label: "US Dollar" },
-              { value: "eur", label: "Euro" },
-            ]}
+            options={formControlOptions}
             value={currency}
             onValueChange={setCurrency}
           />

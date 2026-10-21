@@ -1,13 +1,13 @@
 "use client"
 
-import { type ComponentProps, type ReactNode, useId } from "react"
+import type { ComponentProps, ReactNode } from "react"
 
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
 } from "./field-error.js"
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 /** Props `FormControlField` hands its control: spread them onto it. */
 export type FormControlProps = {
@@ -51,9 +51,7 @@ export function FormControlField({
   children,
   ...props
 }: Props) {
-  const generatedId = useId()
-  const id = idProp ?? generatedId
-  const errorText = metaErrorText(meta, { submitted, showError })
+  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
 
   return (
     <FormFieldShell

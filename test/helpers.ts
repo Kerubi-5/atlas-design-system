@@ -1,6 +1,13 @@
-import { act, render, screen, waitFor, within } from "@testing-library/react"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
-import { afterEach, expect, vi } from "vitest"
+import { afterEach, expect, onTestFinished, vi } from "vitest"
 
 import type {
   FieldErrorMessage,
@@ -17,6 +24,9 @@ export function createUser() {
 
 export { render, screen, waitFor, within }
 
+/** The user `createUser` returns. */
+export type User = ReturnType<typeof createUser>
+
 /** The `[data-slot=name]` element under `root`; throws when it is missing. */
 export function slot(name: string, root: ParentNode = document) {
   const element = root.querySelector(`[data-slot="${name}"]`)
@@ -29,6 +39,14 @@ export function slot(name: string, root: ParentNode = document) {
 /** The class tokens of an element; empty when there is no element. */
 export function classes(element: Element | null | undefined) {
   return element?.getAttribute("class")?.split(/\s+/) ?? []
+}
+
+/** The month the picker tests open on: October 2026. */
+export const october = new Date(2026, 9, 1)
+
+/** Day `date` of October 2026, or of another month and year. */
+export function day(date: number, month = 9, year = 2026) {
+  return new Date(year, month, date)
 }
 
 /**
@@ -50,6 +68,19 @@ export function findPopoverContent() {
     const node = document.querySelector("[data-slot=popover-content]")
     expect(node).toBeTruthy()
     return node as HTMLElement
+  })
+}
+
+/** Click the picker trigger named `name`; resolves to the calendar grids. */
+export async function openPicker(user: User, name: string | RegExp) {
+  await user.click(screen.getByRole("button", { name }))
+  return screen.findAllByRole("grid")
+}
+
+/** Wait until nothing with `role` is left, e.g. once an overlay closes. */
+export function waitForNoRole(role: string) {
+  return waitFor(() => {
+    expect(screen.queryAllByRole(role)).toHaveLength(0)
   })
 }
 
@@ -96,8 +127,8 @@ export function expectFormControlTrigger(element: HTMLElement) {
 type MatchMediaListener = (event: MediaQueryListEvent) => void
 
 /**
- * Replace `window.matchMedia` for one test. jsdom's default stub always
- * reports `matches: false` (below `md`).
+ * Replace `window.matchMedia` for one test; `setup.ts` puts back the
+ * default after each test, which reports `matches: false` (below `md`).
  */
 export function stubMatchMedia(
   matches: boolean | ((query: string) => boolean)
@@ -127,10 +158,46 @@ export function stubMatchMedia(
         return false
       },
     }) as MediaQueryList
+}
 
-  return () => {
-    listeners.clear()
-  }
+/**
+ * Spy on `scrollIntoView` for the rest of one test; `mock.instances` are
+ * the elements scrolled, in order.
+ */
+export function recordScrollIntoView() {
+  const spy = vi.spyOn(Element.prototype, "scrollIntoView")
+  onTestFinished(() => spy.mockRestore())
+  return spy
+}
+
+/** A primary-button mouse pointer, for the `press`/`move`/`release` steps. */
+export const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
+
+/** Pointer down at `clientX` with the button held. */
+export function press(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerDown(element, { ...init, buttons: 1, clientX })
+}
+
+/** Pointer move to `clientX` with the button held. */
+export function move(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerMove(element, { ...init, buttons: 1, clientX })
+}
+
+/** Pointer up at `clientX`. */
+export function release(element: Element, clientX: number, init = mouse) {
+  fireEvent.pointerUp(element, { ...init, buttons: 0, clientX })
+}
+
+/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
+export function dragWithMouse(
+  element: Element,
+  from: number,
+  to: number,
+  init = mouse
+) {
+  press(element, from, init)
+  move(element, to, init)
+  release(element, to, init)
 }
 
 /**

@@ -7,14 +7,16 @@ import test from "node:test"
 import {
   PHONE,
   THEMES,
+  assertNoProblems,
   inBatches,
+  indexEntries,
   openStory,
   runAxe,
   storyIndex,
   violationMessage,
   withSite,
 } from "./browser.mjs"
-import { OVERLAYS } from "./overlays.mjs"
+import { OVERLAYS, openOverlay } from "./overlays.mjs"
 
 /**
  * Overlays render in portals and only after interaction, so the per-story
@@ -34,11 +36,7 @@ async function auditStory(context, baseUrl, entry, theme, overlay) {
       return [`${entry.id} [${theme}]: story failed to render`]
     }
     if (overlay) {
-      await overlay.open(page)
-      await page.waitForSelector(overlay.shows, {
-        state: "visible",
-        timeout: 10_000,
-      })
+      await openOverlay(page, overlay)
       await page.evaluate(
         () => new Promise((resolve) => setTimeout(resolve, 300))
       )
@@ -79,12 +77,27 @@ async function auditStory(context, baseUrl, entry, theme, overlay) {
   }
 }
 
+/** Each overlay opened and audited in both themes, one after another. */
+async function auditOverlays(context, baseUrl, index, overlays) {
+  const found = []
+  for (const overlay of overlays) {
+    for (const theme of THEMES) {
+      found.push(
+        ...(await auditStory(
+          context,
+          baseUrl,
+          index.entries[overlay.id],
+          theme,
+          overlay
+        ))
+      )
+    }
+  }
+  return found
+}
+
 test("every story passes WCAG 2.2 AA checks in light and dark", async () => {
-  const index = await storyIndex()
-  const stories = Object.values(index.entries).filter(
-    (entry) => entry.type === "story"
-  )
-  assert.ok(stories.length > 0, "index.json lists stories")
+  const stories = await indexEntries()
 
   const problems = await withSite(({ context, baseUrl }) =>
     inBatches(
@@ -94,11 +107,7 @@ test("every story passes WCAG 2.2 AA checks in light and dark", async () => {
     )
   )
 
-  assert.deepEqual(
-    problems,
-    [],
-    `${problems.length} accessibility violations:\n${problems.join("\n")}`
-  )
+  assertNoProblems(problems, "accessibility violations")
 })
 
 test("open overlays pass WCAG 2.2 AA checks in light and dark", async () => {
@@ -106,38 +115,17 @@ test("open overlays pass WCAG 2.2 AA checks in light and dark", async () => {
   for (const { id } of OVERLAYS) {
     assert.ok(index.entries[id], `${id} is in the story index`)
   }
-  const problems = await withSite(async ({ context, baseUrl }) => {
-    const found = []
-    for (const overlay of OVERLAYS) {
-      for (const theme of THEMES) {
-        found.push(
-          ...(await auditStory(
-            context,
-            baseUrl,
-            index.entries[overlay.id],
-            theme,
-            overlay
-          ))
-        )
-      }
-    }
-    return found
-  })
-  assert.deepEqual(
-    problems,
-    [],
-    `${problems.length} accessibility violations:\n${problems.join("\n")}`
+  const problems = await withSite(({ context, baseUrl }) =>
+    auditOverlays(context, baseUrl, index, OVERLAYS)
   )
+  assertNoProblems(problems, "accessibility violations")
 })
 
 test("audited controls pass WCAG 2.2 AA at 390px in both themes", async () => {
   const index = await storyIndex()
   const affected =
     /^(actions-button|overlays-info-tip|layout-card|navigation-tabs|navigation-nav-link|forms-combobox|forms-search-picker|forms-calendar|forms-date-picker|forms-date-time-picker|overlays-dialog|feedback-toast)--/
-  const stories = Object.values(index.entries).filter(
-    (entry) => entry.type === "story" && affected.test(entry.id)
-  )
-  assert.ok(stories.length > 0)
+  const stories = await indexEntries("story", affected)
   const problems = await withSite(
     async ({ context, baseUrl }) => {
       const found = []
@@ -145,21 +133,17 @@ test("audited controls pass WCAG 2.2 AA at 390px in both themes", async () => {
         for (const theme of THEMES)
           found.push(...(await auditStory(context, baseUrl, entry, theme)))
       }
-      for (const overlay of OVERLAYS.filter(({ id }) => affected.test(id))) {
-        for (const theme of THEMES)
-          found.push(
-            ...(await auditStory(
-              context,
-              baseUrl,
-              index.entries[overlay.id],
-              theme,
-              overlay
-            ))
-          )
-      }
+      found.push(
+        ...(await auditOverlays(
+          context,
+          baseUrl,
+          index,
+          OVERLAYS.filter(({ id }) => affected.test(id))
+        ))
+      )
       return found
     },
     { viewport: PHONE }
   )
-  assert.deepEqual(problems, [], problems.join("\n"))
+  assertNoProblems(problems, "accessibility violations")
 })

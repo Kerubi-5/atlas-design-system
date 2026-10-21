@@ -15,14 +15,15 @@ import { SelectItem } from "../src/select.js"
 
 import {
   createUser,
+  day,
   fakeTextField,
   getDayButton,
+  october,
+  openPicker,
   render,
   screen,
   slot,
 } from "./helpers.js"
-
-const october = new Date(2026, 9, 1)
 
 /** Day Picker's first weekday header (the row is hidden from the a11y tree). */
 function firstWeekday() {
@@ -61,8 +62,7 @@ describe("DatePickerButton customization", () => {
     )
     const value = slot("date-picker-value")
     expect(value.id).toBe("due-value")
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(screen.getByRole("dialog").className).toContain("w-96")
   })
 
@@ -74,15 +74,14 @@ describe("DatePickerButton customization", () => {
         onChange={() => {}}
         calendarProps={{
           weekStartsOn: 1,
-          disabled: { before: new Date(2026, 9, 10) },
+          disabled: { before: day(10) },
         }}
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(firstWeekday()).toMatch(/monday/i)
-    expect(getDayButton(new Date(2026, 9, 8))).toBeDisabled()
-    expect(getDayButton(new Date(2026, 9, 12))).toBeEnabled()
+    expect(getDayButton(day(8))).toBeDisabled()
+    expect(getDayButton(day(12))).toBeEnabled()
   })
 
   it("marks the range footer", async () => {
@@ -97,8 +96,7 @@ describe("DatePickerButton customization", () => {
         calendarProps={{ weekStartsOn: 1 }}
       />
     )
-    await user.click(screen.getByRole("button", { name: /October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /October 5/)
     expect(
       slot("date-picker-footer").querySelector("button")
     ).toHaveTextContent("Clear")
@@ -119,13 +117,12 @@ describe("DateTimePickerButton customization", () => {
       />
     )
     expect(slot("date-picker-value").id).toBe("start-value")
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(screen.getByRole("dialog").className).toContain("w-96")
     expect(slot("date-time-picker-time")).toHaveAccessibleName("Time")
     expect(slot("date-picker-footer")).toHaveTextContent("Clear")
     // October 10, 2026 is a Saturday.
-    expect(getDayButton(new Date(2026, 9, 10))).toBeDisabled()
+    expect(getDayButton(day(10))).toBeDisabled()
   })
 })
 

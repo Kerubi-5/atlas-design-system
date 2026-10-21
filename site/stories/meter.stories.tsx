@@ -1,17 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Meter } from "../../src/meter.js"
-import { MeterStory } from "../../stories/meter.js"
+import { MeterStory, spendMarkers, spendMeter } from "../../stories/meter.js"
 
 const meta = {
   title: "Data display/Meter",
   component: Meter,
-  args: {
-    value: 72,
-    max: 100,
-    "aria-label": "Spend against limit",
-    fillClassName: "bg-warning",
-  },
+  args: spendMeter,
   argTypes: {
     value: { control: { type: "number", min: 0, max: 200 } },
     max: { control: { type: "number", min: 1 } },
@@ -19,13 +14,7 @@ const meta = {
   },
   render: (args) => (
     <div className="max-w-sm">
-      <Meter
-        {...args}
-        markers={[
-          { position: 80 },
-          { position: 50, className: "w-0.5 bg-foreground" },
-        ]}
-      />
+      <Meter {...args} markers={spendMarkers} />
     </div>
   ),
 } satisfies Meta<typeof Meter>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { type ReactNode, useEffect, useRef, useState } from "react"
 
 import {
   loadThemeTokens,
@@ -123,6 +123,24 @@ function TokenTable({
  * Live token reference parsed from `theme.css`. Swatches follow the Storybook
  * theme toolbar so light and dark values stay in sync with consuming apps.
  */
+/** A titled block of the page (Color, Type, Spacing...). */
+function TokenSection({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) {
+  return (
+    <section className="grid gap-4">
+      <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
+        {title}
+      </h2>
+      {children}
+    </section>
+  )
+}
+
 export function TokensPage() {
   return (
     <div className="grid gap-12">
@@ -136,17 +154,11 @@ export function TokensPage() {
         </p>
       </header>
 
-      <section className="grid gap-4">
-        <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
-          Color
-        </h2>
+      <TokenSection title="Color">
         <TokenTable label="Color tokens" vars={tokens.colors} swatch />
-      </section>
+      </TokenSection>
 
-      <section className="grid gap-4">
-        <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
-          Dark color values
-        </h2>
+      <TokenSection title="Dark color values">
         <p className="text-sm text-muted-foreground">
           Raw <code className="bg-muted px-1">.dark</code> assignments, computed
           under <code className="bg-muted px-1">.dark</code> whatever the
@@ -157,12 +169,9 @@ export function TokensPage() {
           vars={tokens.darkColors}
           probe="dark"
         />
-      </section>
+      </TokenSection>
 
-      <section className="grid gap-4">
-        <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
-          Type
-        </h2>
+      <TokenSection title="Type">
         <p className="text-sm text-muted-foreground">
           <code className="bg-muted px-1">font-heading</code> uses the
           configured sans font. IBM Plex Sans is supplied by this site.
@@ -183,12 +192,9 @@ export function TokensPage() {
             </div>
           ))}
         </div>
-      </section>
+      </TokenSection>
 
-      <section className="grid gap-4">
-        <h2 className="font-heading text-base font-semibold tracking-wider uppercase">
-          Spacing
-        </h2>
+      <TokenSection title="Spacing">
         <p className="text-sm text-muted-foreground">
           Radius tokens from the theme, plus the default Tailwind spacing scale
           the kit uses for control height and padding (
@@ -230,7 +236,7 @@ export function TokensPage() {
             </div>
           ))}
         </div>
-      </section>
+      </TokenSection>
     </div>
   )
 }

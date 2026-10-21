@@ -5,11 +5,13 @@ import { Label } from "../../src/label.js"
 import {
   Select,
   SelectContent,
-  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "../../src/select.js"
-import { formControlOptions } from "../../stories/form-control-triggers.js"
+import {
+  formControlSelectItems,
+  formControlValues,
+} from "../../stories/form-control-triggers.js"
 
 type Args = { value: string; placeholder: string; disabled: boolean }
 const meta = {
@@ -18,7 +20,7 @@ const meta = {
   argTypes: {
     value: {
       control: "select",
-      options: ["", ...formControlOptions.map((option) => option.value)],
+      options: formControlValues,
     },
     placeholder: { control: "text" },
     disabled: { control: "boolean" },
@@ -37,13 +39,7 @@ const meta = {
           <SelectTrigger id={id}>
             <SelectValue placeholder={args.placeholder} />
           </SelectTrigger>
-          <SelectContent>
-            {formControlOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
+          <SelectContent>{formControlSelectItems}</SelectContent>
         </Select>
       </div>
     )

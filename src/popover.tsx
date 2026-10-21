@@ -4,13 +4,11 @@ import * as React from "react"
 import { Popover as PopoverPrimitive } from "radix-ui"
 
 import {
+  anchoredPanel,
   OVERLAY_COLLISION_PADDING,
   OVERLAY_SIDE_OFFSET,
-  overlayFadeZoom,
-  overlaySideSlide,
-  overlaySurface,
 } from "./internal/overlay-styles.js"
-import { labelText } from "./internal/styles.js"
+import { descriptionText, labelText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 function Popover({
@@ -40,9 +38,7 @@ function PopoverContent({
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         className={cn(
-          overlaySurface,
-          overlaySideSlide,
-          overlayFadeZoom,
+          anchoredPanel,
           "z-50 flex max-w-(--radix-popover-content-available-width) origin-(--radix-popover-content-transform-origin) flex-col gap-4 p-4 text-sm outline-hidden",
           className
         )}
@@ -85,10 +81,7 @@ function PopoverDescription({
   return (
     <p
       data-slot="popover-description"
-      className={cn(
-        "mt-0.5 text-sm leading-relaxed text-muted-foreground",
-        className
-      )}
+      className={cn("mt-0.5", descriptionText, className)}
       {...props}
     />
   )

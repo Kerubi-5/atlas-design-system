@@ -14,6 +14,13 @@ import {
 const finePointer = (query: string) =>
   query.includes("(hover: hover)") && query.includes("(pointer: fine)")
 
+/** Wait until the "Hint title" panel is gone (or never opened). */
+function hintClosed() {
+  return waitFor(() => {
+    expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
+  })
+}
+
 describe("InfoTip", () => {
   it("names the glyph and opens a popover from click", async () => {
     const user = createUser()
@@ -34,7 +41,7 @@ describe("InfoTip", () => {
 
     const trigger = screen.getByRole("button", { name: "About flood depth" })
     expect(trigger).toHaveAttribute("data-layout", "box")
-    expect(trigger.className.split(/\s+/)).toContain("size-11")
+    expect(trigger).toHaveClass("size-11")
 
     await user.click(trigger)
     expect(await screen.findByText("Depth")).toBeVisible()
@@ -69,22 +76,12 @@ describe("InfoTip", () => {
 
     const trigger = screen.getByRole("button", { name: "What depth means" })
     expect(trigger).toHaveAttribute("data-layout", "inline")
-    expect(trigger.className.split(/\s+/)).toContain("size-[1em]")
+    expect(trigger).toHaveClass("size-[1em]")
     expect(trigger.className).toMatch(/after:size-11/)
   })
 
-  it("opens on hover only when the pointer can hover", async () => {
-    const restore = stubMatchMedia(finePointer)
-    const user = createUser()
-    render(<InfoTip label="Hint" title="Hint title" />)
-
-    await user.hover(screen.getByRole("button", { name: "Hint" }))
-    expect(await screen.findByText("Hint title")).toBeVisible()
-    restore()
-  })
-
-  it("closes a hover-opened panel on the first Escape", async () => {
-    const restore = stubMatchMedia(finePointer)
+  it("opens on hover when the pointer can hover, and closes on the first Escape", async () => {
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -92,14 +89,11 @@ describe("InfoTip", () => {
     expect(await screen.findByText("Hint title")).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
-    })
-    restore()
+    await hintClosed()
   })
 
   it("closes a click-pinned panel on Escape and returns focus to the glyph", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
@@ -108,15 +102,12 @@ describe("InfoTip", () => {
     expect(await screen.findByText("Hint title")).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
-    })
+    await hintClosed()
     expect(trigger).toHaveFocus()
-    restore()
   })
 
   it("keeps focus in the field being typed in when hover opens the panel", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(
       <div>
@@ -135,15 +126,12 @@ describe("InfoTip", () => {
     expect(field).toHaveFocus()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
-    })
+    await hintClosed()
     expect(field).toHaveFocus()
-    restore()
   })
 
   it("stays open after a click when the pointer leaves", async () => {
-    const restore = stubMatchMedia(finePointer)
+    stubMatchMedia(finePointer)
     const user = createUser()
     render(
       <div>
@@ -156,18 +144,14 @@ describe("InfoTip", () => {
     expect(await screen.findByText("Hint title")).toBeVisible()
     await user.hover(screen.getByRole("button", { name: "Away" }))
     expect(screen.getByText("Hint title")).toBeVisible()
-    restore()
   })
 
   it("does not open on hover for a coarse pointer", async () => {
-    const restore = stubMatchMedia(false)
+    stubMatchMedia(false)
     const user = createUser()
     render(<InfoTip label="Hint" title="Hint title" />)
 
     await user.hover(screen.getByRole("button", { name: "Hint" }))
-    await waitFor(() => {
-      expect(screen.queryByText("Hint title")).not.toBeInTheDocument()
-    })
-    restore()
+    await hintClosed()
   })
 })

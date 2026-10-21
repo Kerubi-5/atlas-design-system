@@ -3,15 +3,16 @@
 // light, dark and forced colors (2.4.7), and is not covered by other content
 // (2.4.11); the page reflows at 320px without scrolling sideways (1.4.10);
 // and WCAG's text-spacing overrides clip no text (1.4.12).
-import assert from "node:assert/strict"
 import test from "node:test"
 
 import {
   DESKTOP,
   THEMES,
+  assertNoProblems,
   inBatches,
+  indexEntries,
+  newContext,
   openStory,
-  storyIndex,
   withSite,
 } from "./browser.mjs"
 
@@ -95,10 +96,7 @@ async function focusProblems(page, label, { forced, ringOnParent }) {
 }
 
 async function auditStory(browser, baseUrl, entry) {
-  const context = await browser.newContext({
-    reducedMotion: "reduce",
-    viewport: DESKTOP,
-  })
+  const context = await newContext(browser)
   const page = await context.newPage()
   const problems = []
   try {
@@ -189,17 +187,9 @@ async function auditStory(browser, baseUrl, entry) {
 }
 
 test("every story keeps focus visible, reflows at 320px, and survives text spacing", async () => {
-  const index = await storyIndex()
-  const stories = Object.values(index.entries).filter(
-    (entry) => entry.type === "story"
-  )
-  assert.ok(stories.length > 0, "index.json lists stories")
+  const stories = await indexEntries()
   const problems = await withSite(({ browser, baseUrl }) =>
     inBatches(stories.map((entry) => () => auditStory(browser, baseUrl, entry)))
   )
-  assert.deepEqual(
-    problems,
-    [],
-    `${problems.length} problems:\n${problems.join("\n")}`
-  )
+  assertNoProblems(problems)
 })

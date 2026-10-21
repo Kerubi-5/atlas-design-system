@@ -8,16 +8,11 @@ import assert from "node:assert/strict"
 import fs from "node:fs/promises"
 import path from "node:path"
 import test from "node:test"
-import { fileURLToPath } from "node:url"
 
 import { chromium } from "playwright"
 
-import { THEMES } from "./browser.mjs"
-
-const repoRoot = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../.."
-)
+import { THEMES, assertNoProblems } from "./browser.mjs"
+import { repoRoot } from "./serve.mjs"
 const TEXT = 4.5
 const UI = 3
 
@@ -152,7 +147,7 @@ test("theme tokens meet WCAG contrast in light and dark", async () => {
         (result) =>
           `${result.what} [${result.theme}]: ${result.ratio.toFixed(2)}:1, needs ${result.min}:1`
       )
-    assert.deepEqual(failures, [], failures.join("\n"))
+    assertNoProblems(failures, "contrast failures")
   } finally {
     await browser.close()
   }

@@ -1,8 +1,8 @@
-import { readdirSync, readFileSync } from "node:fs"
 import path from "node:path"
-import { fileURLToPath } from "node:url"
 
 import { describe, expect, it } from "vitest"
+
+import { srcModules } from "./repo-files.js"
 
 /**
  * The kit's layers, bottom to top:
@@ -13,11 +13,6 @@ import { describe, expect, it } from "vitest"
  * Imports point down or sideways, never up, and never in a cycle, so any
  * component can be used without pulling in an adapter.
  */
-const srcDir = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../src"
-)
-
 function layerOf(module: string) {
   if (module === "utils" || module.startsWith("internal/")) return 0
   if (module.startsWith("form/") || module.startsWith("next/")) return 2
@@ -25,13 +20,11 @@ function layerOf(module: string) {
 }
 
 const graph = new Map<string, string[]>()
-for (const file of readdirSync(srcDir, { recursive: true, encoding: "utf8" })) {
-  if (!/\.tsx?$/.test(file) || file.endsWith(".d.ts")) continue
+for (const [file, source] of srcModules()) {
   const module = file
     .replace(/\.tsx?$/, "")
     .split(path.sep)
     .join("/")
-  const source = readFileSync(path.join(srcDir, file), "utf8")
   // Static `from "./x.js"` and dynamic `import("./x.js")` alike.
   const imports = [
     ...source.matchAll(/(?:from |import\()"(\.{1,2}\/[^"]+)\.js"/g),

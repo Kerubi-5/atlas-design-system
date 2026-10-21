@@ -14,13 +14,11 @@ import {
   optionState,
 } from "./internal/styles.js"
 import {
+  anchoredPanel,
   menuLabel,
   optionRow,
   OVERLAY_COLLISION_PADDING,
   OVERLAY_SIDE_OFFSET,
-  overlayFadeZoom,
-  overlaySideSlide,
-  overlaySurface,
 } from "./internal/overlay-styles.js"
 import { cn } from "./utils.js"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
@@ -80,7 +78,6 @@ function SelectTrigger({
         invalidState,
         disabledState,
         emptyValueText,
-        emptyValueText,
         inlineIcon.default,
         triggerHeight[size],
         "flex items-center justify-between gap-1.5 whitespace-nowrap *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5",
@@ -111,9 +108,7 @@ function SelectContent({
         data-slot="select-content"
         data-align-trigger={position === "item-aligned"}
         className={cn(
-          overlaySurface,
-          overlaySideSlide,
-          overlayFadeZoom,
+          anchoredPanel,
           "relative z-50 max-h-(--radix-select-content-available-height) min-w-(--radix-select-trigger-width) origin-(--radix-select-content-transform-origin) overflow-x-hidden overflow-y-auto data-[align-trigger=true]:animate-none",
           position === "popper" &&
             "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",

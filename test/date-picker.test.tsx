@@ -15,20 +15,32 @@ import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 
 import {
   createUser,
+  day,
   expectFormControlTrigger,
   findPopoverContent,
   getDayButton,
+  october,
+  openPicker,
   render,
   screen,
   stubMatchMedia,
   waitFor,
+  waitForNoRole,
   within,
 } from "./helpers.js"
 
-const october = new Date(2026, 9, 1)
 const locale = { code: "en-US" }
-const day = (date: number, month = 9, year = 2026) =>
-  new Date(year, month, date)
+
+/** The range `spy` was last called with, as local `yyyy-MM-dd` days. */
+function lastRange(spy: {
+  mock: { calls: [DateRange | undefined, ...unknown[]][] }
+}) {
+  const range = spy.mock.calls.at(-1)?.[0]
+  return [
+    range?.from && formatLocalDate(range.from),
+    range?.to && formatLocalDate(range.to),
+  ]
+}
 
 function RangePickerHarness({
   initial,
@@ -67,7 +79,7 @@ describe("date helpers", () => {
   })
 
   it("round-trips a Date through formatLocalDate", () => {
-    const date = new Date(2026, 9, 5)
+    const date = day(5)
     expect(formatLocalDate(date)).toBe("2026-10-05")
     expect(toDate(date)).toBe(date)
   })
@@ -87,7 +99,7 @@ describe("Calendar", () => {
     )
 
     expect(screen.getByRole("grid")).toBeInTheDocument()
-    await user.click(getDayButton(new Date(2026, 9, 15)))
+    await user.click(getDayButton(day(15)))
     expect(onSelect).toHaveBeenCalled()
     const selected = onSelect.mock.calls.at(-1)?.[0]
     expect(selected).toBeInstanceOf(Date)
@@ -125,36 +137,27 @@ describe("Calendar", () => {
       captions.some((node) => /November/.test(node.textContent ?? ""))
     ).toBe(true)
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
+    await user.click(getDayButton(day(5)))
     await user.click(getDayButton(new Date(2026, 10, 10)))
 
-    const last = onSelect.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.from?.getMonth()).toBe(9)
-    expect(last?.to?.getDate()).toBe(10)
-    expect(last?.to?.getMonth()).toBe(10)
+    expect(lastRange(onSelect)).toEqual(["2026-10-05", "2026-11-10"])
 
-    expect(getDayButton(new Date(2026, 9, 5))).toHaveAttribute(
-      "data-range-start",
-      "true"
-    )
+    expect(getDayButton(day(5))).toHaveAttribute("data-range-start", "true")
     expect(getDayButton(new Date(2026, 10, 10))).toHaveAttribute(
       "data-range-end",
       "true"
     )
-    expect(getDayButton(new Date(2026, 9, 15))).toHaveAttribute(
-      "data-range-middle",
-      "true"
-    )
+    expect(getDayButton(day(15))).toHaveAttribute("data-range-middle", "true")
   })
 
   it("preserves calendar nodes on parent updates and refreshes locale without losing navigation focus", () => {
-    const month = new Date(2026, 9, 1)
+    const month = day(1)
     const { container, rerender } = render(
       <Calendar mode="single" defaultMonth={month} />
     )
     const root = container.querySelector('[data-slot="calendar"]')
-    const day = container.querySelector<HTMLButtonElement>("button[data-day]")!
+    const dayButton =
+      container.querySelector<HTMLButtonElement>("button[data-day]")!
     const nextMonth = screen.getByRole("button", {
       name: "Go to the Next Month",
     })
@@ -164,7 +167,7 @@ describe("Calendar", () => {
       <Calendar mode="single" defaultMonth={month} className="updated" />
     )
     expect(container.querySelector('[data-slot="calendar"]')).toBe(root)
-    expect(container.querySelector("button[data-day]")).toBe(day)
+    expect(container.querySelector("button[data-day]")).toBe(dayButton)
     expect(nextMonth).toHaveFocus()
 
     rerender(
@@ -214,11 +217,9 @@ describe("DatePickerButton", () => {
     await user.click(trigger)
     expect(await screen.findByRole("grid")).toBeVisible()
 
-    await user.click(getDayButton(new Date(2026, 9, 15)))
+    await user.click(getDayButton(day(15)))
 
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(onChange).toHaveBeenCalled()
     const next = onChange.mock.calls.at(-1)?.[0]
     expect(next?.getDate()).toBe(15)
@@ -233,9 +234,7 @@ describe("DatePickerButton", () => {
     expect(await screen.findByRole("grid")).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveFocus()
   })
 
@@ -244,20 +243,16 @@ describe("DatePickerButton", () => {
     const user = createUser()
     render(<DatePickerButton value="2026-10-05" onChange={() => {}} />)
 
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Choose date")
-    await waitFor(() =>
-      expect(getDayButton(new Date(2026, 9, 5))).toHaveFocus()
-    )
+    await waitFor(() => expect(getDayButton(day(5))).toHaveFocus())
   })
 
   it("focuses today when nothing is selected", async () => {
     const user = createUser()
     render(<DatePickerButton value={undefined} onChange={() => {}} />)
 
-    await user.click(screen.getByRole("button", { name: "Pick a date" }))
-    await screen.findByRole("grid")
+    await openPicker(user, "Pick a date")
     await waitFor(() => expect(getDayButton(new Date())).toHaveFocus())
   })
 
@@ -300,8 +295,7 @@ describe("DatePickerButton minDate and maxDate", () => {
         onChange={onChange}
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 15/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 15/)
 
     expect(getDayButton(day(9))).toBeDisabled()
     expect(getDayButton(day(21))).toBeDisabled()
@@ -329,8 +323,7 @@ describe("DatePickerButton minDate and maxDate", () => {
         onChange={() => {}}
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 15/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 15/)
 
     // October 11, 2026 is a Sunday; Monday October 5 is before minDate.
     expect(getDayButton(day(11))).toBeDisabled()
@@ -347,8 +340,7 @@ describe("DatePickerButton minDate and maxDate", () => {
         onChange={() => {}}
       />
     )
-    await user.click(screen.getByRole("button", { name: "Pick a date" }))
-    await screen.findByRole("grid")
+    await openPicker(user, "Pick a date")
     expect(getDayButton(day(10, 2, 2099))).toBeEnabled()
     expect(getDayButton(day(9, 2, 2099))).toBeDisabled()
   })
@@ -365,8 +357,7 @@ describe("DatePickerButton minDate and maxDate", () => {
         onChange={() => {}}
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 12/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 12/)
     expect(getDayButton(day(9))).toBeDisabled()
     expect(getDayButton(day(21))).toBeDisabled()
   })
@@ -390,8 +381,7 @@ describe("DatePickerButton minDate and maxDate", () => {
         />
       </>
     )
-    await user.click(screen.getByRole("button", { name: /^Due/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^Due/)
     expect(getDayButton(day(9))).toBeDisabled()
   })
 })
@@ -402,24 +392,21 @@ describe("DatePickerButton clearable", () => {
     const { unmount } = render(
       <DatePickerButton value="2026-10-05" onValueChange={() => {}} />
     )
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(screen.queryByRole("button", { name: "Clear" })).toBeNull()
     unmount()
 
     render(
       <DatePickerButton value="2026-10-05" onValueChange={() => {}} clearable />
     )
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
     expect(screen.getByRole("button", { name: "Clear" })).toBeEnabled()
   })
 
   it("disables Clear while nothing is picked", async () => {
     const user = createUser()
     render(<DatePickerButton onValueChange={() => {}} clearable />)
-    await user.click(screen.getByRole("button", { name: "Pick a date" }))
-    await screen.findByRole("grid")
+    await openPicker(user, "Pick a date")
     expect(screen.getByRole("button", { name: "Clear" })).toBeDisabled()
   })
 
@@ -438,9 +425,7 @@ describe("DatePickerButton clearable", () => {
     await screen.findByRole("grid")
 
     await user.click(screen.getByRole("button", { name: "Clear" }))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(onValueChange).toHaveBeenCalledTimes(1)
     expect(onValueChange).toHaveBeenLastCalledWith(undefined)
     expect(trigger).toHaveFocus()
@@ -456,13 +441,10 @@ describe("DatePickerButton clearable", () => {
         clearable
       />
     )
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await user.click(getDayButton(day(5)))
+    await waitForNoRole("grid")
     expect(onValueChange.mock.calls.at(-1)?.[0]?.getDate()).toBe(5)
   })
 
@@ -472,13 +454,10 @@ describe("DatePickerButton clearable", () => {
     render(
       <DatePickerButton value="2026-10-05" onValueChange={onValueChange} />
     )
-    await user.click(screen.getByRole("button", { name: /^October 5/ }))
-    await screen.findByRole("grid")
+    await openPicker(user, /^October 5/)
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await user.click(getDayButton(day(5)))
+    await waitForNoRole("grid")
     expect(onValueChange).toHaveBeenLastCalledWith(undefined)
   })
 })
@@ -525,9 +504,7 @@ describe("FormDatePickerField", () => {
     expect(await screen.findByRole("grid")).toBeVisible()
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveFocus()
   })
 
@@ -583,8 +560,7 @@ describe("DatePickerButton range mode", () => {
     const user = createUser()
     render(<RangePickerHarness />)
 
-    await user.click(screen.getByRole("button", { name: "Export range" }))
-    await screen.findAllByRole("grid")
+    await openPicker(user, "Export range")
     expect(screen.getByRole("dialog")).toHaveAccessibleName("Choose dates")
   })
 
@@ -599,9 +575,7 @@ describe("DatePickerButton range mode", () => {
     expect(await screen.findAllByRole("grid")).toHaveLength(2)
 
     await user.click(trigger)
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
   })
 
   it("closes on Escape and returns focus to the trigger", async () => {
@@ -613,9 +587,7 @@ describe("DatePickerButton range mode", () => {
     expect(await screen.findAllByRole("grid")).toHaveLength(2)
 
     await user.keyboard("{Escape}")
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveFocus()
     expect(trigger).toHaveTextContent("Export range")
   })
@@ -625,22 +597,15 @@ describe("DatePickerButton range mode", () => {
     const onChange = vi.fn<(range: DateRange | undefined) => void>()
     render(<RangePickerHarness onChange={onChange} />)
 
-    await user.click(screen.getByRole("button", { name: "Export range" }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    expect(await openPicker(user, "Export range")).toHaveLength(2)
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
+    await user.click(getDayButton(day(5)))
     expect(onChange).toHaveBeenCalled()
     expect(screen.getAllByRole("grid")).toHaveLength(2)
 
     await user.click(getDayButton(new Date(2026, 10, 10)))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.from?.getMonth()).toBe(9)
-    expect(last?.to?.getDate()).toBe(10)
-    expect(last?.to?.getMonth()).toBe(10)
+    await waitForNoRole("grid")
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-11-10"])
   })
 
   it("clears a selected range and returns to the placeholder", async () => {
@@ -648,7 +613,7 @@ describe("DatePickerButton range mode", () => {
     render(
       <RangePickerHarness
         initial={{
-          from: new Date(2026, 9, 5),
+          from: day(5),
           to: new Date(2026, 10, 10),
         }}
       />
@@ -662,9 +627,7 @@ describe("DatePickerButton range mode", () => {
     expect(await screen.findAllByRole("grid")).toHaveLength(2)
 
     await user.click(screen.getByRole("button", { name: "Clear" }))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
+    await waitForNoRole("grid")
     expect(trigger).toHaveTextContent("Export range")
     expect(trigger).toHaveAttribute("data-empty", "true")
     expect(trigger).toHaveFocus()
@@ -675,29 +638,22 @@ describe("DatePickerButton range mode", () => {
     const onChange = vi.fn<(range: DateRange | undefined) => void>()
     render(
       <RangePickerHarness
-        initial={{ from: new Date(2026, 9, 5), to: new Date(2026, 9, 10) }}
+        initial={{ from: day(5), to: day(10) }}
         onChange={onChange}
       />
     )
 
-    await user.click(screen.getByRole("button", { name: /October 5/ }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    expect(await openPicker(user, /October 5/)).toHaveLength(2)
 
     // The first click restarts the range instead of extending Oct 5 – 10
     // (Day Picker's resetOnSelect): the clicked day is the new start.
-    await user.click(getDayButton(new Date(2026, 9, 20)))
+    await user.click(getDayButton(day(20)))
     expect(screen.getAllByRole("grid")).toHaveLength(2)
-    const started = onChange.mock.calls.at(-1)?.[0]
-    expect(started?.from?.getDate()).toBe(20)
-    expect(started?.to).toBeUndefined()
+    expect(lastRange(onChange)).toEqual(["2026-10-20", undefined])
 
-    await user.click(getDayButton(new Date(2026, 9, 25)))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(20)
-    expect(last?.to?.getDate()).toBe(25)
+    await user.click(getDayButton(day(25)))
+    await waitForNoRole("grid")
+    expect(lastRange(onChange)).toEqual(["2026-10-20", "2026-10-25"])
     expect(
       screen.getByRole("button", { name: /October 20.*October 25/ })
     ).toBeInTheDocument()
@@ -708,15 +664,12 @@ describe("DatePickerButton range mode", () => {
     const onChange = vi.fn<(range: DateRange | undefined) => void>()
     render(<RangePickerHarness onChange={onChange} />)
 
-    await user.click(screen.getByRole("button", { name: "Export range" }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
-    await user.click(getDayButton(new Date(2026, 9, 5)))
-    expect(onChange.mock.calls.at(-1)?.[0]?.to).toBeUndefined()
+    expect(await openPicker(user, "Export range")).toHaveLength(2)
+    await user.click(getDayButton(day(5)))
+    expect(lastRange(onChange)).toEqual(["2026-10-05", undefined])
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.to?.getDate()).toBe(5)
+    await user.click(getDayButton(day(5)))
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-10-05"])
     // A same-day range keeps the popover open, as before.
     expect(screen.getAllByRole("grid")).toHaveLength(2)
   })
@@ -726,21 +679,16 @@ describe("DatePickerButton range mode", () => {
     const onChange = vi.fn<(range: DateRange | undefined) => void>()
     render(
       <RangePickerHarness
-        initial={{ from: new Date(2026, 9, 5), to: undefined }}
+        initial={{ from: day(5), to: undefined }}
         onChange={onChange}
       />
     )
 
-    await user.click(screen.getByRole("button", { name: /October 5/ }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    expect(await openPicker(user, /October 5/)).toHaveLength(2)
 
-    await user.click(getDayButton(new Date(2026, 9, 9)))
-    await waitFor(() => {
-      expect(screen.queryByRole("grid")).not.toBeInTheDocument()
-    })
-    const last = onChange.mock.calls.at(-1)?.[0]
-    expect(last?.from?.getDate()).toBe(5)
-    expect(last?.to?.getDate()).toBe(9)
+    await user.click(getDayButton(day(9)))
+    await waitForNoRole("grid")
+    expect(lastRange(onChange)).toEqual(["2026-10-05", "2026-10-09"])
   })
 
   it("keeps a two-month, auto-sized popover while the calendar is open", async () => {
@@ -764,7 +712,7 @@ describe("DatePickerButton range mode", () => {
         .some((node) => /November/.test(node.textContent ?? ""))
     ).toBe(true)
 
-    await user.click(getDayButton(new Date(2026, 9, 5)))
+    await user.click(getDayButton(day(5)))
     const afterStart = document.querySelector("[data-slot=popover-content]")
     expect(afterStart).toHaveClass("w-auto")
     expect(afterStart?.className ?? "").not.toMatch(/\bw-72\b/)
@@ -786,11 +734,11 @@ describe("DatePickerButton range mode", () => {
     const popover = await findPopoverContent()
 
     expect(screen.getAllByRole("grid")).toHaveLength(1)
-    expect(popover.className.split(/\s+/)).toContain("w-auto")
+    expect(popover).toHaveClass("w-auto")
     expect(popover.className.split(/\s+/)).toContain(
       "max-h-(--radix-popover-content-available-height)"
     )
-    expect(popover.className.split(/\s+/)).toContain("overflow-y-auto")
+    expect(popover).toHaveClass("overflow-y-auto")
   })
 
   it("defaults to two months at md and above when numberOfMonths is omitted", async () => {
@@ -805,8 +753,7 @@ describe("DatePickerButton range mode", () => {
       />
     )
 
-    await user.click(screen.getByRole("button", { name: "Export range" }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    expect(await openPicker(user, "Export range")).toHaveLength(2)
   })
 
   it("honors an explicit numberOfMonths below md", async () => {
@@ -821,8 +768,7 @@ describe("DatePickerButton range mode", () => {
       />
     )
 
-    await user.click(screen.getByRole("button", { name: "Export range" }))
-    expect(await screen.findAllByRole("grid")).toHaveLength(2)
+    expect(await openPicker(user, "Export range")).toHaveLength(2)
   })
 
   it("forwards side to the range popover", async () => {

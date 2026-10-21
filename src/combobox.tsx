@@ -247,13 +247,10 @@ export function Combobox({
 
   const onSearchKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     handleListboxKey(event, {
+      items: list,
       highlight,
-      length: list.length,
       setHighlight,
-      onEnter: (index) => {
-        const option = list[index]
-        if (option) selectOption(option)
-      },
+      onPick: selectOption,
     })
   }
 
