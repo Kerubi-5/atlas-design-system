@@ -2,13 +2,13 @@
 
 import type { ReactNode } from "react"
 
+import { fieldNameProps } from "../internal/form-control.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
-  FormFieldNameProps,
 } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
@@ -21,7 +21,6 @@ export type ToggleGroupFieldOption<T extends string> = {
 
 type Props<T extends string> = FormFieldBaseProps &
   FormFieldMetaProps &
-  FormFieldNameProps &
   FormFieldDescriptionProps & {
     /** The selected option, or `""` for none yet. */
     value: T | ""
@@ -78,7 +77,7 @@ export function FormToggleGroupField<T extends string>({
     >
       <ToggleGroup
         id={id}
-        data-field-name={fieldName}
+        {...fieldNameProps(fieldName)}
         type="single"
         value={value}
         onValueChange={handleValueChange}

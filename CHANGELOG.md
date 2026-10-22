@@ -24,10 +24,10 @@ API: read it before you upgrade.**
   control: the input or textarea, the select, combobox or date trigger, the
   checkbox (the first box of a checkbox group) and the toggle group.
   `FormTextField` and `FormMarkdownField` use `field.name`. The other
-  fields take an optional `fieldName` prop (type `FormFieldNameProps` from
-  `form/field-error`): pass `fieldName={field.name}`. `FormControlField`
-  adds `data-field-name` to the props it hands your control, so spread them
-  as before. `DatePickerButton` and `DateTimePickerButton` forward
+  fields take an optional `fieldName` prop, added to `FormFieldMetaProps`
+  from `form/field-error` with `meta`: pass `fieldName={field.name}`.
+  `FormControlField` adds `data-field-name` to the props it hands your
+  control, so spread them as before. `DatePickerButton` and `DateTimePickerButton` forward
   `data-field-name` to their trigger for the date fields.
 - `focusFirstInvalid(formId)` finds fields by `data-field-name` inside the
   form with that id, instead of matching control ids across

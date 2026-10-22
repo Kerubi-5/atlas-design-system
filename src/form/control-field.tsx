@@ -2,11 +2,12 @@
 
 import type { ComponentProps, ReactNode } from "react"
 
+import { fieldNameProps } from "../internal/form-control.js"
+
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
-  FormFieldNameProps,
 } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
@@ -26,7 +27,6 @@ export type FormControlProps = {
 
 type Props = Omit<FormFieldBaseProps, "fieldClassName"> &
   FormFieldMetaProps &
-  FormFieldNameProps &
   FormFieldDescriptionProps &
   Omit<ComponentProps<"div">, "id" | "children"> & {
     /** Marks the label and passes `aria-required` to the control. */
@@ -66,7 +66,7 @@ export function FormControlField({
     >
       {children({
         id,
-        "data-field-name": fieldName,
+        ...fieldNameProps(fieldName),
         ...fieldAria(id, errorText, { description, required }),
       })}
     </FormFieldShell>

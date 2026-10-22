@@ -2,13 +2,13 @@
 
 import { Checkbox } from "../checkbox.js"
 import { Field, FieldContent, FieldLabel, FieldLegend } from "../field.js"
+import { fieldNameProps } from "../internal/form-control.js"
 import { cn } from "../utils.js"
 
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
-  FormFieldNameProps,
 } from "./field-error.js"
 import {
   fieldAria,
@@ -19,7 +19,6 @@ import {
 
 type CheckboxFieldProps = FormFieldBaseProps &
   FormFieldMetaProps &
-  FormFieldNameProps &
   FormFieldDescriptionProps & {
     /** Whether the box is checked. */
     checked: boolean
@@ -62,7 +61,7 @@ export function FormCheckboxField({
   const checkbox = (
     <Checkbox
       id={id}
-      data-field-name={fieldName}
+      {...fieldNameProps(fieldName)}
       checked={checked}
       onCheckedChange={(next) => onCheckedChange(next === true)}
       onBlur={onBlur}
@@ -105,7 +104,6 @@ export type CheckboxGroupOption<T extends string | number> = {
 
 type CheckboxGroupFieldProps<T extends string | number> = FormFieldBaseProps &
   FormFieldMetaProps &
-  FormFieldNameProps &
   FormFieldDescriptionProps & {
     /** The boxes to show, in order. */
     options: CheckboxGroupOption<T>[]
@@ -168,7 +166,7 @@ export function FormCheckboxGroupField<T extends string | number>({
                 <Checkbox
                   id={optionId}
                   // The fieldset cannot take focus; the first box stands for it.
-                  data-field-name={index === 0 ? fieldName : undefined}
+                  {...fieldNameProps(index === 0 ? fieldName : undefined)}
                   checked={value.includes(option.value)}
                   onCheckedChange={(next) =>
                     toggle(option.value, next === true)

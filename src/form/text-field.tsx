@@ -1,13 +1,12 @@
 "use client"
 
-import { useId } from "react"
-
 import { Input } from "../input.js"
+import { fieldNameProps } from "../internal/form-control.js"
 import { Textarea } from "../textarea.js"
 import { onInputChange } from "../utils.js"
 
 import type { FieldMetaState, FormFieldBaseProps } from "./field-error.js"
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 export type TextFieldApi = {
   /** Field name; put on the control as `data-field-name` for `focusFirstInvalid`. */
@@ -82,12 +81,14 @@ export function FormTextField({
   /** Minimum text length (native form validation). */
   minLength?: number
 }) {
-  const id = useId()
+  const { id, errorText } = useFormField(field.state.meta, {
+    submitted,
+    showError,
+  })
   const onChange = onInputChange(field.handleChange)
-  const errorText = metaErrorText(field.state.meta, { submitted, showError })
   const controlProps = {
     id,
-    "data-field-name": field.name,
+    ...fieldNameProps(field.name),
     value: field.state.value,
     onChange,
     onBlur: field.handleBlur,

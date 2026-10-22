@@ -10,7 +10,7 @@ import { Slot } from "radix-ui"
 
 import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import type { AsChildProps } from "../internal/as-child.js"
-import { pickerValueId } from "../internal/form-control.js"
+import { fieldNameProps, pickerValueId } from "../internal/form-control.js"
 import { Label } from "../label.js"
 import { cn } from "../utils.js"
 
@@ -21,7 +21,6 @@ import {
   type FieldMetaState,
   type FormFieldBaseProps,
   type FormFieldMetaProps,
-  type FormFieldNameProps,
 } from "./field-error.js"
 
 /**
@@ -35,7 +34,7 @@ import {
  * `showError` is false, or the field is untouched (`isTouched: false`)
  * and the form has not been submitted.
  */
-export function metaErrorText(
+function metaErrorText(
   meta: FieldMetaState | undefined,
   { submitted, showError = true }: ErrorTimingProps = {}
 ) {
@@ -125,8 +124,7 @@ export function fieldAria(
  * `onValueChange`, and `placeholder`.
  */
 export type PickerFieldBaseProps = FormFieldBaseProps &
-  FormFieldMetaProps &
-  FormFieldNameProps & {
+  FormFieldMetaProps & {
     /** Disables the trigger so no date can be picked. */
     disabled?: boolean
     /** Marks the label and adds "Required" to the trigger's description. */
@@ -196,7 +194,7 @@ export function FormPickerField<P extends PickerFieldBaseProps>({
       <Picker
         {...pickerProps}
         id={id}
-        data-field-name={fieldName}
+        {...fieldNameProps(fieldName)}
         {...fieldAria(id, errorText, {
           required: required && "described",
           labelledBy: "label-value",

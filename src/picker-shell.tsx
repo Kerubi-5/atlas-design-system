@@ -11,6 +11,7 @@ import {
   type DateMatcher,
 } from "./internal/date-like.js"
 import {
+  fieldNameProps,
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
   pickerTriggerClassName,
@@ -201,7 +202,7 @@ export function PickerShell({
           aria-invalid={ariaInvalid}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
-          data-field-name={fieldName}
+          {...fieldNameProps(fieldName)}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
           onPointerEnter={preloadCalendar}

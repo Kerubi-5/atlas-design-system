@@ -1,3 +1,5 @@
+import { FIELD_NAME_ATTRIBUTE } from "../internal/form-control.js"
+
 /**
  * The part of a form library's invalid-submit event this helper reads: the
  * form state's per-field meta, keyed by field name (TanStack Form's
@@ -37,9 +39,9 @@ export function focusFirstInvalid(formId: string) {
         .map(([name]) => name)
     )
     for (const element of form.querySelectorAll<HTMLElement>(
-      "[data-field-name]"
+      `[${FIELD_NAME_ATTRIBUTE}]`
     )) {
-      if (invalid.has(element.dataset.fieldName ?? "")) {
+      if (invalid.has(element.getAttribute(FIELD_NAME_ATTRIBUTE) ?? "")) {
         element.focus()
         return
       }

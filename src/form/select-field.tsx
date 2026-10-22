@@ -2,18 +2,14 @@
 
 import type { ReactNode } from "react"
 
+import { fieldNameProps } from "../internal/form-control.js"
 import { Select, SelectContent, SelectTrigger, SelectValue } from "../select.js"
 
-import type {
-  FormFieldBaseProps,
-  FormFieldMetaProps,
-  FormFieldNameProps,
-} from "./field-error.js"
+import type { FormFieldBaseProps, FormFieldMetaProps } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
-  FormFieldMetaProps &
-  FormFieldNameProps & {
+  FormFieldMetaProps & {
     /** The selected item's value, or `undefined` for none. */
     value: string | undefined
     /** Called with the value of the item the person picks. */
@@ -59,7 +55,7 @@ export function FormSelectField({
       <Select value={value} onValueChange={onValueChange} required={required}>
         <SelectTrigger
           id={id}
-          data-field-name={fieldName}
+          {...fieldNameProps(fieldName)}
           className={className}
           {...fieldAria(id, errorText, { required })}
         >

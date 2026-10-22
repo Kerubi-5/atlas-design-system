@@ -3,18 +3,17 @@
 import type { ComponentProps } from "react"
 
 import { Combobox } from "../combobox.js"
+import { fieldNameProps } from "../internal/form-control.js"
 
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
   FormFieldMetaProps,
-  FormFieldNameProps,
 } from "./field-error.js"
 import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 type Props = FormFieldBaseProps &
   FormFieldMetaProps &
-  FormFieldNameProps &
   FormFieldDescriptionProps &
   Omit<
     ComponentProps<typeof Combobox>,
@@ -53,7 +52,7 @@ export function FormComboboxField({
       <Combobox
         {...props}
         id={id}
-        data-field-name={fieldName}
+        {...fieldNameProps(fieldName)}
         {...fieldAria(id, errorText, { description, required })}
       />
     </FormFieldShell>
