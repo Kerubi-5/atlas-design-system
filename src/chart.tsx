@@ -274,13 +274,13 @@ export function ChartYAxisGrid({
             x2={frame.right}
             y2={y(tick)}
             strokeWidth={1}
-            className="stroke-border"
+            className="stroke-input"
           />
           <text
             x={frame.left - 6}
             y={y(tick) + 3}
             textAnchor="end"
-            className="fill-muted-foreground text-[10px] tabular-nums"
+            className="fill-muted-foreground text-xs tabular-nums"
           >
             {format(tick)}
           </text>

@@ -199,7 +199,7 @@ describe("Combobox", () => {
       expect(option).toHaveAttribute("tabindex", "-1")
     }
     const highlighted = screen.getByRole("option", { name: "US Dollar" })
-    expect(highlighted.className).toMatch(/bg-accent/)
+    expect(highlighted.className).toMatch(/bg-selected/)
     expect(highlighted.className).toMatch(/shadow-\[inset_2px/)
 
     await user.tab()

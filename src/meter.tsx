@@ -63,7 +63,7 @@ function Meter({
       aria-valuenow={clamp(current, min, max)}
       aria-label={ariaLabel}
       className={cn(
-        "relative h-1.5 w-full overflow-hidden bg-muted",
+        "relative h-1.5 w-full overflow-hidden bg-input",
         className
       )}
     >

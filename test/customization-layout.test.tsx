@@ -78,13 +78,16 @@ describe("parents leave width to the app", () => {
     expect(screen.getByRole("status")).not.toHaveClass("w-full")
   })
 
-  it("Pagination does not center or stretch itself", () => {
-    render(<Pagination />)
+  it("Pagination fills its responsive container and accepts an app width", () => {
+    const { rerender } = render(<Pagination />)
     const nav = screen.getByRole("navigation", { name: "Pagination" })
-    expect(nav).toHaveClass("flex")
-    for (const name of ["mx-auto", "w-full", "justify-center"]) {
+    expect(nav).toHaveClass("flex", "w-full")
+    for (const name of ["mx-auto", "justify-center"]) {
       expect(classes(nav)).not.toContain(name)
     }
+    rerender(<Pagination className="w-64" />)
+    expect(nav).toHaveClass("w-64")
+    expect(nav).not.toHaveClass("w-full")
   })
 
   it("Table takes containerClassName and lets className shrink the table", () => {

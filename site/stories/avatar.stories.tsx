@@ -13,7 +13,7 @@ type Args = {
 const meta = {
   title: "Data display/Avatar",
   component: Avatar,
-  args: { size: "default", src: "/favicon.svg", initials: "AT" },
+  args: { size: "default", src: "./favicon.svg", initials: "AT" },
   argTypes: {
     size: { control: "select" },
     src: { control: "text" },

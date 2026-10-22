@@ -15,9 +15,8 @@ export const focusRing =
 export const focusRingWithin =
   "has-focus-visible:ring-2 has-focus-visible:ring-ring has-focus-visible:ring-offset-2 has-focus-visible:ring-offset-background"
 
-/** `aria-invalid`: destructive border and a soft glow; the error text carries the message. */
-export const invalidState =
-  "aria-invalid:border-destructive aria-invalid:ring-2 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40"
+/** `aria-invalid`: a destructive border; keyboard focus keeps the shared solid ring. */
+export const invalidState = "aria-invalid:border-destructive"
 
 /** Muted trigger text while empty (`data-placeholder` or `data-empty`). */
 export const emptyValueText =
@@ -86,10 +85,10 @@ export const listboxScroll = "max-h-60 overflow-y-auto"
 export const optionState = {
   /** Highlight as focus moves: grey fill plus a 2px ring bar (the fill alone is 1.1:1). */
   focus:
-    "focus:bg-accent focus:text-accent-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
+    "focus:bg-selected focus:text-selected-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The same highlight for lists that track the active option in state. */
   active:
-    "bg-accent text-accent-foreground shadow-[inset_2px_0_0_var(--color-ring)]",
+    "bg-selected text-selected-foreground shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The chosen value (`data-state="checked"`); a check icon marks it too. */
   checked:
     "data-[state=checked]:bg-selected data-[state=checked]:text-selected-foreground",

@@ -98,7 +98,7 @@ export function FieldError({
     <p
       id={id}
       data-slot="form-field-error"
-      className={cn("text-xs text-destructive", className)}
+      className={cn("text-sm font-normal text-destructive", className)}
       role="alert"
     >
       {resolved}

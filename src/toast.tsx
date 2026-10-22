@@ -17,7 +17,7 @@ import {
 } from "sonner"
 
 import { buttonVariants } from "./button.js"
-import { statusTone } from "./internal/styles.js"
+import { focusRing, statusTone } from "./internal/styles.js"
 import { cn } from "./utils.js"
 
 /*
@@ -133,28 +133,22 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * `error`, and `loading` each show a status icon. Tone colors the icon, title,
  * and border (`statusTone`, shared with Alert), not the body text.
  *
- * Close button: a circular badge centred on the top-right corner (`-top-2
- * -right-2`, half outside the border). Ghost / icon-xs still supplies the
- * shared focus ring, but Sonner's unlayered `[data-button]` default
- * (`background: var(--normal-text)`) and the dark `[data-close-button]` rule
- * (not gated on `data-styled`) would paint a foreground square. Important
- * popover fill, border, and muted text beat those fills. The 24px hit area
- * is the badge itself; the X is 12px. `overflow-visible` on the toast and
- * toaster keeps stacked badges from being clipped.
+ * Close button: a 24px square inside the top-right corner. Important kit
+ * utilities beat Sonner's unlayered close-button positioning and colors.
  *
- * Stacking: while the stack is collapsed, every part of the toasts behind
- * the front one is `invisible`. Their badges would otherwise peek out above
- * the front toast, closer together than the 24px target spacing, and their
- * buttons would stay in the tab order unseen. Hovering or focusing the stack
- * expands it (see `Toaster`), which shows them again.
+ * Stacking: notifications occupy normal flow in their mount area. Hidden
+ * and overflow notifications take no space or keyboard stops. Hovering or
+ * focusing the stack expands the visible notifications (see `Toaster`).
  *
- * Padding is asymmetric: `pl-4` matches Alert; `pr-6` clears the badge
- * (about 16px of it sits inside the border). Icon-to-text is `gap-x-2.5`
+ * Padding is asymmetric: `pl-4` matches Alert; `pr-10` clears the close
+ * button. Icon-to-text is `gap-x-2.5`
  * so the status icon and copy read as one unit.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
-  toast:
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-6 text-sm text-popover-foreground shadow-md data-[expanded=false]:data-[front=false]:*:invisible",
+  toast: cn(
+    focusRing,
+    "!relative !transform-none flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:hidden data-[expanded=false]:data-[front=false]:hidden"
+  ),
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
   // falls back to the title's width, so a one-word toast stays compact.
@@ -171,7 +165,7 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   ),
   closeButton: cn(
     buttonVariants({ variant: "ghost", size: "icon-xs" }),
-    "!absolute !-top-2 !-right-2 !left-auto !z-10 !size-6 !rounded-full !border !border-border !bg-popover !p-0 !text-muted-foreground !shadow-xs !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
+    "!absolute !top-2 !right-2 !left-auto !z-10 !size-6 !rounded-none !border !border-border !bg-popover !p-0 !text-muted-foreground !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
   ),
   success: statusTone.success,
   info: statusTone.neutral,
@@ -217,13 +211,14 @@ const Toaster = ({
   return (
     <div
       data-slot="toaster"
-      className="contents"
+      className="min-w-0"
       onFocus={() => setFocusWithin(true)}
       onBlur={onBlur}
     >
       <Sonner
         theme={theme as SonnerProps["theme"]}
-        className="toaster group overflow-visible"
+        className="toaster group !relative !inset-auto !transform-none flex !w-full flex-col gap-3 overflow-visible p-2 data-[x-position=right]:items-end data-[x-position=center]:items-center data-[y-position=bottom]:flex-col-reverse"
+        style={{ fontFamily: "var(--font-sans)", height: "auto" }}
         position={position}
         closeButton={closeButton}
         expand={expand || focusWithin}

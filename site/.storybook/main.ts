@@ -25,6 +25,8 @@ const config = {
   // Storybook links public/favicon.svg itself; iOS home screens need a PNG.
   managerHead: (head) =>
     `${head}<link rel="apple-touch-icon" href="./apple-touch-icon.png" />`,
+  previewHead: (head) =>
+    `${head}<link rel="icon" type="image/svg+xml" href="./favicon.svg" />`,
   async viteFinal(config) {
     // Relative preview chunks work at the site root and in the dev server.
     config.base = "./"

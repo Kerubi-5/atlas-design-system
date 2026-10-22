@@ -67,6 +67,12 @@ const pairs = [
   ]),
   ["field border on the page", "var(--input)", page, UI],
   ["field border on a card", "var(--input)", card, UI],
+  ["shared progress, meter and slider track", "var(--input)", page, UI],
+  ["track on a card", "var(--input)", card, UI],
+  ["skeleton and separator", "var(--input)", page, UI],
+  ["invalid input border", "var(--destructive)", page, UI],
+  ["chart grid", "var(--input)", page, UI],
+  ["chart line", "var(--selected-foreground)", page, UI],
   [
     "switch thumb on the off track",
     "var(--background)",

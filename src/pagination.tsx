@@ -12,7 +12,7 @@ import { cn } from "./utils.js"
 /**
  * Page links for long lists and tables. Links are plain anchors so the page
  * lives in the URL; pass `onClick` with `href` for client-side routing.
- * The nav is a plain flex row: place it with `className` (`justify-center`,
+ * The nav fills its container: place its links with `className` (`justify-center`,
  * `justify-end`, `mx-auto`) to suit the layout.
  */
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
@@ -20,7 +20,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
     <nav
       aria-label="Pagination"
       data-slot="pagination"
-      className={cn("flex", className)}
+      className={cn("@container/pagination flex w-full min-w-0 p-1", className)}
       {...props}
     />
   )
@@ -33,7 +33,7 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-1", className)}
+      className={cn("flex flex-row flex-wrap items-center gap-1", className)}
       {...props}
     />
   )

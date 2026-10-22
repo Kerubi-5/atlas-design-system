@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.3 - 2026-10-23
+
+- Sort the Table demo by Region or Count in both directions. Collapse pagination on narrow containers.
+- Place field errors under their controls at a consistent size, separate from form feedback.
+- Keep solid keyboard focus rings visible at narrow widths, including calendar navigation, Kanban and the last navigation tab; pad tab panels.
+- Improve light and dark contrast for loading placeholders, separators, tracks, disabled buttons, invalid fields and charts. Progress, Meter and Slider share the input-boundary track colour.
+- Add readable chart day labels, align badge typography and option selection colours, and keep toast notifications in their own space with the kit font and square close button.
+- Remove Kanban column landmarks and move scroll arrows below cards.
+- Fix narrow docs code and calendars, code copy chrome and favicon paths; add docs security headers and update Storybook to 10.6.3.
+
 ## 1.2.2 - 2026-10-21
 
 Form fields get their own ids and `focusFirstInvalid` reaches every kind of
