@@ -2,6 +2,8 @@
 
 import type { ComponentProps, ReactNode } from "react"
 
+import { fieldNameProps } from "../internal/form-control.js"
+
 import type {
   FormFieldBaseProps,
   FormFieldDescriptionProps,
@@ -11,8 +13,10 @@ import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 
 /** Props `FormControlField` hands its control: spread them onto it. */
 export type FormControlProps = {
-  /** Id the label points at. */
+  /** Generated id the label points at. */
   id: string
+  /** The field's `fieldName`, for `focusFirstInvalid`; `undefined` without one. */
+  "data-field-name": string | undefined
   /** `true` while the field shows error text. */
   "aria-invalid": true | undefined
   /** Ids of the hint and the error text, when shown. */
@@ -25,8 +29,6 @@ type Props = Omit<FormFieldBaseProps, "fieldClassName"> &
   FormFieldMetaProps &
   FormFieldDescriptionProps &
   Omit<ComponentProps<"div">, "id" | "children"> & {
-    /** Control id the label points at. Defaults to a generated id. */
-    id?: string
     /** Marks the label and passes `aria-required` to the control. */
     required?: boolean
     /** Renders the control from the id and ARIA props it should carry. */
@@ -41,7 +43,7 @@ type Props = Omit<FormFieldBaseProps, "fieldClassName"> &
  * wrapper (`data-slot="form-field"`).
  */
 export function FormControlField({
-  id: idProp,
+  fieldName,
   label,
   description,
   required,
@@ -51,7 +53,7 @@ export function FormControlField({
   children,
   ...props
 }: Props) {
-  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   return (
     <FormFieldShell
@@ -62,7 +64,11 @@ export function FormControlField({
       errorText={errorText}
       required={required}
     >
-      {children({ id, ...fieldAria(id, errorText, { description, required }) })}
+      {children({
+        id,
+        ...fieldNameProps(fieldName),
+        ...fieldAria(id, errorText, { description, required }),
+      })}
     </FormFieldShell>
   )
 }

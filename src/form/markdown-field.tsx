@@ -5,10 +5,11 @@ import { lazy, Suspense, useState } from "react"
 import { Spinner } from "../spinner.js"
 import { Textarea } from "../textarea.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
+import { fieldNameProps } from "../internal/form-control.js"
 import { fieldSurface } from "../internal/styles.js"
 import { cn, onInputChange } from "../utils.js"
 
-import { fieldAria, FormFieldShell, metaErrorText } from "./field-shell.js"
+import { fieldAria, FormFieldShell, useFormField } from "./field-shell.js"
 import type { TextFieldBaseProps } from "./text-field.js"
 
 type Mode = "write" | "preview"
@@ -27,7 +28,6 @@ const Markdown = lazy(() =>
  */
 export function FormMarkdownField({
   field,
-  id = field.name,
   label,
   placeholder = "Markdown supported",
   rows = 5,
@@ -45,9 +45,12 @@ export function FormMarkdownField({
   /** Classes for the Preview surface, e.g. a taller `min-h-40`. */
   previewClassName?: string
 }) {
+  const { id, errorText } = useFormField(field.state.meta, {
+    submitted,
+    showError,
+  })
   const [mode, setMode] = useState<Mode>("write")
   const onChange = onInputChange(field.handleChange)
-  const errorText = metaErrorText(field.state.meta, { submitted, showError })
   const trimmed = field.state.value.trim()
 
   function handleModeChange(value: string) {
@@ -86,6 +89,7 @@ export function FormMarkdownField({
       {mode === "write" ? (
         <Textarea
           id={id}
+          {...fieldNameProps(field.name)}
           value={field.state.value}
           onChange={onChange}
           onBlur={field.handleBlur}

@@ -11,6 +11,7 @@ import {
   type DateMatcher,
 } from "./internal/date-like.js"
 import {
+  fieldNameProps,
   PICKER_COLLISION_PADDING,
   pickerContentClassName,
   pickerTriggerClassName,
@@ -83,6 +84,8 @@ export type PickerTriggerProps = {
   "aria-labelledby"?: string
   /** Forwarded to the trigger, e.g. the id of a hint or error text. */
   "aria-describedby"?: string
+  /** Forwarded to the trigger; a form field sets it for `focusFirstInvalid`. */
+  "data-field-name"?: string
   /** Popover side. Defaults to `bottom`; Radix still flips on collision. */
   side?: React.ComponentProps<typeof PopoverContent>["side"]
   /** Month shown when the popover opens; falls back to the selected date. */
@@ -172,6 +175,7 @@ export function PickerShell({
   "aria-invalid": ariaInvalid,
   "aria-labelledby": ariaLabelledBy,
   "aria-describedby": ariaDescribedBy,
+  "data-field-name": fieldName,
   side,
   defaultMonth,
   minDate,
@@ -198,6 +202,7 @@ export function PickerShell({
           aria-invalid={ariaInvalid}
           aria-labelledby={ariaLabelledBy}
           aria-describedby={ariaDescribedBy}
+          {...fieldNameProps(fieldName)}
           data-empty={empty}
           className={cn(pickerTriggerClassName, className)}
           onPointerEnter={preloadCalendar}

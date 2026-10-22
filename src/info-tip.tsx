@@ -29,7 +29,9 @@ export type InfoTipProps = {
   /**
    * `inline` sits in a line of text: the glyph is 1em, a quarter em after
    * the word, on the text's cap height, and keeps the line height; the 44px
-   * hit area overflows. Default `box`.
+   * hit area overflows. `box` is a 44px button; after a label (any earlier
+   * sibling) its glyph sits that same quarter em from the text, so leave the
+   * gap off the parent. Default `box`.
    */
   layout?: InfoTipLayout
   /** Panel side. Default `top`; Radix still flips on collision. */
@@ -128,9 +130,12 @@ function InfoTip({
             quietTextHover,
             // Inline: 1em scales with the sentence; -0.125em centres the
             // glyph on the cap height without growing the line box.
+            // Box: the 44px target leaves 12px either side of the 20px
+            // glyph. After a label, pull it back over that padding so the
+            // glyph sits the same quarter em from the text as it does inline.
             inline
               ? cn("ml-[0.25em] size-[1em] align-[-0.125em]", hitArea44)
-              : "size-11",
+              : "size-11 not-first:ml-[calc(0.25em-0.75rem)]",
             className
           )}
           onMouseEnter={openFromHover}

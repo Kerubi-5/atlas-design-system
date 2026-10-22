@@ -5,7 +5,7 @@ import { InfoTip, InlineTip } from "../src/info-tip.js"
 export function InfoTipStory() {
   return (
     <div className="grid max-w-lg gap-4">
-      <div className="flex items-center gap-1">
+      <div className="flex items-center">
         <h2 className="font-heading text-sm font-semibold tracking-widest uppercase">
           Depth
         </h2>

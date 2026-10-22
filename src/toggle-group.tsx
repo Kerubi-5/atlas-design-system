@@ -18,6 +18,15 @@ type ToggleGroupLayoutProps = {
   orientation?: "horizontal" | "vertical"
 }
 
+/** The keys Radix's roving focus moves between items with. */
+const arrowKeys = new Set(["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"])
+
+function isItem(target: EventTarget): target is HTMLElement {
+  return (
+    target instanceof HTMLElement && target.dataset.slot === "toggle-group-item"
+  )
+}
+
 const ToggleGroupContext = React.createContext<
   VariantProps<typeof toggleVariants> & ToggleGroupLayoutProps
 >({
@@ -34,10 +43,18 @@ function ToggleGroup({
   spacing = 2,
   orientation = "horizontal",
   children,
+  onKeyDown,
+  onPointerDown,
+  onFocus,
   ...props
 }: React.ComponentProps<typeof ToggleGroupPrimitive.Root> &
   VariantProps<typeof toggleVariants> &
   ToggleGroupLayoutProps) {
+  // The item an arrow key was pressed on, until focus lands on the next one.
+  // A single group's items are radios, and focus that arrives by arrow key
+  // selects, as in any radio group; Tab and clicks do not.
+  const arrowFrom = React.useRef<EventTarget | null>(null)
+  const selectsOnArrow = props.type === "single" && props.rovingFocus !== false
   const context = React.useMemo(
     () => ({ variant, size, spacing, orientation }),
     [variant, size, spacing, orientation]
@@ -49,6 +66,37 @@ function ToggleGroup({
       data-size={size}
       data-spacing={spacing}
       data-orientation={orientation}
+      onKeyDown={(event) => {
+        onKeyDown?.(event)
+        // Radix moves focus to the next item once the key has bubbled up.
+        if (
+          selectsOnArrow &&
+          arrowKeys.has(event.key) &&
+          isItem(event.target) &&
+          !(event.metaKey || event.ctrlKey || event.altKey || event.shiftKey)
+        ) {
+          arrowFrom.current = event.target
+        }
+      }}
+      onPointerDown={(event) => {
+        onPointerDown?.(event)
+        arrowFrom.current = null
+      }}
+      onFocus={(event) => {
+        onFocus?.(event)
+        const from = arrowFrom.current
+        arrowFrom.current = null
+        const item = event.target
+        // Clicking runs the selection Radix already owns, onValueChange included.
+        if (
+          from &&
+          from !== item &&
+          isItem(item) &&
+          item.getAttribute("aria-checked") !== "true"
+        ) {
+          item.click()
+        }
+      }}
       style={{ "--gap": spacing } as React.CSSProperties}
       className={cn(
         "group/toggle-group flex w-fit max-w-full flex-row flex-wrap items-center gap-[--spacing(var(--gap))] data-[spacing=0]:data-[variant=outline]:rounded-none data-vertical:flex-col data-vertical:flex-nowrap data-vertical:items-stretch",

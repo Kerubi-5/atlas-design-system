@@ -3,6 +3,7 @@
 import type { ComponentProps } from "react"
 
 import { Combobox } from "../combobox.js"
+import { fieldNameProps } from "../internal/form-control.js"
 
 import type {
   FormFieldBaseProps,
@@ -27,6 +28,7 @@ type Props = FormFieldBaseProps &
  * timing. Pass the field's blur handler as `onBlur` so touch state updates.
  */
 export function FormComboboxField({
+  fieldName,
   label,
   description,
   meta,
@@ -50,6 +52,7 @@ export function FormComboboxField({
       <Combobox
         {...props}
         id={id}
+        {...fieldNameProps(fieldName)}
         {...fieldAria(id, errorText, { description, required })}
       />
     </FormFieldShell>

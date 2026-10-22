@@ -45,13 +45,22 @@ export type FormFieldBaseProps = ErrorTimingProps & {
   fieldClassName?: string
 }
 
-/** Error meta for the `form/*` fields that are not bound to a `field` API. */
+/**
+ * What the `form/*` fields that are not bound to a `field` API take in its
+ * place: its meta and its name.
+ */
 export type FormFieldMetaProps = {
   /**
    * The field's meta (TanStack Form's `field.state.meta`); its first error
    * shows under the control. Leave it out for no error text.
    */
   meta?: FieldMetaState
+  /**
+   * The field's name (TanStack Form's `field.name`). Put on the control as
+   * `data-field-name`, so `focusFirstInvalid` can find it. Leave it out and
+   * the field is not a focus target.
+   */
+  fieldName?: string
 }
 
 /** The optional hint the `form/*` fields render under the label. */

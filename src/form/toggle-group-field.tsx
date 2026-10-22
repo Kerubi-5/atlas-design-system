@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react"
 
+import { fieldNameProps } from "../internal/form-control.js"
 import { ToggleGroup, ToggleGroupItem } from "../toggle-group.js"
 
 import type {
@@ -42,6 +43,7 @@ type Props<T extends string> = FormFieldBaseProps &
  * control), with a visible label and the `form/*` error wiring.
  */
 export function FormToggleGroupField<T extends string>({
+  fieldName,
   label,
   description,
   value,
@@ -75,6 +77,7 @@ export function FormToggleGroupField<T extends string>({
     >
       <ToggleGroup
         id={id}
+        {...fieldNameProps(fieldName)}
         type="single"
         value={value}
         onValueChange={handleValueChange}

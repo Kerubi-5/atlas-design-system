@@ -384,11 +384,13 @@ function KanbanColumnView({
         className
       )}
     >
+      {/* The name truncates; the count and badge wrap under it, to the
+          right, once they no longer fit beside it. */}
       <header
         data-slot="kanban-column-header"
-        className="flex items-start justify-between gap-2"
+        className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5"
       >
-        <span className="flex items-center gap-2 text-xs font-semibold tracking-widest uppercase">
+        <span className="flex max-w-full min-w-0 items-center gap-2 text-xs font-semibold tracking-widest uppercase">
           {column.color ? (
             <span
               aria-hidden
@@ -396,16 +398,24 @@ function KanbanColumnView({
               style={{ backgroundColor: column.color }}
             />
           ) : null}
-          <span className="leading-tight">{column.label}</span>
+          <span className="truncate leading-tight" title={column.label}>
+            {column.label}
+          </span>
         </span>
-        <span className="flex shrink-0 flex-col items-end gap-0.5 text-muted-foreground tabular-nums">
+        <span className="ml-auto flex max-w-full min-w-0 flex-col items-end gap-0.5 text-muted-foreground tabular-nums">
           <span className="text-xs">{count}</span>
           {column.badge ? (
-            <span className="text-[10px] font-medium">{column.badge}</span>
+            <span className="max-w-full truncate text-[10px] font-medium">
+              {column.badge}
+            </span>
           ) : null}
         </span>
       </header>
-      <div className="flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto pr-1">
+      {/* `p-1` gives the card's 4px focus ring (2px ring + 2px gap) room inside
+          the scroll area, which clips at its padding edge. `-m-1` pulls the
+          top, bottom and left back out so the cards stay where they were; the
+          right keeps its 4px gutter. */}
+      <div className="-m-1 mr-0 flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto p-1">
         {loading ? (
           <>
             <Skeleton className="h-20" />

@@ -2,6 +2,7 @@
 
 import { Checkbox } from "../checkbox.js"
 import { Field, FieldContent, FieldLabel, FieldLegend } from "../field.js"
+import { fieldNameProps } from "../internal/form-control.js"
 import { cn } from "../utils.js"
 
 import type {
@@ -25,8 +26,6 @@ type CheckboxFieldProps = FormFieldBaseProps &
     onCheckedChange: (checked: boolean) => void
     /** Called when the checkbox loses focus; pass the field's blur handler. */
     onBlur?: () => void
-    /** Checkbox id the label points at. Defaults to a generated id. */
-    id?: string
     /** Sets `required` on the checkbox and marks the label. */
     required?: boolean
     /** Disables the checkbox. */
@@ -45,9 +44,9 @@ export function FormCheckboxField({
   checked,
   onCheckedChange,
   onBlur,
+  fieldName,
   label,
   description,
-  id: idProp,
   meta,
   submitted,
   showError,
@@ -57,11 +56,12 @@ export function FormCheckboxField({
   className,
   fieldClassName,
 }: CheckboxFieldProps) {
-  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   const checkbox = (
     <Checkbox
       id={id}
+      {...fieldNameProps(fieldName)}
       checked={checked}
       onCheckedChange={(next) => onCheckedChange(next === true)}
       onBlur={onBlur}
@@ -119,6 +119,7 @@ type CheckboxGroupFieldProps<T extends string | number> = FormFieldBaseProps &
 
 /** Several values from a short list, as a labelled set of checkboxes. */
 export function FormCheckboxGroupField<T extends string | number>({
+  fieldName,
   label,
   description,
   options,
@@ -158,12 +159,14 @@ export function FormCheckboxGroupField<T extends string | number>({
           data-slot="form-checkbox-group-options"
           className={cn("flex flex-wrap gap-x-6 gap-y-3 pt-1", className)}
         >
-          {options.map((option) => {
+          {options.map((option, index) => {
             const optionId = `${id}-${option.value}`
             return (
               <Field key={option.value} orientation="horizontal">
                 <Checkbox
                   id={optionId}
+                  // The fieldset cannot take focus; the first box stands for it.
+                  {...fieldNameProps(index === 0 ? fieldName : undefined)}
                   checked={value.includes(option.value)}
                   onCheckedChange={(next) =>
                     toggle(option.value, next === true)

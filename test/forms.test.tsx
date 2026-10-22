@@ -24,7 +24,9 @@ describe("portable forms", () => {
     const html = renderToStaticMarkup(
       <FormTextField field={field} label="Title" />
     )
-    expect(html).toContain('for="title"')
+    const id = /<label[^>]* for="([^"]+)"/.exec(html)?.[1]
+    expect(id).toBeTruthy()
+    expect(html).toContain(`id="${id}"`)
     expect(html).toContain('value="Draft"')
     expect(html).toContain('aria-invalid="true"')
     expect(html).toContain('role="alert"')
@@ -43,18 +45,37 @@ describe("portable forms", () => {
     expect(multiline).not.toContain('role="alert"')
   })
 
-  it("accepts an id so two forms can share a field name", () => {
-    const field = fakeTextField("email", "")
-    const html = renderToStaticMarkup(
+  it("gives two forms that share a field name distinct ids, so each label reaches its own input", async () => {
+    const user = createUser()
+    render(
       <>
-        <FormTextField field={field} label="Login email" />
-        <FormTextField field={field} id="signup-email" label="Sign-up email" />
+        <form aria-label="Log in">
+          <FormTextField
+            field={fakeTextField("email", "")}
+            label="Login email"
+            description="The address you signed up with"
+          />
+        </form>
+        <form aria-label="Sign up">
+          <FormTextField
+            field={fakeTextField("email", "", ["Enter an email address"])}
+            label="Sign-up email"
+          />
+        </form>
       </>
     )
-    expect(html).toContain('for="email"')
-    expect(html).toContain('id="email"')
-    expect(html).toContain('for="signup-email"')
-    expect(html).toContain('id="signup-email"')
+    const login = screen.getByLabelText("Login email")
+    const signup = screen.getByLabelText("Sign-up email")
+    expect(login.id).not.toBe(signup.id)
+
+    await user.click(screen.getByText("Sign-up email"))
+    expect(signup).toHaveFocus()
+    await user.click(screen.getByText("Login email"))
+    expect(login).toHaveFocus()
+
+    // Hint and error text stay with their own field.
+    expect(login).toHaveAccessibleDescription("The address you signed up with")
+    expect(signup).toHaveAccessibleDescription("Enter an email address")
   })
 
   it("toggles markdown write and preview", async () => {
@@ -82,11 +103,12 @@ describe("portable forms", () => {
       <FormMarkdownField field={fakeTextField("notes", "")} label="Notes" />
     )
     const label = screen.getByText("Notes")
-    expect(label).toHaveAttribute("for", "notes")
+    const { id } = screen.getByLabelText("Notes")
+    expect(label).toHaveAttribute("for", id)
 
     await user.click(screen.getByRole("radio", { name: "Preview" }))
     expect(label).not.toHaveAttribute("for")
-    expect(document.getElementById("notes")).toBeNull()
+    expect(document.getElementById(id)).toBeNull()
   })
 
   it("keeps utility class precedence and controlled input values", () => {
@@ -195,7 +217,6 @@ describe("FormMarkdownField", () => {
     render(
       <FormMarkdownField
         field={markdownField("", ["Required"])}
-        id="custom-notes"
         label="Notes"
         placeholder="Write here"
         rows={3}
@@ -203,7 +224,6 @@ describe("FormMarkdownField", () => {
       />
     )
     const box = screen.getByLabelText("Notes")
-    expect(box).toHaveAttribute("id", "custom-notes")
     expect(box).toHaveAttribute("rows", "3")
     expect(box).not.toHaveAttribute("aria-invalid")
     expect(screen.queryByRole("alert")).toBeNull()

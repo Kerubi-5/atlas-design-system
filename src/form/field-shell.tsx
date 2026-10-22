@@ -10,7 +10,7 @@ import { Slot } from "radix-ui"
 
 import type { DateLike, DatePickerCalendarProps } from "../date-picker.js"
 import type { AsChildProps } from "../internal/as-child.js"
-import { pickerValueId } from "../internal/form-control.js"
+import { fieldNameProps, pickerValueId } from "../internal/form-control.js"
 import { Label } from "../label.js"
 import { cn } from "../utils.js"
 
@@ -34,7 +34,7 @@ import {
  * `showError` is false, or the field is untouched (`isTouched: false`)
  * and the form has not been submitted.
  */
-export function metaErrorText(
+function metaErrorText(
   meta: FieldMetaState | undefined,
   { submitted, showError = true }: ErrorTimingProps = {}
 ) {
@@ -45,15 +45,15 @@ export function metaErrorText(
 
 /**
  * The error text a `form/*` field shows (`metaErrorText`) and its control
- * id: `id` when passed, else a generated one.
+ * id. The id is generated per field, so two forms that share a field name
+ * (login and sign-up `email`) never share an id, and each label, hint, and
+ * error links to its own control.
  */
 export function useFormField(
   meta: FieldMetaState | undefined,
-  timing: ErrorTimingProps,
-  id?: string
+  timing: ErrorTimingProps
 ) {
-  const generatedId = useId()
-  return { id: id ?? generatedId, errorText: metaErrorText(meta, timing) }
+  return { id: useId(), errorText: metaErrorText(meta, timing) }
 }
 
 /** Id of the label `FormFieldShell` renders for control `id`. */
@@ -125,12 +125,6 @@ export function fieldAria(
  */
 export type PickerFieldBaseProps = FormFieldBaseProps &
   FormFieldMetaProps & {
-    /**
-     * Id of the trigger the label points at. Defaults to a generated id;
-     * pass the field name (`id={field.name}`) so a submit handler such as
-     * `focusFirstInvalid` can find the control.
-     */
-    id?: string
     /** Disables the trigger so no date can be picked. */
     disabled?: boolean
     /** Marks the label and adds "Required" to the trigger's description. */
@@ -149,7 +143,7 @@ export type PickerFieldBaseProps = FormFieldBaseProps &
 
 /** The props a date or date-time field keeps for its shell, not the picker. */
 type PickerFieldOwnKey =
-  | "id"
+  | "fieldName"
   | "label"
   | "meta"
   | "submitted"
@@ -171,11 +165,14 @@ export function FormPickerField<P extends PickerFieldBaseProps>({
   field: P
   /** The picker trigger. */
   picker: ComponentType<
-    Omit<P, PickerFieldOwnKey> & { id: string } & ReturnType<typeof fieldAria>
+    Omit<P, PickerFieldOwnKey> & {
+      id: string
+      "data-field-name"?: string
+    } & ReturnType<typeof fieldAria>
   >
 }) {
   const {
-    id: idProp,
+    fieldName,
     label,
     meta,
     submitted,
@@ -184,7 +181,7 @@ export function FormPickerField<P extends PickerFieldBaseProps>({
     fieldClassName,
     ...pickerProps
   } = field
-  const { id, errorText } = useFormField(meta, { submitted, showError }, idProp)
+  const { id, errorText } = useFormField(meta, { submitted, showError })
 
   return (
     <FormFieldShell
@@ -197,6 +194,7 @@ export function FormPickerField<P extends PickerFieldBaseProps>({
       <Picker
         {...pickerProps}
         id={id}
+        {...fieldNameProps(fieldName)}
         {...fieldAria(id, errorText, {
           required: required && "described",
           labelledBy: "label-value",

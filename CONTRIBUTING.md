@@ -6,8 +6,10 @@ the same steps.
 
 ## Set up and check
 
-Working on the kit needs Node 22.12 or newer (Vitest 5). Apps that install
-the package need only the Node versions in `engines` in `package.json`.
+Working on the kit needs Node 22.19 or newer: Vitest 5 needs 22.12, and
+`npm run size` (size-limit 14, which uses `fs.promises.glob`) needs 22.19.
+Apps that install the package need only the Node versions in `engines` in
+`package.json`.
 
 ```sh
 npm ci

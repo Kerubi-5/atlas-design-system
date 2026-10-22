@@ -46,11 +46,12 @@ type ComboboxProps = {
   disabled?: boolean
   /** Goes on the trigger, so a `<Label htmlFor>` names it. Generated when omitted. */
   id?: string
-  /** Classes for the trigger, e.g. its width; the list matches it. */
+  /** Classes for the trigger, e.g. its width; the list is at least as wide. */
   className?: string
   /**
-   * Classes for the popover panel, e.g. a width other than the trigger's.
-   * Defaults to the trigger width.
+   * Classes for the popover panel, e.g. a fixed width. By default the panel
+   * is at least as wide as the trigger and grows to fit the longest option,
+   * up to the space the viewport leaves.
    */
   contentClassName?: string
   /** Marks the trigger invalid, drawing the error border. */
@@ -288,7 +289,7 @@ export function Combobox({
       <PopoverContent
         align="start"
         className={cn(
-          "w-[var(--radix-popover-trigger-width)] gap-0 rounded-none p-0",
+          "w-max min-w-(--radix-popover-trigger-width) gap-0 rounded-none p-0",
           contentClassName
         )}
       >
