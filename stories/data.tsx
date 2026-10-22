@@ -55,10 +55,10 @@ export function TableStory() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {sortedRows.map((row, index) => (
+        {sortedRows.map((row) => (
           <TableRow
             key={row.name}
-            data-state={index === 0 ? "selected" : undefined}
+            data-state={row.name === rows[0]?.name ? "selected" : undefined}
           >
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.value}</TableCell>

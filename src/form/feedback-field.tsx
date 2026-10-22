@@ -1,3 +1,4 @@
+import { errorText } from "../internal/styles.js"
 import { cn } from "../utils.js"
 
 /** Form-level submit or mutation error (not tied to a single field). */
@@ -14,10 +15,7 @@ export function FormFeedbackField({
   return (
     <p
       data-slot="form-feedback"
-      className={cn(
-        "border-t border-destructive pt-3 text-sm text-destructive",
-        className
-      )}
+      className={cn("border-t border-destructive pt-3", errorText, className)}
       role="alert"
     >
       {message}

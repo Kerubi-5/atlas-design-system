@@ -12,6 +12,7 @@ import test from "node:test"
 import { chromium } from "playwright"
 
 import { THEMES, assertNoProblems } from "./browser.mjs"
+import { contrastRatio } from "./contrast.mjs"
 import { repoRoot } from "./serve.mjs"
 const TEXT = 4.5
 const UI = 3
@@ -124,22 +125,17 @@ test("theme tokens meet WCAG contrast in light and dark", async () => {
           }
           return [...ctx.getImageData(0, 0, 1, 1).data.slice(0, 3)]
         }
-        const luminance = (rgb) =>
-          rgb
-            .map((value) => {
-              const c = value / 255
-              return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-            })
-            .reduce((sum, c, i) => sum + c * [0.2126, 0.7152, 0.0722][i], 0)
         const out = []
         for (const theme of themes) {
           document.documentElement.className = theme === "dark" ? "dark" : ""
           for (const [what, foreground, background, min] of pairs) {
-            const [hi, lo] = [
-              luminance(paint([...background, foreground])),
-              luminance(paint(background)),
-            ].sort((a, b) => b - a)
-            out.push({ theme, what, min, ratio: (hi + 0.05) / (lo + 0.05) })
+            out.push({
+              theme,
+              what,
+              min,
+              foreground: paint([...background, foreground]),
+              background: paint(background),
+            })
           }
         }
         return out
@@ -148,6 +144,10 @@ test("theme tokens meet WCAG contrast in light and dark", async () => {
     )
 
     const failures = results
+      .map((result) => ({
+        ...result,
+        ratio: contrastRatio(result.foreground, result.background),
+      }))
       .filter((result) => result.ratio < result.min)
       .map(
         (result) =>

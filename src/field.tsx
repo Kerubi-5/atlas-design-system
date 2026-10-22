@@ -3,7 +3,7 @@
 import { useMemo } from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
-import { labelText } from "./internal/styles.js"
+import { errorText, labelText } from "./internal/styles.js"
 import { cn } from "./utils.js"
 import { Label } from "./label.js"
 import { Separator } from "./separator.js"
@@ -236,7 +236,7 @@ function FieldError({
     <div
       role="alert"
       data-slot="field-error"
-      className={cn("text-sm font-normal text-destructive", className)}
+      className={cn(errorText, className)}
       {...props}
     >
       {content}

@@ -83,7 +83,7 @@ export const listboxScroll = "max-h-60 overflow-y-auto"
 
 /** Options in menus and listboxes. */
 export const optionState = {
-  /** Highlight as focus moves: grey fill plus a 2px ring bar (the fill alone is 1.1:1). */
+  /** Highlight as focus moves: the selected wash plus a 2px inset ring bar. */
   focus:
     "focus:bg-selected focus:text-selected-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The same highlight for lists that track the active option in state. */
@@ -138,6 +138,9 @@ export const controlText =
  * DialogDescription, AlertDescription).
  */
 export const descriptionText = "text-sm leading-relaxed text-muted-foreground"
+
+/** Field and form-level error text share one size, weight, and color. */
+export const errorText = "text-sm font-normal text-destructive"
 
 /** Field-label text (Label, FieldLegend, FieldTitle, PopoverTitle). */
 export const labelText = "text-xs font-semibold tracking-wide uppercase"

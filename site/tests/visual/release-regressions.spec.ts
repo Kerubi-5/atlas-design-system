@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test"
 import { THEMES, openStory, settle, storyRoot, storyUrl } from "../browser.mjs"
+import { contrastRatio } from "../contrast.mjs"
 
 test("docs serve security headers and their preview favicon", async ({
   page,
@@ -159,34 +160,23 @@ for (const theme of THEMES) {
       const canvas = document.createElement("canvas")
       canvas.width = canvas.height = 1
       const context = canvas.getContext("2d")!
-      const luminance = (color: string) => {
+      const paint = (color: string) => {
         context.clearRect(0, 0, 1, 1)
         context.filter = style.filter
         context.fillStyle = color
         context.fillRect(0, 0, 1, 1)
-        return [...context.getImageData(0, 0, 1, 1).data]
-          .slice(0, 3)
-          .map((value) => {
-            const c = value / 255
-            return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4
-          })
-          .reduce(
-            (sum, value, index) =>
-              sum + value * [0.2126, 0.7152, 0.0722][index]!,
-            0
-          )
+        return [...context.getImageData(0, 0, 1, 1).data].slice(0, 3)
       }
-      const values = [
-        luminance(style.color),
-        luminance(style.backgroundColor),
-      ].sort((a, b) => b - a)
       return {
-        ratio: (values[0]! + 0.05) / (values[1]! + 0.05),
+        foreground: paint(style.color),
+        background: paint(style.backgroundColor),
         opacity: style.opacity,
       }
     })
     expect(contrast.opacity).toBe("1")
-    expect(contrast.ratio).toBeGreaterThanOrEqual(4.5)
+    expect(
+      contrastRatio(contrast.foreground, contrast.background)
+    ).toBeGreaterThanOrEqual(4.5)
   })
   test(`solid focus rings stay inside narrow scrolling controls ${theme}`, async ({
     page,
