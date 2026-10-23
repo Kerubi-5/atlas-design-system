@@ -47,7 +47,7 @@ const retyped: Array<[string, RegExp, string]> = [
   ["field surface", /border border-input bg-background px-3/, "fieldSurface"],
   [
     "selected chrome",
-    /(?:hover|aria-expanded|aria-pressed|aria-checked|data-on|data-\[active=true\]|data-\[state=(?:on|"?active"?|checked)\]):bg-selected/,
+    /(?:hover|aria-expanded|aria-pressed|aria-checked|data-on|has-data-checked|data-\[active=true\]|data-\[state=(?:on|"?active"?|checked)\]):bg-selected/,
     "selectedState",
   ],
   ["option highlight bar", /inset_2px_0_0_var\(--color-ring\)/, "optionState"],

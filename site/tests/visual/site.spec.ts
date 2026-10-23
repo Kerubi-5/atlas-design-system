@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test"
 
 import { GITHUB_URL, NPM_URL } from "../../src/lib/docs.js"
+import { openStory, THEMES } from "../browser.mjs"
 import { sidebarGroups } from "../sidebar-groups.mjs"
 
 // Loads the Storybook UI itself (the screenshots only load the preview
@@ -34,6 +35,34 @@ test("the sidebar groups components by purpose", async ({ page }) => {
     sidebarGroups as string[]
   )
 })
+
+test("picker guidance links between related components", async ({ page }) => {
+  await page.goto("/?path=/docs/forms-combobox--docs")
+  const docs = page.frameLocator("#storybook-preview-iframe")
+  await docs.getByRole("link", { name: "Select", exact: true }).click()
+  await expect(page).toHaveURL(/path=\/docs\/forms-select--docs/)
+  await docs.getByRole("link", { name: "Combobox", exact: true }).click()
+  await expect(page).toHaveURL(/path=\/docs\/forms-combobox--docs/)
+  await docs.getByRole("link", { name: "SearchPicker", exact: true }).click()
+  await expect(page).toHaveURL(/path=\/docs\/forms-search-picker--docs/)
+})
+
+for (const theme of THEMES) {
+  test(`a field card toggles from its label and keyboard in ${theme}`, async ({
+    page,
+  }) => {
+    await openStory(page, "", "forms-field--selectable", theme)
+    const choice = page.getByRole("checkbox", {
+      name: "Receive the weekly digest",
+    })
+    await expect(choice).toBeChecked()
+    await page.getByText("Receive the weekly digest", { exact: true }).click()
+    await expect(choice).not.toBeChecked()
+    await choice.focus()
+    await page.keyboard.press("Space")
+    await expect(choice).toBeChecked()
+  })
+}
 
 test("links to a page's old Components/ id land on its new page", async ({
   page,

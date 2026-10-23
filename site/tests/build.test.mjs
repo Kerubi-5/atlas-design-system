@@ -327,12 +327,14 @@ test("redirects and doc cross-links point at indexed entries", async () => {
     (match) => match[1]
   )
   assert.ok(targets.length >= 3, "docs.ts maps the markdown guides")
-  const startHere = await read(siteRoot, "stories/docs/start-here.mdx")
-  targets.push(
-    ...[...startHere.matchAll(/\]\((\/(?:docs|story)\/[^)]+)\)/g)].map(
-      (match) => match[1]
+  for (const file of ["stories/docs/start-here.mdx", "src/lib/usage.ts"]) {
+    const source = await read(siteRoot, file)
+    targets.push(
+      ...[...source.matchAll(/\]\((\/(?:docs|story)\/[^)]+)\)/g)].map(
+        (match) => match[1]
+      )
     )
-  )
+  }
   for (const target of targets) {
     assert.doesNotMatch(target, /\?path=/, `${target} is a bare story path`)
     const id = storyIdFromPath(target)

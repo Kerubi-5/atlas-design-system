@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Field cards use the shared selected text and border colors in both themes.
+- Component usage pages link to related components; docs checks validate those destinations.
+
 ## 1.2.4 - 2026-10-23
 
 Restores 1.2.2 behaviour that 1.2.3 changed by accident.

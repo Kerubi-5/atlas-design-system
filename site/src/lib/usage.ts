@@ -31,7 +31,7 @@ export const usage: Record<string, string> = {
   Alert: `
 **Use for** a message about the page or a section that should stay visible: a failed save, a trial ending, a sync warning.
 
-**Not for** brief confirmations (use a toast) or field errors (use \`FieldError\` under the field).
+**Not for** brief confirmations (use [Toast](/docs/feedback-toast--docs)) or field errors (use [FieldError](/docs/forms-field--docs) under the field).
 
 **Accessibility** Destructive alerts are \`role="alert"\` and are announced; others are \`role="status"\`. Write a short title and a description that says what to do next.`,
   Avatar: `
@@ -61,7 +61,7 @@ export const usage: Record<string, string> = {
   Calendar: `
 **Use for** an always-visible month grid, such as a scheduling sidebar.
 
-**Not for** a form field (use \`DatePickerButton\`, which opens this calendar in a popover).
+**Not for** a form field (use [DatePickerButton](/docs/forms-date-picker--docs), which opens this calendar in a popover).
 
 **Accessibility** Arrow keys move between days. Day names include the visible number ("Tuesday, October 27, 2026").`,
   Card: `
@@ -91,7 +91,7 @@ export const usage: Record<string, string> = {
   Combobox: `
 **Use for** picking one value from a long or searchable list: timezones, currencies, countries. Set \`creatable\` when the search can become a new option (for example a 3-letter currency code the catalog does not have yet). Domain lists and validation stay in the app (\`normalizeCreateValue\`). Creating calls \`onValueChange\` like a selection.
 
-**Not for** short lists of a handful of options (use \`Select\`) or an always-visible filtered list (use \`SearchPicker\`). Creatable is still a picker: it does not turn Combobox into a text field.
+**Not for** short lists of a handful of options (use [Select](/docs/forms-select--docs)) or an always-visible filtered list (use [SearchPicker](/docs/forms-search-picker--docs)). Creatable is still a picker: it does not turn Combobox into a text field.
 
 **Accessibility** Name it with \`Label htmlFor={id}\` or \`aria-label\`; a combobox does not take its name from the selected value. The create row is a listbox option (\`Create "PHP"\`); Enter selects it like any other option.`,
   "Color legend": `
@@ -109,25 +109,25 @@ export const usage: Record<string, string> = {
   "Date time picker": `
 **Use for** a local date and time in one field (appointments, scheduled sends).
 
-**Not for** a date alone (use \`DatePickerButton\`) or durations.
+**Not for** a date alone (use [DatePickerButton](/docs/forms-date-picker--docs)) or durations.
 
 **Accessibility** Label the trigger with \`Label htmlFor\`; the time selects are labelled inside the popover.`,
   Dialog: `
 **Use for** a short task or confirmation that needs focus before the user continues.
 
-**Not for** messages that don't need a decision (use an \`Alert\` or toast) or long, multi-page flows.
+**Not for** messages that don't need a decision (use an [Alert](/docs/feedback-alert--docs) or [Toast](/docs/feedback-toast--docs)) or long, multi-page flows.
 
 **Accessibility** Always include \`DialogTitle\`; focus is trapped inside and returns to the trigger on close. Name confirm buttons after the action ("Delete order").`,
   "Dropdown menu": `
 **Use for** a list of commands behind a button: row actions, overflow menus, account menus.
 
-**Not for** choosing a form value (use \`Select\` or \`Combobox\`) or site navigation.
+**Not for** choosing a form value (use [Select](/docs/forms-select--docs) or [Combobox](/docs/forms-combobox--docs)) or site navigation.
 
 **Accessibility** Opens with Enter, Space, or Arrow Down; arrows move between items; typing jumps to an item. Name icon-only triggers as [Accessibility](./DESIGN_RULES.md#accessibility) says.`,
   "Empty panel": `
 **Use for** the space where a list, table, or widget will show content once there is some.
 
-**Not for** errors (use \`ErrorBoundary\` or an \`Alert\`) or loading (use \`Skeleton\`).
+**Not for** errors (use [ErrorBoundary](/docs/feedback-error-boundary--docs) or an [Alert](/docs/feedback-alert--docs)) or loading (use [Skeleton](/docs/feedback-skeleton--docs)).
 
 **Writing** Say what will appear and how to add the first item.`,
   "Error boundary": `
@@ -151,7 +151,7 @@ export const usage: Record<string, string> = {
   Input: `
 **Use for** single-line text: names, emails, search terms, numbers.
 
-**Not for** multi-line text (use \`Textarea\`) or picking from known options.
+**Not for** multi-line text (use [Textarea](/docs/forms-textarea--docs)) or picking from known options.
 
 **Accessibility** Always pair with a visible \`Label\`; a placeholder is an example, not a label. Set \`aria-invalid\` with a field error.`,
   Label: `
@@ -217,13 +217,13 @@ export const usage: Record<string, string> = {
   "Search picker": `
 **Use for** picking one item from a list that stays on the page: places, directories, long filters.
 
-**Not for** a compact popover picker (use \`Combobox\`) or a short fixed list (use \`Select\`).
+**Not for** a compact popover picker (use [Combobox](/docs/forms-combobox--docs)) or a short fixed list (use [Select](/docs/forms-select--docs)).
 
 **Accessibility** The input is \`role="combobox"\` with an always-visible listbox. Arrows, Home, End, PageUp, PageDown, Enter, and Escape move and select.`,
   Select: `
 **Use for** one value from a short, fixed list.
 
-**Not for** long or searchable lists (use \`Combobox\`) or commands (use \`DropdownMenu\`).
+**Not for** long or searchable lists (use [Combobox](/docs/forms-combobox--docs)) or commands (use [DropdownMenu](/docs/actions-dropdown-menu--docs)).
 
 **Accessibility** Label the trigger with \`Label htmlFor\`; typing a letter jumps to matching options.`,
   Separator: `
@@ -241,13 +241,13 @@ export const usage: Record<string, string> = {
   Skeleton: `
 **Use for** placeholders shaped like the content that is loading.
 
-**Not for** unknown layouts (use \`Spinner\`) or empty results (use \`EmptyPanel\`).
+**Not for** unknown layouts (use [Spinner](/docs/feedback-spinner--docs)) or empty results (use [EmptyPanel](/docs/feedback-empty-panel--docs)).
 
 **Accessibility** Mark the loading region \`aria-busy\` and announce completion when it matters.`,
   Toast: `
 **Use for** brief confirmations after an action: "Settings saved", "Order archived".
 
-**Not for** errors the user must fix or anything they need to read later (use an \`Alert\`).
+**Not for** errors the user must fix or anything they need to read later (use an [Alert](/docs/feedback-alert--docs)).
 
 **Writing** Past tense and short.
 
@@ -285,7 +285,7 @@ export const usage: Record<string, string> = {
   Textarea: `
 **Use for** multi-line text: notes, descriptions, messages. It grows with its content.
 
-**Not for** single values (use \`Input\`).
+**Not for** single values (use [Input](/docs/forms-input--docs)).
 
 **Accessibility** Pair with a visible \`Label\`; set \`aria-invalid\` with a field error.`,
   "Theme provider": `

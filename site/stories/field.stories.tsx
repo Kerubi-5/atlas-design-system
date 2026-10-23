@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { FieldStory, FormHelpersStory } from "../../stories/fields.js"
+import {
+  FieldStory,
+  FormHelpersStory,
+  SelectableFieldStory,
+} from "../../stories/fields.js"
 
 const meta = {
   title: "Forms/Field",
@@ -17,4 +21,5 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Composition: Story = { render: () => <FieldStory /> }
+export const Selectable: Story = { render: () => <SelectableFieldStory /> }
 export const FormHelpers: Story = { render: () => <FormHelpersStory /> }
