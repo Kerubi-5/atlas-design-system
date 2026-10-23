@@ -9,7 +9,6 @@ import {
   activeLinkSelector,
 } from "./internal/active-link.js"
 import type { AsChildProps } from "./internal/as-child.js"
-import { revealInline } from "./internal/reveal-inline.js"
 import { focusRing } from "./internal/styles.js"
 import {
   tabsListVariants,
@@ -17,7 +16,10 @@ import {
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
 import { useDragScroll } from "./internal/use-drag-scroll.js"
-import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
+import {
+  revealInline,
+  useHorizontalOverflow,
+} from "./internal/use-horizontal-overflow.js"
 import { cn } from "./utils.js"
 
 type Orientation = "horizontal" | "vertical"
@@ -99,20 +101,13 @@ function TabsScroller({
     })
   })
 
-  // Focus scrolling only reveals the tab's border box, so a tab at either
-  // end would leave its outset focus ring under the scroller's edge.
-  const revealFocused = React.useCallback(
-    (event: React.FocusEvent<HTMLDivElement>) => {
-      if (event.target !== event.currentTarget)
-        revealInline(event.currentTarget, event.target)
-    },
-    []
-  )
-
   return (
     <div
       ref={ref}
-      onFocus={revealFocused}
+      onFocus={(event) => {
+        if (event.target !== event.currentTarget)
+          revealInline(event.currentTarget, event.target)
+      }}
       data-slot="tabs-scroller"
       data-variant={variant}
       tabIndex={overflowing ? 0 : undefined}

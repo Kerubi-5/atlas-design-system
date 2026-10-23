@@ -12,10 +12,8 @@ import { cn } from "./utils.js"
 /**
  * Page links for long lists and tables. Links are plain anchors so the page
  * lives in the URL; pass `onClick` with `href` for client-side routing.
- * The nav fills its container (it measures that width to drop pages that no
- * longer fit, keeping the first, last and current pages while it can): place
- * its links with `className` (`justify-center`, `justify-end`) to suit the
- * layout.
+ * The nav fills its container: place its links with `className` (`justify-center`,
+ * `justify-end`, `mx-auto`) to suit the layout.
  */
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (

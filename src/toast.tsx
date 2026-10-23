@@ -136,11 +136,8 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * Close button: a 24px square inside the top-right corner. Important kit
  * utilities beat Sonner's unlayered close-button positioning and colors.
  *
- * Stacking: the toaster floats over the page, anchored to the viewport at
- * `position`, as Sonner lays it out. While the stack is collapsed, every
- * part of the toasts behind the front one is `invisible`, so their buttons
- * stay out of the tab order unseen; queued toasts beyond `visibleToasts` are
- * invisible too. Hovering or focusing the stack expands it (see `Toaster`).
+ * Stacking: the toaster floats at `position`; collapsed back toasts are
+ * `invisible`. Hovering or focusing expands it (see `Toaster`).
  *
  * Padding is asymmetric: `pl-4` matches Alert; `pr-10` clears the close
  * button. Icon-to-text is `gap-x-2.5`

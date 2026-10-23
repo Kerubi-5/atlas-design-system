@@ -83,7 +83,7 @@ export const listboxScroll = "max-h-60 overflow-y-auto"
 
 /** Options in menus and listboxes. */
 export const optionState = {
-  /** Highlight as focus moves: grey fill plus a 2px ring bar (the fill alone is 1.1:1), distinct from the checked/selected wash. */
+  /** Highlight as focus moves: grey fill plus a 2px ring bar, unlike checked. */
   focus:
     "focus:bg-accent focus:text-accent-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The same highlight for lists that track the active option in state. */

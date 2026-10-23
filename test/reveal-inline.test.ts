@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { revealInline } from "../src/internal/reveal-inline.js"
+import { revealInline } from "../src/internal/use-horizontal-overflow.js"
 
 /** A scroller 0–200px wide holding `element` at `left`–`right`, focused or not. */
 function setup(left: number, right: number, focusVisible = true) {
