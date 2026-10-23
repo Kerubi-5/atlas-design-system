@@ -41,8 +41,10 @@ const markdownComponents: Components = {
   ul: ({ children }) => (
     <ul className="list-disc space-y-1 pl-5 text-sm">{children}</ul>
   ),
-  ol: ({ children }) => (
-    <ol className="list-decimal space-y-1 pl-5 text-sm">{children}</ol>
+  ol: ({ children, start }) => (
+    <ol start={start} className="list-decimal space-y-1 pl-5 text-sm">
+      {children}
+    </ol>
   ),
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
   blockquote: ({ children }) => (

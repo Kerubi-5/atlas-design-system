@@ -87,6 +87,35 @@ async function openCombobox(user: User) {
 }
 
 describe("Combobox", () => {
+  it("keeps a selectable highlight when the open catalog shrinks or reloads", async () => {
+    const user = createUser()
+    const options = ["A", "B", "C"].map((value) => ({ value, label: value }))
+    const props = { options, onValueChange: vi.fn() }
+    const { rerender } = render(<Combobox {...props} />)
+    await user.click(screen.getByRole("combobox"))
+    const input = screen.getByRole("textbox")
+    await user.keyboard("{End}")
+
+    rerender(<Combobox {...props} options={options.slice(0, 1)} />)
+    expect(input).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getByRole("option", { name: "A" }).id
+    )
+
+    rerender(<Combobox {...props} options={[]} />)
+    expect(input).not.toHaveAttribute("aria-activedescendant")
+    await user.keyboard("{Enter}")
+    expect(props.onValueChange).not.toHaveBeenCalled()
+
+    rerender(<Combobox {...props} options={options.slice(0, 1)} />)
+    expect(input).toHaveAttribute(
+      "aria-activedescendant",
+      screen.getByRole("option", { name: "A" }).id
+    )
+    await user.keyboard("{Enter}")
+    expect(props.onValueChange).toHaveBeenCalledWith("A")
+  })
+
   it("opens and closes from the trigger", async () => {
     const user = createUser()
     render(<ComboboxHarness />)

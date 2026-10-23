@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Keep Combobox and SearchPicker keyboard selection working when their options shrink or reload.
+- Show ErrorBoundary recovery controls for falsy thrown values, including `null` and `0`.
+- Preserve ordered-list starting numbers in Markdown.
+
 ## 1.2.4 - 2026-10-23
 
 Restores 1.2.2 behaviour that 1.2.3 changed by accident.
