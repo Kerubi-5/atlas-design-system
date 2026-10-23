@@ -136,9 +136,11 @@ const toast: Toast = Object.assign(show(sonnerToast), {
  * Close button: a 24px square inside the top-right corner. Important kit
  * utilities beat Sonner's unlayered close-button positioning and colors.
  *
- * Stacking: notifications occupy normal flow in their mount area. Hidden
- * and overflow notifications take no space or keyboard stops. Hovering or
- * focusing the stack expands the visible notifications (see `Toaster`).
+ * Stacking: the toaster floats over the page, anchored to the viewport at
+ * `position`, as Sonner lays it out. While the stack is collapsed, every
+ * part of the toasts behind the front one is `invisible`, so their buttons
+ * stay out of the tab order unseen; queued toasts beyond `visibleToasts` are
+ * invisible too. Hovering or focusing the stack expands it (see `Toaster`).
  *
  * Padding is asymmetric: `pl-4` matches Alert; `pr-10` clears the close
  * button. Icon-to-text is `gap-x-2.5`
@@ -147,7 +149,7 @@ const toast: Toast = Object.assign(show(sonnerToast), {
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast: cn(
     focusRing,
-    "!relative !transform-none flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:hidden data-[expanded=false]:data-[front=false]:hidden"
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:invisible data-[expanded=false]:data-[front=false]:*:invisible"
   ),
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
@@ -211,14 +213,14 @@ const Toaster = ({
   return (
     <div
       data-slot="toaster"
-      className="min-w-0"
+      className="contents"
       onFocus={() => setFocusWithin(true)}
       onBlur={onBlur}
     >
       <Sonner
         theme={theme as SonnerProps["theme"]}
-        className="toaster group !relative !inset-auto !transform-none flex !w-full flex-col gap-3 overflow-visible p-2 data-[x-position=right]:items-end data-[x-position=center]:items-center data-[y-position=bottom]:flex-col-reverse"
-        style={{ fontFamily: "var(--font-sans)", height: "auto" }}
+        className="toaster group overflow-visible"
+        style={{ fontFamily: "var(--font-sans)" }}
         position={position}
         closeButton={closeButton}
         expand={expand || focusWithin}

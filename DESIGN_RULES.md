@@ -120,8 +120,8 @@ Primitives have square corners. Reserve `rounded-full` for dots, avatars,
 and other circles. Card and dialog titles already use
 uppercase, tracked `font-heading` styling. Toasts use the same square corners
 and Alert's left padding, with a square close button inside the top-right
-corner. Mount the toaster in its own notification area; it occupies space
-in the page so notifications do not cover content. A plain `toast()` has no icon — status icons
+corner. The toaster floats over the page at its `position`, anchored to the
+viewport; mount one near the app root. A plain `toast()` has no icon — status icons
 belong to `success`, `info`, `warning`, `error`, and `loading`. Tone colors
 the icon, title, and border, not the body.
 

@@ -15,7 +15,7 @@ export function FormFeedbackField({
   return (
     <p
       data-slot="form-feedback"
-      className={cn("border-t border-destructive pt-3", errorText, className)}
+      className={cn(errorText, className)}
       role="alert"
     >
       {message}

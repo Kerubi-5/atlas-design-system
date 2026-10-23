@@ -33,6 +33,7 @@ import {
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
+import { revealInline } from "./internal/reveal-inline.js"
 import { focusRingWithin } from "./internal/styles.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
@@ -224,6 +225,18 @@ function KanbanBoard<T extends { id: string; position: number }>({
     [cardClassName, itemById, renderCard]
   )
 
+  // Tabbing to a card in a column off to the side does not move the
+  // snapping row by itself; bring the whole card and its ring into view.
+  const revealFocusedCard = React.useCallback(
+    (event: React.FocusEvent<HTMLDivElement>) => {
+      const card = (event.target as Element).closest(
+        '[data-slot="kanban-card"]'
+      )
+      if (card) revealInline(event.currentTarget, card)
+    },
+    []
+  )
+
   // `min-w-0` lets a flex or grid parent shrink the board so the scroller,
   // not the page, overflows.
   return (
@@ -237,7 +250,7 @@ function KanbanBoard<T extends { id: string; position: number }>({
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="relative min-w-0 pb-12">
+        <div className="relative min-w-0">
           <div
             ref={scrollerRef}
             data-slot="kanban-scroller"
@@ -245,6 +258,7 @@ function KanbanBoard<T extends { id: string; position: number }>({
             data-overflow-start={overflow.start || undefined}
             data-overflow-end={overflow.end || undefined}
             onScroll={overflow.measure}
+            onFocus={revealFocusedCard}
             className={cn(
               "flex min-w-0 gap-4 overflow-x-auto pb-2",
               // AutoScroller scrolls in small steps near the edge; mandatory
@@ -654,7 +668,7 @@ function ScrollButton({
       }
       onClick={onClick}
       className={cn(
-        "absolute bottom-1 z-20",
+        "absolute top-1/2 z-20 -translate-y-1/2",
         side === "start" ? "left-1" : "right-1"
       )}
     >
