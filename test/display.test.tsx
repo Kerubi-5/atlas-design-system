@@ -36,6 +36,16 @@ describe("Badge", () => {
     expect(paid).toHaveAttribute("data-variant", "soft")
     expect(paid.className).toMatch(/bg-success\/15/)
     expect(paid.className).toMatch(/text-success/)
+    // 1.2.2 typography: 12px, medium, sentence case, normal tracking.
+    for (const token of [
+      "text-xs",
+      "font-medium",
+      "tracking-normal",
+      "normal-case",
+    ]) {
+      expect(paid.className.split(/\s+/)).toContain(token)
+    }
+    expect(paid.className.split(/\s+/)).not.toContain("uppercase")
 
     rerender(
       <Badge variant="soft" tone="warning">

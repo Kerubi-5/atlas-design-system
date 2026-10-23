@@ -96,6 +96,32 @@ describe("Toaster", () => {
     expect(close.className).not.toContain("bg-primary")
   })
 
+  it("floats the toaster at its position instead of taking page space", async () => {
+    const { container } = renderToaster({ position: "top-left" })
+    act(() => {
+      toast("Floating")
+    })
+    const item = await findToast("Floating")
+    const toaster = item.closest<HTMLElement>("[data-sonner-toaster]")!
+    expect(toaster.dataset.xPosition).toBe("left")
+    expect(toaster.dataset.yPosition).toBe("top")
+    // No kit overrides of Sonner's fixed, viewport-anchored layout.
+    for (const token of [
+      "!relative",
+      "!inset-auto",
+      "!transform-none",
+      "!w-full",
+    ]) {
+      expect(toaster.className.split(/\s+/)).not.toContain(token)
+      expect(item.className.split(/\s+/)).not.toContain(token)
+    }
+    expect(toaster.style.height).toBe("")
+    // The wrapper adds no box of its own.
+    expect(
+      container.querySelector('[data-slot="toaster"]')!.className
+    ).toContain("contents")
+  })
+
   it("adds a labelled close button unless closeButton is false", async () => {
     const user = createUser()
     const { unmount } = renderToaster()
