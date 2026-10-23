@@ -66,6 +66,8 @@
 }
 
 .markdown code {
+  overflow-wrap: anywhere;
+  white-space: normal;
   font-size: 0.8125rem;
   background: var(--muted);
   padding: 0.1rem 0.3rem;
@@ -88,8 +90,23 @@
 }
 
 .markdown pre code {
+  white-space: pre;
   background: transparent;
   padding: 0;
+}
+
+/* Autodocs descriptions also contain inline code outside DocsMarkdown. */
+.sbdocs-content :is(p, li, td) code {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+/* Keep Copy compact instead of drawing a full-width empty toolbar beside it. */
+.docblock-source > div:last-child:has(> button) {
+  width: fit-content;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
 }
 
 .markdown table {

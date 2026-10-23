@@ -15,7 +15,7 @@ import { FormControlField } from "../src/form/control-field.js"
 import { FormDatePickerField } from "../src/form/date-picker-field.js"
 import { FormDateTimePickerField } from "../src/form/date-time-picker-field.js"
 import { FormMarkdownField } from "../src/form/markdown-field.js"
-import { FieldError, type FieldMetaState } from "../src/form/field-error.js"
+import { type FieldMetaState } from "../src/form/field-error.js"
 import { FormFeedbackField } from "../src/form/feedback-field.js"
 import { focusFirstInvalid } from "../src/form/focus-first-invalid.js"
 import { FormSelectField } from "../src/form/select-field.js"
@@ -75,7 +75,9 @@ export function FieldStory() {
 
 /** Portable form helpers, including an error and form-level feedback. */
 export function FormHelpersStory() {
-  const name = useDemoField("name", "Atlas")
+  const name = useDemoField("name", "Atlas", {
+    errors: ["This name is already taken."],
+  })
   const notes = useDemoField("notes", "Use **bold** for emphasis.")
   const [currency, setCurrency] = useState("usd")
   const [date, setDate] = useState<Date | undefined>(new Date(2026, 9, 9))
@@ -112,7 +114,6 @@ export function FormHelpersStory() {
         onValueChange={setDateTime}
         placeholder="Pick a date and time"
       />
-      <FieldError message="This name is already taken." />
       <FormFeedbackField message="Could not save. Try again." />
     </div>
   )

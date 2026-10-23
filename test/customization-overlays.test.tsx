@@ -252,7 +252,7 @@ describe("SearchPicker customization", () => {
     render(<SearchPicker {...placeItems} onSelect={() => {}} label="Place" />)
     const option = screen.getByRole("option", { name: "North ward" })
     const names = classes(option)
-    expect(names.filter((name) => name === "bg-accent")).toHaveLength(1)
+    expect(names.filter((name) => name === "bg-selected")).toHaveLength(1)
   })
 })
 

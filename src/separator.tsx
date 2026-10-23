@@ -21,7 +21,7 @@ function Separator({
       decorative={decorative}
       orientation={orientation}
       className={cn(
-        "shrink-0 bg-border",
+        "shrink-0 bg-input",
         orientation === "vertical" ? "w-px self-stretch" : "h-px w-full",
         className
       )}

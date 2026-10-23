@@ -17,6 +17,15 @@ const contentTypes = {
   ".woff2": "font/woff2",
 }
 
+const hosting = JSON.parse(
+  await fs.readFile(new URL("../../vercel.json", import.meta.url), "utf8")
+)
+const securityHeaders = Object.fromEntries(
+  hosting.headers.flatMap((rule) =>
+    rule.headers.map(({ key, value }) => [key, value])
+  )
+)
+
 /** The site package, its Storybook build, and the kit repo around it. */
 export const siteRoot = fileURLToPath(new URL("../", import.meta.url))
 export const distDir = path.join(siteRoot, "dist")
@@ -25,6 +34,9 @@ export const repoRoot = path.resolve(siteRoot, "..")
 /** Serve `root` on 127.0.0.1; port 0 picks a free one. */
 export function serve(root = distDir, port = 0) {
   const server = http.createServer(async (request, response) => {
+    for (const [key, value] of Object.entries(securityHeaders)) {
+      response.setHeader(key, value)
+    }
     const url = new URL(request.url ?? "/", "http://localhost")
     let file = path.join(root, decodeURIComponent(url.pathname))
     if (!file.startsWith(root)) {

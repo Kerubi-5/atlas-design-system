@@ -1,6 +1,7 @@
 import type { ReactNode } from "react"
 
 import type { FieldErrorItem } from "../field.js"
+import { errorText } from "../internal/styles.js"
 import { cn } from "../utils.js"
 
 /** An error as TanStack Form reports it: text, or an error with a `message`. */
@@ -98,7 +99,7 @@ export function FieldError({
     <p
       id={id}
       data-slot="form-field-error"
-      className={cn("text-xs text-destructive", className)}
+      className={cn(errorText, className)}
       role="alert"
     >
       {resolved}

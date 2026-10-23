@@ -14,7 +14,7 @@ export function AvatarStory() {
         <AvatarFallback>AL</AvatarFallback>
       </Avatar>
       <Avatar>
-        <AvatarImage src="/favicon.svg" alt="Atlas" />
+        <AvatarImage src="./favicon.svg" alt="Atlas" />
         <AvatarFallback>AT</AvatarFallback>
       </Avatar>
       <Avatar size="lg">

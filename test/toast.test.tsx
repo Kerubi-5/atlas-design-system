@@ -70,7 +70,7 @@ describe("Toaster", () => {
     expect(onRetry).toHaveBeenCalled()
   })
 
-  it("draws a compact plain toast with a floating circular close badge and no icon", async () => {
+  it("draws a compact plain toast with a square close button and no icon", async () => {
     renderToaster()
     act(() => {
       toast("Saved")
@@ -81,7 +81,7 @@ describe("Toaster", () => {
     expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
     expect(item.className).toContain("rounded-none")
     expect(item.className).toContain("pl-4")
-    expect(item.className).toContain("pr-6")
+    expect(item.className).toContain("pr-10")
     expect(item.className).toContain("gap-x-2.5")
     expect(item.className).toContain("overflow-visible")
     expect(item.className).not.toContain("pr-11")
@@ -90,8 +90,8 @@ describe("Toaster", () => {
     // Popover-fill ! utilities beat Sonner's unlayered [data-button] /
     // [data-close-button] foreground square; the badge sits on the corner.
     expect(close.className).toContain("!bg-popover")
-    expect(close.className).toContain("!rounded-full")
-    expect(close.className).toContain("!-top-2")
+    expect(close.className).toContain("!rounded-none")
+    expect(close.className).toContain("!top-2")
     expect(close.className).toContain("!text-muted-foreground")
     expect(close.className).not.toContain("bg-primary")
   })

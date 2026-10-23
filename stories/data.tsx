@@ -19,8 +19,19 @@ const rows = [
 
 /** Table with a sortable header and a selected row. */
 export function TableStory() {
-  const [sorted, setSorted] = useState(true)
+  const [sortKey, setSortKey] = useState<"name" | "value">("name")
   const [direction, setDirection] = useState<"asc" | "desc">("asc")
+  const sort = (key: "name" | "value") => {
+    setDirection(sortKey === key && direction === "asc" ? "desc" : "asc")
+    setSortKey(key)
+  }
+  const sortedRows = [...rows].sort((a, b) => {
+    const comparison =
+      sortKey === "name"
+        ? a.name.localeCompare(b.name)
+        : Number(a.value) - Number(b.value)
+    return direction === "asc" ? comparison : -comparison
+  })
 
   return (
     <Table>
@@ -28,27 +39,26 @@ export function TableStory() {
       <TableHeader>
         <TableRow>
           <SortableTableHead
-            sorted={sorted}
+            sorted={sortKey === "name"}
             direction={direction}
-            onClick={() => {
-              if (!sorted) {
-                setSorted(true)
-                setDirection("asc")
-                return
-              }
-              setDirection((current) => (current === "asc" ? "desc" : "asc"))
-            }}
+            onClick={() => sort("name")}
           >
             Region
           </SortableTableHead>
-          <TableHead>Count</TableHead>
+          <SortableTableHead
+            sorted={sortKey === "value"}
+            direction={direction}
+            onClick={() => sort("value")}
+          >
+            Count
+          </SortableTableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows.map((row, index) => (
+        {sortedRows.map((row) => (
           <TableRow
             key={row.name}
-            data-state={index === 0 ? "selected" : undefined}
+            data-state={row.name === rows[0]?.name ? "selected" : undefined}
           >
             <TableCell>{row.name}</TableCell>
             <TableCell>{row.value}</TableCell>

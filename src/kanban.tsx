@@ -237,7 +237,7 @@ function KanbanBoard<T extends { id: string; position: number }>({
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
-        <div className="relative min-w-0">
+        <div className="relative min-w-0 pb-12">
           <div
             ref={scrollerRef}
             data-slot="kanban-scroller"
@@ -386,7 +386,7 @@ function KanbanColumnView({
     >
       {/* The name truncates; the count and badge wrap under it, to the
           right, once they no longer fit beside it. */}
-      <header
+      <div
         data-slot="kanban-column-header"
         className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5"
       >
@@ -410,7 +410,7 @@ function KanbanColumnView({
             </span>
           ) : null}
         </span>
-      </header>
+      </div>
       {/* `p-1` gives the card's 4px focus ring (2px ring + 2px gap) room inside
           the scroll area, which clips at its padding edge. `-m-1` pulls the
           top, bottom and left back out so the cards stay where they were; the
@@ -654,7 +654,7 @@ function ScrollButton({
       }
       onClick={onClick}
       className={cn(
-        "absolute top-1/2 z-20 -translate-y-1/2",
+        "absolute bottom-1 z-20",
         side === "start" ? "left-1" : "right-1"
       )}
     >

@@ -227,6 +227,12 @@
  * without `!`. Size and flush still set the variable on `[data-slot=card]`.
  */
 @layer components {
+  @container pagination (max-width: 36rem) {
+    [data-slot="pagination-content"]:has([aria-current="page"])
+      > li:not(:first-child):not(:last-child):not(:has([aria-current="page"])) {
+      display: none;
+    }
+  }
   [data-slot="card"] {
     padding-block: var(--card-p);
   }

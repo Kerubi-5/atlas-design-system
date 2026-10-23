@@ -164,3 +164,16 @@ export const Stacked: Story = {
     />
   ),
 }
+
+export const Queued: Story = {
+  ...preview,
+  render: () => (
+    <MountedToasts
+      run={() => {
+        for (let index = 1; index <= 4; index++) {
+          toast(`Export ${index} scheduled`, { ...keep, id: `queue-${index}` })
+        }
+      }}
+    />
+  ),
+}

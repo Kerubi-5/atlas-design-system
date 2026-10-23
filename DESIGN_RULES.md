@@ -117,11 +117,11 @@ still read normal words.
 ## Shape and composition
 
 Primitives have square corners. Reserve `rounded-full` for dots, avatars,
-other circles, and the toast close badge. Card and dialog titles already use
-uppercase, tracked `font-heading` styling. Toasts are overlay popovers with
-the same square corners and Alert's left padding. The close control is a
-circular badge centred on the top-right corner (half outside the border),
-not a control in the text row. A plain `toast()` has no icon — status icons
+and other circles. Card and dialog titles already use
+uppercase, tracked `font-heading` styling. Toasts use the same square corners
+and Alert's left padding, with a square close button inside the top-right
+corner. Mount the toaster in its own notification area; it occupies space
+in the page so notifications do not cover content. A plain `toast()` has no icon — status icons
 belong to `success`, `info`, `warning`, `error`, and `loading`. Tone colors
 the icon, title, and border, not the body.
 
@@ -146,8 +146,8 @@ toasts keep their width.
 
 Parents do not force sizes on their children. A vertical `Field` stretches
 its controls through the flex column, so a control's own width class (such
-as `w-32`) wins; `Field`, `Alert`, and `Pagination` set no width of their
-own. `FieldGroup` keeps `w-full` because its inline-size container has no
+as `w-32`) wins; `Field` and `Alert` set no width of their
+own. `FieldGroup` and `Pagination` keep `w-full` because an inline-size container has no
 intrinsic width. Size classes that `className` should be able to replace are
 plain classes picked from props (`Avatar` `size`, `Separator` orientation,
 `SelectTrigger` `size`, tab orientation), never `data-*` variants, which sort

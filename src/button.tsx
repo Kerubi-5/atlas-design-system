@@ -33,7 +33,7 @@ const buttonVariants = cva(
     disabledState,
     "group/button inline-flex shrink-0 items-center justify-center rounded-none border border-transparent bg-clip-padding",
     controlText,
-    "transition-all select-none active:not-aria-[haspopup]:translate-y-px",
+    "transition-all select-none active:not-aria-[haspopup]:translate-y-px disabled:opacity-100 disabled:saturate-0",
     inlineIcon.default,
   ],
   {

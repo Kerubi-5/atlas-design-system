@@ -14,7 +14,7 @@ import {
  * root instead, as it always has for apps building their own list.
  */
 const tabsListVariants = cva(
-  "group/tabs-list inline-flex w-max min-w-full items-stretch justify-start p-0 text-muted-foreground",
+  "group/tabs-list inline-flex w-max min-w-full items-stretch justify-start p-0 after:w-1 after:shrink-0 after:content-[''] text-muted-foreground",
   {
     variants: {
       variant: {
