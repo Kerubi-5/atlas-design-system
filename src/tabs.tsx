@@ -16,7 +16,10 @@ import {
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
 import { useDragScroll } from "./internal/use-drag-scroll.js"
-import { useHorizontalOverflow } from "./internal/use-horizontal-overflow.js"
+import {
+  revealInline,
+  useHorizontalOverflow,
+} from "./internal/use-horizontal-overflow.js"
 import { cn } from "./utils.js"
 
 type Orientation = "horizontal" | "vertical"
@@ -101,6 +104,10 @@ function TabsScroller({
   return (
     <div
       ref={ref}
+      onFocus={(event) => {
+        if (event.target !== event.currentTarget)
+          revealInline(event.currentTarget, event.target)
+      }}
       data-slot="tabs-scroller"
       data-variant={variant}
       tabIndex={overflowing ? 0 : undefined}
@@ -170,7 +177,7 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 p-2 text-sm", focusRing, className)}
+      className={cn("flex-1 text-sm", focusRing, className)}
       {...props}
     />
   )

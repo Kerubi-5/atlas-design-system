@@ -83,12 +83,12 @@ export const listboxScroll = "max-h-60 overflow-y-auto"
 
 /** Options in menus and listboxes. */
 export const optionState = {
-  /** Highlight as focus moves: the selected wash plus a 2px inset ring bar. */
+  /** Highlight as focus moves: grey fill plus a 2px ring bar, unlike checked. */
   focus:
-    "focus:bg-selected focus:text-selected-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
+    "focus:bg-accent focus:text-accent-foreground focus:shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The same highlight for lists that track the active option in state. */
   active:
-    "bg-selected text-selected-foreground shadow-[inset_2px_0_0_var(--color-ring)]",
+    "bg-accent text-accent-foreground shadow-[inset_2px_0_0_var(--color-ring)]",
   /** The chosen value (`data-state="checked"`); a check icon marks it too. */
   checked:
     "data-[state=checked]:bg-selected data-[state=checked]:text-selected-foreground",

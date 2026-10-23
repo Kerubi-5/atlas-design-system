@@ -26,3 +26,15 @@ export function useHorizontalOverflow(
 
   return overflowing
 }
+
+/** Scrolls a keyboard-focused `element` and its ring into `scroller`'s view. */
+export function revealInline(scroller: HTMLElement, element: Element) {
+  const rect = element.getBoundingClientRect()
+  const focused = scroller.ownerDocument.activeElement
+  if (!rect.width || !focused?.matches(":focus-visible")) return
+  const box = scroller.getBoundingClientRect()
+  const before = rect.left - 8 - box.left
+  const after = rect.right + 8 - box.right
+  if (before < 0) scroller.scrollLeft += before
+  else if (after > 0) scroller.scrollLeft += Math.min(after, before)
+}

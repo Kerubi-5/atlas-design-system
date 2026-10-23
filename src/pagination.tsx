@@ -20,7 +20,7 @@ function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
     <nav
       aria-label="Pagination"
       data-slot="pagination"
-      className={cn("@container/pagination flex w-full min-w-0 p-1", className)}
+      className={cn("@container/pagination flex w-full min-w-0", className)}
       {...props}
     />
   )

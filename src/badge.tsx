@@ -25,7 +25,7 @@ const badgeVariants = cva(
         ghost: "text-muted-foreground hover:text-foreground",
         link: "text-foreground underline-offset-4 hover:underline",
         /** Tinted chip; pick its color with `tone`. */
-        soft: "px-2 py-0.5",
+        soft: "px-2 py-0.5 text-xs font-medium tracking-normal normal-case",
       },
       /** Only `soft` reads this. */
       tone: {

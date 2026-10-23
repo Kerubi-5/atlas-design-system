@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { quietButtonInteraction } from "../src/button.js"
+import { Button, quietButtonInteraction } from "../src/button.js"
 import {
   ButtonVariantsStory,
   OutlineOnSelectedStory,
@@ -63,5 +63,33 @@ describe("Button quiet hover", () => {
       "text-selected-foreground",
       "ring-ring"
     )
+  })
+})
+
+describe("Button disabled", () => {
+  it("dims every variant to half opacity with no pointer or hover", () => {
+    for (const variant of [
+      "default",
+      "outline",
+      "secondary",
+      "ghost",
+      "destructive",
+      "link",
+    ] as const) {
+      const { unmount } = render(
+        <Button variant={variant} disabled>
+          {variant}
+        </Button>
+      )
+      const tokens = screen
+        .getByRole("button", { name: variant })
+        .className.split(/\s+/)
+      expect(tokens).toContain("disabled:opacity-50")
+      expect(tokens).toContain("disabled:pointer-events-none")
+      // 1.2.3 kept disabled buttons fully opaque and only desaturated them.
+      expect(tokens).not.toContain("disabled:opacity-100")
+      expect(tokens).not.toContain("disabled:saturate-0")
+      unmount()
+    }
   })
 })

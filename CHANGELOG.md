@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.2.4 - 2026-10-23
+
+Restores 1.2.2 behaviour that 1.2.3 changed by accident.
+
+- Toasts float over the page again, anchored to the viewport at the Toaster's `position`, instead of taking space where the Toaster is mounted. The square close button inside the corner stays.
+- Disabled buttons look disabled again in every variant (half opacity, no hover change).
+- Soft badges use 12px sentence-case text again.
+- Menu and listbox highlights use the grey fill again, distinct from the checked option.
+- Kanban drops the extra space under the board and keeps its scroll arrows centred on the side; form feedback drops its red top border; tab panels drop their padding.
+- Narrow pagination keeps the first and last pages and the ellipses while they fit, and shows only Previous, the current page and Next when they do not.
+- Tabbing to the last navigation tab, or to a Kanban card in a column off to the side, scrolls it into view with room for its focus ring.
+- Docs send `X-Content-Type-Options: nosniff` and a `Permissions-Policy`.
+
 ## 1.2.3 - 2026-10-23
 
 - Sort the Table demo by Region or Count in both directions. Collapse pagination on narrow containers.

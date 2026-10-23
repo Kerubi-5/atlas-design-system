@@ -161,7 +161,7 @@ function SelectItem({
         optionState.checked,
         dataDisabledState,
         inlineIcon.default,
-        "pr-8 *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "pr-8 not-data-[variant=destructive]:focus:**:text-accent-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
         className
       )}
       {...props}
