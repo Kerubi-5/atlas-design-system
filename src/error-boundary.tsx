@@ -18,9 +18,7 @@ type ErrorFallbackProps = {
 }
 
 /**
- * Presentational recovery UI used by `ErrorBoundary`: a large `EmptyPanel`
- * with the message and recovery buttons. Exported so the markup can be
- * tested without throwing during render.
+ * Recovery UI used by `ErrorBoundary`: a large `EmptyPanel` with recovery buttons.
  */
 export function ErrorFallback({
   message = "Something went wrong.",
@@ -66,21 +64,20 @@ type ErrorBoundaryProps = {
 }
 
 type ErrorBoundaryState = {
-  error: Error | null
+  hasError: boolean
 }
 
 /**
  * Generic React error boundary with retry (reset) and full-page reload.
- * Not tied to any data library.
  */
 export class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
-  state: ErrorBoundaryState = { error: null }
+  state: ErrorBoundaryState = { hasError: false }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { error }
+  static getDerivedStateFromError(): ErrorBoundaryState {
+    return { hasError: true }
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
@@ -88,7 +85,7 @@ export class ErrorBoundary extends Component<
   }
 
   retry = () => {
-    this.setState({ error: null })
+    this.setState({ hasError: false })
   }
 
   reload = () => {
@@ -96,7 +93,7 @@ export class ErrorBoundary extends Component<
   }
 
   render() {
-    if (!this.state.error) return this.props.children
+    if (!this.state.hasError) return this.props.children
 
     return (
       <ErrorFallback

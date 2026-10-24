@@ -30,6 +30,12 @@ describe("safeMarkdownUrl", () => {
 })
 
 describe("Markdown", () => {
+  it("preserves the starting number of an ordered list", () => {
+    render(<Markdown content={"5. Fifth\n6. Sixth"} />)
+    expect(screen.getByRole("list")).toHaveAttribute("start", "5")
+    expect(screen.getAllByRole("listitem")).toHaveLength(2)
+  })
+
   it("renders GFM and aliases MarkdownContent", () => {
     render(
       <Markdown
