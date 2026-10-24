@@ -60,6 +60,36 @@ function activeOptionLabel() {
 }
 
 describe("SearchPicker", () => {
+  it("keeps a selectable highlight when the catalog shrinks or reloads", () => {
+    const props = {
+      items: places,
+      getValue: getPlaceId,
+      getLabel: getPlaceName,
+      onSelect: vi.fn(),
+      label: "Place",
+    }
+    const { rerender } = render(<SearchPicker {...props} />)
+    const input = getCombobox()
+    fireEvent.keyDown(input, { key: "End" })
+    expect(activeOptionLabel()).toBe("East")
+
+    rerender(<SearchPicker {...props} items={places.slice(0, 1)} />)
+    expect(activeOptionLabel()).toBe("Niño")
+    fireEvent.keyDown(input, { key: "Enter" })
+    expect(props.onSelect).toHaveBeenLastCalledWith(places[0])
+
+    rerender(<SearchPicker {...props} items={[]} />)
+    expect(input).not.toHaveAttribute("aria-activedescendant")
+    props.onSelect.mockClear()
+    fireEvent.keyDown(input, { key: "Enter" })
+    expect(props.onSelect).not.toHaveBeenCalled()
+
+    rerender(<SearchPicker {...props} items={places.slice(0, 1)} />)
+    expect(activeOptionLabel()).toBe("Niño")
+    fireEvent.keyDown(input, { key: "Enter" })
+    expect(props.onSelect).toHaveBeenCalledWith(places[0])
+  })
+
   it("keeps the list visible and marks the selected option", () => {
     render(<PickerHarness />)
 
