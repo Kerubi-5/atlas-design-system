@@ -453,11 +453,6 @@ const handleChrome = cn(
   "bg-muted/30 px-1.5 text-muted-foreground"
 )
 
-/**
- * The grip and an openable body are separate tab stops. Each draws the
- * shared ring on itself so a keyboard user can tell which one is focused.
- * `z-10` lifts the focused stop so its sibling does not cover the ring.
- */
 const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 
 function stopClick(event: React.MouseEvent) {
@@ -504,6 +499,7 @@ function KanbanCardViewImpl<T extends { id: string }>({
         className
       )}
     >
+      {/* Each stop draws its own ring; z-10 keeps the sibling from covering it. */}
       <button
         type="button"
         ref={handleRef}
