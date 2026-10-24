@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- `KanbanBoard` (beta): the drag grip and an openable card body each show
+  their own keyboard focus ring, so the two tab stops no longer look the
+  same. The shared ring tokens and the column's 4px gutter are unchanged.
+
 ## 1.2.4 - 2026-10-23
 
 Restores 1.2.2 behaviour that 1.2.3 changed by accident.

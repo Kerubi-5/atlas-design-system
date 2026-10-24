@@ -33,7 +33,7 @@ import {
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
-import { focusRingWithin } from "./internal/styles.js"
+import { focusRing } from "./internal/styles.js"
 import { revealInline } from "./internal/use-horizontal-overflow.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
@@ -416,10 +416,10 @@ function KanbanColumnView({
           ) : null}
         </span>
       </div>
-      {/* `p-1` gives the card's 4px focus ring (2px ring + 2px gap) room inside
-          the scroll area, which clips at its padding edge. `-m-1` pulls the
-          top, bottom and left back out so the cards stay where they were; the
-          right keeps its 4px gutter. */}
+      {/* `p-1` gives the focused stop's 4px ring (2px ring + 2px gap) room
+          inside the scroll area, which clips at its padding edge. `-m-1`
+          pulls the top, bottom and left back out so the cards stay where
+          they were; the right keeps its 4px gutter. */}
       <div className="-m-1 mr-0 flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto p-1">
         {loading ? (
           <>
@@ -452,6 +452,13 @@ const handleChrome = cn(
   "flex shrink-0 items-center self-stretch border-r border-border",
   "bg-muted/30 px-1.5 text-muted-foreground"
 )
+
+/**
+ * The grip and an openable body are separate tab stops. Each draws the
+ * shared ring on itself so a keyboard user can tell which one is focused.
+ * `z-10` lifts the focused stop so its sibling does not cover the ring.
+ */
+const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 
 function stopClick(event: React.MouseEvent) {
   event.stopPropagation()
@@ -493,8 +500,6 @@ function KanbanCardViewImpl<T extends { id: string }>({
         "shadow-sm transition-[box-shadow,opacity,border-color]",
         // The overlay moves; the source keeps its slot.
         "data-dragging:pointer-events-none data-dragging:invisible",
-        // One ring on the card for the grip and the body alike.
-        focusRingWithin,
         onCardClick && "hover:border-foreground/15",
         className
       )}
@@ -507,7 +512,8 @@ function KanbanCardViewImpl<T extends { id: string }>({
         onClick={stopClick}
         className={cn(
           handleChrome,
-          "cursor-grab outline-none hover:bg-muted/50 active:cursor-grabbing"
+          stopFocus,
+          "cursor-grab hover:bg-muted/50 active:cursor-grabbing"
         )}
       >
         <GripVertical className="size-4" aria-hidden />
@@ -517,7 +523,10 @@ function KanbanCardViewImpl<T extends { id: string }>({
           type="button"
           data-slot="kanban-card-body"
           onClick={() => onCardClick(item)}
-          className="min-w-0 flex-1 cursor-pointer p-3 text-left outline-none hover:bg-muted/20"
+          className={cn(
+            "min-w-0 flex-1 cursor-pointer p-3 text-left hover:bg-muted/20",
+            stopFocus
+          )}
         >
           {children}
         </button>
