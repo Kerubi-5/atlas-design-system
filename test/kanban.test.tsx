@@ -23,7 +23,7 @@ import {
   KanbanSkeleton,
 } from "../src/kanban.js"
 
-import { createUser, render, screen, within } from "./helpers.js"
+import { classes, createUser, render, screen, slot, within } from "./helpers.js"
 
 type Card = { id: string; position: number; title: string; stage: string }
 
@@ -76,6 +76,24 @@ describe("KanbanBoard", () => {
     expect(within(doing!).getByText("$1,200")).toBeInTheDocument()
     expect(within(done!).getByText("Nothing finished")).toBeVisible()
     expect(within(todo!).getByText("Drop a card")).toHaveClass("hidden")
+  })
+
+  it("puts the keyboard focus ring on the focused stop, not the whole card", () => {
+    renderBoard({ onCardClick: vi.fn() })
+
+    const card = slot("kanban-card")
+    const grip = slot("kanban-card-handle")
+    const body = slot("kanban-card-body")
+
+    // Failed while both stops used `focusRingWithin` on the card: a keyboard
+    // user could not tell the grip from the body. Each stop now carries the
+    // shared `focusRing` hook.
+    expect(classes(card)).not.toContain("has-focus-visible:ring-2")
+    expect(classes(card)).not.toContain("has-focus-visible:ring-ring")
+    expect(classes(grip)).toContain("focus-visible:ring-2")
+    expect(classes(grip)).toContain("focus-visible:ring-ring")
+    expect(classes(body)).toContain("focus-visible:ring-2")
+    expect(classes(body)).toContain("focus-visible:ring-ring")
   })
 
   it("opens a card from its body and keeps the grip separate", async () => {

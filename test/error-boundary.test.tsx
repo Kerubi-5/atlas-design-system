@@ -59,6 +59,31 @@ describe("ErrorFallback", () => {
 })
 
 describe("ErrorBoundary", () => {
+  it.each([null, undefined, false, 0, ""])(
+    "shows recovery UI and can retry after a child throws %s",
+    async (value) => {
+      const user = createUser()
+      vi.spyOn(console, "error").mockImplementation(() => {})
+      let explode = true
+      function Child() {
+        if (explode) throw value
+        return <p>Recovered</p>
+      }
+      const onError = vi.fn()
+      render(
+        <ErrorBoundary onError={onError}>
+          <Child />
+        </ErrorBoundary>
+      )
+      expect(screen.getByRole("alert")).toBeInTheDocument()
+      expect(onError).toHaveBeenCalled()
+      expect(onError.mock.calls[0]?.[0]).toBe(value)
+      explode = false
+      await user.click(screen.getByRole("button", { name: "Try again" }))
+      expect(screen.getByText("Recovered")).toBeInTheDocument()
+    }
+  )
+
   it("catches a thrown child, renders the fallback, and retries", async () => {
     const user = createUser()
     const onError = vi.fn()

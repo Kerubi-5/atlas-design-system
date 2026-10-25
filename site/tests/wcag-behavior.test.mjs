@@ -19,8 +19,6 @@ import {
 const MAX_TABS = 40
 const TEXT_SPACING =
   "* { line-height: 1.5 !important; letter-spacing: 0.12em !important; word-spacing: 0.16em !important; } p { margin-bottom: 2em !important; }"
-// Kanban cards ring the whole card while the grip has focus.
-const RING_ON_PARENT = new Set(["kanban-card-handle"])
 
 function describe(element) {
   const slot = element.getAttribute("data-slot")
@@ -31,57 +29,52 @@ function describe(element) {
 }
 
 /** Tab through the story and report controls without a visible focus cue. */
-async function focusProblems(page, label, { forced, ringOnParent }) {
+async function focusProblems(page, label, { forced }) {
   await page.evaluate(() => document.activeElement?.blur())
   const seen = new Set()
   const problems = []
   for (let i = 0; i < MAX_TABS; i += 1) {
     await page.keyboard.press("Tab")
-    const result = await page.evaluate(
-      ({ describeSource, ringOnParent }) => {
-        const describe = new Function(`return ${describeSource}`)()
-        const element = document.activeElement
-        if (!element || element === document.body) return null
-        const inStory =
-          document.querySelector("#storybook-root").contains(element) ||
-          element.closest(
-            "[data-radix-popper-content-wrapper],[role=dialog],[data-sonner-toaster]"
-          )
-        if (!inStory) return null
-        const style = getComputedStyle(element)
-        const outline =
-          style.outlineStyle !== "none" &&
-          parseFloat(style.outlineWidth) > 0 &&
-          !/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(style.outlineColor)
-        const ring =
-          style.boxShadow !== "none" ||
-          ringOnParent.includes(element.getAttribute("data-slot"))
-        const bounds = element.getBoundingClientRect()
-        const x = Math.min(
-          Math.max(bounds.left + bounds.width / 2, 0),
-          innerWidth - 1
+    const result = await page.evaluate((describeSource) => {
+      const describe = new Function(`return ${describeSource}`)()
+      const element = document.activeElement
+      if (!element || element === document.body) return null
+      const inStory =
+        document.querySelector("#storybook-root").contains(element) ||
+        element.closest(
+          "[data-radix-popper-content-wrapper],[role=dialog],[data-sonner-toaster]"
         )
-        const y = Math.min(
-          Math.max(bounds.top + bounds.height / 2, 0),
-          innerHeight - 1
-        )
-        const hit = document.elementFromPoint(x, y)
-        const covered =
-          bounds.width > 0 &&
-          hit &&
-          !element.contains(hit) &&
-          !hit.contains(element) &&
-          !(element.labels && [...element.labels].some((l) => l.contains(hit)))
-        return {
-          key: `${describe(element)}@${Math.round(bounds.left)},${Math.round(bounds.top)}`,
-          what: describe(element),
-          outline,
-          ring,
-          covered: covered ? describe(hit) : null,
-        }
-      },
-      { describeSource: describe.toString(), ringOnParent: [...ringOnParent] }
-    )
+      if (!inStory) return null
+      const style = getComputedStyle(element)
+      const outline =
+        style.outlineStyle !== "none" &&
+        parseFloat(style.outlineWidth) > 0 &&
+        !/rgba\(\d+, \d+, \d+, 0\)|transparent/.test(style.outlineColor)
+      const ring = style.boxShadow !== "none"
+      const bounds = element.getBoundingClientRect()
+      const x = Math.min(
+        Math.max(bounds.left + bounds.width / 2, 0),
+        innerWidth - 1
+      )
+      const y = Math.min(
+        Math.max(bounds.top + bounds.height / 2, 0),
+        innerHeight - 1
+      )
+      const hit = document.elementFromPoint(x, y)
+      const covered =
+        bounds.width > 0 &&
+        hit &&
+        !element.contains(hit) &&
+        !hit.contains(element) &&
+        !(element.labels && [...element.labels].some((l) => l.contains(hit)))
+      return {
+        key: `${describe(element)}@${Math.round(bounds.left)},${Math.round(bounds.top)}`,
+        what: describe(element),
+        outline,
+        ring,
+        covered: covered ? describe(hit) : null,
+      }
+    }, describe.toString())
     if (!result || seen.has(result.key)) break
     seen.add(result.key)
     // Forced colors drop box-shadow, so only an outline shows there.
@@ -105,7 +98,6 @@ async function auditStory(browser, baseUrl, entry) {
       problems.push(
         ...(await focusProblems(page, `${entry.id} [${theme}]`, {
           forced: false,
-          ringOnParent: RING_ON_PARENT,
         }))
       )
     }
@@ -114,7 +106,6 @@ async function auditStory(browser, baseUrl, entry) {
     problems.push(
       ...(await focusProblems(page, `${entry.id} [forced colors]`, {
         forced: true,
-        ringOnParent: RING_ON_PARENT,
       }))
     )
     await page.emulateMedia({ forcedColors: "none" })

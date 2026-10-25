@@ -56,6 +56,12 @@ export function KanbanStory() {
     setDeals((current) => current.filter((d) => d.id !== id))
   }, [])
 
+  // Apps open a dialog here. Passing the handler makes the body a button,
+  // so Tab has two stops: the grip, then the card.
+  const openDeal = React.useCallback(() => {
+    return undefined
+  }, [])
+
   return (
     <KanbanBoard
       aria-label="Deals"
@@ -63,6 +69,7 @@ export function KanbanStory() {
       items={deals}
       getColumnId={getColumnId}
       onMove={moveDeal}
+      onCardClick={openDeal}
       onDelete={removeDeal}
       renderCard={renderCard}
       emptyLabel="No deals here"

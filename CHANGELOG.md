@@ -5,6 +5,18 @@
 - Field cards use the shared selected text and border colors in both themes.
 - Component usage pages link to related components; docs checks validate those destinations.
 
+## 1.2.5 - 2026-10-25
+
+Bug fixes. No public props, exports or tokens change; apps only need to
+bump the package.
+
+- Keep Combobox and SearchPicker keyboard selection working when their options shrink or reload.
+- Show ErrorBoundary recovery controls for falsy thrown values, including `null` and `0`.
+- Preserve ordered-list starting numbers in Markdown.
+- `KanbanBoard` (beta): the drag grip and an openable card body each show
+  their own keyboard focus ring, so the two tab stops no longer look the
+  same. The shared ring tokens and the column's 4px gutter are unchanged.
+
 ## 1.2.4 - 2026-10-23
 
 Restores 1.2.2 behaviour that 1.2.3 changed by accident.

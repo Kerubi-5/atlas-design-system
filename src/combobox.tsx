@@ -7,6 +7,7 @@ import { Button } from "./button.js"
 import { Input } from "./input.js"
 import { formControlTriggerClassName } from "./internal/form-control.js"
 import { handleListboxKey } from "./internal/listbox-navigation.js"
+import { clamp } from "./internal/math.js"
 import {
   Listbox,
   ListboxEmptyStatus,
@@ -161,7 +162,7 @@ export function Combobox({
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [query, setQuery] = React.useState("")
-  const [highlight, setHighlight] = React.useState(0)
+  const [highlightIndex, setHighlight] = React.useState(0)
   const listId = React.useId()
   const generatedId = React.useId()
   const triggerId = id ?? generatedId
@@ -202,6 +203,7 @@ export function Combobox({
       : null
   }, [creatable, query, existingValues, normalizeCreateValue, createLabel])
   const list = createOption ? [...filtered, createOption] : filtered
+  const highlight = clamp(highlightIndex, 0, Math.max(0, list.length - 1))
 
   const onOpenChange = (next: boolean) => {
     setOpen(next)

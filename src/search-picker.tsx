@@ -5,6 +5,7 @@ import * as React from "react"
 import { Input } from "./input.js"
 import { Label } from "./label.js"
 import { handleListboxKey } from "./internal/listbox-navigation.js"
+import { clamp } from "./internal/math.js"
 import {
   Listbox,
   ListboxEmptyStatus,
@@ -115,11 +116,10 @@ function SearchPicker<T>({
     [filtered, getValue]
   )
 
-  const [highlight, setHighlight] = React.useState(selectedIndex)
+  const [highlightIndex, setHighlight] = React.useState(selectedIndex)
+  const highlight = clamp(highlightIndex, 0, Math.max(0, filtered.length - 1))
 
-  // Reset the highlight while rendering, not in an effect, when the query or
-  // the selected row changes: an effect commits every keystroke twice, once
-  // with the stale highlight and again with the reset.
+  // Reset during render so a query or selection change commits only once.
   const [highlightFor, setHighlightFor] = React.useState({
     query,
     selectedIndex,
