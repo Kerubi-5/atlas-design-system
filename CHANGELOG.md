@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 1.2.5 - 2026-10-25
+
+Bug fixes. No public props, exports or tokens change; apps only need to
+bump the package.
 
 - Keep Combobox and SearchPicker keyboard selection working when their options shrink or reload.
 - Show ErrorBoundary recovery controls for falsy thrown values, including `null` and `0`.
