@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Field cards use the shared selected text and border colors in both themes.
+- Component usage pages link to related components; docs checks validate those destinations.
+
 ## 1.2.5 - 2026-10-25
 
 Bug fixes. No public props, exports or tokens change; apps only need to

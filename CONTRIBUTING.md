@@ -62,8 +62,8 @@ CI still fails the pull request.
    corners, `"use client"` when it uses hooks or handlers. Build on Radix
    primitives from `radix-ui` when one exists. Take focus, invalid,
    disabled, field, selected, and option states from
-   `src/internal/styles.ts` instead of typing the classes;
-   `test/dry.test.ts` fails on a retyped state.
+   [shared state styles](./src/internal/styles.ts) instead of typing the classes;
+   the [DRY checks](./test/dry.test.ts) fail on a retyped state.
 2. An export in `package.json`; `test/artifact.test.ts` fails when a module
    in `src/` has none.
 3. A shared example in `stories/` and a Storybook file in `site/stories/`
@@ -97,16 +97,18 @@ check. If screenshots change on purpose, run `npm run test:visual:update
 Files stay flat, so every import path is `atlas-react-kit/<name>`, but
 imports follow layers, bottom to top:
 
-- **Helpers**: `utils.ts` and `src/internal/` (shared classes and hooks).
+- **Helpers**: [utils](./src/utils.ts) and `src/internal/` (shared classes and hooks).
 - **Components**: the top-level modules. A component may build on others
-  (`Combobox` uses `Button`, `Input`, and `Popover`; `DatePickerButton`
-  uses `Calendar`).
+  ([Combobox](./src/combobox.tsx) uses `Button`, `Input`, and `Popover`;
+  [PickerShell](./src/picker-shell.tsx) composes the calendar for both date pickers).
 - **Adapters**: `src/form/` (form-library fields) and `src/next/`
-  (framework links).
+  (framework links). The [form shell](./src/form/field-shell.tsx) owns label,
+  hint, and error wiring; [Next NavLink](./src/next/nav-link.tsx) delegates to
+  the core navigation component.
 
 Imports point down or sideways, never up, and never in a cycle, so apps can
-use any component without pulling in an adapter. `test/layers.test.ts`
-checks this.
+use any component without pulling in an adapter. The [layer checks](./test/layers.test.ts)
+enforce this direction and reject import cycles.
 
 ## Change a component or token
 

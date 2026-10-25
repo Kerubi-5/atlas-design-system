@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 import { Button } from "../src/button.js"
+import { Checkbox } from "../src/checkbox.js"
 import { Input } from "../src/input.js"
 import { Label } from "../src/label.js"
 import { Textarea } from "../src/textarea.js"
@@ -70,6 +71,22 @@ export function FieldStory() {
         <FieldDescription>Who receives the digest.</FieldDescription>
       </Field>
     </FieldGroup>
+  )
+}
+
+/** A whole field card acts as the checkbox's label. */
+export function SelectableFieldStory() {
+  return (
+    <FieldLabel htmlFor="digest-card">
+      <Field orientation="horizontal">
+        <Checkbox
+          id="digest-card"
+          aria-labelledby="digest-card-label"
+          defaultChecked
+        />
+        <span id="digest-card-label">Receive the weekly digest</span>
+      </Field>
+    </FieldLabel>
   )
 }
 

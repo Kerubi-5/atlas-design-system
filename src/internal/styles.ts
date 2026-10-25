@@ -38,6 +38,8 @@ export const fieldSurface =
  * the wash alone is 1.2:1 against the page. One string per state attribute.
  */
 export const selectedState = {
+  checkedWithin:
+    "has-data-checked:border-selected-foreground has-data-checked:bg-selected has-data-checked:text-selected-foreground",
   /**
    * Toggle and ToggleGroupItem. Radix Toggle sets `data-state=on` and
    * `aria-pressed`; group items always set `data-state=on`, add
