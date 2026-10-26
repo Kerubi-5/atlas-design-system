@@ -146,7 +146,7 @@ const toast: Toast = Object.assign(show(sonnerToast), {
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast: cn(
     focusRing,
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:invisible data-[expanded=false]:data-[front=false]:*:invisible"
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] max-[600px]:!w-full flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:invisible data-[expanded=false]:data-[front=false]:*:invisible"
   ),
   // Fills the row beside the icon, so action buttons wrap to their own row
   // (aligned right by the toast's justify-end). Without an icon the basis
@@ -216,8 +216,14 @@ const Toaster = ({
     >
       <Sonner
         theme={theme as SonnerProps["theme"]}
-        className="toaster group overflow-visible"
-        style={{ fontFamily: "var(--font-sans)" }}
+        className="toaster group overflow-visible !max-w-[calc(100vw-2rem)]"
+        style={{
+          fontFamily: "var(--font-sans)",
+          // Sonner's mobile rule is width:100% with a 16px inset, so the
+          // list extends 16px past a 390px viewport. Clamp to that inset
+          // on both sides; the toast item already uses the same max.
+          maxWidth: "calc(100vw - 2rem)",
+        }}
         position={position}
         closeButton={closeButton}
         expand={expand || focusWithin}

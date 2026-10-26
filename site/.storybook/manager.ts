@@ -4,6 +4,7 @@ import { addons, types } from "storybook/manager-api"
 import { create } from "storybook/theming"
 
 import { GITHUB_URL, NPM_URL } from "../src/lib/docs.js"
+import { MANAGER_MUTED } from "../src/lib/manager-theme.js"
 
 const KIT_TITLE = "Atlas React Kit"
 
@@ -116,6 +117,13 @@ if (typeof window !== "undefined") {
   redirectMovedPage().catch(() => {})
 }
 
+/**
+ * Storybook paints sidebar shortcut hints with `textMutedColor` (and, in
+ * light, `theme.color.dark`). The default light muted is 2.75:1 on
+ * #ecf2f9; MANAGER_MUTED is 4.5:1 on that sidebar and on dark chrome.
+ * A stylesheet covers hints that ignore the theme token (search `code`,
+ * aria-hidden keycaps).
+ */
 addons.setConfig({
   theme: create({
     base: "light",
@@ -124,8 +132,26 @@ addons.setConfig({
     brandTarget: "_self",
     colorPrimary: "#7c3aed",
     colorSecondary: "#7c3aed",
+    textMutedColor: MANAGER_MUTED.light,
+    barTextColor: MANAGER_MUTED.light,
   }),
 })
+
+if (typeof document !== "undefined") {
+  const style = document.createElement("style")
+  style.dataset.atlas = "manager-muted"
+  style.textContent = `
+    .sidebar-container .search-field code,
+    .sidebar-container .search-field span[aria-hidden="true"] {
+      color: ${MANAGER_MUTED.light} !important;
+    }
+    html.dark .sidebar-container .search-field code,
+    html.dark .sidebar-container .search-field span[aria-hidden="true"] {
+      color: ${MANAGER_MUTED.dark} !important;
+    }
+  `
+  document.head.append(style)
+}
 
 /** Source and package links, kept on the right of the canvas toolbar. */
 const links = [

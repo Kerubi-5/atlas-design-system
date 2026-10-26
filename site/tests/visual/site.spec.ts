@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test"
 
 import { GITHUB_URL, NPM_URL } from "../../src/lib/docs.js"
+import { MANAGER_MUTED, MANAGER_MUTED_ON } from "../../src/lib/manager-theme.js"
 import { openStory, THEMES } from "../browser.mjs"
+import { contrastRatio, hexRgb } from "../contrast.mjs"
 import { sidebarGroups } from "../sidebar-groups.mjs"
 
 // Loads the Storybook UI itself (the screenshots only load the preview
@@ -27,6 +29,60 @@ test("the README page links to GitHub and npm", async ({ page }) => {
   await expect(
     docs.getByRole("link", { name: "npm", exact: true })
   ).toHaveAttribute("href", NPM_URL)
+})
+
+test("sidebar shortcut hints meet 4.5:1 in light and dark story themes", async ({
+  page,
+}) => {
+  for (const theme of THEMES) {
+    await page.goto(
+      `/?path=/story/actions-button--playground&globals=theme:${theme}`
+    )
+    const hint = page
+      .locator(".sidebar-container .search-field code")
+      .or(
+        page
+          .locator(".sidebar-container span[aria-hidden='true']")
+          .filter({ hasText: /[⌘⌃⌥⇧]|Ctrl|Cmd|Alt|Shift|\b[A-Z]\b/ })
+      )
+      .first()
+    await expect(hint, `shortcut hint in ${theme}`).toBeVisible()
+    const ratio = await hint.evaluate((element) => {
+      const parse = (color: string) => {
+        const match = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/)
+        return match
+          ? [Number(match[1]), Number(match[2]), Number(match[3])]
+          : null
+      }
+      const color = parse(getComputedStyle(element).color)
+      let node: HTMLElement | null = element
+      let background: number[] | null = null
+      while (node && !background) {
+        const raw = getComputedStyle(node).backgroundColor
+        const rgb = parse(raw)
+        const alpha = /rgba\(/.test(raw)
+          ? Number(raw.split(",")[3])
+          : rgb
+            ? 1
+            : 0
+        if (rgb && alpha >= 1) background = rgb
+        node = node.parentElement
+      }
+      return { color, background }
+    })
+    expect(ratio.color, `shortcut color in ${theme}`).toBeTruthy()
+    expect(ratio.background, `shortcut background in ${theme}`).toBeTruthy()
+    expect(
+      contrastRatio(ratio.color!, ratio.background!),
+      `shortcut contrast in ${theme}`
+    ).toBeGreaterThanOrEqual(4.5)
+    expect(
+      contrastRatio(hexRgb(MANAGER_MUTED.light), hexRgb(MANAGER_MUTED_ON.light))
+    ).toBeGreaterThanOrEqual(4.5)
+    expect(
+      contrastRatio(hexRgb(MANAGER_MUTED.dark), hexRgb(MANAGER_MUTED_ON.dark))
+    ).toBeGreaterThanOrEqual(4.5)
+  }
 })
 
 test("the sidebar groups components by purpose", async ({ page }) => {

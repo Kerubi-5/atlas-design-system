@@ -79,6 +79,7 @@ describe("Toaster", () => {
     expect(item.querySelector("[data-icon]")).toBeNull()
     expect(item.className).toContain("w-max")
     expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
+    expect(item.className).toContain("max-[600px]:!w-full")
     expect(item.className).toContain("rounded-none")
     expect(item.className).toContain("pl-4")
     expect(item.className).toContain("pr-10")
@@ -116,6 +117,11 @@ describe("Toaster", () => {
       expect(item.className.split(/\s+/)).not.toContain(token)
     }
     expect(toaster.style.height).toBe("")
+    // Narrow viewports: Sonner's list is width:100% plus a 16px inset.
+    expect(toaster.style.maxWidth).toBe("calc(100vw - 2rem)")
+    expect(toaster.className.split(/\s+/)).toContain(
+      "!max-w-[calc(100vw-2rem)]"
+    )
     // The wrapper adds no box of its own.
     expect(
       container.querySelector('[data-slot="toaster"]')!.className

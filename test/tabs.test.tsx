@@ -341,6 +341,14 @@ describe("tab trigger padding", () => {
     expect(classes.some((token) => /last-child/.test(token))).toBe(false)
   })
 
+  it("drops vertical padding so the 16px label fits the h-7 row", () => {
+    const classes = tabsTriggerVariants().split(/\s+/)
+    expect(classes).toContain("h-full")
+    expect(classes).toContain("py-0")
+    expect(classes).not.toContain("py-1.5")
+    expect(classes).toContain('group-data-[orientation="vertical"]/tabs:py-2')
+  })
+
   it("keeps that padding on every Settings link and trigger", () => {
     render(<TabsNavStory />)
     const links = screen.getAllByRole("link")
