@@ -8,7 +8,8 @@
   the 28px `h-7` row (the scroller stays `h-9` to match `Button` `size="sm"`).
 - Storybook sidebar shortcut hints meet 4.5:1 contrast in light and dark.
 - The toaster list stays inside the viewport on narrow screens
-  (`max-width: calc(100vw - 2rem)`).
+  (`max-width: calc(100vw - 2rem)`). The whole-kit size budget is 71.6 kB
+  for that clamp.
 
 ## 1.2.5 - 2026-10-25
 

@@ -216,12 +216,9 @@ const Toaster = ({
     >
       <Sonner
         theme={theme as SonnerProps["theme"]}
-        className="toaster group overflow-visible !max-w-[calc(100vw-2rem)]"
+        className="toaster group overflow-visible"
         style={{
           fontFamily: "var(--font-sans)",
-          // Sonner's mobile rule is width:100% with a 16px inset, so the
-          // list extends 16px past a 390px viewport. Clamp to that inset
-          // on both sides; the toast item already uses the same max.
           maxWidth: "calc(100vw - 2rem)",
         }}
         position={position}

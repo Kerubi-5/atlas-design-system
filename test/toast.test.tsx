@@ -119,9 +119,6 @@ describe("Toaster", () => {
     expect(toaster.style.height).toBe("")
     // Narrow viewports: Sonner's list is width:100% plus a 16px inset.
     expect(toaster.style.maxWidth).toBe("calc(100vw - 2rem)")
-    expect(toaster.className.split(/\s+/)).toContain(
-      "!max-w-[calc(100vw-2rem)]"
-    )
     // The wrapper adds no box of its own.
     expect(
       container.querySelector('[data-slot="toaster"]')!.className
