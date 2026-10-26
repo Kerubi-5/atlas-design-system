@@ -223,11 +223,14 @@ for (const theme of THEMES) {
   }) => {
     await page.setViewportSize(PHONE)
     await openStory(page, "", "feedback-toast--long-text", theme)
-    const toaster = page.locator("[data-sonner-toaster]")
-    await expect(toaster).toBeVisible()
-    const box = (await toaster.boundingBox())!
+    await expect(page.locator("[data-sonner-toast]")).toBeVisible()
+    // The list itself is often `visibility: hidden` in Sonner; measure the box.
+    const box = await page.locator("[data-sonner-toaster]").evaluate((el) => {
+      const rect = el.getBoundingClientRect()
+      return { x: rect.x, right: rect.right }
+    })
     expect(box.x).toBeGreaterThanOrEqual(0)
-    expect(box.x + box.width).toBeLessThanOrEqual(PHONE.width)
+    expect(box.right).toBeLessThanOrEqual(PHONE.width)
   })
   test(`disabled buttons look disabled in every variant ${theme}`, async ({
     page,

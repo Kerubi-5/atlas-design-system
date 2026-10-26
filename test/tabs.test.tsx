@@ -347,6 +347,13 @@ describe("tab trigger padding", () => {
     expect(classes).toContain("py-0")
     expect(classes).not.toContain("py-1.5")
     expect(classes).toContain('group-data-[orientation="vertical"]/tabs:py-2')
+    // The line bar stays inside the trigger; hanging it overflowed the row.
+    expect(classes).toContain(
+      'group-data-[orientation="horizontal"]/tabs:after:bottom-0'
+    )
+    expect(classes).not.toContain(
+      'group-data-[orientation="horizontal"]/tabs:after:bottom-[-5px]'
+    )
   })
 
   it("keeps that padding on every Settings link and trigger", () => {

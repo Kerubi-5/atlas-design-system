@@ -4,8 +4,9 @@
 
 - Field cards use the shared selected text and border colors in both themes.
 - Component usage pages link to related components; docs checks validate those destinations.
-- TabsNav and TabsList triggers drop vertical padding so the 16px label fits
-  the 28px `h-7` row (the scroller stays `h-9` to match `Button` `size="sm"`).
+- TabsNav and TabsList triggers drop vertical padding and keep the line bar
+  inside the row so the 16px label fits the 28px `h-7` list (the scroller
+  stays `h-9` to match `Button` `size="sm"`).
 - Storybook sidebar shortcut hints meet 4.5:1 contrast in light and dark.
 - The toaster list stays inside the viewport on narrow screens
   (`max-width: calc(100vw - 2rem)`). The whole-kit size budget is 71.6 kB

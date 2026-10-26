@@ -81,7 +81,9 @@ const tabsTriggerVariants = cva([
   inlineIcon.default,
   'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:border-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state="active"]:bg-transparent',
   selectedState.active,
-  'after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation="horizontal"]/tabs:after:inset-x-0 group-data-[orientation="horizontal"]/tabs:after:bottom-[-5px] group-data-[orientation="horizontal"]/tabs:after:h-0.5 group-data-[orientation="vertical"]/tabs:after:inset-y-0 group-data-[orientation="vertical"]/tabs:after:-right-1 group-data-[orientation="vertical"]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state="active"]:after:opacity-100',
+  // The line-variant bar stays inside the trigger. Hanging it at
+  // bottom-[-5px] made the 28px list's scrollHeight 32 even with py-0.
+  'after:absolute after:bg-foreground after:opacity-0 after:transition-opacity group-data-[orientation="horizontal"]/tabs:after:inset-x-0 group-data-[orientation="horizontal"]/tabs:after:bottom-0 group-data-[orientation="horizontal"]/tabs:after:h-0.5 group-data-[orientation="vertical"]/tabs:after:inset-y-0 group-data-[orientation="vertical"]/tabs:after:right-0 group-data-[orientation="vertical"]/tabs:after:w-0.5 group-data-[variant=line]/tabs-list:data-[state="active"]:after:opacity-100',
 ])
 
 export { tabsListVariants, tabsScrollerVariants, tabsTriggerVariants }

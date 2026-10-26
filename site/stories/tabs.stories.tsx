@@ -53,7 +53,7 @@ export const Nav: Story = {
     docs: {
       description: {
         story:
-          "The row is `h-7` (28px) to match Button `sm`. Links use `py-0` so the 16px label fits that row.",
+          "The row is `h-7` (28px) to match Button `sm`. Links use `py-0` and keep the line bar inside the trigger so the 16px label fits that row.",
       },
     },
   },
