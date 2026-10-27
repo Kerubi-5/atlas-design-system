@@ -13,6 +13,9 @@ describe("accessible names", () => {
         locale={{ code: "en-US" }}
         defaultMonth={new Date(2026, 9, 1)}
         selected={new Date(2026, 9, 9)}
+        // Pin "today" so 27 Oct keeps the documented name instead of
+        // "Today, Tuesday, October 27, 2026" when the suite runs on that date.
+        today={new Date(2026, 0, 1)}
       />
     )
     expect(
