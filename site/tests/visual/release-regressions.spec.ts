@@ -1,5 +1,12 @@
 import { expect, test } from "@playwright/test"
-import { THEMES, openStory, settle, storyRoot, storyUrl } from "../browser.mjs"
+import {
+  PHONE,
+  THEMES,
+  openStory,
+  settle,
+  storyRoot,
+  storyUrl,
+} from "../browser.mjs"
 
 test("docs serve security headers and their preview favicon", async ({
   page,
@@ -188,6 +195,13 @@ for (const theme of THEMES) {
         .locator("[data-sonner-toaster]")
         .evaluate((e) => getComputedStyle(e).fontFamily)
     ).toContain("IBM Plex Sans")
+    const toasterBox = (await page
+      .locator("[data-sonner-toaster]")
+      .boundingBox())!
+    expect(toasterBox.x).toBeGreaterThanOrEqual(0)
+    expect(toasterBox.x + toasterBox.width).toBeLessThanOrEqual(
+      page.viewportSize()!.width
+    )
     await page.keyboard.press("Tab")
     await toast.focus()
     await expect
@@ -203,6 +217,20 @@ for (const theme of THEMES) {
       .click()
     await expect(page.getByText("Export 1 scheduled")).toBeVisible()
     await expect(page.locator("[data-sonner-toast]:visible")).toHaveCount(3)
+  })
+  test(`toaster list stays inside a 390px viewport ${theme}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize(PHONE)
+    await openStory(page, "", "feedback-toast--long-text", theme)
+    await expect(page.locator("[data-sonner-toast]")).toBeVisible()
+    // The list itself is often `visibility: hidden` in Sonner; measure the box.
+    const box = await page.locator("[data-sonner-toaster]").evaluate((el) => {
+      const rect = el.getBoundingClientRect()
+      return { x: rect.x, right: rect.right }
+    })
+    expect(box.x).toBeGreaterThanOrEqual(0)
+    expect(box.right).toBeLessThanOrEqual(PHONE.width)
   })
   test(`disabled buttons look disabled in every variant ${theme}`, async ({
     page,

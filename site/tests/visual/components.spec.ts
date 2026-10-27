@@ -184,12 +184,15 @@ test("tab scroller content fits the box without a vertical scrollbar", async ({
         const el = node as HTMLElement
         const previous = el.style.overflowY
         el.style.overflowY = "auto"
+        const list = el.querySelector(
+          "[data-slot=tabs-list]"
+        ) as HTMLElement | null
         const next = {
           scrollHeight: el.scrollHeight,
           clientHeight: el.clientHeight,
-          listHeight:
-            el.querySelector("[data-slot=tabs-list]")?.getBoundingClientRect()
-              .height ?? 0,
+          listHeight: list?.getBoundingClientRect().height ?? 0,
+          listScrollHeight: list?.scrollHeight ?? 0,
+          listClientHeight: list?.clientHeight ?? 0,
         }
         el.style.overflowY = previous
         return next
@@ -205,6 +208,10 @@ test("tab scroller content fits the box without a vertical scrollbar", async ({
         box.listHeight,
         `${id} @ ${width}px list fits the scroller content box`
       ).toBeLessThanOrEqual(box.clientHeight)
+      expect(
+        box.listScrollHeight,
+        `${id} @ ${width}px list content fits the 28px row`
+      ).toBe(box.listClientHeight)
     }
   }
 })

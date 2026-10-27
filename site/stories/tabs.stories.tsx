@@ -48,7 +48,15 @@ export const Composition: Story = {
 }
 export const Nav: Story = {
   render: () => <TabsNavStory />,
-  parameters: { controls: { disable: true } },
+  parameters: {
+    controls: { disable: true },
+    docs: {
+      description: {
+        story:
+          "The row is `h-7` (28px) to match Button `sm`. Links use `py-0` and keep the line bar inside the trigger so the 16px label fits that row.",
+      },
+    },
+  },
 }
 export const NavNarrow: Story = {
   render: () => <TabsNavNarrowStory />,

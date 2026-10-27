@@ -12,7 +12,7 @@ import test from "node:test"
 import { chromium } from "playwright"
 
 import { THEMES, assertNoProblems } from "./browser.mjs"
-import { contrastRatio } from "./contrast.mjs"
+import { contrastRatio, hexRgb } from "./contrast.mjs"
 import { repoRoot } from "./serve.mjs"
 const TEXT = 4.5
 const UI = 3
@@ -95,6 +95,25 @@ const pairs = [
     UI,
   ],
 ]
+
+test("Storybook shortcut hint colors meet 4.5:1 in light and dark", () => {
+  // Paired with site/src/lib/manager-theme.ts; build.test.mjs checks the hex.
+  const pairs = [
+    ["light", "#5c5c5c", "#ecf2f9"],
+    ["dark", "#c8c8c8", "#0a0a0a"],
+  ]
+  const failures = pairs
+    .map(([theme, foreground, background]) => ({
+      theme,
+      ratio: contrastRatio(hexRgb(foreground), hexRgb(background)),
+    }))
+    .filter((result) => result.ratio < TEXT)
+    .map(
+      (result) =>
+        `shortcut hint [${result.theme}]: ${result.ratio.toFixed(2)}:1, needs ${TEXT}:1`
+    )
+  assertNoProblems(failures, "shortcut-hint contrast failures")
+})
 
 test("theme tokens meet WCAG contrast in light and dark", async () => {
   const theme = await fs.readFile(path.join(repoRoot, "theme.css"), "utf8")

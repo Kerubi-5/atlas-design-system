@@ -58,6 +58,15 @@ test("the manager document title is Atlas React Kit", async () => {
   assert.match(manager, /document\.title = KIT_TITLE/)
 })
 
+test("the manager theme uses AA muted colors for shortcut hints", async () => {
+  const manager = await read(siteRoot, ".storybook/manager.ts")
+  const theme = await read(siteRoot, "src/lib/manager-theme.ts")
+  assert.match(theme, /light: "#5c5c5c"/)
+  assert.match(theme, /dark: "#c8c8c8"/)
+  assert.match(manager, /textMutedColor: MANAGER_MUTED\.light/)
+  assert.match(manager, /barTextColor: MANAGER_MUTED\.light/)
+})
+
 test("the site publishes its generated docs and package-entry index", async () => {
   const index = await readJson(output, "docs-index.json")
   assert.equal(index.schemaVersion, 1)

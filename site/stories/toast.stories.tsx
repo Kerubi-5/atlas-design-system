@@ -140,6 +140,15 @@ export const WithActionAndCancel: Story = {
 
 export const LongText: Story = {
   ...preview,
+  parameters: {
+    ...preview.parameters,
+    docs: {
+      description: {
+        story:
+          "The toaster list is clamped to `calc(100vw - 2rem)` so it stays inside a 390px viewport.",
+      },
+    },
+  },
   render: () => (
     <MountedToasts
       run={() =>
