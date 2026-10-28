@@ -121,11 +121,12 @@ describe("KanbanBoard", () => {
 
   it("shows skeleton columns while the first load has no items", () => {
     renderBoard({ items: [], isLoading: true })
-    expect(
-      document.querySelectorAll(
-        '[data-slot="kanban-column"] [data-slot="skeleton"]'
-      ).length
-    ).toBe(6)
+    const cards = document.querySelectorAll(
+      '[data-slot="kanban-column"] [data-slot="skeleton"]'
+    )
+    expect(cards.length).toBe(6)
+    expect(cards[0]).toHaveClass("animate-pulse", "bg-muted")
+    expect(cards[0]).not.toHaveClass("bg-input")
     expect(screen.queryByText("Drop here")).not.toBeInTheDocument()
   })
 
@@ -200,6 +201,8 @@ describe("KanbanSkeleton", () => {
     )
     expect(placeholders).toHaveLength(4)
     expect(placeholders[0]).toHaveClass("w-40")
+    expect(placeholders[0]).toHaveClass("animate-pulse", "bg-muted")
+    expect(placeholders[0]).not.toHaveClass("bg-input")
   })
 })
 

@@ -71,6 +71,13 @@ describe("Skeletons", () => {
     expect(block.className).toContain("h-4")
   })
 
+  it("pulses on the muted fill, not the input-boundary token", () => {
+    render(<Skeleton data-testid="block" />)
+    const block = screen.getByTestId("block")
+    expect(block).toHaveClass("animate-pulse", "bg-muted")
+    expect(block).not.toHaveClass("bg-input")
+  })
+
   it("fills a table body with rows by columns of placeholders", () => {
     render(
       <Table>
@@ -84,7 +91,10 @@ describe("Skeletons", () => {
     for (const row of rows) {
       expect(row.querySelectorAll("td")).toHaveLength(3)
     }
-    expect(document.querySelectorAll("[data-slot=skeleton]")).toHaveLength(6)
+    const bars = document.querySelectorAll("[data-slot=skeleton]")
+    expect(bars).toHaveLength(6)
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-muted")
+    expect(bars[0]).not.toHaveClass("bg-input")
   })
 
   // Found in the 1.0 audit; failed before its fix.

@@ -239,7 +239,7 @@ export const usage: Record<string, string> = {
 
 **Accessibility** Pair with a visible \`Label\` and \`aria-labelledby\` (the thumb is not a labelable element). The thumb has a 44px hit area; arrows, Home, and End move it.`,
   Skeleton: `
-**Use for** placeholders shaped like the content that is loading.
+**Use for** placeholders shaped like the content that is loading. The fill is \`bg-muted\` (light gray in light mode), not the input-boundary token.
 
 **Not for** unknown layouts (use [Spinner](/docs/feedback-spinner--docs)) or empty results (use [EmptyPanel](/docs/feedback-empty-panel--docs)).
 

@@ -84,7 +84,9 @@ keyboard and screen-reader testing.
   field, checkbox, radio, and switch boundaries (`border-input`), checked
   fills (`bg-primary`), selected borders (`border-selected-foreground`), and
   the focus ring. `border-border` is for dividers and card edges only; never
-  make it the only boundary of a control.
+  make it the only boundary of a control. Loading placeholders (`Skeleton`)
+  use `bg-muted`. They are decorative, not UI boundaries, so they do not
+  use the input-boundary token.
 - Focus is a solid `ring-ring` (brand purple), never a translucent ring such
   as `ring-ring/30`, which fades below 3:1. Keyboard-highlighted menu and list
   items show a 2px `ring` bar on their leading edge. Content that scrolls must

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.7 - 2026-10-28
+
+Bug fixes. No public props, exports or tokens change; apps only need to
+bump the package.
+
+- Skeleton uses the muted fill again (`bg-muted`, about #f5f5f5 in light)
+  instead of the input-boundary token (`bg-input`, about #868686) that 1.2.3
+  applied for contrast. TableBodySkeleton and Kanban loading placeholders
+  follow. Pulse animation is unchanged. `--input` stays the 3:1 control
+  boundary for fields, separators, Progress, Meter and Slider.
+
 ## 1.2.6 - 2026-10-27
 
 Bug fixes. No public props, exports or tokens change; apps only need to

@@ -28,6 +28,17 @@ export function SkeletonAndSeparatorStory() {
   )
 }
 
+/** Project-card shaped placeholders, the layout KairOS uses on Projects. */
+export function SkeletonCardsStory() {
+  return (
+    <div className="grid max-w-3xl grid-cols-3 gap-4">
+      <Skeleton className="h-24" />
+      <Skeleton className="h-24" />
+      <Skeleton className="h-24" />
+    </div>
+  )
+}
+
 /** Recovery chrome without throwing during render. */
 export function ErrorFallbackStory() {
   return (
