@@ -37,8 +37,8 @@ type Props = Omit<FormFieldBaseProps, "fieldClassName"> &
 
 /**
  * The `form/*` field layout for a control the kit does not ship (a
- * combobox, a segmented picker): label with the required marker, optional
- * hint, the control, and its error, with the same spacing, ids, and error
+ * combobox, a segmented picker): label with the required marker, the
+ * control, optional hint, and its error, with the same spacing, ids, and error
  * timing as `FormTextField`. `className` and other div props go to the
  * wrapper (`data-slot="form-field"`).
  */

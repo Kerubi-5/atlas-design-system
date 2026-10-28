@@ -217,10 +217,11 @@ spread on the control:
 </div>
 ```
 
-Each `form/*` field stacks label, hint, control, and error with `gap-1.5`.
-The error sits below the control and takes no space until it shows, so use
-`items-start` on a row of fields, as above, to keep the controls on one top
-edge; the default `stretch` is fine for a single column.
+Each `form/*` field stacks label, control, hint, and error with `gap-1.5`.
+The hint and the error sit below the control; the error takes no space until
+it shows. Use `items-start` on a row of fields, as above, to keep the
+controls on one top edge when only some fields have a hint or an error; the
+default `stretch` is fine for a single column.
 
 Set `required` on a `form/*` field to mark its label with a visible `*`.
 The marker is hidden from screen readers, which announce the control's own

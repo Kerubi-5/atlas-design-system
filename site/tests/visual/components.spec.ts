@@ -58,6 +58,8 @@ const stories: Story[] = [
   { id: "forms-choice-fields--form" },
   { id: "forms-field--composition" },
   { id: "forms-field--selectable" },
+  { id: "forms-field--form-helpers" },
+  { id: "forms-field--paired-fields" },
   { id: "forms-checkbox--composition" },
   { id: "forms-radio-group--composition" },
   { id: "forms-switch--settings" },

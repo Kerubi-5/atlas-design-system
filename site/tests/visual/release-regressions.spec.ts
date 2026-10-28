@@ -136,6 +136,23 @@ for (const theme of THEMES) {
     // They do not: Previous, the current page and Next.
     expect(await visible(190)).toEqual([previous, "2", next])
   })
+  test(`paired fields keep inputs aligned when only one has a hint ${theme}`, async ({
+    page,
+  }) => {
+    await openStory(page, "", "forms-field--paired-fields", theme)
+    const invested = page.getByRole("textbox", { name: "Invested now" })
+    const saves = page.getByRole("textbox", { name: "Saves per month" })
+    const investedBox = (await invested.boundingBox())!
+    const savesBox = (await saves.boundingBox())!
+    expect(investedBox.y).toBe(savesBox.y)
+    expect(savesBox.y).toBeGreaterThan(
+      (await page.getByText("Saves per month", { exact: true }).boundingBox())!
+        .y
+    )
+    expect(
+      (await page.getByText(/In today's money/).boundingBox())!.y
+    ).toBeGreaterThan(savesBox.y)
+  })
   test(`field errors stay beside their field and separate from form feedback ${theme}`, async ({
     page,
   }) => {

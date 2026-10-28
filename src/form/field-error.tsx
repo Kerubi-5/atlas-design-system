@@ -40,8 +40,8 @@ export type FormFieldBaseProps = ErrorTimingProps & {
   /** Visible label text (the legend, for a checkbox group). */
   label: string
   /**
-   * Classes for the field wrapper (`data-slot="form-field"`: label, hint,
-   * control, and error), e.g. a width.
+   * Classes for the field wrapper (`data-slot="form-field"`: label, control,
+   * hint, and error), e.g. a width.
    */
   fieldClassName?: string
 }
@@ -64,9 +64,9 @@ export type FormFieldMetaProps = {
   fieldName?: string
 }
 
-/** The optional hint the `form/*` fields render under the label. */
+/** The optional hint the `form/*` fields render under the control. */
 export type FormFieldDescriptionProps = {
-  /** Hint between the label and the control, read with the control. */
+  /** Hint under the control, read with the control. */
   description?: ReactNode
 }
 

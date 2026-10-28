@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.2.8 - 2026-10-28
+
+Bug fixes. No public props, exports or tokens change; apps only need to
+bump the package.
+
+- Form fields put the hint under the control (label, control, hint, error).
+  Two fields in a row with `items-start` keep their inputs on one top edge
+  when only one has a hint, the same way errors already do.
+
 ## 1.2.7 - 2026-10-28
 
 Bug fixes. No public props, exports or tokens change; apps only need to
