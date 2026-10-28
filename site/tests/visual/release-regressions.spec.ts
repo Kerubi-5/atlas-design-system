@@ -218,6 +218,39 @@ for (const theme of THEMES) {
     await expect(page.getByText("Export 1 scheduled")).toBeVisible()
     await expect(page.locator("[data-sonner-toast]:visible")).toHaveCount(3)
   })
+  test(`skeleton fill matches muted, not the input boundary ${theme}`, async ({
+    page,
+  }) => {
+    for (const id of [
+      "feedback-skeleton--loading",
+      "feedback-skeleton--cards",
+      "data-display-table--loading",
+      "data-display-kanban--loading",
+    ]) {
+      await openStory(page, "", id, theme)
+      const colors = await storyRoot(page).evaluate(() => {
+        const skeleton = document.querySelector("[data-slot=skeleton]")
+        if (!skeleton) return null
+        const probe = document.createElement("div")
+        document.body.append(probe)
+        probe.style.backgroundColor = "var(--muted)"
+        const muted = getComputedStyle(probe).backgroundColor
+        probe.style.backgroundColor = "var(--input)"
+        const input = getComputedStyle(probe).backgroundColor
+        probe.remove()
+        return {
+          fill: getComputedStyle(skeleton).backgroundColor,
+          muted,
+          input,
+        }
+      })
+      if (!colors) {
+        throw new Error(`${id} has no [data-slot=skeleton]`)
+      }
+      expect(colors.fill, id).toBe(colors.muted)
+      expect(colors.fill, id).not.toBe(colors.input)
+    }
+  })
   test(`toaster list stays inside a 390px viewport ${theme}`, async ({
     page,
   }) => {

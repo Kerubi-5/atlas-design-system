@@ -1,7 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Skeleton } from "../../src/skeleton.js"
-import { SkeletonAndSeparatorStory } from "../../stories/display.js"
+import {
+  SkeletonAndSeparatorStory,
+  SkeletonCardsStory,
+} from "../../stories/display.js"
 
 const meta = {
   title: "Feedback/Skeleton",
@@ -14,5 +17,9 @@ type Story = StoryObj<typeof meta>
 export const Playground: Story = {}
 export const Loading: Story = {
   render: () => <SkeletonAndSeparatorStory />,
+  parameters: { controls: { disable: true } },
+}
+export const Cards: Story = {
+  render: () => <SkeletonCardsStory />,
   parameters: { controls: { disable: true } },
 }
