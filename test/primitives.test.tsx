@@ -71,10 +71,11 @@ describe("Skeletons", () => {
     expect(block.className).toContain("h-4")
   })
 
-  it("pulses on the muted fill, not the input-boundary token", () => {
+  it("pulses on the skeleton fill, not muted or the input-boundary token", () => {
     render(<Skeleton data-testid="block" />)
     const block = screen.getByTestId("block")
-    expect(block).toHaveClass("animate-pulse", "bg-muted")
+    expect(block).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(block).not.toHaveClass("bg-muted")
     expect(block).not.toHaveClass("bg-input")
   })
 
@@ -93,7 +94,8 @@ describe("Skeletons", () => {
     }
     const bars = document.querySelectorAll("[data-slot=skeleton]")
     expect(bars).toHaveLength(6)
-    expect(bars[0]).toHaveClass("animate-pulse", "bg-muted")
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(bars[0]).not.toHaveClass("bg-muted")
     expect(bars[0]).not.toHaveClass("bg-input")
   })
 

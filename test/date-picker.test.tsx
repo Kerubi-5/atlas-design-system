@@ -1,7 +1,7 @@
 import { fr } from "date-fns/locale"
 import { useState } from "react"
 import { renderToStaticMarkup } from "react-dom/server"
-import { describe, expect, it, vi } from "vitest"
+import { describe, expect, it, onTestFinished, vi } from "vitest"
 
 import { Calendar } from "../src/calendar.js"
 import {
@@ -249,11 +249,23 @@ describe("DatePickerButton", () => {
   })
 
   it("focuses today when nothing is selected", async () => {
+    // Pin the clock so this does not depend on the suite's run date.
+    // Only Date is faked; real timers keep userEvent and waitFor working.
+    vi.useFakeTimers({ toFake: ["Date"] })
+    vi.setSystemTime(day(15))
+    onTestFinished(() => vi.useRealTimers())
+
     const user = createUser()
-    render(<DatePickerButton value={undefined} onChange={() => {}} />)
+    render(
+      <DatePickerButton
+        value={undefined}
+        onChange={() => {}}
+        defaultMonth={october}
+      />
+    )
 
     await openPicker(user, "Pick a date")
-    await waitFor(() => expect(getDayButton(new Date())).toHaveFocus())
+    await waitFor(() => expect(getDayButton(day(15))).toHaveFocus())
   })
 
   it("forwards aria-labelledby and aria-describedby to the trigger", () => {

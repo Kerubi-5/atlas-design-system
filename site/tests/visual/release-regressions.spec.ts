@@ -235,7 +235,7 @@ for (const theme of THEMES) {
     await expect(page.getByText("Export 1 scheduled")).toBeVisible()
     await expect(page.locator("[data-sonner-toast]:visible")).toHaveCount(3)
   })
-  test(`skeleton fill matches muted, not the input boundary ${theme}`, async ({
+  test(`skeleton fill matches the skeleton token, not muted or input ${theme}`, async ({
     page,
   }) => {
     for (const id of [
@@ -250,6 +250,8 @@ for (const theme of THEMES) {
         if (!skeleton) return null
         const probe = document.createElement("div")
         document.body.append(probe)
+        probe.style.backgroundColor = "var(--skeleton)"
+        const token = getComputedStyle(probe).backgroundColor
         probe.style.backgroundColor = "var(--muted)"
         const muted = getComputedStyle(probe).backgroundColor
         probe.style.backgroundColor = "var(--input)"
@@ -257,6 +259,7 @@ for (const theme of THEMES) {
         probe.remove()
         return {
           fill: getComputedStyle(skeleton).backgroundColor,
+          token,
           muted,
           input,
         }
@@ -264,7 +267,8 @@ for (const theme of THEMES) {
       if (!colors) {
         throw new Error(`${id} has no [data-slot=skeleton]`)
       }
-      expect(colors.fill, id).toBe(colors.muted)
+      expect(colors.fill, id).toBe(colors.token)
+      expect(colors.fill, id).not.toBe(colors.muted)
       expect(colors.fill, id).not.toBe(colors.input)
     }
   })
