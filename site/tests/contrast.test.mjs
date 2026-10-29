@@ -71,7 +71,7 @@ const pairs = [
   ["shared progress, meter and slider track", "var(--input)", page, UI],
   ["track on a card", "var(--input)", card, UI],
   // Separator, tracks and field borders share --input (3:1). Skeleton is a
-  // decorative placeholder on --muted; it is not a UI boundary.
+  // decorative placeholder on --skeleton; it is not a UI boundary.
   ["separator", "var(--input)", page, UI],
   ["invalid input border", "var(--destructive)", page, UI],
   ["chart grid", "var(--input)", page, UI],

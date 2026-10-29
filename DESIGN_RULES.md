@@ -41,8 +41,8 @@ is a breaking change:
 - Color tokens and their `--color-*` utilities: `background`, `foreground`,
   `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `selected`
   (each with its `-foreground` pair where one exists), `destructive`,
-  `success`, `warning`, `border`, `input`, `ring`, `chart-1` to `chart-5`,
-  and the `sidebar` set.
+  `success`, `warning`, `border`, `input`, `skeleton`, `ring`, `chart-1` to
+  `chart-5`, and the `sidebar` set.
 - `--radius` and the `--radius-*` scale, and `--font-heading`.
 - Every `data-slot` listed under "Styling parts" in
   [COMPONENTS.md](./COMPONENTS.md#styling-parts).
@@ -85,7 +85,7 @@ keyboard and screen-reader testing.
   fills (`bg-primary`), selected borders (`border-selected-foreground`), and
   the focus ring. `border-border` is for dividers and card edges only; never
   make it the only boundary of a control. Loading placeholders (`Skeleton`)
-  use `bg-muted`. They are decorative, not UI boundaries, so they do not
+  use `bg-skeleton`. They are decorative, not UI boundaries, so they do not
   use the input-boundary token.
 - Focus is a solid `ring-ring` (brand purple), never a translucent ring such
   as `ring-ring/30`, which fades below 3:1. Keyboard-highlighted menu and list

@@ -60,6 +60,7 @@
   --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
+  --color-skeleton: var(--skeleton);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
@@ -124,6 +125,11 @@
   /* Form-control boundaries (fields, checkboxes, radios, switch track): 3:1
      on the page and on cards, as WCAG 1.4.11 requires. */
   --input: oklch(0.62 0 0);
+  /* Loading placeholders: a visible light gray on white cards. --muted
+     (~#f5f5f5) disappears on --card; --input (~#868686) is the 3:1 control
+     boundary and too dark for a pulse. About Tailwind gray-200 (#e5e7eb).
+     Decorative, so no contrast minimum. */
+  --skeleton: oklch(0.928 0 0);
   /* Focus ring: solid brand purple, 7.3:1 on the page. */
   --ring: var(--primary);
   --chart-1: oklch(0.87 0 0);
@@ -167,6 +173,8 @@
   --warning: oklch(0.828 0.189 84.429);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(0.52 0 0);
+  /* Same role on dark cards: a step above --card, well below --input. */
+  --skeleton: oklch(0.35 0 0);
   --ring: oklch(0.75 0.14 293);
   /* --chart-1..5 are the same in both themes; :root sets them. */
   --sidebar: oklch(0.205 0 0);

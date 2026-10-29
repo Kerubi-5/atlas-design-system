@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.2.9 - 2026-10-29
+
+Bug fixes. Apps only need to bump the package. `--skeleton` is a new fill
+token for loading placeholders; existing tokens are unchanged.
+
+- Skeleton uses a dedicated `--skeleton` fill (about Tailwind gray-200,
+  #e5e7eb, in light; a mid gray on dark cards) so placeholders stay visible
+  on white cards. 1.2.7's `bg-muted` (~#f5f5f5) disappeared on `--card`;
+  1.2.3's `bg-input` (~#868686) was too dark. TableBodySkeleton and Kanban
+  loading placeholders follow. Pulse animation is unchanged. `--muted` and
+  `--input` stay as they are.
+- The date-picker test that focuses today pins the clock, so it no longer
+  depends on the suite's run date.
+
 ## 1.2.8 - 2026-10-28
 
 Bug fixes. No public props, exports or tokens change; apps only need to
