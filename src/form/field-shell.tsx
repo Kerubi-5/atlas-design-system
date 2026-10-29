@@ -256,7 +256,7 @@ export function FormFieldDescription({
 }
 
 /**
- * Label, hint, control, and error in a `FormFieldFrame`. `labelAction` sits
+ * Label, control, hint, and error in a `FormFieldFrame`. `labelAction` sits
  * on the label's row; `labelFor={false}` when the control is not rendered
  * (Markdown preview). `required` marks the label only.
  */
@@ -277,7 +277,7 @@ export function FormFieldShell({
   label: string
   /** Content on the label's row, after the label (e.g. a mode toggle). */
   labelAction?: ReactNode
-  /** Hint between the label and the control, with id `descriptionIdFor(id)`. */
+  /** Hint under the control, with id `descriptionIdFor(id)`. */
   description?: ReactNode
   /** Error text under the control; `undefined` shows none. */
   errorText: string | undefined
@@ -309,10 +309,10 @@ export function FormFieldShell({
       ) : (
         labelNode
       )}
+      {children}
       {description ? (
         <FormFieldDescription id={id}>{description}</FormFieldDescription>
       ) : null}
-      {children}
       {required ? (
         <span id={requiredIdFor(id)} hidden>
           Required

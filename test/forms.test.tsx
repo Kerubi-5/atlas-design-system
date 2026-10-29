@@ -168,6 +168,32 @@ describe("form field descriptions", () => {
     )
   })
 
+  it("places the hint under the control, then the error", () => {
+    render(
+      <FormTextField
+        field={fakeTextField("saves", "0", ["Enter a number"])}
+        label="Saves per month"
+        description="In today's money; assumes savings rise with inflation."
+      />
+    )
+    const field = document.querySelector('[data-slot="form-field"]')
+    expect(field).toBeTruthy()
+    const parts = [...field!.children].map(
+      (el) => el.getAttribute("data-slot") ?? el.tagName.toLowerCase()
+    )
+    expect(parts).toEqual([
+      "label",
+      "input",
+      "form-field-description",
+      "form-field-error",
+    ])
+    const input = screen.getByLabelText("Saves per month")
+    expect(input).toHaveAttribute(
+      "aria-describedby",
+      `${input.id}-description ${input.id}-error`
+    )
+  })
+
   it("describes the markdown textarea with its error", () => {
     render(
       <FormMarkdownField

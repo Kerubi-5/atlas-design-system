@@ -59,7 +59,7 @@ export function FormTextField({
 }: TextFieldBaseProps & {
   /** Text shown in the empty control. */
   placeholder?: string
-  /** Optional hint under the label (employer vs referrer, etc.). */
+  /** Optional hint under the control (employer vs referrer, etc.). */
   description?: string
   /** Focuses the input on mount (ignored with `multiline`). */
   autoFocus?: boolean

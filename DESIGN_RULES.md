@@ -164,7 +164,10 @@ or its `data-slot`.
 triggers as outline buttons in application code.
 
 Build forms from the `form/*` fields; [Forms](./COMPONENTS.md#forms) in
-COMPONENTS.md says how they lay out and when they show errors. Pick other
-components by their rows there. Domain data and application shells stay
-with the application: currency or timezone option lists, query-library
-error views, and WYSIWYG editors.
+COMPONENTS.md says how they lay out and when they show errors. Each field
+stacks label, control, hint, and error. Put the hint under the control, not
+between the label and the control, so a row of fields with `items-start`
+keeps the inputs on one top edge when only some fields have a hint, the
+same way errors already do. Pick other components by their rows there.
+Domain data and application shells stay with the application: currency or
+timezone option lists, query-library error views, and WYSIWYG editors.

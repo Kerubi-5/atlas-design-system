@@ -203,6 +203,27 @@ export function FocusFirstInvalidStory() {
 }
 
 /**
+ * Two fields in a row, only one with a hint. `items-start` keeps both
+ * inputs on the same top edge because the hint sits under the control,
+ * the same way an error already does.
+ */
+export function PairedFieldsStory() {
+  const invested = useDemoField("investedNow", "0")
+  const saves = useDemoField("savesPerMonth", "0")
+
+  return (
+    <div className="grid max-w-md grid-cols-2 items-start gap-3">
+      <FormTextField field={invested} label="Invested now" />
+      <FormTextField
+        field={saves}
+        label="Saves per month"
+        description="In today's money; assumes savings rise with inflation."
+      />
+    </div>
+  )
+}
+
+/**
  * A kit field and a custom control (`Combobox` in `FormControlField`) in one
  * row. `items-start` keeps both controls on the same top edge when only one
  * field shows an error, and the error takes no space until it appears.
