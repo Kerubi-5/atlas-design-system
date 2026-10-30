@@ -114,6 +114,24 @@ describe("FormCheckboxGroupField", () => {
 })
 
 describe("FormToggleGroupField", () => {
+  it("exposes the required state on the radio group", () => {
+    const props = {
+      label: "Type",
+      value: "",
+      onValueChange: vi.fn(),
+      options: [{ value: "a", label: "A" }],
+    }
+    const { rerender } = render(<FormToggleGroupField {...props} required />)
+    expect(screen.getByRole("radiogroup", { name: "Type" })).toHaveAttribute(
+      "aria-required",
+      "true"
+    )
+    rerender(<FormToggleGroupField {...props} />)
+    expect(
+      screen.getByRole("radiogroup", { name: "Type" })
+    ).not.toHaveAttribute("aria-required")
+  })
+
   it("is labelled by its label and ignores deselecting the active item", async () => {
     const user = createUser()
     const onValueChange = vi.fn()

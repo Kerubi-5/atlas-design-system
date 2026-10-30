@@ -81,6 +81,8 @@ export function handleListboxKey<T>(
   }
 ): boolean {
   if (isComposingKey(event)) return true
+  const { shiftKey, ctrlKey, metaKey, altKey } = event.nativeEvent
+  if (shiftKey || ctrlKey || metaKey || altKey) return false
   const next = moveListboxHighlight(event.key, highlight, items.length)
   if (next !== undefined) {
     event.preventDefault()

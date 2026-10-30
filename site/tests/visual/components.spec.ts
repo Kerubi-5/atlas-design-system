@@ -103,6 +103,8 @@ const stories: Story[] = [
 
 /** Stories whose layout changes at phone width. */
 const phoneStories = new Set([
+  "data-display-kanban--board",
+  "data-display-kanban--card-actions",
   "navigation-nav-link--shell",
   "examples-fields--trigger-alignment",
   "forms-date-time-picker--playground",

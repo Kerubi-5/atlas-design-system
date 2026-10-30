@@ -28,6 +28,29 @@ function SliderHarness({
 }
 
 describe("Slider", () => {
+  it("exposes its value description and error on the focusable thumb", () => {
+    render(
+      <>
+        <p id="temperature-hint">Choose a safe temperature</p>
+        <p id="temperature-error">Too hot</p>
+        <Slider
+          value={25}
+          onValueChange={vi.fn()}
+          aria-label="Temperature"
+          aria-valuetext="25 degrees Celsius"
+          aria-describedby="temperature-hint"
+          aria-invalid
+          aria-errormessage="temperature-error"
+        />
+      </>
+    )
+    const slider = screen.getByRole("slider", { name: "Temperature" })
+    expect(slider).toHaveAttribute("aria-valuetext", "25 degrees Celsius")
+    expect(slider).toHaveAccessibleDescription("Choose a safe temperature")
+    expect(slider).toHaveAttribute("aria-invalid", "true")
+    expect(slider).toHaveAttribute("aria-errormessage", "temperature-error")
+  })
+
   it("is a labelled slider with a 44px thumb hit area", () => {
     render(<SliderHarness />)
 

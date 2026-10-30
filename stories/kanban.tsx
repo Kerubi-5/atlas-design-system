@@ -57,7 +57,7 @@ export function KanbanStory() {
   }, [])
 
   // Apps open a dialog here. Passing the handler makes the body a button,
-  // so Tab has two stops: the grip, then the card.
+  // so Tab reaches the grip, the card body, and the card actions menu.
   const openDeal = React.useCallback(() => {
     return undefined
   }, [])

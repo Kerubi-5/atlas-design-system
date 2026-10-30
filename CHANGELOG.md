@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+- Kanban cards offer an actions menu for moving between columns, reordering,
+  finishing, and removing without dragging. Focus follows a moved card and
+  returns to the board when its last card is removed.
+- Slider forwards value text, descriptions, and validation messages to its
+  focusable thumb. Required toggle fields expose their required state.
+- SearchPicker keeps input focus after pointer selection. Search-driven
+  listboxes preserve modified text-editing shortcuts such as Shift+Home.
+- Invalid-submit focus continues past controls that cannot receive focus.
+
 ## 1.2.9 - 2026-10-29
 
 Bug fixes. Apps only need to bump the package. `--skeleton` is a new fill

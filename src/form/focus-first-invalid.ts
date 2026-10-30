@@ -43,7 +43,7 @@ export function focusFirstInvalid(formId: string) {
     )) {
       if (invalid.has(element.getAttribute(FIELD_NAME_ATTRIBUTE) ?? "")) {
         element.focus()
-        return
+        if (element.contains(document.activeElement)) return
       }
     }
   }

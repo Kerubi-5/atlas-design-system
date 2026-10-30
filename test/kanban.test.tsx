@@ -4,6 +4,7 @@ import {
   SortableKeyboardPlugin,
 } from "@dnd-kit/dom/sortable"
 import { fireEvent } from "@testing-library/react"
+import { createRef, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import {
@@ -61,6 +62,133 @@ function renderBoard(props: Partial<KanbanBoardProps<Card>> = {}) {
 }
 
 describe("KanbanBoard", () => {
+  it.each([
+    [0, "Move down", "todo", 2, undefined],
+    [1, "Move up", "todo", undefined, 1],
+    [0, "Move to Doing", "doing", 1, undefined],
+    [0, "Move to Done", "done", undefined, undefined],
+  ] as const)(
+    "moves card %i with %s without dragging",
+    async (index, command, column, beforePosition, afterPosition) => {
+      const user = createUser()
+      const onMove = vi.fn()
+      const onCardClick = vi.fn()
+      renderBoard({ onMove, onCardClick })
+      await user.click(
+        screen.getAllByRole("button", { name: "Card actions" })[index]!
+      )
+      await user.click(screen.getByRole("menuitem", { name: command }))
+      expect(onMove).toHaveBeenCalledExactlyOnceWith(cards[index], column, {
+        beforePosition,
+        afterPosition,
+      })
+      expect(onCardClick).not.toHaveBeenCalled()
+    }
+  )
+
+  it("disables reordering at column boundaries and omits the current column", async () => {
+    const user = createUser()
+    renderBoard()
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[0]!
+    )
+    expect(screen.getByRole("menuitem", { name: "Move up" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+    expect(
+      screen.queryByRole("menuitem", { name: "Move to To do" })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("menuitem", { name: "Finish" })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("menuitem", { name: "Remove" })
+    ).not.toBeInTheDocument()
+    await user.keyboard("{Escape}")
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[1]!
+    )
+    expect(screen.getByRole("menuitem", { name: "Move down" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+  })
+
+  it.each([
+    ["Mark done", "onComplete"],
+    ["Archive", "onDelete"],
+  ] as const)("offers %s outside a drag", async (label, callback) => {
+    const user = createUser()
+    const handler = vi.fn()
+    renderBoard({
+      [callback]: handler,
+      completeLabel: "Mark done",
+      deleteLabel: "Archive",
+    })
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[0]!
+    )
+    await user.click(screen.getByRole("menuitem", { name: label }))
+    expect(handler).toHaveBeenCalledExactlyOnceWith("a")
+  })
+
+  it("restores keyboard focus after moving a card across columns and removing it", async () => {
+    const externalRef = createRef<HTMLDivElement>()
+    function EditableBoard() {
+      const [items, setItems] = useState([cards[0]!])
+      return (
+        <KanbanBoard
+          ref={externalRef}
+          columns={columns}
+          items={items}
+          getColumnId={getColumnId}
+          renderCard={renderCard}
+          onMove={(item, stage) =>
+            setItems((items) =>
+              items.map((next) =>
+                next.id === item.id ? { ...next, stage } : next
+              )
+            )
+          }
+          onDelete={(id) =>
+            setItems((items) => items.filter((item) => item.id !== id))
+          }
+        />
+      )
+    }
+    const user = createUser()
+    render(<EditableBoard />)
+    const trigger = screen.getByRole("button", { name: "Card actions" })
+    expect(externalRef.current).toBe(screen.getByRole("group"))
+    expect(trigger).toHaveAccessibleDescription("Write spec")
+    trigger.focus()
+    await user.keyboard("{Enter}")
+    await user.keyboard("{Escape}")
+    await vi.waitFor(() => expect(trigger).toHaveFocus())
+    await user.keyboard("{Enter}")
+    // Move down is disabled for the sole card; the first enabled action
+    // moves it into Doing without any pointer gesture.
+    await vi.waitFor(() =>
+      expect(
+        screen.getByRole("menuitem", { name: "Move to Doing" })
+      ).toHaveFocus()
+    )
+    await user.keyboard("{Enter}")
+    expect(
+      within(
+        document.querySelectorAll(
+          '[data-slot="kanban-column"]'
+        )[1]! as HTMLElement
+      ).getByText("Write spec")
+    ).toBeInTheDocument()
+    const movedTrigger = screen.getByRole("button", { name: "Card actions" })
+    await vi.waitFor(() => expect(movedTrigger).toHaveFocus())
+    await user.keyboard("{Enter}")
+    await user.click(screen.getByRole("menuitem", { name: "Remove" }))
+    await vi.waitFor(() => expect(screen.getByRole("group")).toHaveFocus())
+  })
+
   it("renders columns in order with counts, badges, and empty copy", () => {
     renderBoard({ emptyLabel: "Drop a card" })
 
