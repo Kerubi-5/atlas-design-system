@@ -520,8 +520,7 @@ const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 const cardSensors = [
   PointerSensor.configure({
     preventActivation: (event) =>
-      event.target instanceof Element &&
-      event.target.closest('[data-slot="kanban-card-actions"]') !== null,
+      !!(event.target as Element).closest('[data-slot="kanban-card-actions"]'),
   }),
 ]
 
