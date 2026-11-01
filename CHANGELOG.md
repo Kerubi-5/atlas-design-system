@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 1.3.0 - 2026-11-02
+
+Kanban cards drag from anywhere and lose their grip and scroll buttons. The
+`kanban-card-handle` slot is removed. Tabs rows no longer drag with a mouse.
+Everything else is additive or a fix; apps only need to bump the package, and
+those that style or test the removed Kanban slot or parts need a small update.
+
 - `KanbanBoard` (beta): the whole card is the drag source and the grip is
   gone. A click still opens the card; a press drags once the pointer moves or
   touch holds. The cursor stays native. The `kanban-card-handle` slot is
