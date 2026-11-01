@@ -59,8 +59,8 @@ whether to promote it or keep it beta in 1.0.
 - [x] Deferred major upgrades, each in its own PR with screenshots checked:
       TypeScript 7 (#47), `@vitest/coverage-v8` 5 with Vitest 5 (#49),
       `next` 16.4 dev dependency.
-- [x] Every component page has a usage entry and a screenshot (already
-      enforced; confirm still green). The site job in CI enforces it.
+- [x] Every component page has a usage entry and a screenshot (run
+      `npm run test:a11y` and `test:visual` in `site`; CI no longer runs them).
 
 ### Quality audit (2026-10-17)
 
