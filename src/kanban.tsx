@@ -10,11 +10,11 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/react"
 import { isSortable, useSortable } from "@dnd-kit/react/sortable"
+import { PointerSensor } from "@dnd-kit/dom"
 import {
   CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  GripVertical,
   MoreHorizontal,
   Trash2,
   type LucideIcon,
@@ -90,7 +90,7 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   /** Offers Remove in each card's actions menu and a drop zone while dragging. */
   onDelete?: (itemId: string) => void
   /**
-   * Card body; the board adds the grip, chrome, and sorting. Cards re-render
+   * Card body; the board adds the chrome and sorting. Cards re-render
    * only when their item changes while this and `onCardClick` keep their
    * identity, so define them outside the render or wrap them in `useCallback`.
    */
@@ -134,8 +134,8 @@ const KanbanActionsContext = React.createContext<{
 /**
  * Drag-and-drop board built on dnd-kit. The consumer owns `items` and maps
  * each to a column; the board derives its layout from them, so an optimistic
- * cache update is the only state. Cards drag by their grip, the body stays
- * clickable, and off-screen columns get edge fades and scroll buttons.
+ * cache update is the only state. Cards drag from anywhere except the actions
+ * menu; a click still opens the card. Off-screen columns get edge fades and scroll buttons.
  * Each card's actions menu offers the same operations without dragging.
  */
 function KanbanBoard<T extends { id: string; position: number }>({
@@ -277,9 +277,6 @@ function KanbanBoard<T extends { id: string; position: number }>({
             cardClassName
           )}
         >
-          <div className={cn(handleChrome, "cursor-grabbing")}>
-            <GripVertical className="size-4" aria-hidden />
-          </div>
           <div className="min-w-0 flex-1 p-3">{renderCard(item)}</div>
         </div>
       )
@@ -515,16 +512,18 @@ function KanbanColumnView({
 
 const cardChrome = cn("flex border border-border bg-card text-card-foreground")
 
-const handleChrome = cn(
-  "flex shrink-0 items-center self-stretch border-r border-border",
-  "bg-muted/30 px-1.5 text-muted-foreground"
-)
-
 const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 
-function stopClick(event: React.MouseEvent) {
-  event.stopPropagation()
-}
+// The whole card is the drag source. A press becomes a drag only after the
+// pointer moves (or touch holds), so a plain click still reaches the body.
+// dnd-kit skips presses on buttons by default; only the actions menu keeps that.
+const cardSensors = [
+  PointerSensor.configure({
+    preventActivation: (event) =>
+      event.target instanceof Element &&
+      event.target.closest('[data-slot="kanban-card-actions"]') !== null,
+  }),
+]
 
 function KanbanCardViewImpl<T extends { id: string }>({
   item,
@@ -543,13 +542,14 @@ function KanbanCardViewImpl<T extends { id: string }>({
 }) {
   const bodyId = React.useId()
   const children = renderCard(item)
-  const { handleRef, ref, isDragging } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: item.id,
     index,
     type: "item",
     accept: "item",
     group: column,
     transition: null,
+    sensors: cardSensors,
     plugins: configureCardSortablePlugins,
   })
 
@@ -567,21 +567,7 @@ function KanbanCardViewImpl<T extends { id: string }>({
         className
       )}
     >
-      {/* Each stop draws its own ring; z-10 keeps the sibling from covering it. */}
-      <button
-        type="button"
-        ref={handleRef}
-        data-slot="kanban-card-handle"
-        aria-label="Drag to move"
-        onClick={stopClick}
-        className={cn(
-          handleChrome,
-          stopFocus,
-          "cursor-grab hover:bg-muted/50 active:cursor-grabbing"
-        )}
-      >
-        <GripVertical className="size-4" aria-hidden />
-      </button>
+      {/* The body and the actions menu are separate tab stops; each draws its own ring. */}
       {onCardClick ? (
         <button
           id={bodyId}

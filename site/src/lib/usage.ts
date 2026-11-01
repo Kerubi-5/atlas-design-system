@@ -165,7 +165,7 @@ export const usage: Record<string, string> = {
 
 **Not for** a sortable list with one column (use a list or \`Table\`) or picking a single status (use \`Select\`).
 
-**Accessibility** Cards drag by a labelled grip so the card body stays a normal button. The Card actions menu also moves, reorders, finishes, and removes cards without dragging. Each stop shows its own focus ring. Give the board an \`aria-label\`; scroll buttons appear when columns are off-screen.`,
+**Accessibility** Cards drag from anywhere on the card except the actions menu, and a plain click still opens the card. The Card actions menu also moves, reorders, finishes, and removes cards without dragging. Each stop shows its own focus ring. Give the board an \`aria-label\`; scroll buttons appear when columns are off-screen.`,
   Markdown: `
 **Use for** rendering GitHub-flavoured Markdown the app already stores as a string.
 

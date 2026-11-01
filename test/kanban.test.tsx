@@ -210,33 +210,27 @@ describe("KanbanBoard", () => {
     renderBoard({ onCardClick: vi.fn() })
 
     const card = slot("kanban-card")
-    const grip = slot("kanban-card-handle")
     const body = slot("kanban-card-body")
 
     // Failed while both stops used `focusRingWithin` on the card: a keyboard
-    // user could not tell the grip from the body. Each stop now carries the
-    // shared `focusRing` hook.
+    // user could not tell the stops apart. Each stop now carries the shared
+    // `focusRing` hook.
     expect(classes(card)).not.toContain("has-focus-visible:ring-2")
     expect(classes(card)).not.toContain("has-focus-visible:ring-ring")
-    expect(classes(grip)).toContain("focus-visible:ring-2")
-    expect(classes(grip)).toContain("focus-visible:ring-ring")
     expect(classes(body)).toContain("focus-visible:ring-2")
     expect(classes(body)).toContain("focus-visible:ring-ring")
   })
 
-  it("opens a card from its body and keeps the grip separate", async () => {
+  it("opens a card from its body and has no separate drag grip", async () => {
     const user = createUser()
     const onCardClick = vi.fn()
     renderBoard({ onCardClick })
 
     await user.click(screen.getByRole("button", { name: "Ship it" }))
     expect(onCardClick).toHaveBeenCalledWith(cards[2])
-
-    const grips = screen.getAllByRole("button", { name: "Drag to move" })
-    expect(grips).toHaveLength(3)
-    // A real pointer press starts a dnd-kit drag, which needs layout jsdom lacks.
-    fireEvent.click(grips[0]!)
-    expect(onCardClick).toHaveBeenCalledTimes(1)
+    expect(
+      screen.queryByRole("button", { name: "Drag to move" })
+    ).not.toBeInTheDocument()
   })
 
   it("renders a static card body when cards do not open", () => {
@@ -306,9 +300,6 @@ describe("KanbanBoard", () => {
     const card = document.querySelector('[data-slot="kanban-card"]')
     expect(card).toHaveClass("shadow-none")
     expect(card).not.toHaveClass("shadow-sm")
-    expect(
-      document.querySelector('[data-slot="kanban-card-handle"]')
-    ).toBeInTheDocument()
     expect(
       document.querySelector('[data-slot="kanban-column-header"]')
     ).toBeInTheDocument()
