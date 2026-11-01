@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react"
-import { Feedback } from "@dnd-kit/dom"
+import { Accessibility, Feedback } from "@dnd-kit/dom"
 import { OptimisticSortingPlugin } from "@dnd-kit/dom/sortable"
 import type { DragDropProvider } from "@dnd-kit/react"
 
@@ -24,8 +24,12 @@ export const configureKanbanPlugins: Extract<
 /**
  * Cards leave out OptimisticSortingPlugin: it moves DOM nodes under React and
  * throws `removeChild` on re-render (dnd-kit #1747). Column layout comes from
- * the consumer's `items`.
+ * the consumer's `items`. They also leave out Accessibility, which would mark
+ * the whole card as a focusable button around its own buttons; pointer drags
+ * need no ARIA, and keyboard users move cards from the actions menu.
  */
 export function configureCardSortablePlugins<T>(defaults: readonly T[]): T[] {
-  return defaults.filter((plugin) => plugin !== OptimisticSortingPlugin)
+  return defaults.filter(
+    (plugin) => plugin !== OptimisticSortingPlugin && plugin !== Accessibility
+  )
 }
