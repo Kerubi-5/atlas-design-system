@@ -22,9 +22,10 @@ npm run test:a11y --prefix site   # token contrast, axe on every story and open 
 npm run test:visual --prefix site # screenshots of every component, light, dark, 390px
 ```
 
-The scripts in `package.json` say what each command runs. CI runs the gate
-and the site checks on every pull request
-([check.yml](./.github/workflows/check.yml)); run them before you push.
+The scripts in `package.json` say what each command runs. CI runs only the gate
+on every pull request ([check.yml](./.github/workflows/check.yml)). The site
+checks (accessibility and screenshots) use a browser and too much CPU for
+GitHub, so they do not run in CI; run them yourself before you push.
 
 ## Commit and push checks
 

@@ -40,7 +40,8 @@ export type SliderProps = Omit<
  * Single-thumb range on Radix Slider. Square track and thumb, primary fill,
  * solid focus ring, 44px thumb hit area. Pair with a visible `Label`. Other
  * props (`orientation`, `inverted`, `data-*`) go to the Radix root; `id`
- * and the accessible name go to the thumb.
+ * and the accessible name, description, value text, and error attributes go
+ * to the thumb.
  */
 function Slider({
   value,
@@ -53,6 +54,10 @@ function Slider({
   className,
   "aria-label": ariaLabel,
   "aria-labelledby": ariaLabelledBy,
+  "aria-describedby": ariaDescribedBy,
+  "aria-valuetext": ariaValueText,
+  "aria-invalid": ariaInvalid,
+  "aria-errormessage": ariaErrorMessage,
   ...props
 }: SliderProps) {
   return (
@@ -90,6 +95,10 @@ function Slider({
         id={id}
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
+        aria-describedby={ariaDescribedBy}
+        aria-valuetext={ariaValueText}
+        aria-invalid={ariaInvalid}
+        aria-errormessage={ariaErrorMessage}
         data-slot="slider-thumb"
         className={cn(
           focusRing,

@@ -10,31 +10,35 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/react"
 import { isSortable, useSortable } from "@dnd-kit/react/sortable"
+import { PointerSensor } from "@dnd-kit/dom"
 import {
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  GripVertical,
+  MoreHorizontal,
   Trash2,
   type LucideIcon,
 } from "lucide-react"
 
 import { Button } from "./button.js"
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./dropdown-menu.js"
+import {
   KANBAN_COMPLETE_ID,
   KANBAN_DELETE_ID,
   buildKanbanGroups,
-  kanbanOverflowEdges,
-  kanbanScrollBy,
   resolveKanbanDrop,
-  type KanbanOverflowEdges,
+  type KanbanDropInput,
+  type KanbanGroups,
 } from "./internal/kanban-layout.js"
 import {
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
 import { focusRing } from "./internal/styles.js"
-import { revealInline } from "./internal/use-horizontal-overflow.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
 
@@ -73,14 +77,14 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   items: T[]
   /** The id of the column a card belongs in. */
   getColumnId: (item: T) => string
-  /** Every drop that changes a column or the order, including same-column reorders. */
+  /** Every column change or reorder, from dragging or the actions menu. */
   onMove: (item: T, toColumnId: string, target: KanbanDropTarget) => void
-  /** Shows a Finish zone while dragging. */
+  /** Offers Finish in each card's actions menu and a drop zone while dragging. */
   onComplete?: (itemId: string) => void
-  /** Shows a Remove zone while dragging. */
+  /** Offers Remove in each card's actions menu and a drop zone while dragging. */
   onDelete?: (itemId: string) => void
   /**
-   * Card body; the board adds the grip, chrome, and sorting. Cards re-render
+   * Card body; the board adds the chrome and sorting. Cards re-render
    * only when their item changes while this and `onCardClick` keep their
    * identity, so define them outside the render or wrap them in `useCallback`.
    */
@@ -91,9 +95,9 @@ export type KanbanBoardProps<T extends { id: string; position: number }> = {
   isLoading?: boolean
   /** Text in a column with no cards. Default `"Drop here"`. */
   emptyLabel?: string
-  /** Text on the Finish zone. Default `"Finish"`. */
+  /** Text for the Finish action and drop zone. Default `"Finish"`. */
   completeLabel?: string
-  /** Text on the Remove zone. Default `"Remove"`. */
+  /** Text for the Remove action and drop zone. Default `"Remove"`. */
   deleteLabel?: string
   /** Classes for the horizontal scroller that holds the columns. */
   scrollerClassName?: string
@@ -111,11 +115,22 @@ const ACTION_ZONE_PRIORITY = 10
 /** Grow to fill the board; 18rem floor so a long row still scrolls. */
 const columnSize = "flex-1 basis-72 min-w-72 min-h-[min(70vh,32rem)]"
 
+/** Only action menus consume board updates, leaving memoized card bodies alone. */
+const KanbanActionsContext = React.createContext<{
+  columns: KanbanColumn[]
+  groups: KanbanGroups
+  perform: (input: KanbanDropInput) => void
+  completeLabel: string | null
+  deleteLabel: string | null
+  focusCard: (id: string) => void
+} | null>(null)
+
 /**
  * Drag-and-drop board built on dnd-kit. The consumer owns `items` and maps
  * each to a column; the board derives its layout from them, so an optimistic
- * cache update is the only state. Cards drag by their grip, the body stays
- * clickable, and off-screen columns get edge fades and scroll buttons.
+ * cache update is the only state. Cards drag from anywhere except the actions
+ * menu; a click still opens the card. The columns scroll sideways natively.
+ * Each card's actions menu offers the same operations without dragging.
  */
 function KanbanBoard<T extends { id: string; position: number }>({
   columns,
@@ -134,10 +149,11 @@ function KanbanBoard<T extends { id: string; position: number }>({
   scrollerClassName,
   columnClassName,
   cardClassName,
+  ref,
   ...props
 }: KanbanBoardProps<T>) {
-  const scrollerRef = React.useRef<HTMLDivElement>(null)
-  const overflow = useOverflowEdges(scrollerRef, columns.length, items.length)
+  const boardRef = React.useRef<HTMLDivElement>(null)
+  React.useImperativeHandle(ref, () => boardRef.current!, [])
 
   const itemById = React.useMemo(
     () => new Map(items.map((item) => [item.id, item])),
@@ -156,26 +172,9 @@ function KanbanBoard<T extends { id: string; position: number }>({
     event.preventDefault()
   }, [])
 
-  const handleDragEnd = React.useCallback(
-    (event: DragEndEvent) => {
-      if (event.canceled) return
-      const { source, target } = event.operation
-      if (!source || !isSortable(source)) return
-      const drop = resolveKanbanDrop(
-        {
-          itemId: String(source.id),
-          targetId: target ? String(target.id) : null,
-          targetGroup:
-            target && isSortable(target) && target.group != null
-              ? String(target.group)
-              : null,
-          initialGroup:
-            source.initialGroup != null ? String(source.initialGroup) : null,
-          currentGroup: source.group != null ? String(source.group) : null,
-          index: typeof source.index === "number" ? source.index : undefined,
-        },
-        groups
-      )
+  const perform = React.useCallback(
+    (input: KanbanDropInput) => {
+      const drop = resolveKanbanDrop(input, groups)
       if (!drop) return
       if (drop.kind === "complete") return onComplete?.(drop.itemId)
       if (drop.kind === "delete") return onDelete?.(drop.itemId)
@@ -193,13 +192,59 @@ function KanbanBoard<T extends { id: string; position: number }>({
     [groups, itemById, onComplete, onDelete, onMove]
   )
 
-  const scrollToStart = React.useCallback(
-    () => kanbanScrollBy(scrollerRef.current, -1),
-    []
+  const handleDragEnd = React.useCallback(
+    (event: DragEndEvent) => {
+      if (event.canceled) return
+      const { source, target } = event.operation
+      if (!source || !isSortable(source)) return
+      perform({
+        itemId: String(source.id),
+        targetId: target ? String(target.id) : null,
+        targetGroup:
+          target && isSortable(target) && target.group != null
+            ? String(target.group)
+            : null,
+        initialGroup:
+          source.initialGroup != null ? String(source.initialGroup) : null,
+        currentGroup: source.group != null ? String(source.group) : null,
+        index: typeof source.index === "number" ? source.index : undefined,
+      })
+    },
+    [perform]
   )
-  const scrollToEnd = React.useCallback(
-    () => kanbanScrollBy(scrollerRef.current, 1),
-    []
+
+  const focusCard = React.useCallback((id: string) => {
+    const board = boardRef.current
+    const triggers = board?.querySelectorAll<HTMLButtonElement>(
+      '[data-slot="kanban-card-actions"]'
+    )
+    // A column change remounts the card; removal falls back to another card
+    // or the board when empty, instead of leaving focus on the document.
+    const trigger =
+      triggers && [...triggers].find((node) => node.dataset.cardId === id)
+    const target = trigger ?? triggers?.[0] ?? board
+    target?.focus()
+  }, [])
+
+  const actions = React.useMemo(
+    () => ({
+      columns,
+      groups,
+      perform,
+      completeLabel: onComplete ? completeLabel : null,
+      deleteLabel: onDelete ? deleteLabel : null,
+      focusCard,
+    }),
+    [
+      columns,
+      groups,
+      perform,
+      onComplete,
+      completeLabel,
+      onDelete,
+      deleteLabel,
+      focusCard,
+    ]
   )
 
   const renderOverlay = React.useCallback(
@@ -215,9 +260,6 @@ function KanbanBoard<T extends { id: string; position: number }>({
             cardClassName
           )}
         >
-          <div className={cn(handleChrome, "cursor-grabbing")}>
-            <GripVertical className="size-4" aria-hidden />
-          </div>
           <div className="min-w-0 flex-1 p-3">{renderCard(item)}</div>
         </div>
       )
@@ -229,27 +271,22 @@ function KanbanBoard<T extends { id: string; position: number }>({
   // not the page, overflows.
   return (
     <div
+      ref={boardRef}
+      role="group"
+      tabIndex={-1}
       data-slot="kanban-board"
-      className={cn("min-w-0", className)}
+      className={cn("min-w-0", focusRing, className)}
       {...props}
     >
-      <DragDropProvider
-        plugins={configureKanbanPlugins}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="relative min-w-0">
+      <KanbanActionsContext.Provider value={actions}>
+        <DragDropProvider
+          plugins={configureKanbanPlugins}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
           <div
-            ref={scrollerRef}
             data-slot="kanban-scroller"
             data-loading={dimmed || undefined}
-            data-overflow-start={overflow.start || undefined}
-            data-overflow-end={overflow.end || undefined}
-            onScroll={overflow.measure}
-            onFocus={(event) => {
-              const card = event.target.closest('[data-slot="kanban-card"]')
-              if (card) revealInline(event.currentTarget, card)
-            }}
             className={cn(
               "flex min-w-0 gap-4 overflow-x-auto pb-2",
               // AutoScroller scrolls in small steps near the edge; mandatory
@@ -289,68 +326,17 @@ function KanbanBoard<T extends { id: string; position: number }>({
               )
             })}
           </div>
-          <OverflowFade side="start" visible={overflow.start} />
-          <OverflowFade side="end" visible={overflow.end} />
-          {overflow.start ? (
-            <ScrollButton side="start" onClick={scrollToStart} />
+          {onComplete || onDelete ? (
+            <ActionRail
+              completeLabel={onComplete ? completeLabel : null}
+              deleteLabel={onDelete ? deleteLabel : null}
+            />
           ) : null}
-          {overflow.end ? (
-            <ScrollButton side="end" onClick={scrollToEnd} />
-          ) : null}
-          {overflow.start || overflow.end ? (
-            <p className="sr-only">
-              More columns available. Scroll horizontally to see them.
-            </p>
-          ) : null}
-        </div>
-        {onComplete || onDelete ? (
-          <ActionRail
-            completeLabel={onComplete ? completeLabel : null}
-            deleteLabel={onDelete ? deleteLabel : null}
-          />
-        ) : null}
-        <DragOverlay dropAnimation={null}>{renderOverlay}</DragOverlay>
-      </DragDropProvider>
+          <DragOverlay dropAnimation={null}>{renderOverlay}</DragOverlay>
+        </DragDropProvider>
+      </KanbanActionsContext.Provider>
     </div>
   )
-}
-
-function useOverflowEdges(
-  ref: React.RefObject<HTMLDivElement | null>,
-  columnCount: number,
-  itemCount: number
-) {
-  const [edges, setEdges] = React.useState<KanbanOverflowEdges>({
-    start: false,
-    end: false,
-  })
-
-  const measure = React.useCallback(() => {
-    const element = ref.current
-    if (!element) return
-    const next = kanbanOverflowEdges(
-      element.scrollLeft,
-      element.clientWidth,
-      element.scrollWidth
-    )
-    // Scroll fires every frame; keep the old object so the board (and every
-    // card in it) re-renders only when an edge appears or goes.
-    setEdges((edges) =>
-      edges.start === next.start && edges.end === next.end ? edges : next
-    )
-  }, [ref])
-
-  React.useLayoutEffect(() => {
-    const element = ref.current
-    if (!element || typeof ResizeObserver === "undefined") return
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
-    for (const child of element.children) observer.observe(child)
-    return () => observer.disconnect()
-  }, [columnCount, itemCount, measure, ref])
-
-  return { ...edges, measure }
 }
 
 function KanbanColumnView({
@@ -448,16 +434,17 @@ function KanbanColumnView({
 
 const cardChrome = cn("flex border border-border bg-card text-card-foreground")
 
-const handleChrome = cn(
-  "flex shrink-0 items-center self-stretch border-r border-border",
-  "bg-muted/30 px-1.5 text-muted-foreground"
-)
-
 const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 
-function stopClick(event: React.MouseEvent) {
-  event.stopPropagation()
-}
+// The whole card is the drag source. A press becomes a drag only after the
+// pointer moves (or touch holds), so a plain click still reaches the body.
+// dnd-kit skips presses on buttons by default; only the actions menu keeps that.
+const cardSensors = [
+  PointerSensor.configure({
+    preventActivation: (event) =>
+      !!(event.target as Element).closest('[data-slot="kanban-card-actions"]'),
+  }),
+]
 
 function KanbanCardViewImpl<T extends { id: string }>({
   item,
@@ -474,14 +461,16 @@ function KanbanCardViewImpl<T extends { id: string }>({
   className?: string
   renderCard: (item: T) => React.ReactNode
 }) {
+  const bodyId = React.useId()
   const children = renderCard(item)
-  const { handleRef, ref, isDragging } = useSortable({
+  const { ref, isDragging } = useSortable({
     id: item.id,
     index,
     type: "item",
     accept: "item",
     group: column,
     transition: null,
+    sensors: cardSensors,
     plugins: configureCardSortablePlugins,
   })
 
@@ -499,23 +488,10 @@ function KanbanCardViewImpl<T extends { id: string }>({
         className
       )}
     >
-      {/* Each stop draws its own ring; z-10 keeps the sibling from covering it. */}
-      <button
-        type="button"
-        ref={handleRef}
-        data-slot="kanban-card-handle"
-        aria-label="Drag to move"
-        onClick={stopClick}
-        className={cn(
-          handleChrome,
-          stopFocus,
-          "cursor-grab hover:bg-muted/50 active:cursor-grabbing"
-        )}
-      >
-        <GripVertical className="size-4" aria-hidden />
-      </button>
+      {/* The body and the actions menu are separate tab stops; each draws its own ring. */}
       {onCardClick ? (
         <button
+          id={bodyId}
           type="button"
           data-slot="kanban-card-body"
           onClick={() => onCardClick(item)}
@@ -527,11 +503,106 @@ function KanbanCardViewImpl<T extends { id: string }>({
           {children}
         </button>
       ) : (
-        <div data-slot="kanban-card-body" className="min-w-0 flex-1 p-3">
+        <div
+          id={bodyId}
+          data-slot="kanban-card-body"
+          className="min-w-0 flex-1 p-3"
+        >
           {children}
         </div>
       )}
+      <KanbanCardActions
+        itemId={item.id}
+        column={column}
+        index={index}
+        bodyId={bodyId}
+      />
     </div>
+  )
+}
+
+function KanbanCardActions({
+  itemId,
+  column,
+  index,
+  bodyId,
+}: {
+  itemId: string
+  column: string
+  index: number
+  bodyId: string
+}) {
+  const actions = React.useContext(KanbanActionsContext)!
+  const choose = (targetId: string, targetIndex?: number) =>
+    actions.perform({
+      itemId,
+      initialGroup: column,
+      currentGroup: column,
+      targetGroup: null,
+      targetId,
+      index: targetIndex,
+    })
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon-sm"
+          data-slot="kanban-card-actions"
+          data-card-id={itemId}
+          aria-label="Card actions"
+          aria-describedby={bodyId}
+          className="m-1 self-start"
+        >
+          <MoreHorizontal />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        aria-label="Card actions"
+        onCloseAutoFocus={(event) => {
+          event.preventDefault()
+          actions.focusCard(itemId)
+        }}
+      >
+        <DropdownMenuItem
+          disabled={index === 0}
+          onSelect={() => choose(column, index - 1)}
+        >
+          Move up
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          disabled={index === (actions.groups[column]?.length ?? 0) - 1}
+          onSelect={() => choose(column, index + 1)}
+        >
+          Move down
+        </DropdownMenuItem>
+        {actions.columns
+          .filter((next) => next.id !== column)
+          .map((next) => (
+            <DropdownMenuItem key={next.id} onSelect={() => choose(next.id)}>
+              Move to {next.label}
+            </DropdownMenuItem>
+          ))}
+        {actions.completeLabel != null || actions.deleteLabel != null ? (
+          <DropdownMenuSeparator />
+        ) : null}
+        {actions.completeLabel != null ? (
+          <DropdownMenuItem onSelect={() => choose(KANBAN_COMPLETE_ID)}>
+            {actions.completeLabel}
+          </DropdownMenuItem>
+        ) : null}
+        {actions.deleteLabel != null ? (
+          <DropdownMenuItem
+            variant="destructive"
+            onSelect={() => choose(KANBAN_DELETE_ID)}
+          >
+            {actions.deleteLabel}
+          </DropdownMenuItem>
+        ) : null}
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 
@@ -642,57 +713,6 @@ function ActionZone({
       <Icon className="size-4 shrink-0" aria-hidden />
       {label}
     </div>
-  )
-}
-
-function ScrollButton({
-  side,
-  onClick,
-}: {
-  side: "start" | "end"
-  onClick: () => void
-}) {
-  const Icon = side === "start" ? ChevronLeft : ChevronRight
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon-sm"
-      data-slot="kanban-scroll-button"
-      aria-label={
-        side === "start" ? "Show previous columns" : "Show next columns"
-      }
-      onClick={onClick}
-      className={cn(
-        "absolute top-1/2 z-20 -translate-y-1/2",
-        side === "start" ? "left-1" : "right-1"
-      )}
-    >
-      <Icon />
-    </Button>
-  )
-}
-
-function OverflowFade({
-  side,
-  visible,
-}: {
-  side: "start" | "end"
-  visible: boolean
-}) {
-  return (
-    <div
-      aria-hidden
-      data-slot="kanban-overflow-fade"
-      data-side={side}
-      className={cn(
-        "pointer-events-none absolute inset-y-0 z-10 w-10 to-transparent transition-opacity",
-        side === "start"
-          ? "left-0 bg-gradient-to-r from-background"
-          : "right-0 bg-gradient-to-l from-background",
-        visible ? "opacity-100" : "opacity-0"
-      )}
-    />
   )
 }
 

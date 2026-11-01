@@ -2,9 +2,9 @@
   {
     "name": "Whole kit (every module)",
     "path": "dist/**/*.js",
-    "limit": "71.6 kB"
+    "limit": "73 kB"
   },
-  { "name": "kanban", "path": "dist/kanban.js", "limit": "4.35 kB" },
+  { "name": "kanban", "path": "dist/kanban.js", "limit": "5.1 kB" },
   { "name": "chart", "path": "dist/chart.js", "limit": "2.85 kB" },
   { "name": "combobox", "path": "dist/combobox.js", "limit": "2.6 kB" }
 ]

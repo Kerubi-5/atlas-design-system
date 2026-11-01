@@ -85,7 +85,11 @@ export function FormToggleGroupField<T extends string>({
         size={size}
         spacing={0}
         disabled={disabled}
-        {...fieldAria(id, errorText, { description, labelledBy: "label" })}
+        {...fieldAria(id, errorText, {
+          description,
+          required,
+          labelledBy: "label",
+        })}
         className={className}
       >
         {options.map((option) => (

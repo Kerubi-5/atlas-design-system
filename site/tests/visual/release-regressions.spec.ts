@@ -331,8 +331,8 @@ for (const theme of THEMES) {
     page,
   }) => {
     // Where the focused element's 2px ring + 2px offset lands against every
-    // clipping ancestor; a negative side is clipped. Kanban rings the grip
-    // or the body, so measure the focused stop.
+    // clipping ancestor; a negative side is clipped. Kanban rings the body
+    // or the actions button, so measure the focused stop.
     const ringClearance = () =>
       page.evaluate(() => {
         const focused = document.activeElement as HTMLElement
@@ -375,12 +375,7 @@ for (const theme of THEMES) {
       ["data-display-chart--spend-line", 390, ["SVG"], 1],
       ["navigation-tabs--nav", 390, ["tabs-nav-link"], 6],
       ["navigation-tabs--nav", 768, ["tabs-nav-link"], 6],
-      [
-        "data-display-kanban--board",
-        390,
-        ["kanban-card-handle", "kanban-card-body"],
-        4,
-      ],
+      ["data-display-kanban--board", 390, ["kanban-card-body"], 4],
     ] as const) {
       await page.setViewportSize({ width, height: 844 })
       await openStory(page, "", id, theme)

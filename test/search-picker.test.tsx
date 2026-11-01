@@ -187,6 +187,34 @@ describe("SearchPicker", () => {
     expect(screen.getByRole("button", { name: "Next field" })).toHaveFocus()
   })
 
+  it("keeps keyboard navigation working after clicking a filtered option", async () => {
+    const user = createUser()
+    render(<PickerHarness />)
+    await user.type(getCombobox(), "nor")
+    await user.click(screen.getByRole("option", { name: "North" }))
+    expect(getCombobox()).toHaveFocus()
+    expect(getCombobox()).toHaveValue("")
+    await user.keyboard("{ArrowDown}{Enter}")
+    expect(screen.getByRole("option", { name: "South" })).toHaveAttribute(
+      "aria-selected",
+      "true"
+    )
+  })
+
+  it.each([
+    { shiftKey: true },
+    { ctrlKey: true },
+    { metaKey: true },
+    { altKey: true },
+  ])("leaves modified editing keys to the browser: %j", (modifier) => {
+    render(<PickerHarness />)
+    const before = activeOptionLabel()
+    for (const key of ["Home", "End", "ArrowUp", "ArrowDown"]) {
+      expect(fireEvent.keyDown(getCombobox(), { key, ...modifier })).toBe(true)
+      expect(activeOptionLabel()).toBe(before)
+    }
+  })
+
   it("does not select on Enter while an IME is composing", () => {
     const onSelect = vi.fn()
     render(<PickerHarness onSelect={onSelect} />)

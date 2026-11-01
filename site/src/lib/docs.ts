@@ -2,7 +2,6 @@ export const GITHUB_URL = "https://github.com/Kerubi-5/atlas-design-system"
 export const NPM_URL = "https://www.npmjs.com/package/atlas-react-kit"
 const GITHUB_NOTICE = `${GITHUB_URL}/blob/main/NOTICE`
 const GITHUB_CONTRIBUTING = `${GITHUB_URL}/blob/main/CONTRIBUTING.md`
-const GITHUB_ROADMAP = `${GITHUB_URL}/blob/main/ROADMAP-1.0.md`
 const GITHUB_CHANGELOG = `${GITHUB_URL}/blob/main/CHANGELOG.md`
 const GITHUB_SKILL = `${GITHUB_URL}/blob/main/skills/atlas-react-kit/SKILL.md`
 
@@ -14,7 +13,6 @@ const docLinkMap: Record<string, string> = {
   "./README.md": "/docs/docs-readme--docs",
   "./NOTICE": GITHUB_NOTICE,
   "./CONTRIBUTING.md": GITHUB_CONTRIBUTING,
-  "./ROADMAP-1.0.md": GITHUB_ROADMAP,
   "./CHANGELOG.md": GITHUB_CHANGELOG,
   "./skills/atlas-react-kit/SKILL.md": GITHUB_SKILL,
 }

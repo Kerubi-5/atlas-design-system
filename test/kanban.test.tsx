@@ -1,16 +1,18 @@
-import { AutoScroller, Feedback, defaultPreset } from "@dnd-kit/dom"
+import {
+  Accessibility,
+  AutoScroller,
+  Feedback,
+  defaultPreset,
+} from "@dnd-kit/dom"
 import {
   OptimisticSortingPlugin,
   SortableKeyboardPlugin,
 } from "@dnd-kit/dom/sortable"
-import { fireEvent } from "@testing-library/react"
+import { createRef, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import {
   buildKanbanGroups,
-  kanbanOverflowEdges,
-  kanbanScrollBy,
-  kanbanScrollStepPx,
   resolveKanbanDrop,
 } from "../src/internal/kanban-layout.js"
 import {
@@ -61,6 +63,133 @@ function renderBoard(props: Partial<KanbanBoardProps<Card>> = {}) {
 }
 
 describe("KanbanBoard", () => {
+  it.each([
+    [0, "Move down", "todo", 2, undefined],
+    [1, "Move up", "todo", undefined, 1],
+    [0, "Move to Doing", "doing", 1, undefined],
+    [0, "Move to Done", "done", undefined, undefined],
+  ] as const)(
+    "moves card %i with %s without dragging",
+    async (index, command, column, beforePosition, afterPosition) => {
+      const user = createUser()
+      const onMove = vi.fn()
+      const onCardClick = vi.fn()
+      renderBoard({ onMove, onCardClick })
+      await user.click(
+        screen.getAllByRole("button", { name: "Card actions" })[index]!
+      )
+      await user.click(screen.getByRole("menuitem", { name: command }))
+      expect(onMove).toHaveBeenCalledExactlyOnceWith(cards[index], column, {
+        beforePosition,
+        afterPosition,
+      })
+      expect(onCardClick).not.toHaveBeenCalled()
+    }
+  )
+
+  it("disables reordering at column boundaries and omits the current column", async () => {
+    const user = createUser()
+    renderBoard()
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[0]!
+    )
+    expect(screen.getByRole("menuitem", { name: "Move up" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+    expect(
+      screen.queryByRole("menuitem", { name: "Move to To do" })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("menuitem", { name: "Finish" })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByRole("menuitem", { name: "Remove" })
+    ).not.toBeInTheDocument()
+    await user.keyboard("{Escape}")
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[1]!
+    )
+    expect(screen.getByRole("menuitem", { name: "Move down" })).toHaveAttribute(
+      "aria-disabled",
+      "true"
+    )
+  })
+
+  it.each([
+    ["Mark done", "onComplete"],
+    ["Archive", "onDelete"],
+  ] as const)("offers %s outside a drag", async (label, callback) => {
+    const user = createUser()
+    const handler = vi.fn()
+    renderBoard({
+      [callback]: handler,
+      completeLabel: "Mark done",
+      deleteLabel: "Archive",
+    })
+    await user.click(
+      screen.getAllByRole("button", { name: "Card actions" })[0]!
+    )
+    await user.click(screen.getByRole("menuitem", { name: label }))
+    expect(handler).toHaveBeenCalledExactlyOnceWith("a")
+  })
+
+  it("restores keyboard focus after moving a card across columns and removing it", async () => {
+    const externalRef = createRef<HTMLDivElement>()
+    function EditableBoard() {
+      const [items, setItems] = useState([cards[0]!])
+      return (
+        <KanbanBoard
+          ref={externalRef}
+          columns={columns}
+          items={items}
+          getColumnId={getColumnId}
+          renderCard={renderCard}
+          onMove={(item, stage) =>
+            setItems((items) =>
+              items.map((next) =>
+                next.id === item.id ? { ...next, stage } : next
+              )
+            )
+          }
+          onDelete={(id) =>
+            setItems((items) => items.filter((item) => item.id !== id))
+          }
+        />
+      )
+    }
+    const user = createUser()
+    render(<EditableBoard />)
+    const trigger = screen.getByRole("button", { name: "Card actions" })
+    expect(externalRef.current).toBe(screen.getByRole("group"))
+    expect(trigger).toHaveAccessibleDescription("Write spec")
+    trigger.focus()
+    await user.keyboard("{Enter}")
+    await user.keyboard("{Escape}")
+    await vi.waitFor(() => expect(trigger).toHaveFocus())
+    await user.keyboard("{Enter}")
+    // Move down is disabled for the sole card; the first enabled action
+    // moves it into Doing without any pointer gesture.
+    await vi.waitFor(() =>
+      expect(
+        screen.getByRole("menuitem", { name: "Move to Doing" })
+      ).toHaveFocus()
+    )
+    await user.keyboard("{Enter}")
+    expect(
+      within(
+        document.querySelectorAll(
+          '[data-slot="kanban-column"]'
+        )[1]! as HTMLElement
+      ).getByText("Write spec")
+    ).toBeInTheDocument()
+    const movedTrigger = screen.getByRole("button", { name: "Card actions" })
+    await vi.waitFor(() => expect(movedTrigger).toHaveFocus())
+    await user.keyboard("{Enter}")
+    await user.click(screen.getByRole("menuitem", { name: "Remove" }))
+    await vi.waitFor(() => expect(screen.getByRole("group")).toHaveFocus())
+  })
+
   it("renders columns in order with counts, badges, and empty copy", () => {
     renderBoard({ emptyLabel: "Drop a card" })
 
@@ -82,33 +211,27 @@ describe("KanbanBoard", () => {
     renderBoard({ onCardClick: vi.fn() })
 
     const card = slot("kanban-card")
-    const grip = slot("kanban-card-handle")
     const body = slot("kanban-card-body")
 
     // Failed while both stops used `focusRingWithin` on the card: a keyboard
-    // user could not tell the grip from the body. Each stop now carries the
-    // shared `focusRing` hook.
+    // user could not tell the stops apart. Each stop now carries the shared
+    // `focusRing` hook.
     expect(classes(card)).not.toContain("has-focus-visible:ring-2")
     expect(classes(card)).not.toContain("has-focus-visible:ring-ring")
-    expect(classes(grip)).toContain("focus-visible:ring-2")
-    expect(classes(grip)).toContain("focus-visible:ring-ring")
     expect(classes(body)).toContain("focus-visible:ring-2")
     expect(classes(body)).toContain("focus-visible:ring-ring")
   })
 
-  it("opens a card from its body and keeps the grip separate", async () => {
+  it("opens a card from its body and has no separate drag grip", async () => {
     const user = createUser()
     const onCardClick = vi.fn()
     renderBoard({ onCardClick })
 
     await user.click(screen.getByRole("button", { name: "Ship it" }))
     expect(onCardClick).toHaveBeenCalledWith(cards[2])
-
-    const grips = screen.getAllByRole("button", { name: "Drag to move" })
-    expect(grips).toHaveLength(3)
-    // A real pointer press starts a dnd-kit drag, which needs layout jsdom lacks.
-    fireEvent.click(grips[0]!)
-    expect(onCardClick).toHaveBeenCalledTimes(1)
+    expect(
+      screen.queryByRole("button", { name: "Drag to move" })
+    ).not.toBeInTheDocument()
   })
 
   it("renders a static card body when cards do not open", () => {
@@ -178,9 +301,6 @@ describe("KanbanBoard", () => {
     const card = document.querySelector('[data-slot="kanban-card"]')
     expect(card).toHaveClass("shadow-none")
     expect(card).not.toHaveClass("shadow-sm")
-    expect(
-      document.querySelector('[data-slot="kanban-card-handle"]')
-    ).toBeInTheDocument()
     expect(
       document.querySelector('[data-slot="kanban-column-header"]')
     ).toBeInTheDocument()
@@ -314,68 +434,19 @@ describe("resolveKanbanDrop", () => {
   })
 })
 
-describe("kanbanOverflowEdges", () => {
-  it("hides both cues when content fits", () => {
-    expect(kanbanOverflowEdges(0, 375, 375)).toEqual({
-      start: false,
-      end: false,
-    })
-  })
-
-  it("shows the end cue at the start of an overflowing board", () => {
-    expect(kanbanOverflowEdges(0, 343, 1132)).toEqual({
-      start: false,
-      end: true,
-    })
-  })
-
-  it("shows both cues in the middle and only the start cue at the end", () => {
-    expect(kanbanOverflowEdges(200, 343, 1132)).toEqual({
-      start: true,
-      end: true,
-    })
-    expect(kanbanOverflowEdges(789, 343, 1132)).toEqual({
-      start: true,
-      end: false,
-    })
-  })
-})
-
-describe("kanbanScrollBy", () => {
-  it("pages by most of the viewport, never less than one narrow column", () => {
-    expect(kanbanScrollStepPx(343)).toBe(Math.round(343 * 0.75))
-    expect(kanbanScrollStepPx(80)).toBe(140)
-  })
-
-  it("no-ops without a scroller and scrolls one step when present", () => {
-    kanbanScrollBy(null, 1)
-    const scrollBy = vi.fn()
-    kanbanScrollBy({ clientWidth: 200, scrollBy }, 1)
-    expect(scrollBy).toHaveBeenCalledWith({
-      left: kanbanScrollStepPx(200),
-      behavior: "smooth",
-    })
-    kanbanScrollBy({ clientWidth: 200, scrollBy }, -1)
-    expect(scrollBy).toHaveBeenLastCalledWith({
-      left: -kanbanScrollStepPx(200),
-      behavior: "smooth",
-    })
-  })
-})
-
-/**
- * Feedback must stay active so DragOverlay is positioned; `feedback: "none"`
- * leaves a static overlay. Checked against the real default preset so a
- * dnd-kit upgrade fails here.
- */
 describe("kanban plugins", () => {
   const result = configureKanbanPlugins([...defaultPreset.plugins])
 
-  it("keeps AutoScroller and every other default plugin", () => {
+  it("keeps AutoScroller and every other default plugin but Accessibility", () => {
     expect(result).toContain(AutoScroller)
-    for (const plugin of defaultPreset.plugins.filter((p) => p !== Feedback)) {
-      expect(result).toContain(plugin)
-    }
+    const kept = defaultPreset.plugins.filter(
+      (p) => p !== Feedback && p !== Accessibility
+    )
+    for (const plugin of kept) expect(result).toContain(plugin)
+  })
+
+  it("drops Accessibility, which would mark each card a button", () => {
+    expect(result).not.toContain(Accessibility)
   })
 
   it("keeps Feedback with the drop animation off", () => {
@@ -395,42 +466,6 @@ describe("kanban plugins", () => {
   })
 })
 
-describe("KanbanBoard overflow cues", () => {
-  it("shows fades and scroll buttons once columns overflow", async () => {
-    const user = createUser()
-    renderBoard()
-    const scroller = document.querySelector<HTMLElement>(
-      '[data-slot="kanban-scroller"]'
-    )!
-    Object.defineProperties(scroller, {
-      clientWidth: { configurable: true, value: 300 },
-      scrollWidth: { configurable: true, value: 900 },
-    })
-    const scrollBy = vi.fn()
-    scroller.scrollBy = scrollBy as typeof scroller.scrollBy
-
-    scroller.scrollLeft = 200
-    fireEvent.scroll(scroller)
-    expect(scroller).toHaveAttribute("data-overflow-start")
-    expect(scroller).toHaveAttribute("data-overflow-end")
-    expect(
-      screen.getByText(
-        "More columns available. Scroll horizontally to see them."
-      )
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole("button", { name: "Show next columns" }))
-    expect(scrollBy).toHaveBeenLastCalledWith({ left: 225, behavior: "smooth" })
-    await user.click(
-      screen.getByRole("button", { name: "Show previous columns" })
-    )
-    expect(scrollBy).toHaveBeenLastCalledWith({
-      left: -225,
-      behavior: "smooth",
-    })
-  })
-})
-
 describe("KanbanBoard render counts", () => {
   // Interactions that repeat many times a second. Each case failed before
   // its fix; the PR that added it records the before and after.
@@ -443,21 +478,6 @@ describe("KanbanBoard render counts", () => {
       stage: column.id,
     }))
   )
-
-  it("does not re-render its cards while scrolling leaves the overflow edges unchanged", () => {
-    const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)
-    const { container } = renderBoard({
-      columns: stages,
-      items: manyCards,
-      renderCard,
-    })
-    const scroller = container.querySelector<HTMLElement>(
-      "[data-slot=kanban-scroller]"
-    )!
-    renderCard.mockClear()
-    for (let i = 0; i < 20; i += 1) fireEvent.scroll(scroller)
-    expect(renderCard).toHaveBeenCalledTimes(0)
-  })
 
   it("re-renders only the card whose item changed", () => {
     const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)

@@ -9,4 +9,5 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const Board: Story = { render: () => <KanbanStory /> }
+export const CardActions: Story = { render: () => <KanbanStory /> }
 export const Loading: Story = { render: () => <KanbanSkeletonStory /> }

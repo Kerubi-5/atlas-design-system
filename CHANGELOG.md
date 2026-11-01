@@ -1,5 +1,24 @@
 # Changelog
 
+## Unreleased
+
+- `KanbanBoard` (beta): the whole card is the drag source and the grip is
+  gone. A click still opens the card; a press drags once the pointer moves or
+  touch holds. The cursor stays native. The `kanban-card-handle` slot is
+  removed, and keyboard users move cards from the Card actions menu. The
+  hand-built scroll buttons, edge fades and scroll hint are gone too: the
+  columns scroll sideways natively.
+- `TabsNav` and `TabsList` no longer drag sideways with a mouse (added in
+  1.1). Touch, wheel, keyboard and the scrollbar scroll the row as before.
+- Kanban cards offer an actions menu for moving between columns, reordering,
+  finishing, and removing without dragging. Focus follows a moved card and
+  returns to the board when its last card is removed.
+- Slider forwards value text, descriptions, and validation messages to its
+  focusable thumb. Required toggle fields expose their required state.
+- SearchPicker keeps input focus after pointer selection. Search-driven
+  listboxes preserve modified text-editing shortcuts such as Shift+Home.
+- Invalid-submit focus continues past controls that cannot receive focus.
+
 ## 1.2.9 - 2026-10-29
 
 Bug fixes. Apps only need to bump the package. `--skeleton` is a new fill

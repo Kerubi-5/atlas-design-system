@@ -10,6 +10,7 @@ import {
 } from "../browser.mjs"
 
 const controls = [
+  ["data-display-kanban--board", "[data-slot=kanban-card-actions]"],
   ["actions-button--variants", "[data-slot=button]:not(:disabled)"],
   ["overlays-info-tip--layouts", "[data-slot=info-tip-trigger]"],
   ["navigation-tabs--composition", "[data-slot=tabs-trigger]"],
@@ -21,6 +22,99 @@ const controls = [
   ["overlays-dialog--playground", "[data-slot=dialog-close-button]"],
   ["feedback-toast--plain", "[data-close-button]"],
 ] as const
+
+test("SearchPicker keeps keyboard navigation after a pointer selection", async ({
+  page,
+}) => {
+  await openStory(page, "", "forms-search-picker--example")
+  const input = page.getByRole("combobox", { name: "Place" })
+  await input.fill("East")
+  await page.getByRole("option", { name: "East ward" }).click()
+  await expect(input).toBeFocused()
+  await expect(input).toHaveValue("")
+  const before = await input.getAttribute("aria-activedescendant")
+  await page.keyboard.press("ArrowDown")
+  await expect(input).not.toHaveAttribute("aria-activedescendant", before!)
+  const activeId = await input.getAttribute("aria-activedescendant")
+  await page.keyboard.press("Enter")
+  await expect(page.locator(`[role=option][id="${activeId}"]`)).toHaveAttribute(
+    "aria-selected",
+    "true"
+  )
+})
+
+for (const picker of [
+  "forms-search-picker--example",
+  "forms-combobox--playground",
+]) {
+  test(`${picker} preserves Shift+Home text selection`, async ({ page }) => {
+    await openStory(page, "", picker)
+    if (picker === "forms-combobox--playground")
+      await page.getByRole("combobox").click()
+    const input = page.locator("input").first()
+    await input.fill("test")
+    await input.press("End")
+    await input.press("Shift+Home")
+    expect(
+      await input.evaluate((element) => ({
+        start: element.selectionStart,
+        end: element.selectionEnd,
+      }))
+    ).toEqual({ start: 0, end: 4 })
+  })
+}
+
+for (const width of WIDTHS) {
+  test(`Kanban actions move, reorder, and remove cards without dragging at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: DESKTOP.height })
+    await openStory(page, "", "data-display-kanban--board")
+    const card = () =>
+      page
+        .locator('[data-slot="kanban-card"]')
+        .filter({ hasText: "Harbor Coffee" })
+    const action = () => card().getByRole("button", { name: "Card actions" })
+    await action().click()
+    await page.getByRole("menuitem", { name: "Move down", exact: true }).click()
+    await expect(
+      page
+        .locator('[data-slot="kanban-column"]')
+        .first()
+        .locator('[data-slot="kanban-card-body"]')
+    ).toHaveText(["North Clinic", "Harbor Coffee"])
+    await expect(action()).toBeFocused()
+    await action().click()
+    await page
+      .getByRole("menuitem", { name: "Move to Talking", exact: true })
+      .click()
+    await expect(
+      page
+        .locator('[data-slot="kanban-column"]')
+        .nth(1)
+        .locator('[data-slot="kanban-card-body"]')
+    ).toHaveText(["Pine Studio", "Harbor Coffee"])
+    await expect(action()).toBeFocused()
+    await action().press("Enter")
+    await page
+      .getByRole("menuitem", { name: "Move to Won", exact: true })
+      .focus()
+    await page.keyboard.press("Enter")
+    await expect(
+      page
+        .locator('[data-slot="kanban-column"]')
+        .nth(2)
+        .locator('[data-slot="kanban-card-body"]')
+    ).toHaveText(["Harbor Coffee"])
+    await expect(action()).toBeFocused()
+    await action().click()
+    await page.getByRole("menuitem", { name: "Remove", exact: true }).click()
+    await expect(card()).toHaveCount(0)
+    await expect(
+      page.getByRole("button", { name: "Card actions" }).first()
+    ).toBeFocused()
+  })
+}
 
 for (const width of WIDTHS) {
   for (const theme of THEMES) {

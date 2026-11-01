@@ -89,6 +89,7 @@ function SearchPicker<T>({
   ...props
 }: SearchPickerProps<T>) {
   const [query, setQuery] = React.useState("")
+  const inputRef = React.useRef<HTMLInputElement>(null)
   const listId = React.useId()
   const inputId = React.useId()
 
@@ -137,6 +138,9 @@ function SearchPicker<T>({
 
   const selectItem = React.useCallback(
     (item: T) => {
+      // Options use aria-activedescendant, so pointer selection must leave
+      // keyboard focus on the input. Let the caller move it elsewhere next.
+      inputRef.current?.focus()
       onSelect(item)
       setQuery("")
     },
@@ -167,6 +171,7 @@ function SearchPicker<T>({
     >
       <Label htmlFor={inputId}>{label}</Label>
       <Input
+        ref={inputRef}
         id={inputId}
         role="combobox"
         aria-expanded

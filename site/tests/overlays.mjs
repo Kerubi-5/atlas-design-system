@@ -56,6 +56,12 @@ export async function openOverlay(page, overlay) {
 
 export const OVERLAYS = [
   {
+    id: "data-display-kanban--card-actions",
+    shows: "[role=menu]",
+    open: (page) =>
+      page.getByRole("button", { name: "Card actions" }).first().click(),
+  },
+  {
     id: "actions-dropdown-menu--row-actions",
     shows: "[role=menu]",
     open: (page) => page.getByRole("button", { name: "Actions" }).click(),

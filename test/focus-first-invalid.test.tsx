@@ -6,6 +6,8 @@ import { FormSelectField } from "../src/form/select-field.js"
 import { FormTextField } from "../src/form/text-field.js"
 import { SelectItem } from "../src/select.js"
 
+import { FormToggleGroupField } from "../src/form/toggle-group-field.js"
+
 import { fakeTextField, render, screen } from "./helpers.js"
 
 /** An invalid-submit event whose fields with `errors` are the invalid ones. */
@@ -30,6 +32,48 @@ function OrderForm() {
 }
 
 describe("focusFirstInvalid", () => {
+  it("continues past disabled and hidden invalid controls", () => {
+    render(
+      <form id="order">
+        <input aria-label="Disabled" data-field-name="disabled" disabled />
+        <input type="hidden" data-field-name="hidden" />
+        <input aria-label="Available" data-field-name="available" />
+        <button type="submit">Save</button>
+      </form>
+    )
+    screen.getByRole("button", { name: "Save" }).focus()
+    focusFirstInvalid("order")(
+      invalidSubmit({
+        disabled: { errors: ["Invalid"] },
+        hidden: { errors: ["Invalid"] },
+        available: { errors: ["Invalid"] },
+      })
+    )
+    expect(screen.getByRole("textbox", { name: "Available" })).toHaveFocus()
+  })
+
+  it("accepts focus that a radio group moves to its selected option", () => {
+    render(
+      <form id="order">
+        <FormToggleGroupField
+          fieldName="type"
+          label="Type"
+          value="a"
+          onValueChange={() => {}}
+          options={[{ value: "a", label: "A" }]}
+        />
+        <input aria-label="Later" data-field-name="later" />
+      </form>
+    )
+    focusFirstInvalid("order")(
+      invalidSubmit({
+        type: { errors: ["Invalid"] },
+        later: { errors: ["Invalid"] },
+      })
+    )
+    expect(screen.getByRole("radio", { name: "A" })).toHaveFocus()
+  })
+
   it("focuses the first invalid field in page order", () => {
     render(<OrderForm />)
     focusFirstInvalid("order")(
