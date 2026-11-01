@@ -56,8 +56,6 @@ with the application.
 - [Design rules](./DESIGN_RULES.md): tokens, accessibility, writing, and
   composition. This guide ships in the npm package.
 - [Contributing](./CONTRIBUTING.md): component changes, checks, and releases.
-- [Decisions behind 1.0 (record)](./ROADMAP-1.0.md): the closed roadmap that
-  led to 1.0.0.
 - [Changelog](./CHANGELOG.md): published and upcoming changes.
 
 ## AI coding assistants
