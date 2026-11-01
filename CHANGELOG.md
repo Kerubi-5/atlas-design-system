@@ -8,6 +8,8 @@
   removed, and keyboard users move cards from the Card actions menu. The
   hand-built scroll buttons, edge fades and scroll hint are gone too: the
   columns scroll sideways natively.
+- `TabsNav` and `TabsList` no longer drag sideways with a mouse (added in
+  1.1). Touch, wheel, keyboard and the scrollbar scroll the row as before.
 - Kanban cards offer an actions menu for moving between columns, reordering,
   finishing, and removing without dragging. Focus follows a moved card and
   returns to the board when its last card is removed.

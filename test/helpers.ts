@@ -1,11 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react"
+import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { afterEach, expect, onTestFinished, vi } from "vitest"
 
@@ -170,40 +163,10 @@ export function recordScrollIntoView() {
   return spy
 }
 
-/** A primary-button mouse pointer, for the `press`/`move`/`release` steps. */
-export const mouse = { pointerType: "mouse", pointerId: 1, button: 0 }
-
-/** Pointer down at `clientX` with the button held. */
-export function press(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerDown(element, { ...init, buttons: 1, clientX })
-}
-
-/** Pointer move to `clientX` with the button held. */
-export function move(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerMove(element, { ...init, buttons: 1, clientX })
-}
-
-/** Pointer up at `clientX`. */
-export function release(element: Element, clientX: number, init = mouse) {
-  fireEvent.pointerUp(element, { ...init, buttons: 0, clientX })
-}
-
-/** Press at `from`, move to `to` and release, the way a mouse drag arrives. */
-export function dragWithMouse(
-  element: Element,
-  from: number,
-  to: number,
-  init = mouse
-) {
-  press(element, from, init)
-  move(element, to, init)
-  release(element, to, init)
-}
-
 /**
  * jsdom has no layout, so every element reports an 800px row in a 390px
- * box while `run` executes: a horizontal scroller overflows, joins the tab
- * order and takes mouse drags.
+ * box while `run` executes: a horizontal scroller overflows and joins the tab
+ * order.
  */
 export async function withOverflow(run: () => Promise<void>) {
   const descriptors = {

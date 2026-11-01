@@ -3,7 +3,6 @@ import { fireEvent } from "@testing-library/react"
 import { renderToStaticMarkup } from "react-dom/server"
 import { describe, expect, it, vi } from "vitest"
 
-import { DRAG_THRESHOLD } from "../src/internal/use-drag-scroll.js"
 import { TabsNavLink } from "../src/next/tabs-nav-link.js"
 import {
   Tabs,
@@ -22,11 +21,7 @@ import {
 
 import {
   createUser,
-  dragWithMouse,
-  move,
-  press,
   recordScrollIntoView,
-  release,
   render,
   screen,
   waitFor,
@@ -50,15 +45,6 @@ const html = renderToStaticMarkup(
 
 function scrollerOf(element: HTMLElement | null) {
   return element?.closest("[data-slot=tabs-scroller]") ?? null
-}
-
-/** The scroller once `useHorizontalOverflow` has seen the overflow. */
-async function overflowingScroller(element: HTMLElement) {
-  const scroller = scrollerOf(element) as HTMLElement
-  await waitFor(() => {
-    expect(scroller).toHaveAttribute("tabindex", "0")
-  })
-  return scroller
 }
 
 function expectHorizontalOnlyScroller(element: Element | null) {
@@ -205,7 +191,7 @@ describe("TabsNav", () => {
     })
   })
 
-  it("stays out of the tab order and ignores mouse drags while the row fits", () => {
+  it("stays out of the tab order while the row fits", () => {
     const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault())
     render(
       <TabsNav aria-label="Settings">
@@ -217,9 +203,6 @@ describe("TabsNav", () => {
     const link = screen.getByRole("link", { name: "Activity" })
     const scroller = scrollerOf(link) as HTMLElement
     expect(scroller).not.toHaveAttribute("tabindex")
-    scroller.scrollLeft = 100
-    dragWithMouse(link, 200, 100)
-    expect(scroller.scrollLeft).toBe(100)
     fireEvent.click(link)
     expect(onClick).toHaveBeenCalledTimes(1)
   })
@@ -268,66 +251,6 @@ describe("TabsNav in a persistent layout", () => {
     // Re-renders that keep the same active link do not scroll again.
     rerender(<PersistentNav active="Foxtrot" />)
     expect(scrollIntoView).toHaveBeenCalledTimes(2)
-  })
-})
-
-describe("TabsNav mouse drag", () => {
-  function renderLinks(onClick: (event: React.MouseEvent) => void) {
-    render(
-      <TabsNav aria-label="Settings">
-        <BaseTabsNavLink href="#activity" active onClick={onClick}>
-          Activity
-        </BaseTabsNavLink>
-        <BaseTabsNavLink href="#preferences" active={false} onClick={onClick}>
-          Preferences
-        </BaseTabsNavLink>
-      </TabsNav>
-    )
-    return screen.getByRole("link", { name: "Preferences" })
-  }
-
-  it("scrolls the row by the drag distance both ways without following the link", async () => {
-    await withOverflow(async () => {
-      const onClick = vi.fn()
-      const link = renderLinks(onClick)
-      const scroller = await overflowingScroller(link)
-      scroller.scrollLeft = 100
-
-      // Right to left: the content follows the pointer, so scrollLeft grows.
-      dragWithMouse(link, 200, 170)
-      expect(scroller.scrollLeft).toBe(130)
-      // The browser fires the click after pointerup; the drag swallows it.
-      expect(fireEvent.click(link)).toBe(false)
-      expect(onClick).not.toHaveBeenCalled()
-
-      // Left to right.
-      dragWithMouse(link, 200, 260)
-      expect(scroller.scrollLeft).toBe(70)
-      expect(fireEvent.click(link)).toBe(false)
-      expect(onClick).not.toHaveBeenCalled()
-    })
-  })
-
-  it("keeps a plain click on a link working", async () => {
-    await withOverflow(async () => {
-      const onClick = vi.fn((event: React.MouseEvent) => event.preventDefault())
-      const link = renderLinks(onClick)
-      const scroller = await overflowingScroller(link)
-      scroller.scrollLeft = 100
-
-      // A press that wobbles less than the threshold is still a click.
-      press(link, 200)
-      move(link, 200 + DRAG_THRESHOLD - 1)
-      release(link, 203)
-      fireEvent.click(link)
-      expect(onClick).toHaveBeenCalledTimes(1)
-      expect(scroller.scrollLeft).toBe(100)
-
-      // The full browser sequence for a click, with no movement at all.
-      await createUser().click(link)
-      expect(onClick).toHaveBeenCalledTimes(2)
-      expect(scroller.scrollLeft).toBe(100)
-    })
   })
 })
 
@@ -472,27 +395,6 @@ describe("TabsList overflow", () => {
     expect(scroller).toHaveAttribute("data-variant", "default")
     expect(scroller).not.toHaveClass("pb-2")
     expectScrollerFitsList(scroller, list)
-  })
-
-  it("takes the same mouse drag as TabsNav and keeps plain clicks", async () => {
-    await withOverflow(async () => {
-      const onClick = vi.fn()
-      render(<OrderTabs onActivityClick={onClick} />)
-      const tab = screen.getByRole("tab", { name: "Activity" })
-      const scroller = await overflowingScroller(tab)
-      scroller.scrollLeft = 100
-
-      dragWithMouse(tab, 200, 150)
-      expect(scroller.scrollLeft).toBe(150)
-      expect(fireEvent.click(tab)).toBe(false)
-      expect(onClick).not.toHaveBeenCalled()
-
-      // Radix selects on press, so a plain click still switches the tab.
-      await createUser().click(tab)
-      expect(tab).toHaveAttribute("aria-selected", "true")
-      expect(onClick).toHaveBeenCalledTimes(1)
-      expect(scroller.scrollLeft).toBe(150)
-    })
   })
 
   it("gives the line variant extra bottom padding for the underline", () => {

@@ -15,7 +15,6 @@ import {
   tabsScrollerVariants,
   tabsTriggerVariants,
 } from "./internal/tabs-styles.js"
-import { useDragScroll } from "./internal/use-drag-scroll.js"
 import {
   revealInline,
   useHorizontalOverflow,
@@ -64,8 +63,7 @@ function Tabs({
  * active tab's border and focus ring grow a vertical scrollbar. Pad for
  * those strokes *inside* the box (`h-9` = `h-7` list + `p-1`), clip the
  * y axis as a backstop, and fade the edges while the row overflows —
- * same cue as `Table`. While it overflows, a mouse can also drag the row
- * sideways (`useDragScroll`); touch, wheel and keyboard scroll as before.
+ * same cue as `Table`. `revealInline` keeps a focused tab's ring in view.
  */
 function TabsScroller({
   variant = "default",
@@ -84,7 +82,6 @@ function TabsScroller({
   const ref = React.useRef<HTMLDivElement>(null)
   const revealed = React.useRef<HTMLElement | null>(null)
   const overflowing = useHorizontalOverflow(ref)
-  useDragScroll(ref, overflowing)
 
   // Runs after every render, not just mount: TabsNav usually sits in a
   // persistent layout, so a route change updates the active link in place.
