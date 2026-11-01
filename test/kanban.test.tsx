@@ -1,4 +1,9 @@
-import { AutoScroller, Feedback, defaultPreset } from "@dnd-kit/dom"
+import {
+  Accessibility,
+  AutoScroller,
+  Feedback,
+  defaultPreset,
+} from "@dnd-kit/dom"
 import {
   OptimisticSortingPlugin,
   SortableKeyboardPlugin,
@@ -490,11 +495,16 @@ describe("kanbanScrollBy", () => {
 describe("kanban plugins", () => {
   const result = configureKanbanPlugins([...defaultPreset.plugins])
 
-  it("keeps AutoScroller and every other default plugin", () => {
+  it("keeps AutoScroller and every other default plugin but Accessibility", () => {
     expect(result).toContain(AutoScroller)
-    for (const plugin of defaultPreset.plugins.filter((p) => p !== Feedback)) {
-      expect(result).toContain(plugin)
-    }
+    const kept = defaultPreset.plugins.filter(
+      (p) => p !== Feedback && p !== Accessibility
+    )
+    for (const plugin of kept) expect(result).toContain(plugin)
+  })
+
+  it("drops Accessibility, which would mark each card a button", () => {
+    expect(result).not.toContain(Accessibility)
   })
 
   it("keeps Feedback with the drop animation off", () => {

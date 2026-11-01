@@ -11,25 +11,26 @@ type PluginsProp = NonNullable<
  * Board plugins. AutoScroller stays (edge scroll while dragging). Feedback
  * stays because it positions and sizes `DragOverlay`; `feedback: "none"`
  * would leave the overlay behind. The drop animation is off so it does not
- * snap twice against an optimistic update.
+ * snap twice against an optimistic update. Accessibility goes: it marks every
+ * card a focusable button around its own buttons (axe nested-interactive),
+ * and pointer drags need no ARIA; keyboard users move cards from the actions
+ * menu.
  */
 export const configureKanbanPlugins: Extract<
   PluginsProp,
   (...args: never[]) => unknown
 > = (defaults) =>
-  defaults.map((plugin) =>
-    plugin === Feedback ? Feedback.configure({ dropAnimation: null }) : plugin
-  )
+  defaults
+    .filter((plugin) => plugin !== Accessibility)
+    .map((plugin) =>
+      plugin === Feedback ? Feedback.configure({ dropAnimation: null }) : plugin
+    )
 
 /**
  * Cards leave out OptimisticSortingPlugin: it moves DOM nodes under React and
  * throws `removeChild` on re-render (dnd-kit #1747). Column layout comes from
- * the consumer's `items`. They also leave out Accessibility, which would mark
- * the whole card as a focusable button around its own buttons; pointer drags
- * need no ARIA, and keyboard users move cards from the actions menu.
+ * the consumer's `items`.
  */
 export function configureCardSortablePlugins<T>(defaults: readonly T[]): T[] {
-  return defaults.filter(
-    (plugin) => plugin !== OptimisticSortingPlugin && plugin !== Accessibility
-  )
+  return defaults.filter((plugin) => plugin !== OptimisticSortingPlugin)
 }
