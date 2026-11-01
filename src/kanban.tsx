@@ -13,8 +13,6 @@ import { isSortable, useSortable } from "@dnd-kit/react/sortable"
 import { PointerSensor } from "@dnd-kit/dom"
 import {
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   MoreHorizontal,
   Trash2,
   type LucideIcon,
@@ -32,10 +30,7 @@ import {
   KANBAN_COMPLETE_ID,
   KANBAN_DELETE_ID,
   buildKanbanGroups,
-  kanbanOverflowEdges,
-  kanbanScrollBy,
   resolveKanbanDrop,
-  type KanbanOverflowEdges,
   type KanbanDropInput,
   type KanbanGroups,
 } from "./internal/kanban-layout.js"
@@ -44,7 +39,6 @@ import {
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
 import { focusRing } from "./internal/styles.js"
-import { revealInline } from "./internal/use-horizontal-overflow.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
 
@@ -135,7 +129,7 @@ const KanbanActionsContext = React.createContext<{
  * Drag-and-drop board built on dnd-kit. The consumer owns `items` and maps
  * each to a column; the board derives its layout from them, so an optimistic
  * cache update is the only state. Cards drag from anywhere except the actions
- * menu; a click still opens the card. Off-screen columns get edge fades and scroll buttons.
+ * menu; a click still opens the card. The columns scroll sideways natively.
  * Each card's actions menu offers the same operations without dragging.
  */
 function KanbanBoard<T extends { id: string; position: number }>({
@@ -160,8 +154,6 @@ function KanbanBoard<T extends { id: string; position: number }>({
 }: KanbanBoardProps<T>) {
   const boardRef = React.useRef<HTMLDivElement>(null)
   React.useImperativeHandle(ref, () => boardRef.current!, [])
-  const scrollerRef = React.useRef<HTMLDivElement>(null)
-  const overflow = useOverflowEdges(scrollerRef, columns.length, items.length)
 
   const itemById = React.useMemo(
     () => new Map(items.map((item) => [item.id, item])),
@@ -255,15 +247,6 @@ function KanbanBoard<T extends { id: string; position: number }>({
     ]
   )
 
-  const scrollToStart = React.useCallback(
-    () => kanbanScrollBy(scrollerRef.current, -1),
-    []
-  )
-  const scrollToEnd = React.useCallback(
-    () => kanbanScrollBy(scrollerRef.current, 1),
-    []
-  )
-
   const renderOverlay = React.useCallback(
     (source: { id: string | number } | null) => {
       const item = source ? itemById.get(String(source.id)) : undefined
@@ -301,70 +284,47 @@ function KanbanBoard<T extends { id: string; position: number }>({
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="relative min-w-0">
-            <div
-              ref={scrollerRef}
-              data-slot="kanban-scroller"
-              data-loading={dimmed || undefined}
-              data-overflow-start={overflow.start || undefined}
-              data-overflow-end={overflow.end || undefined}
-              onScroll={overflow.measure}
-              onFocus={(event) => {
-                const card = event.target.closest('[data-slot="kanban-card"]')
-                if (card) revealInline(event.currentTarget, card)
-              }}
-              className={cn(
-                "flex min-w-0 gap-4 overflow-x-auto pb-2",
-                // AutoScroller scrolls in small steps near the edge; mandatory
-                // snap would pull each one back, so it is off mid-drag.
-                "snap-x snap-mandatory scroll-px-2 has-data-dragging:snap-none",
-                "data-loading:opacity-60",
-                scrollerClassName
-              )}
-            >
-              {columns.map((column) => {
-                const ids = groups[column.id] ?? []
-                return (
-                  <KanbanColumnView
-                    key={column.id}
-                    column={column}
-                    count={showSkeletons ? 0 : ids.length}
-                    emptyLabel={column.emptyLabel ?? emptyLabel}
-                    loading={showSkeletons}
-                    className={columnClassName}
-                  >
-                    {ids.map((id, index) => {
-                      const item = itemById.get(id)
-                      if (!item) return null
-                      return (
-                        <KanbanCardView
-                          key={id}
-                          item={item}
-                          index={index}
-                          column={column.id}
-                          onCardClick={onCardClick}
-                          className={cardClassName}
-                          renderCard={renderCard}
-                        />
-                      )
-                    })}
-                  </KanbanColumnView>
-                )
-              })}
-            </div>
-            <OverflowFade side="start" visible={overflow.start} />
-            <OverflowFade side="end" visible={overflow.end} />
-            {overflow.start ? (
-              <ScrollButton side="start" onClick={scrollToStart} />
-            ) : null}
-            {overflow.end ? (
-              <ScrollButton side="end" onClick={scrollToEnd} />
-            ) : null}
-            {overflow.start || overflow.end ? (
-              <p className="sr-only">
-                More columns available. Scroll horizontally to see them.
-              </p>
-            ) : null}
+          <div
+            data-slot="kanban-scroller"
+            data-loading={dimmed || undefined}
+            className={cn(
+              "flex min-w-0 gap-4 overflow-x-auto pb-2",
+              // AutoScroller scrolls in small steps near the edge; mandatory
+              // snap would pull each one back, so it is off mid-drag.
+              "snap-x snap-mandatory scroll-px-2 has-data-dragging:snap-none",
+              "data-loading:opacity-60",
+              scrollerClassName
+            )}
+          >
+            {columns.map((column) => {
+              const ids = groups[column.id] ?? []
+              return (
+                <KanbanColumnView
+                  key={column.id}
+                  column={column}
+                  count={showSkeletons ? 0 : ids.length}
+                  emptyLabel={column.emptyLabel ?? emptyLabel}
+                  loading={showSkeletons}
+                  className={columnClassName}
+                >
+                  {ids.map((id, index) => {
+                    const item = itemById.get(id)
+                    if (!item) return null
+                    return (
+                      <KanbanCardView
+                        key={id}
+                        item={item}
+                        index={index}
+                        column={column.id}
+                        onCardClick={onCardClick}
+                        className={cardClassName}
+                        renderCard={renderCard}
+                      />
+                    )
+                  })}
+                </KanbanColumnView>
+              )
+            })}
           </div>
           {onComplete || onDelete ? (
             <ActionRail
@@ -377,44 +337,6 @@ function KanbanBoard<T extends { id: string; position: number }>({
       </KanbanActionsContext.Provider>
     </div>
   )
-}
-
-function useOverflowEdges(
-  ref: React.RefObject<HTMLDivElement | null>,
-  columnCount: number,
-  itemCount: number
-) {
-  const [edges, setEdges] = React.useState<KanbanOverflowEdges>({
-    start: false,
-    end: false,
-  })
-
-  const measure = React.useCallback(() => {
-    const element = ref.current
-    if (!element) return
-    const next = kanbanOverflowEdges(
-      element.scrollLeft,
-      element.clientWidth,
-      element.scrollWidth
-    )
-    // Scroll fires every frame; keep the old object so the board (and every
-    // card in it) re-renders only when an edge appears or goes.
-    setEdges((edges) =>
-      edges.start === next.start && edges.end === next.end ? edges : next
-    )
-  }, [ref])
-
-  React.useLayoutEffect(() => {
-    const element = ref.current
-    if (!element || typeof ResizeObserver === "undefined") return
-    measure()
-    const observer = new ResizeObserver(measure)
-    observer.observe(element)
-    for (const child of element.children) observer.observe(child)
-    return () => observer.disconnect()
-  }, [columnCount, itemCount, measure, ref])
-
-  return { ...edges, measure }
 }
 
 function KanbanColumnView({
@@ -791,57 +713,6 @@ function ActionZone({
       <Icon className="size-4 shrink-0" aria-hidden />
       {label}
     </div>
-  )
-}
-
-function ScrollButton({
-  side,
-  onClick,
-}: {
-  side: "start" | "end"
-  onClick: () => void
-}) {
-  const Icon = side === "start" ? ChevronLeft : ChevronRight
-  return (
-    <Button
-      type="button"
-      variant="outline"
-      size="icon-sm"
-      data-slot="kanban-scroll-button"
-      aria-label={
-        side === "start" ? "Show previous columns" : "Show next columns"
-      }
-      onClick={onClick}
-      className={cn(
-        "absolute top-1/2 z-20 -translate-y-1/2",
-        side === "start" ? "left-1" : "right-1"
-      )}
-    >
-      <Icon />
-    </Button>
-  )
-}
-
-function OverflowFade({
-  side,
-  visible,
-}: {
-  side: "start" | "end"
-  visible: boolean
-}) {
-  return (
-    <div
-      aria-hidden
-      data-slot="kanban-overflow-fade"
-      data-side={side}
-      className={cn(
-        "pointer-events-none absolute inset-y-0 z-10 w-10 to-transparent transition-opacity",
-        side === "start"
-          ? "left-0 bg-gradient-to-r from-background"
-          : "right-0 bg-gradient-to-l from-background",
-        visible ? "opacity-100" : "opacity-0"
-      )}
-    />
   )
 }
 

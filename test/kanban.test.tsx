@@ -8,15 +8,11 @@ import {
   OptimisticSortingPlugin,
   SortableKeyboardPlugin,
 } from "@dnd-kit/dom/sortable"
-import { fireEvent } from "@testing-library/react"
 import { createRef, useState } from "react"
 import { describe, expect, it, vi } from "vitest"
 
 import {
   buildKanbanGroups,
-  kanbanOverflowEdges,
-  kanbanScrollBy,
-  kanbanScrollStepPx,
   resolveKanbanDrop,
 } from "../src/internal/kanban-layout.js"
 import {
@@ -438,60 +434,6 @@ describe("resolveKanbanDrop", () => {
   })
 })
 
-describe("kanbanOverflowEdges", () => {
-  it("hides both cues when content fits", () => {
-    expect(kanbanOverflowEdges(0, 375, 375)).toEqual({
-      start: false,
-      end: false,
-    })
-  })
-
-  it("shows the end cue at the start of an overflowing board", () => {
-    expect(kanbanOverflowEdges(0, 343, 1132)).toEqual({
-      start: false,
-      end: true,
-    })
-  })
-
-  it("shows both cues in the middle and only the start cue at the end", () => {
-    expect(kanbanOverflowEdges(200, 343, 1132)).toEqual({
-      start: true,
-      end: true,
-    })
-    expect(kanbanOverflowEdges(789, 343, 1132)).toEqual({
-      start: true,
-      end: false,
-    })
-  })
-})
-
-describe("kanbanScrollBy", () => {
-  it("pages by most of the viewport, never less than one narrow column", () => {
-    expect(kanbanScrollStepPx(343)).toBe(Math.round(343 * 0.75))
-    expect(kanbanScrollStepPx(80)).toBe(140)
-  })
-
-  it("no-ops without a scroller and scrolls one step when present", () => {
-    kanbanScrollBy(null, 1)
-    const scrollBy = vi.fn()
-    kanbanScrollBy({ clientWidth: 200, scrollBy }, 1)
-    expect(scrollBy).toHaveBeenCalledWith({
-      left: kanbanScrollStepPx(200),
-      behavior: "smooth",
-    })
-    kanbanScrollBy({ clientWidth: 200, scrollBy }, -1)
-    expect(scrollBy).toHaveBeenLastCalledWith({
-      left: -kanbanScrollStepPx(200),
-      behavior: "smooth",
-    })
-  })
-})
-
-/**
- * Feedback must stay active so DragOverlay is positioned; `feedback: "none"`
- * leaves a static overlay. Checked against the real default preset so a
- * dnd-kit upgrade fails here.
- */
 describe("kanban plugins", () => {
   const result = configureKanbanPlugins([...defaultPreset.plugins])
 
@@ -524,42 +466,6 @@ describe("kanban plugins", () => {
   })
 })
 
-describe("KanbanBoard overflow cues", () => {
-  it("shows fades and scroll buttons once columns overflow", async () => {
-    const user = createUser()
-    renderBoard()
-    const scroller = document.querySelector<HTMLElement>(
-      '[data-slot="kanban-scroller"]'
-    )!
-    Object.defineProperties(scroller, {
-      clientWidth: { configurable: true, value: 300 },
-      scrollWidth: { configurable: true, value: 900 },
-    })
-    const scrollBy = vi.fn()
-    scroller.scrollBy = scrollBy as typeof scroller.scrollBy
-
-    scroller.scrollLeft = 200
-    fireEvent.scroll(scroller)
-    expect(scroller).toHaveAttribute("data-overflow-start")
-    expect(scroller).toHaveAttribute("data-overflow-end")
-    expect(
-      screen.getByText(
-        "More columns available. Scroll horizontally to see them."
-      )
-    ).toBeInTheDocument()
-
-    await user.click(screen.getByRole("button", { name: "Show next columns" }))
-    expect(scrollBy).toHaveBeenLastCalledWith({ left: 225, behavior: "smooth" })
-    await user.click(
-      screen.getByRole("button", { name: "Show previous columns" })
-    )
-    expect(scrollBy).toHaveBeenLastCalledWith({
-      left: -225,
-      behavior: "smooth",
-    })
-  })
-})
-
 describe("KanbanBoard render counts", () => {
   // Interactions that repeat many times a second. Each case failed before
   // its fix; the PR that added it records the before and after.
@@ -572,21 +478,6 @@ describe("KanbanBoard render counts", () => {
       stage: column.id,
     }))
   )
-
-  it("does not re-render its cards while scrolling leaves the overflow edges unchanged", () => {
-    const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)
-    const { container } = renderBoard({
-      columns: stages,
-      items: manyCards,
-      renderCard,
-    })
-    const scroller = container.querySelector<HTMLElement>(
-      "[data-slot=kanban-scroller]"
-    )!
-    renderCard.mockClear()
-    for (let i = 0; i < 20; i += 1) fireEvent.scroll(scroller)
-    expect(renderCard).toHaveBeenCalledTimes(0)
-  })
 
   it("re-renders only the card whose item changed", () => {
     const renderCard = vi.fn((card: Card) => <span>{card.id}</span>)

@@ -5,7 +5,9 @@
 - `KanbanBoard` (beta): the whole card is the drag source and the grip is
   gone. A click still opens the card; a press drags once the pointer moves or
   touch holds. The cursor stays native. The `kanban-card-handle` slot is
-  removed, and keyboard users move cards from the Card actions menu.
+  removed, and keyboard users move cards from the Card actions menu. The
+  hand-built scroll buttons, edge fades and scroll hint are gone too: the
+  columns scroll sideways natively.
 - Kanban cards offer an actions menu for moving between columns, reordering,
   finishing, and removing without dragging. Focus follows a moved card and
   returns to the board when its last card is removed.
