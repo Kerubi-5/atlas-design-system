@@ -2,6 +2,7 @@ import {
   Accessibility,
   AutoScroller,
   Feedback,
+  PointerActivationConstraints,
   defaultPreset,
 } from "@dnd-kit/dom"
 import {
@@ -16,6 +17,7 @@ import {
   resolveKanbanDrop,
 } from "../src/internal/kanban-layout.js"
 import {
+  cardSensors,
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "../src/internal/kanban-plugins.js"
@@ -463,6 +465,33 @@ describe("kanban plugins", () => {
     ])
     expect(cardPlugins).toContain(SortableKeyboardPlugin)
     expect(cardPlugins).not.toContain(OptimisticSortingPlugin)
+  })
+
+  it("starts a mouse drag on press and a touch drag after a hold", () => {
+    const { options } = cardSensors[0]!
+    const actions = document.createElement("button")
+    actions.dataset.slot = "kanban-card-actions"
+    expect(
+      options.preventActivation!(
+        { target: actions } as unknown as PointerEvent,
+        {} as never
+      )
+    ).toBe(true)
+    expect(
+      options.preventActivation!(
+        { target: document.createElement("button") } as unknown as PointerEvent,
+        {} as never
+      )
+    ).toBe(false)
+    const constraints = options.activationConstraints as (
+      event: PointerEvent
+    ) => unknown[] | undefined
+    expect(
+      constraints({ pointerType: "mouse" } as PointerEvent)
+    ).toBeUndefined()
+    const touch = constraints({ pointerType: "touch" } as PointerEvent)
+    expect(touch).toHaveLength(1)
+    expect(touch![0]).toBeInstanceOf(PointerActivationConstraints.Delay)
   })
 })
 

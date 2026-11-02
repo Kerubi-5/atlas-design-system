@@ -64,6 +64,38 @@ for (const picker of [
   })
 }
 
+test("Kanban board survives consecutive cross-column drops", async ({
+  page,
+}) => {
+  // Matches the consumer e2e: Playwright `dragTo` from the card body, twice.
+  await page.setViewportSize({ width: DESKTOP.width, height: DESKTOP.height })
+  await openStory(page, "", "data-display-kanban--board")
+  const column = (label: string) =>
+    page.locator('[data-slot="kanban-column"]').filter({
+      has: page.getByText(label, { exact: true }),
+    })
+  const body = (name: string) =>
+    page
+      .locator('[data-slot="kanban-card"]')
+      .filter({ hasText: name })
+      .locator('[data-slot="kanban-card-body"]')
+
+  await body("Harbor Coffee").click()
+  await expect(column("New")).toContainText("Harbor Coffee")
+
+  await body("Harbor Coffee").dragTo(column("Talking"))
+  await expect(column("Talking")).toContainText("Harbor Coffee")
+  await expect(
+    column("New").locator('[data-slot="kanban-card-body"]')
+  ).not.toContainText("Harbor Coffee")
+
+  await body("Harbor Coffee").dragTo(column("Won"))
+  await expect(column("Won")).toContainText("Harbor Coffee")
+  await expect(
+    column("Talking").locator('[data-slot="kanban-card-body"]')
+  ).not.toContainText("Harbor Coffee")
+})
+
 for (const width of WIDTHS) {
   test(`Kanban actions move, reorder, and remove cards without dragging at ${width}px`, async ({
     page,
