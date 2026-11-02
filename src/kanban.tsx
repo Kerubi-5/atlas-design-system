@@ -10,7 +10,6 @@ import {
   type DragOverEvent,
 } from "@dnd-kit/react"
 import { isSortable, useSortable } from "@dnd-kit/react/sortable"
-import { PointerSensor } from "@dnd-kit/dom"
 import {
   CheckCircle2,
   MoreHorizontal,
@@ -35,10 +34,12 @@ import {
   type KanbanGroups,
 } from "./internal/kanban-layout.js"
 import {
+  cardSensors,
   configureCardSortablePlugins,
   configureKanbanPlugins,
 } from "./internal/kanban-plugins.js"
 import { focusRing } from "./internal/styles.js"
+import { revealInline } from "./internal/use-horizontal-overflow.js"
 import { Skeleton } from "./skeleton.js"
 import { cn } from "./utils.js"
 
@@ -287,11 +288,18 @@ function KanbanBoard<T extends { id: string; position: number }>({
           <div
             data-slot="kanban-scroller"
             data-loading={dimmed || undefined}
+            onFocus={(event) => {
+              const card = (event.target as Element).closest(
+                '[data-slot="kanban-card"]'
+              )
+              if (card) revealInline(event.currentTarget, card)
+            }}
             className={cn(
               "flex min-w-0 gap-4 overflow-x-auto pb-2",
               // AutoScroller scrolls in small steps near the edge; mandatory
-              // snap would pull each one back, so it is off mid-drag.
-              "snap-x snap-mandatory scroll-px-2 has-data-dragging:snap-none",
+              // snap would pull each one back, so it is off mid-drag and
+              // while a card stop is focused.
+              "snap-x snap-mandatory scroll-px-2 has-data-dragging:snap-none focus-within:snap-none",
               "data-loading:opacity-60",
               scrollerClassName
             )}
@@ -435,16 +443,6 @@ function KanbanColumnView({
 const cardChrome = cn("flex border border-border bg-card text-card-foreground")
 
 const stopFocus = cn(focusRing, "relative focus-visible:z-10")
-
-// The whole card is the drag source. A press becomes a drag only after the
-// pointer moves (or touch holds), so a plain click still reaches the body.
-// dnd-kit skips presses on buttons by default; only the actions menu keeps that.
-const cardSensors = [
-  PointerSensor.configure({
-    preventActivation: (event) =>
-      !!(event.target as Element).closest('[data-slot="kanban-card-actions"]'),
-  }),
-]
 
 function KanbanCardViewImpl<T extends { id: string }>({
   item,

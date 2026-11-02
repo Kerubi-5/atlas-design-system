@@ -37,8 +37,17 @@ if (!Element.prototype.releasePointerCapture) {
 if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
+/** dnd-kit measures droppables and overlay once a card is pressed. */
+if (!Document.prototype.elementFromPoint) {
+  Document.prototype.elementFromPoint = () => null
+}
+if (!Document.prototype.getAnimations) {
+  Document.prototype.getAnimations = () => []
+}
+if (!Element.prototype.getAnimations) {
+  Element.prototype.getAnimations = () => []
+}
 
-/** dnd-kit watches droppable positions once a card is clicked. */
 class IntersectionObserverStub {
   readonly root = null
   readonly rootMargin = ""
