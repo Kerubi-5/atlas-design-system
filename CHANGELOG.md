@@ -2,12 +2,18 @@
 
 ## Unreleased
 
+## 1.3.1 - 2026-11-03
+
+Bug fixes. Apps only need to bump the package. No public props, exports or
+tokens change.
+
 - `KanbanBoard` (beta): cross-column pointer drops land again, including a
   single-step Playwright `dragTo`. The whole-card drag source used dnd-kit's
   default mouse delay, so the drop ran before collisions existed and the card
   stayed put. Mouse now starts on press like the old handle; a press with no
-  move is cancelled so a click still opens the card. Keyboard focus scrolls
-  the card into the board scroller so the body's ring stays inside at 390px.
+  move is cancelled so a click still opens the card. Touch keeps its 250ms
+  delay. Keyboard focus scrolls the card into the board scroller so the
+  body's ring stays inside at 390px.
 
 ## 1.3.0 - 2026-11-02
 
