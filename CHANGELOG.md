@@ -2,16 +2,17 @@
 
 ## Unreleased
 
+## 1.3.2 - 2026-11-03
+
 Bug fixes. Apps only need to bump the package. No public props, exports or
 tokens change.
 
-- `PageHeader`: from `sm` up, actions stay beside the title. `sm:flex-wrap`
-  let a long heading push actions onto the next row, so pages such as a
-  lead detail jumped when the title loaded. The heading still wraps; actions
-  stack under the title only below `sm`.
-- `Slider`: the unfilled track uses `bg-muted` instead of `bg-input`. The
-  input token is the 3:1 control boundary (~oklch 0.62) and read as a dark
-  trough on cards. The filled range stays `bg-primary`.
+- `KanbanBoard` (beta): a mouse click without movement fires `onCardClick`
+  again. 1.3.1 started the drag on pointerdown and cancelled it on
+  pointerup, which set the source to `pointer-events-none` and swallowed
+  the click. Mouse and pen now wait for about 5px of movement before
+  dragging. Touch keeps its 250ms delay. Cross-column `dragTo` drops
+  still land.
 - `KanbanBoard` (beta): columns keep a 10rem minimum (`basis-40 min-w-40`)
   instead of 18rem, so five columns still fit a 900px board. Longer rows
   still scroll.
@@ -19,6 +20,13 @@ tokens change.
   loaded board, with card-sized `--skeleton` bars (body padding and a
   `size-9` actions square) instead of empty gray blocks. First-load
   `isLoading` cards match that size too.
+- `PageHeader`: from `sm` up, actions stay beside the title. `sm:flex-wrap`
+  let a long heading push actions onto the next row, so pages such as a
+  lead detail jumped when the title loaded. The heading still wraps; actions
+  stack under the title only below `sm`.
+- `Slider`: the unfilled track uses `bg-muted` instead of `bg-input`. The
+  input token is the 3:1 control boundary (~oklch 0.62) and read as a dark
+  trough on cards. The filled range stays `bg-primary`.
 - `Card`: `overflow-hidden` no longer clips flush children such as a
   calendar hour label on the bottom edge. Direct `img` children still clip
   to the card box, including when the app rounds the card.

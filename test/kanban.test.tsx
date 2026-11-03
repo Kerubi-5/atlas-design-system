@@ -3,8 +3,10 @@ import {
   AutoScroller,
   Feedback,
   PointerActivationConstraints,
+  PointerSensor,
   defaultPreset,
 } from "@dnd-kit/dom"
+import { fireEvent } from "@testing-library/react"
 import {
   OptimisticSortingPlugin,
   SortableKeyboardPlugin,
@@ -49,6 +51,27 @@ function getColumnId(card: Card) {
 
 function renderCard(card: Card) {
   return <span>{card.title}</span>
+}
+
+/**
+ * Primary mouse pointer payload. dnd-kit ignores non-primary or non-button-0
+ * pointerdown, so tests that drive the sensor must send this shape.
+ */
+function pointer(init: PointerEventInit): PointerEventInit {
+  return {
+    pointerType: "mouse",
+    pointerId: 1,
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+    ...init,
+  }
+}
+
+/** dnd-kit keeps Distance/Delay options on the constraint instance. */
+function constraintOptions(constraint: unknown) {
+  return (constraint as { options: { value: number; tolerance?: number } })
+    .options
 }
 
 function renderBoard(props: Partial<KanbanBoardProps<Card>> = {}) {
@@ -232,10 +255,40 @@ describe("KanbanBoard", () => {
     renderBoard({ onCardClick })
 
     await user.click(screen.getByRole("button", { name: "Ship it" }))
+    expect(onCardClick).toHaveBeenCalledTimes(1)
     expect(onCardClick).toHaveBeenCalledWith(cards[2])
     expect(
       screen.queryByRole("button", { name: "Drag to move" })
     ).not.toBeInTheDocument()
+  })
+
+  it("opens the card on a mouse press that does not move", () => {
+    // jsdom cannot finish a real drag (see kanban-drag.test.tsx); these
+    // pointer cases only prove a press under the distance never marks the
+    // card dragging, so the click still reaches onCardClick.
+    const onCardClick = vi.fn()
+    renderBoard({ onCardClick })
+    const body = screen.getByRole("button", { name: "Ship it" })
+    const card = body.closest("[data-slot=kanban-card]")
+    fireEvent.pointerDown(body, pointer({ clientX: 40, clientY: 40 }))
+    expect(card).not.toHaveAttribute("data-dragging")
+    fireEvent.pointerUp(body, pointer({ clientX: 40, clientY: 40 }))
+    fireEvent.click(body)
+    expect(onCardClick).toHaveBeenCalledTimes(1)
+    expect(onCardClick).toHaveBeenCalledWith(cards[2])
+  })
+
+  it("opens the card when the mouse jitters under the drag distance", () => {
+    const onCardClick = vi.fn()
+    renderBoard({ onCardClick })
+    const body = screen.getByRole("button", { name: "Ship it" })
+    const card = body.closest("[data-slot=kanban-card]")
+    fireEvent.pointerDown(body, pointer({ clientX: 40, clientY: 40 }))
+    fireEvent.pointerMove(body, pointer({ clientX: 43, clientY: 41 }))
+    expect(card).not.toHaveAttribute("data-dragging")
+    fireEvent.pointerUp(body, pointer({ clientX: 43, clientY: 41 }))
+    fireEvent.click(body)
+    expect(onCardClick).toHaveBeenCalledTimes(1)
   })
 
   it("renders a static card body when cards do not open", () => {
@@ -495,7 +548,9 @@ describe("kanban plugins", () => {
     expect(cardPlugins).not.toContain(OptimisticSortingPlugin)
   })
 
-  it("starts a mouse drag on press and a touch drag after a hold", () => {
+  it("skips the actions menu and uses distance for mouse and delay for touch", () => {
+    expect(cardSensors[0]!.plugin).not.toBe(PointerSensor)
+    expect(cardSensors[0]!.plugin.prototype).toBeInstanceOf(PointerSensor)
     const { options } = cardSensors[0]!
     const actions = document.createElement("button")
     actions.dataset.slot = "kanban-card-actions"
@@ -513,13 +568,22 @@ describe("kanban plugins", () => {
     ).toBe(false)
     const constraints = options.activationConstraints as (
       event: PointerEvent
-    ) => unknown[] | undefined
-    expect(
-      constraints({ pointerType: "mouse" } as PointerEvent)
-    ).toBeUndefined()
+    ) => unknown[]
+    const mouse = constraints({ pointerType: "mouse" } as PointerEvent)
+    const pen = constraints({ pointerType: "pen" } as PointerEvent)
     const touch = constraints({ pointerType: "touch" } as PointerEvent)
+    expect(mouse).toHaveLength(1)
+    expect(mouse[0]).toBeInstanceOf(PointerActivationConstraints.Distance)
+    expect(constraintOptions(mouse[0]!).value).toBe(5)
+    expect(pen).toHaveLength(1)
+    expect(pen[0]).toBeInstanceOf(PointerActivationConstraints.Distance)
+    expect(constraintOptions(pen[0]!).value).toBe(5)
     expect(touch).toHaveLength(1)
-    expect(touch![0]).toBeInstanceOf(PointerActivationConstraints.Delay)
+    expect(touch[0]).toBeInstanceOf(PointerActivationConstraints.Delay)
+    expect(constraintOptions(touch[0]!)).toMatchObject({
+      value: 250,
+      tolerance: 5,
+    })
   })
 })
 
