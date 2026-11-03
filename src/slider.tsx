@@ -37,11 +37,11 @@ export type SliderProps = Omit<
 }
 
 /**
- * Single-thumb range on Radix Slider. Square track and thumb, primary fill,
- * solid focus ring, 44px thumb hit area. Pair with a visible `Label`. Other
- * props (`orientation`, `inverted`, `data-*`) go to the Radix root; `id`
- * and the accessible name, description, value text, and error attributes go
- * to the thumb.
+ * Single-thumb range on Radix Slider. Square track and thumb, muted trough,
+ * primary fill, solid focus ring, 44px thumb hit area. Pair with a visible
+ * `Label`. Other props (`orientation`, `inverted`, `data-*`) go to the Radix
+ * root; `id` and the accessible name, description, value text, and error
+ * attributes go to the thumb.
  */
 function Slider({
   value,
@@ -84,7 +84,7 @@ function Slider({
     >
       <SliderPrimitive.Track
         data-slot="slider-track"
-        className="relative h-1.5 w-full grow overflow-hidden rounded-none bg-input"
+        className="relative h-1.5 w-full grow overflow-hidden rounded-none bg-muted"
       >
         <SliderPrimitive.Range
           data-slot="slider-range"

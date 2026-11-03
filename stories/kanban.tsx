@@ -77,7 +77,37 @@ export function KanbanStory() {
   )
 }
 
-/** The route-level placeholder. */
+/** The route-level placeholder. `min-h-48` keeps the demo short so the
+ * card-sized bars read; apps omit it and get the board's drop-area height. */
 export function KanbanSkeletonStory() {
-  return <KanbanSkeleton columnCount={3} />
+  return <KanbanSkeleton columnCount={3} columnClassName="min-h-48" />
+}
+
+const fiveColumns = [
+  { id: "new", label: "New", color: "var(--color-muted-foreground)" },
+  { id: "talking", label: "Talking", color: "var(--color-primary)" },
+  { id: "proposal", label: "Proposal", color: "var(--color-warning)" },
+  { id: "won", label: "Won", color: "var(--color-success)" },
+  { id: "lost", label: "Lost", color: "var(--color-destructive)" },
+]
+
+const fiveColumnDeals: Deal[] = [
+  { id: "1", position: 1, stage: "new", name: "Harbor Coffee" },
+  { id: "2", position: 1, stage: "talking", name: "North Clinic" },
+  { id: "3", position: 1, stage: "proposal", name: "Pine Studio" },
+]
+
+/** Five pipeline columns in the kit's 900px canvas. */
+export function KanbanFiveColumnStory() {
+  return (
+    <KanbanBoard
+      aria-label="Pipeline"
+      columns={fiveColumns}
+      items={fiveColumnDeals}
+      getColumnId={getColumnId}
+      onMove={() => undefined}
+      renderCard={renderCard}
+      emptyLabel="No deals here"
+    />
+  )
 }

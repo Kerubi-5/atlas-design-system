@@ -95,9 +95,12 @@ const stories: Story[] = [
   { id: "data-display-chart--spend-line" },
   { id: "data-display-kanban--board" },
   { id: "data-display-kanban--loading" },
+  { id: "data-display-kanban--five-columns" },
   { id: "layout-card--full-bleed" },
+  { id: "layout-card--flush-edge" },
   { id: "layout-separator--with-skeleton" },
   { id: "layout-page-header--with-stepper" },
+  { id: "layout-page-header--long-title" },
   ...overlayStories,
 ]
 
@@ -105,6 +108,8 @@ const stories: Story[] = [
 const phoneStories = new Set([
   "data-display-kanban--board",
   "data-display-kanban--card-actions",
+  "data-display-kanban--five-columns",
+  "layout-page-header--long-title",
   "navigation-nav-link--shell",
   "examples-fields--trigger-alignment",
   "forms-date-time-picker--playground",

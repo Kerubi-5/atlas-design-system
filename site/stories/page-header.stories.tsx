@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { PageLayoutStory } from "../../stories/page-layout.js"
+import {
+  PageHeaderLongTitleStory,
+  PageLayoutStory,
+} from "../../stories/page-layout.js"
 
 const meta = {
   title: "Layout/Page header",
@@ -9,3 +12,4 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 export const WithStepper: Story = { render: () => <PageLayoutStory /> }
+export const LongTitle: Story = { render: () => <PageHeaderLongTitleStory /> }

@@ -15,6 +15,7 @@ import { Label } from "../src/label.js"
 import {
   CardContentPx0Story,
   FlexColumnCardsStory,
+  FlushEdgeLabelStory,
 } from "../stories/card-layout.js"
 
 import { render, screen } from "./helpers.js"
@@ -183,12 +184,9 @@ describe("Card", () => {
     const flush = screen.getByText("Flush").closest("[data-slot=card]")
     expect(flush).toHaveAttribute("data-size", "sm")
     expect(flush?.className ?? "").toMatch(/\[--card-p:0px\]/)
-    expect(flush).toHaveClass(
-      "min-h-min",
-      "min-w-0",
-      "shrink-0",
-      "overflow-hidden"
-    )
+    expect(flush).toHaveClass("min-h-min", "min-w-0", "shrink-0")
+    expect(flush).not.toHaveClass("overflow-hidden")
+    expect(flush?.className ?? "").toMatch(/has-\[>img\]:overflow-hidden/)
     expect(flush?.className ?? "").not.toMatch(/py-\(--card-p\)/)
   })
 
@@ -197,14 +195,23 @@ describe("Card", () => {
     const cards = document.querySelectorAll("[data-slot=card]")
     expect(cards).toHaveLength(2)
     for (const card of cards) {
-      expect(card).toHaveClass(
-        "min-h-min",
-        "min-w-0",
-        "shrink-0",
-        "overflow-hidden"
-      )
+      expect(card).toHaveClass("min-h-min", "min-w-0", "shrink-0")
+      expect(card).not.toHaveClass("overflow-hidden")
     }
     expect(screen.getByText(/must not collapse/)).toBeInTheDocument()
+  })
+
+  it("does not clip a flush child on the bottom edge", () => {
+    render(<FlushEdgeLabelStory />)
+    const label = screen.getByText("11 PM")
+    const card = label.closest("[data-slot=card]")
+    expect(label).toHaveAttribute("data-slot", "calendar-hour-label")
+    expect(card).not.toHaveClass("overflow-hidden")
+    expect(card?.className ?? "").toMatch(/has-\[>img\]:overflow-hidden/)
+    const banner = document.querySelector("[data-slot=card] > img")
+    expect(banner?.closest("[data-slot=card]")?.className ?? "").toMatch(
+      /has-\[>img\]:overflow-hidden/
+    )
   })
 
   it("lets CardContent px-0 override padding without an important class", () => {

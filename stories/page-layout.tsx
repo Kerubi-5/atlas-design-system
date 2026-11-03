@@ -36,3 +36,21 @@ export function PageLayoutStory() {
     </div>
   )
 }
+
+/** Long lead-style title with page actions, the wrap case from KairOS. */
+export function PageHeaderLongTitleStory() {
+  return (
+    <PageHeader
+      title="North Harbor Coffee Roasters enterprise discovery"
+      description="Lead detail"
+      actions={
+        <>
+          <Button size="sm" variant="outline">
+            Edit
+          </Button>
+          <Button size="sm">Convert</Button>
+        </>
+      }
+    />
+  )
+}

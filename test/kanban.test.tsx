@@ -198,8 +198,10 @@ describe("KanbanBoard", () => {
     const rendered = document.querySelectorAll('[data-slot="kanban-column"]')
     expect(rendered).toHaveLength(3)
     const [todo, doing, done] = [...rendered] as HTMLElement[]
-    expect(todo).toHaveClass("flex-1", "basis-72", "min-w-72")
+    expect(todo).toHaveClass("flex-1", "basis-40", "min-w-40")
     expect(todo).not.toHaveClass("w-72")
+    expect(todo).not.toHaveClass("min-w-72")
+    expect(todo).not.toHaveClass("basis-72")
     expect(todo).not.toHaveClass("shrink-0")
     expect(within(todo!).getByText("To do")).toBeInTheDocument()
     expect(within(todo!).getByText("2")).toBeInTheDocument()
@@ -244,15 +246,21 @@ describe("KanbanBoard", () => {
     expect(screen.getByText("Write spec")).toBeInTheDocument()
   })
 
-  it("shows skeleton columns while the first load has no items", () => {
+  it("shows card-sized skeleton placeholders while the first load has no items", () => {
     renderBoard({ items: [], isLoading: true })
-    const cards = document.querySelectorAll(
-      '[data-slot="kanban-column"] [data-slot="skeleton"]'
+    const placeholders = document.querySelectorAll(
+      '[data-slot="kanban-card-skeleton"]'
     )
-    expect(cards.length).toBe(6)
-    expect(cards[0]).toHaveClass("animate-pulse", "bg-skeleton")
-    expect(cards[0]).not.toHaveClass("bg-muted")
-    expect(cards[0]).not.toHaveClass("bg-input")
+    expect(placeholders).toHaveLength(6)
+    const first = placeholders[0]!
+    expect(first).toHaveClass("flex", "border", "border-border", "bg-card")
+    expect(first.querySelector(".p-3")).toBeTruthy()
+    expect(first.querySelector(".size-9")).toHaveClass("m-1", "bg-skeleton")
+    const bars = first.querySelectorAll("[data-slot=skeleton]")
+    expect(bars.length).toBeGreaterThan(0)
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(bars[0]).not.toHaveClass("bg-muted")
+    expect(bars[0]).not.toHaveClass("bg-input")
     expect(screen.queryByText("Drop here")).not.toBeInTheDocument()
   })
 
@@ -310,23 +318,43 @@ describe("KanbanBoard", () => {
 })
 
 describe("KanbanSkeleton", () => {
-  it("draws one placeholder per column and takes a className", () => {
+  it("draws column chrome and card placeholders, not empty gray columns", () => {
     render(<KanbanSkeleton columnCount={3} className="gap-2" />)
     const root = document.querySelector('[data-slot="kanban-skeleton"]')
     expect(root).toHaveClass("gap-2")
-    expect(root?.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(3)
+    const columns = root!.querySelectorAll('[data-slot="kanban-column"]')
+    expect(columns).toHaveLength(3)
+    expect(columns[0]).toHaveClass(
+      "flex-1",
+      "basis-40",
+      "min-w-40",
+      "bg-muted/40"
+    )
+    expect(columns[0]).not.toHaveClass("animate-pulse", "bg-skeleton")
+    expect(
+      root!.querySelectorAll('[data-slot="kanban-card-skeleton"]')
+    ).toHaveLength(6)
+    const card = root!.querySelector('[data-slot="kanban-card-skeleton"]')
+    expect(card).toHaveClass("border", "bg-card")
+    const bars = root!.querySelectorAll("[data-slot=skeleton]")
+    expect(bars.length).toBeGreaterThan(3)
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(bars[0]).not.toHaveClass("bg-muted")
+    expect(bars[0]).not.toHaveClass("bg-input")
   })
 
-  it("defaults to four columns", () => {
+  it("defaults to four columns and forwards columnClassName", () => {
     render(<KanbanSkeleton columnClassName="w-40" />)
-    const placeholders = document.querySelectorAll(
-      '[data-slot="kanban-skeleton"] [data-slot="skeleton"]'
+    const columns = document.querySelectorAll(
+      '[data-slot="kanban-skeleton"] [data-slot="kanban-column"]'
     )
-    expect(placeholders).toHaveLength(4)
-    expect(placeholders[0]).toHaveClass("w-40")
-    expect(placeholders[0]).toHaveClass("animate-pulse", "bg-skeleton")
-    expect(placeholders[0]).not.toHaveClass("bg-muted")
-    expect(placeholders[0]).not.toHaveClass("bg-input")
+    expect(columns).toHaveLength(4)
+    expect(columns[0]).toHaveClass("w-40")
+    expect(
+      document.querySelectorAll(
+        '[data-slot="kanban-skeleton"] [data-slot="kanban-card-skeleton"]'
+      )
+    ).toHaveLength(8)
   })
 })
 
