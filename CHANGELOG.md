@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- `Progress` and `Meter`: unfilled tracks use `bg-muted` instead of
+  `bg-input`, matching `Slider`. The input token is the 3:1 control
+  boundary and read as a dark trough on cards. `Meter` also uses
+  `rounded-none` so its corners match `Progress` and `Slider`. Filled
+  ranges stay as they are (`bg-primary` on Progress; `fillClassName` on
+  Meter).
+
 ## 1.3.2 - 2026-11-03
 
 Bug fixes. Apps only need to bump the package. No public props, exports or
