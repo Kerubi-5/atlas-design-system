@@ -103,6 +103,36 @@ describe("Table overflow", () => {
 })
 
 describe("Table", () => {
+  it("keeps a bottom border on every body row so separators stay even", () => {
+    render(
+      <Table>
+        <TableCaption>People</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Name</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableRow>
+            <TableCell>Ada</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Grace</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    )
+
+    const body = document.querySelector("[data-slot=table-body]")
+    expect(body?.className ?? "").not.toMatch(/\[&_tr:last-child\]:border-0/)
+    const rows = screen.getAllByRole("row")
+    const bodyRows = rows.filter((row) => row.closest("[data-slot=table-body]"))
+    expect(bodyRows).toHaveLength(2)
+    for (const row of bodyRows) {
+      expect(row).toHaveClass("border-b")
+    }
+  })
+
   it("exposes native table roles", () => {
     render(
       <Table>

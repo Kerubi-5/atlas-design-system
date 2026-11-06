@@ -4,7 +4,9 @@ import {
   Feedback,
   PointerActivationConstraints,
   PointerSensor,
+  type DragDropManager,
   type Draggable,
+  type Droppable,
   type PointerSensorOptions,
 } from "@dnd-kit/dom"
 import { OptimisticSortingPlugin } from "@dnd-kit/dom/sortable"
@@ -49,18 +51,14 @@ function preventCardSensorActivation(event: PointerEvent) {
   )
 }
 
-/**
- * Mouse and pen start on pointerdown so a single-step drop (Playwright
- * `dragTo`) has time to render collisions, matching the old handle. Touch
- * waits 250ms so a finger can still scroll the column.
- */
+/** Mouse/pen wait 5px so a click opens the card; touch waits 250ms to scroll. */
 function cardSensorActivationConstraints(event: PointerEvent) {
   if (event.pointerType === "touch") {
     return [
       new PointerActivationConstraints.Delay({ value: 250, tolerance: 5 }),
     ]
   }
-  return
+  return [new PointerActivationConstraints.Distance({ value: 5 })]
 }
 
 const cardSensorOptions: PointerSensorOptions = {
@@ -68,28 +66,70 @@ const cardSensorOptions: PointerSensorOptions = {
   activationConstraints: cardSensorActivationConstraints,
 }
 
+/** Droppable under the pointer, skipping the drag overlay. */
+function droppableIdFromPoint(
+  manager: DragDropManager,
+  x: number,
+  y: number
+): string | number | undefined {
+  const byElement = new Map<Element, Droppable>()
+  for (const droppable of manager.registry.droppables) {
+    if (droppable.element) byElement.set(droppable.element, droppable)
+  }
+  for (const node of document.elementsFromPoint(x, y)) {
+    if (node.closest("[data-dnd-overlay]")) continue
+    let current: Element | null = node
+    while (current) {
+      const droppable = byElement.get(current)
+      if (droppable && !droppable.disabled) return droppable.id
+      current = current.parentElement
+    }
+  }
+}
+
 /**
- * A press with no move is a click, not a drop. Cancel that drag before
- * dnd-kit suppresses the click or runs AutoScroller.
+ * Window-capture pointerup drops under the pointer before dnd-kit's
+ * document listener stops the drag at the press coordinates.
  */
 class CardPointerSensor extends PointerSensor {
+  private unbindDrop: (() => void) | undefined
+
   protected handleStart(source: Draggable, event: PointerEvent) {
-    const root = (event.target as Node | null)?.ownerDocument
+    super.handleStart(source, event)
+    if (this.manager.dragOperation.status.idle) return
+
+    const view =
+      event.view ?? (event.target as Node | null)?.ownerDocument?.defaultView
+    if (!view) return
+
+    const pointerId = event.pointerId
     const onUp = (up: Event) => {
       const pointer = up as PointerEvent
-      root?.removeEventListener("pointerup", onUp, true)
-      const start = this.initialCoordinates
-      const distance = start
-        ? Math.hypot(pointer.clientX - start.x, pointer.clientY - start.y)
-        : 0
-      if (!Number.isFinite(distance) || distance < 5) {
-        pointer.stopImmediatePropagation()
-        this.manager.actions.stop({ event: pointer, canceled: true })
-        this.cleanup()
-      }
+      if (pointer.pointerId !== pointerId) return
+      this.unbindDrop?.()
+      this.unbindDrop = undefined
+      if (this.manager.dragOperation.status.idle) return
+      pointer.preventDefault()
+      pointer.stopImmediatePropagation()
+      const id = droppableIdFromPoint(
+        this.manager,
+        pointer.clientX,
+        pointer.clientY
+      )
+      if (id != null) void this.manager.actions.setDropTarget(id)
+      this.manager.actions.stop({ event: pointer, canceled: false })
+      this.cleanup()
     }
-    root?.addEventListener("pointerup", onUp, true)
-    super.handleStart(source, event)
+    this.unbindDrop = () => {
+      view.removeEventListener("pointerup", onUp, true)
+    }
+    view.addEventListener("pointerup", onUp, true)
+  }
+
+  protected cleanup() {
+    this.unbindDrop?.()
+    this.unbindDrop = undefined
+    super.cleanup()
   }
 }
 

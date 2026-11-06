@@ -1,6 +1,6 @@
 {
   "name": "atlas-react-kit",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Shared React components and Tailwind theme for Atlas",
   "type": "module",
   "license": "MIT",

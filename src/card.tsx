@@ -9,7 +9,8 @@ import { cn } from "./utils.js"
  * overrides it without `!`. `flush` sets the variable to 0 so lists and
  * tables can run edge to edge. `min-h-min shrink-0` keeps the card from
  * collapsing inside a bounded flex column. `min-w-0` lets nested tables
- * scroll instead of widening the card. `overflow-hidden` still clips media.
+ * scroll instead of widening the card. Direct `img` children still clip to
+ * the card box; other flush children stay visible.
  */
 function Card({
   className,
@@ -45,7 +46,7 @@ function Card({
       aria-label={canName ? ariaLabel : undefined}
       aria-labelledby={canName ? ariaLabelledBy : undefined}
       className={cn(
-        "group/card flex min-h-min min-w-0 shrink-0 flex-col overflow-hidden bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
+        "group/card flex min-h-min min-w-0 shrink-0 flex-col bg-card text-sm text-card-foreground shadow-sm ring-1 ring-foreground/5 has-[>img]:overflow-hidden has-[>img:first-child]:pt-0 *:[img:first-child]:rounded-none *:[img:last-child]:rounded-none",
         size === "sm"
           ? "gap-5 [--card-p:--spacing(5)]"
           : "gap-8 [--card-p:--spacing(8)]",

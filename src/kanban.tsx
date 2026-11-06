@@ -113,8 +113,30 @@ const COLUMN_DROP_PRIORITY = 1
 /** Rail zones beat columns when both are under the pointer. */
 const ACTION_ZONE_PRIORITY = 10
 
-/** Grow to fill the board; 18rem floor so a long row still scrolls. */
-const columnSize = "flex-1 basis-72 min-w-72 min-h-[min(70vh,32rem)]"
+/** Grow to fill the board; 10rem floor so five columns still fit 900px. */
+const columnSize = "flex-1 basis-40 min-w-40 min-h-[min(70vh,32rem)]"
+const columnChrome =
+  "flex snap-start flex-col gap-3 p-3 bg-muted/40 ring-1 ring-foreground/5"
+const columnBody =
+  "-m-1 mr-0 flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto p-1"
+const columnHeader =
+  "flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5"
+const cardChrome = cn("flex border border-border bg-card text-card-foreground")
+
+function KanbanCardPlaceholder() {
+  return (
+    <div
+      data-slot="kanban-card-skeleton"
+      className={cn(cardChrome, "shadow-sm")}
+    >
+      {/* Same chrome as a real card, with --skeleton bars. */}
+      <div className="min-w-0 flex-1 p-3">
+        <Skeleton className="h-5 w-3/4" />
+      </div>
+      <Skeleton className="m-1 size-9 shrink-0" />
+    </div>
+  )
+}
 
 /** Only action menus consume board updates, leaving memoized card bodies alone. */
 const KanbanActionsContext = React.createContext<{
@@ -376,8 +398,7 @@ function KanbanColumnView({
       data-slot="kanban-column"
       data-drop-target={isDropTarget || undefined}
       className={cn(
-        "flex snap-start flex-col gap-3 p-3",
-        "bg-muted/40 ring-1 ring-foreground/5",
+        columnChrome,
         "data-drop-target:bg-muted/60 data-drop-target:ring-2 data-drop-target:ring-ring/60",
         columnSize,
         className
@@ -385,10 +406,7 @@ function KanbanColumnView({
     >
       {/* The name truncates; the count and badge wrap under it, to the
           right, once they no longer fit beside it. */}
-      <div
-        data-slot="kanban-column-header"
-        className="flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5"
-      >
+      <div data-slot="kanban-column-header" className={columnHeader}>
         <span className="flex max-w-full min-w-0 items-center gap-2 text-xs font-semibold tracking-widest uppercase">
           {column.color ? (
             <span
@@ -414,11 +432,11 @@ function KanbanColumnView({
           inside the scroll area, which clips at its padding edge. `-m-1`
           pulls the top, bottom and left back out so the cards stay where
           they were; the right keeps its 4px gutter. */}
-      <div className="-m-1 mr-0 flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto p-1">
+      <div className={columnBody}>
         {loading ? (
           <>
-            <Skeleton className="h-20" />
-            <Skeleton className="h-16" />
+            <KanbanCardPlaceholder />
+            <KanbanCardPlaceholder />
           </>
         ) : (
           <>
@@ -439,8 +457,6 @@ function KanbanColumnView({
     </div>
   )
 }
-
-const cardChrome = cn("flex border border-border bg-card text-card-foreground")
 
 const stopFocus = cn(focusRing, "relative focus-visible:z-10")
 
@@ -733,7 +749,21 @@ function KanbanSkeleton({
       {...props}
     >
       {Array.from({ length: columnCount }, (_, index) => (
-        <Skeleton key={index} className={cn(columnSize, columnClassName)} />
+        <div
+          key={index}
+          data-slot="kanban-column"
+          className={cn(columnChrome, columnSize, columnClassName)}
+        >
+          {/* Loaded column chrome; card-sized --skeleton bars, not gray blocks. */}
+          <div data-slot="kanban-column-header" className={columnHeader}>
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="ml-auto h-3 w-4" />
+          </div>
+          <div className={columnBody}>
+            <KanbanCardPlaceholder />
+            <KanbanCardPlaceholder />
+          </div>
+        </div>
       ))}
     </div>
   )

@@ -69,7 +69,7 @@ export function NarrowPanelTableStory() {
 
 /**
  * Same table inside a Card in a 390px flex column — the barangay profile
- * NOAH / MGB / Ookla case. Card overflow-hidden must not clip LICENSE.
+ * NOAH / MGB / Ookla case. The card must not clip LICENSE.
  */
 export function ProfileCardTableStory() {
   return (

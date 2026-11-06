@@ -32,6 +32,14 @@ describe("PageHeader", () => {
     expect(
       document.querySelector('[data-slot="page-header-actions"]')
     ).toContainElement(screen.getByRole("button", { name: "New project" }))
+    expect(header).toHaveClass("sm:flex-row", "sm:flex-nowrap")
+    expect(header).not.toHaveClass("sm:flex-wrap")
+    expect(
+      document.querySelector('[data-slot="page-header-heading"]')
+    ).toHaveClass("min-w-0", "flex-1")
+    expect(
+      document.querySelector('[data-slot="page-header-actions"]')
+    ).toHaveClass("shrink-0")
   })
 
   it("takes another heading level and leaves out empty parts", () => {

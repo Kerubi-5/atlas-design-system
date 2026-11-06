@@ -11,6 +11,7 @@ import {
 import {
   CardContentPx0Story,
   FlexColumnCardsStory,
+  FlushEdgeLabelStory,
 } from "../../stories/card-layout.js"
 
 type Args = {
@@ -58,5 +59,9 @@ export const FlexColumn: Story = {
 }
 export const FullBleed: Story = {
   render: () => <CardContentPx0Story />,
+  parameters: { controls: { disable: true } },
+}
+export const FlushEdge: Story = {
+  render: () => <FlushEdgeLabelStory />,
   parameters: { controls: { disable: true } },
 }

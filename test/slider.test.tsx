@@ -61,6 +61,9 @@ describe("Slider", () => {
     expect(slider.className).toMatch(/after:size-11/)
     expect(slider).toHaveClass("size-4")
     expect(slider.className).toMatch(/rounded-none/)
+    const track = document.querySelector("[data-slot=slider-track]")
+    expect(track).toHaveClass("bg-muted")
+    expect(track).not.toHaveClass("bg-input")
   })
 
   it("moves with arrow keys and commits on pointer up", async () => {

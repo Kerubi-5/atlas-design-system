@@ -4,8 +4,9 @@ import { cn } from "./utils.js"
 
 /**
  * A page's title row: the heading, an optional hint, anything else that
- * belongs under them (badges, meta), and actions on the right. Stacks on
- * small screens.
+ * belongs under them (badges, meta), and actions on the trailing edge.
+ * Stacks on small screens; from `sm` up the actions stay beside the title
+ * even when the heading wraps.
  */
 function PageHeader({
   title,
@@ -21,7 +22,7 @@ function PageHeader({
   title: React.ReactNode
   /** Muted hint under the title. */
   description?: React.ReactNode
-  /** Buttons or links on the right (stacked below on small screens). */
+  /** Buttons or links on the trailing edge (stacked below on small screens). */
   actions?: React.ReactNode
   /** Heading level. Default `h1`. */
   titleAs?: "h1" | "h2" | "h3"
@@ -32,14 +33,14 @@ function PageHeader({
     <header
       data-slot="page-header"
       className={cn(
-        "flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between",
+        "flex flex-col gap-3 sm:flex-row sm:flex-nowrap sm:items-start sm:justify-between",
         className
       )}
       {...props}
     >
       <div
         data-slot="page-header-heading"
-        className="flex min-w-0 flex-col gap-1"
+        className="flex min-w-0 flex-1 flex-col gap-1"
       >
         <Title
           data-slot="page-header-title"
@@ -63,7 +64,7 @@ function PageHeader({
       {actions ? (
         <div
           data-slot="page-header-actions"
-          className="flex flex-wrap items-center gap-2"
+          className="flex shrink-0 flex-wrap items-center gap-2"
         >
           {actions}
         </div>

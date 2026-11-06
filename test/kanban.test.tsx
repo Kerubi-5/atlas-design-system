@@ -3,8 +3,10 @@ import {
   AutoScroller,
   Feedback,
   PointerActivationConstraints,
+  PointerSensor,
   defaultPreset,
 } from "@dnd-kit/dom"
+import { fireEvent } from "@testing-library/react"
 import {
   OptimisticSortingPlugin,
   SortableKeyboardPlugin,
@@ -49,6 +51,27 @@ function getColumnId(card: Card) {
 
 function renderCard(card: Card) {
   return <span>{card.title}</span>
+}
+
+/**
+ * Primary mouse pointer payload. dnd-kit ignores non-primary or non-button-0
+ * pointerdown, so tests that drive the sensor must send this shape.
+ */
+function pointer(init: PointerEventInit): PointerEventInit {
+  return {
+    pointerType: "mouse",
+    pointerId: 1,
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+    ...init,
+  }
+}
+
+/** dnd-kit keeps Distance/Delay options on the constraint instance. */
+function constraintOptions(constraint: unknown) {
+  return (constraint as { options: { value: number; tolerance?: number } })
+    .options
 }
 
 function renderBoard(props: Partial<KanbanBoardProps<Card>> = {}) {
@@ -198,8 +221,10 @@ describe("KanbanBoard", () => {
     const rendered = document.querySelectorAll('[data-slot="kanban-column"]')
     expect(rendered).toHaveLength(3)
     const [todo, doing, done] = [...rendered] as HTMLElement[]
-    expect(todo).toHaveClass("flex-1", "basis-72", "min-w-72")
+    expect(todo).toHaveClass("flex-1", "basis-40", "min-w-40")
     expect(todo).not.toHaveClass("w-72")
+    expect(todo).not.toHaveClass("min-w-72")
+    expect(todo).not.toHaveClass("basis-72")
     expect(todo).not.toHaveClass("shrink-0")
     expect(within(todo!).getByText("To do")).toBeInTheDocument()
     expect(within(todo!).getByText("2")).toBeInTheDocument()
@@ -230,10 +255,40 @@ describe("KanbanBoard", () => {
     renderBoard({ onCardClick })
 
     await user.click(screen.getByRole("button", { name: "Ship it" }))
+    expect(onCardClick).toHaveBeenCalledTimes(1)
     expect(onCardClick).toHaveBeenCalledWith(cards[2])
     expect(
       screen.queryByRole("button", { name: "Drag to move" })
     ).not.toBeInTheDocument()
+  })
+
+  it("opens the card on a mouse press that does not move", () => {
+    // jsdom cannot finish a real drag (see kanban-drag.test.tsx); these
+    // pointer cases only prove a press under the distance never marks the
+    // card dragging, so the click still reaches onCardClick.
+    const onCardClick = vi.fn()
+    renderBoard({ onCardClick })
+    const body = screen.getByRole("button", { name: "Ship it" })
+    const card = body.closest("[data-slot=kanban-card]")
+    fireEvent.pointerDown(body, pointer({ clientX: 40, clientY: 40 }))
+    expect(card).not.toHaveAttribute("data-dragging")
+    fireEvent.pointerUp(body, pointer({ clientX: 40, clientY: 40 }))
+    fireEvent.click(body)
+    expect(onCardClick).toHaveBeenCalledTimes(1)
+    expect(onCardClick).toHaveBeenCalledWith(cards[2])
+  })
+
+  it("opens the card when the mouse jitters under the drag distance", () => {
+    const onCardClick = vi.fn()
+    renderBoard({ onCardClick })
+    const body = screen.getByRole("button", { name: "Ship it" })
+    const card = body.closest("[data-slot=kanban-card]")
+    fireEvent.pointerDown(body, pointer({ clientX: 40, clientY: 40 }))
+    fireEvent.pointerMove(body, pointer({ clientX: 43, clientY: 41 }))
+    expect(card).not.toHaveAttribute("data-dragging")
+    fireEvent.pointerUp(body, pointer({ clientX: 43, clientY: 41 }))
+    fireEvent.click(body)
+    expect(onCardClick).toHaveBeenCalledTimes(1)
   })
 
   it("renders a static card body when cards do not open", () => {
@@ -244,15 +299,21 @@ describe("KanbanBoard", () => {
     expect(screen.getByText("Write spec")).toBeInTheDocument()
   })
 
-  it("shows skeleton columns while the first load has no items", () => {
+  it("shows card-sized skeleton placeholders while the first load has no items", () => {
     renderBoard({ items: [], isLoading: true })
-    const cards = document.querySelectorAll(
-      '[data-slot="kanban-column"] [data-slot="skeleton"]'
+    const placeholders = document.querySelectorAll(
+      '[data-slot="kanban-card-skeleton"]'
     )
-    expect(cards.length).toBe(6)
-    expect(cards[0]).toHaveClass("animate-pulse", "bg-skeleton")
-    expect(cards[0]).not.toHaveClass("bg-muted")
-    expect(cards[0]).not.toHaveClass("bg-input")
+    expect(placeholders).toHaveLength(6)
+    const first = placeholders[0]!
+    expect(first).toHaveClass("flex", "border", "border-border", "bg-card")
+    expect(first.querySelector(".p-3")).toBeTruthy()
+    expect(first.querySelector(".size-9")).toHaveClass("m-1", "bg-skeleton")
+    const bars = first.querySelectorAll("[data-slot=skeleton]")
+    expect(bars.length).toBeGreaterThan(0)
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(bars[0]).not.toHaveClass("bg-muted")
+    expect(bars[0]).not.toHaveClass("bg-input")
     expect(screen.queryByText("Drop here")).not.toBeInTheDocument()
   })
 
@@ -310,23 +371,43 @@ describe("KanbanBoard", () => {
 })
 
 describe("KanbanSkeleton", () => {
-  it("draws one placeholder per column and takes a className", () => {
+  it("draws column chrome and card placeholders, not empty gray columns", () => {
     render(<KanbanSkeleton columnCount={3} className="gap-2" />)
     const root = document.querySelector('[data-slot="kanban-skeleton"]')
     expect(root).toHaveClass("gap-2")
-    expect(root?.querySelectorAll('[data-slot="skeleton"]')).toHaveLength(3)
+    const columns = root!.querySelectorAll('[data-slot="kanban-column"]')
+    expect(columns).toHaveLength(3)
+    expect(columns[0]).toHaveClass(
+      "flex-1",
+      "basis-40",
+      "min-w-40",
+      "bg-muted/40"
+    )
+    expect(columns[0]).not.toHaveClass("animate-pulse", "bg-skeleton")
+    expect(
+      root!.querySelectorAll('[data-slot="kanban-card-skeleton"]')
+    ).toHaveLength(6)
+    const card = root!.querySelector('[data-slot="kanban-card-skeleton"]')
+    expect(card).toHaveClass("border", "bg-card")
+    const bars = root!.querySelectorAll("[data-slot=skeleton]")
+    expect(bars.length).toBeGreaterThan(3)
+    expect(bars[0]).toHaveClass("animate-pulse", "bg-skeleton")
+    expect(bars[0]).not.toHaveClass("bg-muted")
+    expect(bars[0]).not.toHaveClass("bg-input")
   })
 
-  it("defaults to four columns", () => {
+  it("defaults to four columns and forwards columnClassName", () => {
     render(<KanbanSkeleton columnClassName="w-40" />)
-    const placeholders = document.querySelectorAll(
-      '[data-slot="kanban-skeleton"] [data-slot="skeleton"]'
+    const columns = document.querySelectorAll(
+      '[data-slot="kanban-skeleton"] [data-slot="kanban-column"]'
     )
-    expect(placeholders).toHaveLength(4)
-    expect(placeholders[0]).toHaveClass("w-40")
-    expect(placeholders[0]).toHaveClass("animate-pulse", "bg-skeleton")
-    expect(placeholders[0]).not.toHaveClass("bg-muted")
-    expect(placeholders[0]).not.toHaveClass("bg-input")
+    expect(columns).toHaveLength(4)
+    expect(columns[0]).toHaveClass("w-40")
+    expect(
+      document.querySelectorAll(
+        '[data-slot="kanban-skeleton"] [data-slot="kanban-card-skeleton"]'
+      )
+    ).toHaveLength(8)
   })
 })
 
@@ -467,7 +548,9 @@ describe("kanban plugins", () => {
     expect(cardPlugins).not.toContain(OptimisticSortingPlugin)
   })
 
-  it("starts a mouse drag on press and a touch drag after a hold", () => {
+  it("skips the actions menu and uses distance for mouse and delay for touch", () => {
+    expect(cardSensors[0]!.plugin).not.toBe(PointerSensor)
+    expect(cardSensors[0]!.plugin.prototype).toBeInstanceOf(PointerSensor)
     const { options } = cardSensors[0]!
     const actions = document.createElement("button")
     actions.dataset.slot = "kanban-card-actions"
@@ -485,13 +568,22 @@ describe("kanban plugins", () => {
     ).toBe(false)
     const constraints = options.activationConstraints as (
       event: PointerEvent
-    ) => unknown[] | undefined
-    expect(
-      constraints({ pointerType: "mouse" } as PointerEvent)
-    ).toBeUndefined()
+    ) => unknown[]
+    const mouse = constraints({ pointerType: "mouse" } as PointerEvent)
+    const pen = constraints({ pointerType: "pen" } as PointerEvent)
     const touch = constraints({ pointerType: "touch" } as PointerEvent)
+    expect(mouse).toHaveLength(1)
+    expect(mouse[0]).toBeInstanceOf(PointerActivationConstraints.Distance)
+    expect(constraintOptions(mouse[0]!).value).toBe(5)
+    expect(pen).toHaveLength(1)
+    expect(pen[0]).toBeInstanceOf(PointerActivationConstraints.Distance)
+    expect(constraintOptions(pen[0]!).value).toBe(5)
     expect(touch).toHaveLength(1)
-    expect(touch![0]).toBeInstanceOf(PointerActivationConstraints.Delay)
+    expect(touch[0]).toBeInstanceOf(PointerActivationConstraints.Delay)
+    expect(constraintOptions(touch[0]!)).toMatchObject({
+      value: 250,
+      tolerance: 5,
+    })
   })
 })
 

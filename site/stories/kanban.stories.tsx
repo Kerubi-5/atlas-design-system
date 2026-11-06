@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { KanbanSkeletonStory, KanbanStory } from "../../stories/kanban.js"
+import {
+  KanbanFiveColumnStory,
+  KanbanSkeletonStory,
+  KanbanStory,
+} from "../../stories/kanban.js"
 
 const meta = {
   title: "Data display/Kanban",
@@ -11,3 +15,4 @@ type Story = StoryObj<typeof meta>
 export const Board: Story = { render: () => <KanbanStory /> }
 export const CardActions: Story = { render: () => <KanbanStory /> }
 export const Loading: Story = { render: () => <KanbanSkeletonStory /> }
+export const FiveColumns: Story = { render: () => <KanbanFiveColumnStory /> }
