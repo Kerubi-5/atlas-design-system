@@ -113,11 +113,7 @@ const COLUMN_DROP_PRIORITY = 1
 /** Rail zones beat columns when both are under the pointer. */
 const ACTION_ZONE_PRIORITY = 10
 
-/**
- * Grow to fill the board. 10rem floor keeps a column readable (header plus
- * a card with its actions button) while five columns still fit a 56rem
- * (900px) board; a longer row scrolls.
- */
+/** Grow to fill the board; 10rem floor so five columns still fit 900px. */
 const columnSize = "flex-1 basis-40 min-w-40 min-h-[min(70vh,32rem)]"
 const columnChrome =
   "flex snap-start flex-col gap-3 p-3 bg-muted/40 ring-1 ring-foreground/5"
@@ -127,17 +123,13 @@ const columnHeader =
   "flex flex-wrap items-start justify-between gap-x-2 gap-y-0.5"
 const cardChrome = cn("flex border border-border bg-card text-card-foreground")
 
-/**
- * Card-shaped placeholder: same chrome, body padding, and actions square as
- * a real card, filled with `--skeleton` bars. Used by the board's first-load
- * state and by `KanbanSkeleton`.
- */
 function KanbanCardPlaceholder() {
   return (
     <div
       data-slot="kanban-card-skeleton"
       className={cn(cardChrome, "shadow-sm")}
     >
+      {/* Same chrome as a real card, with --skeleton bars. */}
       <div className="min-w-0 flex-1 p-3">
         <Skeleton className="h-5 w-3/4" />
       </div>
@@ -738,11 +730,7 @@ function ActionZone({
   )
 }
 
-/**
- * Board-shaped placeholder for a route `loading` file. Columns use the same
- * chrome as a loaded board; each holds card-sized `--skeleton` placeholders
- * instead of a single gray block.
- */
+/** Board-shaped placeholder for a route `loading` file. */
 function KanbanSkeleton({
   columnCount = 4,
   className,
@@ -766,6 +754,7 @@ function KanbanSkeleton({
           data-slot="kanban-column"
           className={cn(columnChrome, columnSize, columnClassName)}
         >
+          {/* Loaded column chrome; card-sized --skeleton bars, not gray blocks. */}
           <div data-slot="kanban-column-header" className={columnHeader}>
             <Skeleton className="h-3 w-24" />
             <Skeleton className="ml-auto h-3 w-4" />

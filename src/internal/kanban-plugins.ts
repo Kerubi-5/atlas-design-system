@@ -51,31 +51,14 @@ function preventCardSensorActivation(event: PointerEvent) {
   )
 }
 
-/**
- * Pixels the mouse or pen must move before a press becomes a drag. A click
- * with no movement (or jitter under this) stays a click so `onCardClick`
- * fires. Playwright `dragTo` still moves far past this before drop.
- */
-const CARD_POINTER_DISTANCE = 5
-
-/**
- * Mouse and pen wait for `CARD_POINTER_DISTANCE` so a click still opens the
- * card. 1.3.1 started the drag on pointerdown, which set the source to
- * `pointer-events-none` and swallowed pointerup in capture, so the click
- * never reached the body. Touch waits 250ms so a finger can still scroll
- * the column.
- */
+/** Mouse/pen wait 5px so a click opens the card; touch waits 250ms to scroll. */
 function cardSensorActivationConstraints(event: PointerEvent) {
   if (event.pointerType === "touch") {
     return [
       new PointerActivationConstraints.Delay({ value: 250, tolerance: 5 }),
     ]
   }
-  return [
-    new PointerActivationConstraints.Distance({
-      value: CARD_POINTER_DISTANCE,
-    }),
-  ]
+  return [new PointerActivationConstraints.Distance({ value: 5 })]
 }
 
 const cardSensorOptions: PointerSensorOptions = {
@@ -83,13 +66,7 @@ const cardSensorOptions: PointerSensorOptions = {
   activationConstraints: cardSensorActivationConstraints,
 }
 
-/**
- * Droppable under the pointer, skipping the drag overlay. Distance
- * activation starts the drag on the first move past 5px; a single-step
- * Playwright `dragTo` then fires pointerup while that move is still being
- * applied, so dnd-kit's collisions still sit at the press coordinates.
- * `elementsFromPoint` sees the column or card the pointer actually covers.
- */
+/** Droppable under the pointer, skipping the drag overlay. */
 function droppableIdFromPoint(
   manager: DragDropManager,
   x: number,
@@ -111,11 +88,8 @@ function droppableIdFromPoint(
 }
 
 /**
- * Distance activation starts the drag on the first move past 5px. The
- * default PointerSensor binds pointerup on the document in capture, and
- * that listener would stop the drag at the press coordinates. Listen on
- * window in capture so we run first, drop on whatever is under the
- * pointer, then stop.
+ * Window-capture pointerup drops under the pointer before dnd-kit's
+ * document listener stops the drag at the press coordinates.
  */
 class CardPointerSensor extends PointerSensor {
   private unbindDrop: (() => void) | undefined

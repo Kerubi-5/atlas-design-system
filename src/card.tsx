@@ -10,8 +10,7 @@ import { cn } from "./utils.js"
  * tables can run edge to edge. `min-h-min shrink-0` keeps the card from
  * collapsing inside a bounded flex column. `min-w-0` lets nested tables
  * scroll instead of widening the card. Direct `img` children still clip to
- * the card box (including when the app rounds the card); other flush
- * children, such as a calendar hour label on the bottom edge, stay visible.
+ * the card box; other flush children stay visible.
  */
 function Card({
   className,
