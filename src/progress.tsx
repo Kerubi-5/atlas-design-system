@@ -33,7 +33,7 @@ function Progress({
       value={current}
       max={scale}
       className={cn(
-        "relative h-2 w-full overflow-hidden rounded-none bg-input",
+        "relative h-2 w-full overflow-hidden rounded-none bg-muted",
         className
       )}
       {...props}
