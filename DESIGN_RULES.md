@@ -41,9 +41,11 @@ is a breaking change:
 - Color tokens and their `--color-*` utilities: `background`, `foreground`,
   `card`, `popover`, `primary`, `secondary`, `muted`, `accent`, `selected`
   (each with its `-foreground` pair where one exists), `destructive`,
-  `success`, `warning`, `border`, `input`, `skeleton`, `ring`, `chart-1` to
-  `chart-5`, and the `sidebar` set.
-- `--radius` and the `--radius-*` scale, and `--font-heading`.
+  `success`, `warning`, `border`, `input`, `skeleton`, `ring`, `overlay`,
+  `chart-1` to `chart-5` (unused by kit components; same in both themes),
+  and the `sidebar` set.
+- `--radius` and the `--radius-*` scale, `--font-heading`, and
+  `--text-micro` (`text-micro`, 0.625rem).
 - Every `data-slot` listed under "Styling parts" in
   [COMPONENTS.md](./COMPONENTS.md#styling-parts).
 

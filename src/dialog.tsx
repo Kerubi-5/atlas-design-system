@@ -46,7 +46,7 @@ function DialogOverlay({
       data-slot="dialog-overlay"
       className={cn(
         overlayFade,
-        "fixed inset-0 isolate z-50 bg-black/20 supports-backdrop-filter:backdrop-blur-sm",
+        "fixed inset-0 isolate z-50 bg-overlay supports-backdrop-filter:backdrop-blur-sm",
         className
       )}
       {...props}
