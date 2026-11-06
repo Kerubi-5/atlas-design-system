@@ -13,7 +13,7 @@ const badgeVariants = cva(
     "group/badge inline-flex w-fit shrink-0 items-center justify-center gap-1.5 overflow-hidden rounded-none border-0 bg-transparent px-0 py-0",
     controlText,
     // Smaller than `controlText`'s `text-xs`; tailwind-merge keeps this one.
-    "text-[0.625rem] transition-colors has-data-[icon=inline-end]:pr-0 has-data-[icon=inline-start]:pl-0 [&>svg]:pointer-events-none [&>svg:not([class*='size-'])]:size-3",
+    "text-micro transition-colors has-data-[icon=inline-end]:pr-0 has-data-[icon=inline-start]:pl-0 [&>svg]:pointer-events-none [&>svg:not([class*='size-'])]:size-3",
   ],
   {
     variants: {

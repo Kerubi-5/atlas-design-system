@@ -45,7 +45,7 @@ describe("Dialog customization", () => {
 
     const overlay = document.querySelector("[data-slot=dialog-overlay]")!
     expect(overlay).toHaveClass("bg-black/60")
-    expect(overlay).not.toHaveClass("bg-black/20")
+    expect(overlay).not.toHaveClass("bg-overlay")
 
     const close = screen.getByRole("button", { name: "Close" })
     expect(close).toHaveAttribute("data-slot", "dialog-close-button")

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+Token cleanup. `--overlay` is a new scrim color; `--text-micro` is a new
+type size. No public props or exports change.
+
+- Dialog overlay uses `bg-overlay` instead of `bg-black/20`. Light is black
+  at 20%; dark is black at 50% so the scrim still reads on a dark page.
+- Badge, Calendar weekday and week-number labels, and Kanban column badges
+  share `text-micro` (0.625rem) instead of hardcoded `text-[10px]`,
+  `text-[0.625rem]`, and `text-[0.8rem]`.
+- Tabs quiet text uses `text-muted-foreground`; the dark override of the
+  same token is gone. Form-control hover and expanded fills drop leftover
+  `dark:` copies of `bg-background`.
+- `--chart-1` through `--chart-5` stay public and keep the same values in
+  both themes. Kit components do not use them.
+
 ## 1.3.2 - 2026-11-03
 
 Bug fixes. Apps only need to bump the package. No public props, exports or
