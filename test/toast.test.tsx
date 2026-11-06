@@ -79,7 +79,7 @@ describe("Toaster", () => {
     expect(item.querySelector("[data-icon]")).toBeNull()
     expect(item.className).toContain("w-max")
     expect(item.className).toContain("max-w-[min(356px,calc(100vw-2rem))]")
-    expect(item.className).toContain("max-[600px]:!w-full")
+    expect(item.className).not.toContain("!w-full")
     expect(item.className).toContain("rounded-none")
     expect(item.className).toContain("pl-4")
     expect(item.className).toContain("pr-10")
@@ -88,12 +88,17 @@ describe("Toaster", () => {
     expect(item.className).not.toContain("pr-11")
     expect(item.className).not.toContain("px-4")
     const close = within(item).getByRole("button", { name: "Close toast" })
-    // Popover-fill ! utilities beat Sonner's unlayered [data-button] /
-    // [data-close-button] foreground square; the badge sits on the corner.
-    expect(close.className).toContain("!bg-popover")
-    expect(close.className).toContain("!rounded-none")
-    expect(close.className).toContain("!top-2")
-    expect(close.className).toContain("!text-muted-foreground")
+    // Kit utilities, no `!`: Sonner's remaining unlayered close colors are
+    // beaten in theme.css with higher-specificity tokens.
+    expect(close.className).toContain("bg-popover")
+    expect(close.className).not.toContain("!bg-popover")
+    expect(close.className).toContain("rounded-none")
+    expect(close.className).toContain("top-2")
+    expect(close.className).not.toContain("!top-2")
+    expect(close.className).toContain("text-muted-foreground")
+    expect(
+      close.className.split(/\s+/).some((name) => name.startsWith("!"))
+    ).toBe(false)
     expect(close.className).not.toContain("bg-primary")
   })
 
