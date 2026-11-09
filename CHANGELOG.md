@@ -7,9 +7,11 @@ type size. No public props or exports change.
 
 - Dialog overlay uses `bg-overlay` instead of `bg-black/20`. Light is black
   at 20%; dark is black at 50% so the scrim still reads on a dark page.
-- Badge, Calendar weekday and week-number labels, and Kanban column badges
-  share `text-micro` (0.625rem) instead of hardcoded `text-[10px]`,
-  `text-[0.625rem]`, and `text-[0.8rem]`.
+- Badge and Kanban column badges share `text-micro` (0.625rem) instead of
+  hardcoded `text-[0.625rem]` and `text-[10px]`. `cn()` registers `micro`
+  as a font size so the class is not dropped as a color next to
+  `text-foreground`. Calendar weekday and week-number labels stay
+  `text-[0.8rem]` so the grid does not shrink.
 - Tabs quiet text uses `text-muted-foreground`; the dark override of the
   same token is gone. Form-control hover and expanded fills drop leftover
   `dark:` copies of `bg-background`.

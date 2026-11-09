@@ -1,6 +1,19 @@
 import type { ChangeEvent } from "react"
 import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { extendTailwindMerge } from "tailwind-merge"
+
+/**
+ * Default twMerge treats unknown `text-*` names as colors. `text-micro` would
+ * then lose to `text-foreground` and would not replace `text-xs`. Register
+ * it as a font size so Badge and Kanban keep the token.
+ */
+const twMerge = extendTailwindMerge({
+  extend: {
+    theme: {
+      text: ["micro"],
+    },
+  },
+})
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))

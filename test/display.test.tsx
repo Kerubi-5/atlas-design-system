@@ -21,6 +21,14 @@ import {
 import { render, screen } from "./helpers.js"
 
 describe("Badge", () => {
+  it("keeps text-micro over controlText's text-xs", () => {
+    render(<Badge>Default</Badge>)
+    const names = screen.getByText("Default").className.split(/\s+/)
+    expect(names).toContain("text-micro")
+    expect(names).not.toContain("text-xs")
+    expect(names).toContain("text-foreground")
+  })
+
   it("exposes variant and tone styling", () => {
     const { rerender } = render(<Badge>Default</Badge>)
     expect(screen.getByText("Default")).toHaveAttribute(
