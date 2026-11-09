@@ -125,33 +125,18 @@ const toast: Toast = Object.assign(show(sonnerToast), {
 })
 
 /**
- * Toasts drawn entirely with kit classes. Sonner's own styles are unlayered
- * CSS that Tailwind utilities cannot override, so the toaster runs Sonner
- * `unstyled` and styles every part here.
- *
- * Icon policy: a plain `toast()` has no icon. `success`, `info`, `warning`,
- * `error`, and `loading` each show a status icon. Tone colors the icon, title,
- * and border (`statusTone`, shared with Alert), not the body text.
- *
- * Close button: a 24px square inside the top-right corner. Important kit
- * utilities beat Sonner's unlayered close-button positioning and colors.
- *
- * Stacking: the toaster floats at `position`; collapsed back toasts are
- * `invisible`. Hovering or focusing expands it (see `Toaster`).
- *
- * Padding is asymmetric: `pl-4` matches Alert; `pr-10` clears the close
- * button. Icon-to-text is `gap-x-2.5`
- * so the status icon and copy read as one unit.
+ * Kit classes on Sonner `unstyled`. Mobile width, focus ring, and dark close
+ * colors live in unlayered `theme.css` so they beat Sonner without `!`.
+ * Plain `toast()` has no icon; status methods tone icon, title, and border.
+ * Close is a 24px square in the top-right. `pl-4` matches Alert; `pr-10`
+ * clears the close button; `gap-x-2.5` joins icon and copy.
  */
 const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   toast: cn(
     focusRing,
-    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] max-[600px]:!w-full flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md focus-visible:!shadow-[var(--tw-ring-offset-shadow),var(--tw-ring-shadow)] data-[visible=false]:invisible data-[expanded=false]:data-[front=false]:*:invisible"
+    "relative flex w-max max-w-[min(356px,calc(100vw-2rem))] flex-wrap items-center justify-end gap-x-2.5 gap-y-2 overflow-visible rounded-none border border-border bg-popover py-3 pl-4 pr-10 text-sm text-popover-foreground shadow-md data-[visible=false]:invisible data-[expanded=false]:data-[front=false]:*:invisible"
   ),
-  // Fills the row beside the icon, so action buttons wrap to their own row
-  // (aligned right by the toast's justify-end). Without an icon the basis
-  // falls back to the title's width, so a one-word toast stays compact.
-  // 1.625rem = 16px icon + 10px gap-x-2.5.
+  // 1.625rem = 16px icon + 10px gap-x-2.5, so actions wrap under title+icon.
   content:
     "flex min-w-0 flex-1 basis-full flex-col gap-1 [[data-icon]+&]:basis-[calc(100%-1.625rem)]",
   title: "font-medium leading-5 text-(--status-tone)",
@@ -164,7 +149,7 @@ const classNames: NonNullable<SonnerProps["toastOptions"]>["classNames"] = {
   ),
   closeButton: cn(
     buttonVariants({ variant: "ghost", size: "icon-xs" }),
-    "!absolute !top-2 !right-2 !left-auto !z-10 !size-6 !rounded-none !border !border-border !bg-popover !p-0 !text-muted-foreground !translate-x-0 !translate-y-0 hover:!border-border hover:!bg-popover hover:!text-foreground focus-visible:!text-foreground active:!translate-y-0 [&_svg]:!size-3"
+    "absolute top-2 right-2 left-auto z-10 size-6 rounded-none border border-border bg-popover p-0 text-muted-foreground translate-x-0 translate-y-0 hover:border-border hover:bg-popover hover:text-foreground focus-visible:text-foreground active:translate-y-0"
   ),
   success: statusTone.success,
   info: statusTone.neutral,

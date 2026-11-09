@@ -237,19 +237,19 @@
 @layer components {
   /*
    * Pagination that no longer fits its container drops pages in two steps,
-   * sized for 36px page links, 38px icon-only Previous / Next and a 4px gap
-   * (40px per item; `n` items fit in n x 40px). The first and last <li> are
-   * Previous and Next.
+   * sized for 36px page links (`size-9`), 38px icon-only Previous / Next and
+   * a `gap-1` (40px per item; n items fit in n * 2.5rem). The first and last
+   * <li> are Previous and Next. Quantity queries (`:has(~ li:nth-child(n))`)
+   * replace per-count copies: a longer list already collapsed at a wider
+   * breakpoint with the same hide.
    * 1. A list with an ellipsis keeps Previous, the first and last pages, the
    *    current page, the ellipses and Next (plus a lone page between the
    *    first or last page and the current one), so every gap is still marked.
    * 2. Narrower still, or for a list without an ellipsis, only Previous, the
    *    current page and Next stay. The list also wraps rather than spill.
    */
-  @container pagination (width < 10rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(4)):not(:has(> li:nth-child(5)))
+  [data-slot="pagination-content"]:has([aria-current="page"]) {
+    &:has([data-slot="pagination-ellipsis"])
       > li:not(
         :first-child,
         :last-child,
@@ -263,277 +263,99 @@
         :has([aria-current="page"])
           + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
       ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(4)):not(:has(> li:nth-child(5)))
+    &:not(:has([data-slot="pagination-ellipsis"]))
       > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
+      &:has(~ li:nth-child(4)),
+      &:nth-child(n + 4) {
+        @container pagination (width < 10rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(5)),
+      &:nth-child(n + 5) {
+        @container pagination (width < 12.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(6)),
+      &:nth-child(n + 6) {
+        @container pagination (width < 15rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(7)),
+      &:nth-child(n + 7) {
+        @container pagination (width < 17.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(8)),
+      &:nth-child(n + 8) {
+        @container pagination (width < 20rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(9)),
+      &:nth-child(n + 9) {
+        @container pagination (width < 22.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(10)),
+      &:nth-child(n + 10) {
+        @container pagination (width < 25rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(11)),
+      &:nth-child(n + 11) {
+        @container pagination (width < 27.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(12)),
+      &:nth-child(n + 12) {
+        @container pagination (width < 30rem) {
+          display: none;
+        }
+      }
+    }
+
+    &:has([data-slot="pagination-ellipsis"])
+      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
+      &:has(~ li:nth-child(4)),
+      &:nth-child(n + 4) {
+        @container pagination (width < 7.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(5)),
+      &:nth-child(n + 5) {
+        @container pagination (width < 10rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(6)),
+      &:nth-child(n + 6) {
+        @container pagination (width < 12.5rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(7)),
+      &:nth-child(n + 7) {
+        @container pagination (width < 15rem) {
+          display: none;
+        }
+      }
+      &:has(~ li:nth-child(8)),
+      &:nth-child(n + 8) {
+        @container pagination (width < 17.5rem) {
+          display: none;
+        }
+      }
     }
   }
-  @container pagination (width < 7.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(4)):not(:has(> li:nth-child(5)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 12.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(5)):not(:has(> li:nth-child(6)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(5)):not(:has(> li:nth-child(6)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 10rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(5)):not(:has(> li:nth-child(6)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 15rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(6)):not(:has(> li:nth-child(7)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(6)):not(:has(> li:nth-child(7)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 12.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(6)):not(:has(> li:nth-child(7)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(7)):not(:has(> li:nth-child(8)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(7)):not(:has(> li:nth-child(8)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 15rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(7)):not(:has(> li:nth-child(8)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 20rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(8)):not(:has(> li:nth-child(9)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(8)):not(:has(> li:nth-child(9)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(8)):not(:has(> li:nth-child(9)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 22.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(9)):not(:has(> li:nth-child(10)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(9)):not(:has(> li:nth-child(10)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(9)):not(:has(> li:nth-child(10)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 25rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(10)):not(:has(> li:nth-child(11)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(10)):not(:has(> li:nth-child(11)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(10)):not(:has(> li:nth-child(11)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 27.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(11)):not(:has(> li:nth-child(12)))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(11)):not(:has(> li:nth-child(12)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(11)):not(:has(> li:nth-child(12)))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 30rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(12))
-      > li:not(
-        :first-child,
-        :last-child,
-        :nth-child(2),
-        :nth-last-child(2),
-        :has([aria-current="page"]),
-        :has([data-slot="pagination-ellipsis"]),
-        :nth-child(3):not(:has([data-slot="pagination-ellipsis"]) + li):has(
-            + li [aria-current="page"]
-          ),
-        :has([aria-current="page"])
-          + :nth-last-child(3):not(:has(+ li [data-slot="pagination-ellipsis"]))
-      ),
-    [data-slot="pagination-content"]:has([aria-current="page"]):not(
-        :has([data-slot="pagination-ellipsis"])
-      ):has(> li:nth-child(12))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
-  @container pagination (width < 17.5rem) {
-    [data-slot="pagination-content"]:has([aria-current="page"]):has(
-        [data-slot="pagination-ellipsis"]
-      ):has(> li:nth-child(12))
-      > li:not(:first-child, :last-child, :has([aria-current="page"])) {
-      display: none;
-    }
-  }
+
   [data-slot="card"] {
     padding-block: var(--card-p);
   }
@@ -617,4 +439,38 @@
   [data-slot="tabs-scroller"][data-variant="line"] {
     --tabs-scroll-fade: var(--background);
   }
+}
+
+/*
+ * Sonner injects unlayered CSS (mobile toast width, :focus-visible
+ * box-shadow, dark close-button colors) that beats Tailwind's utilities
+ * layer. These rules stay unlayered and use extra attributes so they win
+ * without `!`. Tokens match the kit toast classes.
+ */
+[data-slot="toaster"] [data-sonner-toast]:focus-visible {
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow);
+}
+
+@media (max-width: 600px) {
+  [data-slot="toaster"] [data-sonner-toaster] [data-sonner-toast] {
+    width: 100%;
+  }
+}
+
+[data-slot="toaster"]
+  [data-sonner-toaster][data-sonner-theme="dark"]
+  [data-sonner-toast]
+  [data-close-button] {
+  background-color: var(--color-popover);
+  border-color: var(--color-border);
+  color: var(--color-muted-foreground);
+}
+
+[data-slot="toaster"]
+  [data-sonner-toaster][data-sonner-theme="dark"]
+  [data-sonner-toast]
+  [data-close-button]:is(:hover, :focus-visible) {
+  background-color: var(--color-popover);
+  border-color: var(--color-border);
+  color: var(--color-foreground);
 }
