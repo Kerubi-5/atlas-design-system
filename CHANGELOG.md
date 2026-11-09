@@ -23,6 +23,10 @@ type size. No public props or exports change.
   `rounded-none` so its corners match `Progress` and `Slider`. Filled
   ranges stay as they are (`bg-primary` on Progress; `fillClassName` on
   Meter).
+- `Skeleton` uses `rounded-none` so placeholders match square Card,
+  Input, Button, Progress, and Meter corners (DESIGN_RULES: primitives
+  have square corners). Apps can still pass `rounded-full` for dots or
+  progress-bar stand-ins. Fill stays `--skeleton` (light gray).
 - Pagination collapse CSS is a shorter container-query block (`size-9` page
   links, `gap-1`, 2.5rem per item) instead of a copy per list length. Which
   pages drop at which width is unchanged.
