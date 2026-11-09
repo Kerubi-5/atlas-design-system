@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.3.3 - 2026-11-10
 
 Token cleanup. `--overlay` is a new scrim color; `--text-micro` is a new
 type size. No public props or exports change.
