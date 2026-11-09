@@ -53,4 +53,15 @@ describe("Meter", () => {
     const fill = meter.querySelector<HTMLElement>("[data-slot=meter-fill]")!
     expect(fill.style.width).toBe("0%")
   })
+
+  it("uses a muted square track like Slider", () => {
+    render(<Meter value={40} max={100} aria-label="Spend" />)
+    const meter = screen.getByRole("meter", { name: "Spend" })
+    expect(meter).toHaveClass("bg-muted")
+    expect(meter).not.toHaveClass("bg-input")
+    expect(meter).toHaveClass("rounded-none")
+    expect(meter.querySelector("[data-slot=meter-fill]")).toHaveClass(
+      "bg-primary"
+    )
+  })
 })

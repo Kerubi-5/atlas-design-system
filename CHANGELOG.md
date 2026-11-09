@@ -17,6 +17,12 @@ type size. No public props or exports change.
   `dark:` copies of `bg-background`.
 - `--chart-1` through `--chart-5` stay public and keep the same values in
   both themes. Kit components do not use them.
+- `Progress` and `Meter`: unfilled tracks use `bg-muted` instead of
+  `bg-input`, matching `Slider`. The input token is the 3:1 control
+  boundary and read as a dark trough on cards. `Meter` also uses
+  `rounded-none` so its corners match `Progress` and `Slider`. Filled
+  ranges stay as they are (`bg-primary` on Progress; `fillClassName` on
+  Meter).
 - Pagination collapse CSS is a shorter container-query block (`size-9` page
   links, `gap-1`, 2.5rem per item) instead of a copy per list length. Which
   pages drop at which width is unchanged.

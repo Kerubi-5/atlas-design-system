@@ -29,4 +29,13 @@ describe("Progress range", () => {
     expect(bar).toHaveAttribute("data-state", "indeterminate")
     expect(indicator(bar).style.transform).toBe("translateX(-100%)")
   })
+
+  it("uses a muted square track like Slider", () => {
+    render(<Progress value={40} aria-label="Upload" />)
+    const bar = screen.getByRole("progressbar", { name: "Upload" })
+    expect(bar).toHaveClass("bg-muted")
+    expect(bar).not.toHaveClass("bg-input")
+    expect(bar).toHaveClass("rounded-none")
+    expect(indicator(bar)).toHaveClass("bg-primary")
+  })
 })
