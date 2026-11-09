@@ -24,9 +24,13 @@ import {
 
 describe("form-control trigger chrome", () => {
   it("shares Input-matching tokens across DatePicker, DateTimePicker, Combobox, and Select", () => {
+    const triggerClasses = formControlTriggerClassName.split(/\s+/)
     for (const token of formControlTriggerTokens) {
-      expect(formControlTriggerClassName.split(/\s+/)).toContain(token)
+      expect(triggerClasses).toContain(token)
     }
+    expect(triggerClasses).toContain("hover:bg-background")
+    expect(triggerClasses).not.toContain("dark:hover:bg-background")
+    expect(triggerClasses).not.toContain("dark:aria-expanded:bg-background")
 
     render(<FormControlTriggersStory />)
 

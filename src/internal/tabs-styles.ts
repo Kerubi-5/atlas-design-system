@@ -77,9 +77,9 @@ const tabsTriggerVariants = cva([
   // longest (e.g. Apple Reminders) look tighter. No last-child padding.
   // py-0: h-full already fills the h-7 row. py-1.5 plus the 16px line
   // and 1px border needed ~32px, so the 28px list overflowed on y.
-  'relative inline-flex h-full min-w-max flex-none items-center justify-center gap-2 border border-transparent px-4 py-0 text-xs font-semibold tracking-wider whitespace-nowrap text-foreground/60 uppercase transition-all group-data-[orientation="vertical"]/tabs:w-full group-data-[orientation="vertical"]/tabs:justify-start group-data-[orientation="vertical"]/tabs:px-4 group-data-[orientation="vertical"]/tabs:py-2 hover:text-foreground has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5 dark:text-muted-foreground dark:hover:text-foreground',
+  'relative inline-flex h-full min-w-max flex-none items-center justify-center gap-2 border border-transparent px-4 py-0 text-xs font-semibold tracking-wider whitespace-nowrap text-muted-foreground uppercase transition-all group-data-[orientation="vertical"]/tabs:w-full group-data-[orientation="vertical"]/tabs:justify-start group-data-[orientation="vertical"]/tabs:px-4 group-data-[orientation="vertical"]/tabs:py-2 hover:text-foreground has-data-[icon=inline-end]:pr-2.5 has-data-[icon=inline-start]:pl-2.5',
   inlineIcon.default,
-  'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:border-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:bg-transparent dark:group-data-[variant=line]/tabs-list:data-[state="active"]:bg-transparent',
+  'group-data-[variant=line]/tabs-list:bg-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:border-transparent group-data-[variant=line]/tabs-list:data-[state="active"]:bg-transparent',
   selectedState.active,
   // The line-variant bar stays inside the trigger. Hanging it at
   // bottom-[-5px] made the 28px list's scrollHeight 32 even with py-0.

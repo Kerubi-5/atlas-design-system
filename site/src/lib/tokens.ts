@@ -61,7 +61,7 @@ function isRadiusVar(name: string) {
 }
 
 function isTypeVar(name: string) {
-  return name.startsWith("--font-")
+  return name.startsWith("--font-") || name.startsWith("--text-")
 }
 
 /**

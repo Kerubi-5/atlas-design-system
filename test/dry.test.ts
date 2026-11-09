@@ -136,6 +136,13 @@ describe("shared state classes", () => {
     })
   }
 
+  it("no component uses hardcoded micro font sizes", () => {
+    const offenders = components
+      .filter(([, source]) => /text-\[(?:10px|0\.625rem)\]/.test(source))
+      .map(([file]) => file)
+    expect(offenders).toEqual([])
+  })
+
   it("no module but internal/math retypes clamp", () => {
     const offenders = sources
       .filter(

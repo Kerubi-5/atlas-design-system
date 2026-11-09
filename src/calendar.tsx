@@ -178,6 +178,8 @@ function Calendar({
         month_grid: cn("w-full border-collapse", defaultClassNames.month_grid),
         weekdays: cn("flex", defaultClassNames.weekdays),
         weekday: cn(
+          // 0.8rem, not `text-micro`: chips are 0.625rem, weekday labels
+          // need the larger size so the grid does not compress.
           "flex-1 rounded-(--cell-radius) text-[0.8rem] font-normal text-muted-foreground select-none",
           defaultClassNames.weekday
         ),

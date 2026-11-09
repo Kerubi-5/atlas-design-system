@@ -129,8 +129,8 @@ export const controlSize = {
 
 /**
  * Label text of a control (Button, Toggle, Badge): small, bold, wide-tracked
- * uppercase on one line. Badge adds its own `text-[0.625rem]` after it;
- * tailwind-merge then drops the `text-xs`.
+ * uppercase on one line. Badge adds `text-micro` after it; tailwind-merge
+ * then drops the `text-xs`.
  */
 export const controlText =
   "text-xs font-semibold tracking-widest whitespace-nowrap uppercase"

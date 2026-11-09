@@ -422,7 +422,7 @@ function KanbanColumnView({
         <span className="ml-auto flex max-w-full min-w-0 flex-col items-end gap-0.5 text-muted-foreground tabular-nums">
           <span className="text-xs">{count}</span>
           {column.badge ? (
-            <span className="max-w-full truncate text-[10px] font-medium">
+            <span className="max-w-full truncate text-micro font-medium">
               {column.badge}
             </span>
           ) : null}

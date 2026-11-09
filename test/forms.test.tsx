@@ -119,6 +119,16 @@ describe("portable forms", () => {
     })({ target: { value: "Changed" } } as React.ChangeEvent<HTMLInputElement>)
     expect(value).toBe("Changed")
   })
+
+  it("keeps text-micro as a font size next to semantic text colors", () => {
+    expect(cn("text-xs", "text-micro")).toBe("text-micro")
+    expect(cn("text-micro", "text-foreground")).toBe(
+      "text-micro text-foreground"
+    )
+    expect(cn("text-micro", "text-muted-foreground")).toBe(
+      "text-micro text-muted-foreground"
+    )
+  })
 })
 
 /**
