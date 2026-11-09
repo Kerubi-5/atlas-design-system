@@ -17,6 +17,11 @@ type size. No public props or exports change.
   `dark:` copies of `bg-background`.
 - `--chart-1` through `--chart-5` stay public and keep the same values in
   both themes. Kit components do not use them.
+- Pagination collapse CSS is a shorter container-query block (`size-9` page
+  links, `gap-1`, 2.5rem per item) instead of a copy per list length. Which
+  pages drop at which width is unchanged.
+- Toast close, mobile width, and keyboard focus no longer use `!important`.
+  Unlayered theme rules with kit tokens beat Sonner's injected CSS.
 
 ## 1.3.2 - 2026-11-03
 
