@@ -36,6 +36,10 @@ const meta = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/**
+ * Canvas snapshots of a toast already on screen. Tagged `!autodocs` so the
+ * docs page does not raise toasts until the user clicks a trigger.
+ */
 const preview: Pick<Story, "tags" | "parameters"> = {
   tags: ["!autodocs"],
   parameters: { controls: { disable: true }, toaster: false },
@@ -47,9 +51,8 @@ export const Composition: Story = {
 }
 /** Default, success, info, warning, and error toasts, kept open. */
 export const Types: Story = {
+  ...preview,
   render: () => <ToastTypesStory />,
-  // The story mounts its own expanded Toaster instead of the global one.
-  parameters: { controls: { disable: true }, toaster: false },
 }
 
 export const Plain: Story = {
