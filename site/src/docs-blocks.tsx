@@ -51,6 +51,42 @@ function MarkdownPre(props: ComponentProps<"pre">) {
   return <pre tabIndex={0} {...props} />
 }
 
+function childText(children: unknown): string {
+  if (children == null || typeof children === "boolean") return ""
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children)
+  }
+  if (Array.isArray(children)) return children.map(childText).join("")
+  return ""
+}
+
+/**
+ * Shared heading and in-guide link renderer. A stable `<a id>` fragment in
+ * the markdown (used so a renamed heading does not break links) is a target,
+ * not a link, so it renders as a span that keeps the id. Any other link with
+ * no readable text gets a name from its id or href.
+ */
+function DocsAnchor(props: ComponentProps<"a">) {
+  const { children, id, href, "aria-label": ariaLabel } = props
+  const hasName =
+    Boolean(ariaLabel?.trim()) || Boolean(childText(children).trim())
+  if (!href && !hasName && id) {
+    return <span id={id} />
+  }
+  const namedLabel =
+    ariaLabel ??
+    (!hasName
+      ? (id || href?.replace(/^#/, "") || "").replace(/-/g, " ") || undefined
+      : undefined)
+  // AnchorMdx's public type is narrower than the ordinary <a> props
+  // markdown-to-jsx passes through (including id).
+  const next = {
+    ...props,
+    ...(namedLabel ? { "aria-label": namedLabel } : {}),
+  } as ComponentProps<typeof AnchorMdx>
+  return <AnchorMdx {...next} />
+}
+
 /**
  * Storybook's Markdown block with wide tables and code kept inside their own
  * scroll containers. Its `options` replace Storybook's default overrides, so
@@ -63,7 +99,7 @@ export function DocsMarkdown({ children }: { children: string }) {
         options={{
           overrides: {
             code: CodeOrSourceMdx,
-            a: AnchorMdx,
+            a: DocsAnchor,
             ...HeadersMdx,
             table: MarkdownTable,
             pre: MarkdownPre,
