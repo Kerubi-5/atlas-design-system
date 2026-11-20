@@ -14,7 +14,7 @@ scratch. Its Base UI catalog includes input groups, number fields, OTP fields,
 drawers, and segmented controls. COSS is a separate library; its components
 are not Atlas exports.
 
-## Optional peer dependencies
+## Optional peer dependencies <a id="optional-peer-dependencies"></a>
 
 Core entries need only the kit. These feature entries need an extra install
 (same version ranges as the kit's optional peers). `Toaster` also reads the
@@ -109,7 +109,7 @@ change: `accordion`, `avatar`, `breadcrumb`, `chart`, `dropdown-menu`,
 `kanban`, `nav-link`, `page-header`, `pagination`, `period-stepper`,
 `radio-group`, `skip-link`, `spinner`, `switch`.
 
-## Styling parts
+## Styling parts <a id="styling-parts"></a>
 
 Every component takes `className` for its root and passes other HTML props
 through to it. Where a part sits inside a component, a prop names it, and
@@ -142,7 +142,7 @@ each part carries a `data-slot` for parent selectors such as
 | `RadioGroupItem`                                   |                                                                                                                                                                                                                                                                                 | `radio-group-dot`                                                                                                                                                                                                                                 |
 | `EmptyPanel`, `ErrorFallback`, `TableBodySkeleton` | `className`                                                                                                                                                                                                                                                                     | `empty-panel`, `error-boundary`                                                                                                                                                                                                                   |
 
-## Forms
+## Forms <a id="forms"></a>
 
 `TextFieldApi` is a structural interface, with no form library dependency:
 

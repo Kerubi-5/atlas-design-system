@@ -122,7 +122,7 @@ enforce this direction and reject import cycles.
   API they describe changes. The skill sends agents to these files, so a
   stale sentence there becomes wrong code in apps.
 
-## Versions and releases
+## Versions and releases <a id="versions-and-releases"></a>
 
 The package follows semantic versioning.
 
