@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      # Shared Markdown checks (links, anchors, repeated text), pinned like ai-harness's .doc-checks-version.
+      - uses: Kerubi-5/doc-checks@ad5c11816c691bbd23db7426f9538dd223335c18
       - uses: actions/setup-node@v4
         with:
           node-version: "24"
